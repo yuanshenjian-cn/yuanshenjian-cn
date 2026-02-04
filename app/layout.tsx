@@ -9,11 +9,15 @@ import { BackToTop } from "@/components/back-to-top";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap", // 使用 swap 策略，避免字体加载阻塞渲染
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
+  display: "swap", // 使用 swap 策略
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -23,6 +27,11 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/favicon.ico",
+  },
+  // 添加性能优化相关的 meta 标签
+  other: {
+    "theme-color": "#000000",
+    "color-scheme": "dark light",
   },
 };
 

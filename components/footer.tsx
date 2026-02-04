@@ -24,7 +24,7 @@ export function Footer() {
           </div>
           <div className="w-12 h-12 bg-background rounded border p-1 flex-shrink-0">
             <Image
-              src="/images/resume/ysj-qrcode.jpg"
+              src="/images/resume/ysj-qrcode.webp"
               alt="微信公众号"
               width={48}
               height={48}
