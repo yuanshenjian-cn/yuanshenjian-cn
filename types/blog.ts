@@ -7,6 +7,7 @@ export interface Post {
   tags: string[];
   published: boolean;
   readingTime?: number;
+  category?: string;
 }
 
 export interface PostMetadata {
