@@ -18,7 +18,7 @@ export async function Header() {
           href="/"
           className="text-lg font-medium tracking-tight hover:opacity-70 transition-opacity"
         >
-          博客
+          YSJ
         </Link>
 
         <HeaderClient navItems={navItems} posts={posts} />
