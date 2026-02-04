@@ -18,7 +18,7 @@ export function ResumeEducation() {
           <div className="flex items-center gap-6 flex-wrap">
             <div className="w-16 h-16 rounded-full bg-background shadow-sm flex items-center justify-center overflow-hidden flex-shrink-0">
               <Image
-                src="/images/resume/changan-university-logo.png"
+                src="/images/resume/changan-university-logo.webp"
                 alt="长安大学校徽"
                 width={64}
                 height={64}

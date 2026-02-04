@@ -14,7 +14,7 @@ export function ResumeHero() {
       <div className="relative z-10 max-w-3xl mx-auto px-6 py-24 text-center">
         <div className="w-36 h-36 mx-auto mb-8 bg-background rounded-full flex items-center justify-center shadow-xl border-4 border-background/50 overflow-hidden">
           <Image
-            src="/images/resume/ysj-avator.jpg"
+            src="/images/resume/ysj-avator.webp"
             alt="袁慎建"
             width={150}
             height={150}

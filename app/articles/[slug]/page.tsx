@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { getPostBySlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
 import { MDXContent, extractHeadings } from "@/lib/mdx";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
-import { TableOfContents } from "@/components/table-of-contents";
-import { PostNavigation } from "@/components/post-navigation";
 import Script from "next/script";
+
+const TableOfContents = lazy(() => import("@/components/table-of-contents").then((mod) => ({ default: mod.TableOfContents })));
+const PostNavigation = lazy(() => import("@/components/post-navigation").then((mod) => ({ default: mod.PostNavigation })));
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -116,7 +117,9 @@ export default async function PostPage({ params }: Props) {
               </div>
 
               <div className="mt-12 pt-8 border-t">
-                <PostNavigation prev={prev} next={next} />
+                <Suspense fallback={<div className="h-16 bg-muted rounded animate-pulse"></div>}>
+                  <PostNavigation prev={prev} next={next} />
+                </Suspense>
               </div>
             </div>
 
@@ -127,7 +130,9 @@ export default async function PostPage({ params }: Props) {
                     <h3 className="text-sm font-medium mb-3 text-muted-foreground">
                       目录
                     </h3>
-                    <TableOfContents headings={headings} />
+                    <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse"></div>}>
+                      <TableOfContents headings={headings} />
+                    </Suspense>
                   </div>
                 )}
               </div>

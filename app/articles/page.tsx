@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getAllPosts, getAllTags } from "@/lib/blog";
 import { BlogList } from "@/components/blog-list";
 
-export const dynamic = "force-static";
+export const dynamicParams = true;
 
 export const metadata: Metadata = {
   title: "文章 | 袁慎建",
@@ -10,15 +10,9 @@ export const metadata: Metadata = {
 };
 
 
-export default async function ArticlesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
+export default async function ArticlesPage() {
   const posts = getAllPosts();
   const tags = getAllTags();
-  const params = await searchParams;
-  const initialTag = typeof params.tag === "string" ? params.tag : null;
 
   return (
     <main className="py-12 px-4">
@@ -29,7 +23,7 @@ export default async function ArticlesPage({
             共 {posts.length} 篇文章 · {tags.length} 个标签
           </p>
         </div>
-        <BlogList posts={posts} tags={tags} initialTag={initialTag} />
+        <BlogList posts={posts} tags={tags} initialTag={null} />
       </div>
     </main>
   );
