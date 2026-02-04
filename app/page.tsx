@@ -26,7 +26,7 @@ export default function Home() {
             个人博客
           </h1>
           <p className="text-lg md:text-xl text-foreground/80 mb-10 max-w-xl mx-auto">
-            分享技术见解、生活感悟与创意想法
+            分享技术、生活感悟与想法
           </p>
           <div className="flex gap-4 justify-center">
             <Link
