@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getAllPosts, getAllTags } from "@/lib/blog";
 import { BlogList } from "@/components/blog-list";
 
 export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+  title: "文章 | 袁慎建",
+  description: "分享技术知识、生活感悟与个人想法",
+};
+
 
 export default async function BlogPage({
   searchParams,

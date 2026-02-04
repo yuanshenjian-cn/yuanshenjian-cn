@@ -65,7 +65,7 @@ function parsePostFile(filePath: string): Post {
     slug,
     title: data.title || slug,
     date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
-    excerpt: data.excerpt || data.desc || data.brief || content.slice(0, 200).replace(/[#*_`]/g, "") + "...",
+    excerpt: data.brief || content.slice(0, 200).replace(/[#*_]/g, "") + "...",
     content,
     tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []),
     published: data.published !== false,

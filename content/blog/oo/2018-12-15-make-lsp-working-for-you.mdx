@@ -1,27 +1,8 @@
 ---
 title: 让里氏替换原则为你效力
 date: '2018-12-15'
-excerpt: >-
-  面向对象的基石
-
-  从事软件开发的朋友或多或少都听过以下一些原则：比如KiSS、DRY、LKP、COC、DbC、SoC、HP、SOLID等。这些原则已经在业界被证实了自身的价值，尤其当谈到面向对象设计的时候，SOLID则是一个避不开的主题。
-
-
-  作为面向对象的基本原则，SOLID本身就是一个明显的招牌 - 坚固的磐石，撑起了面向对象设计大厦。
-
-
-  SOLID由五大原则构成：
-
-
-  Single Responsibility Principle【单一职责原则】
-
-  Open Close Principle【开闭原则】
-
-  Liskov Substitution Principle【里氏替换原则】
-
-  Interface Segregation Principle【接口隔离原则】
-
-  Dependency Inversion Princi...
+brief: >-
+  SOLID是面向对象设计的五大原则，LSP（里氏替换原则）强调子类实例替换父类实例不会改变程序行为。Square继承Rectangle的例子展示了LSP被破坏的场景——当Square重写setWidth和setHeight改变行为时，替换会导致程序出错。继承的核心目的是复用，但子类不应重写父类方法。可以用Is-A初步验证继承关系，当LSP失效时需要进一步抽象，将Square和Rectangle抽象为Quads，避免破坏LSP。LSP是检验继承关系合理性的有效工具，帮助减少继承滥用，提升软件设计质量。
 tags:
   - ood
   - object-oriented design

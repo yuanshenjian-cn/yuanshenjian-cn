@@ -1,16 +1,8 @@
 ---
 title: QA in Production
 date: '2020-09-23'
-excerpt: >-
-  Gathering operational data about a system is common practice, particularly
-  metrics that indicate system load and performance such as CPU and memory
-  usage. This data has been used for years to help teams who support a system
-  learn when an outage is happening or imminent. When things become slow, a code
-  profiler might be enabled in order to determine which part of the system is
-  causing a bottleneck, for example a slow-running database query.
-
-
-  收集系统相关的生产数据是常见的做法，尤其是那那些指示系统负载和性能（例如CPU和内存使用情况）的指标。多年来，这些数据一直用于帮助系统运维团队了解系统何时发生或即将发生停机。
+brief: >-
+  本文翻译自Rouan Wilsenach的文章。生产环境总会出错，但这不一定是坏事——这是了解系统的好机会。"生产环境中的QA"是指团队密切关注生产环境中系统的行为，以便提高系统功能的整体质量。收集生产数据的关键成功指标是那些能支付账单的事情。关键技术包括：Logging（日志记录，提供可搜索的实时数据）、Metrics（指标统计，聚合系统事件和数据）、APIs（从现有工具API获取数据）。通过建立自动化修复系统、设置关键成功指标警报，团队可以更深入地了解系统面临的实际问题，并学习提高质量的新方法。
 tags:
   - agile
   - agile-testing

@@ -17,8 +17,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "个人博客 | Personal Blog",
-  description: "A beautiful personal blog built with Next.js",
+  title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
+  description: "分享技术知识、生活感悟与个人想法",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
