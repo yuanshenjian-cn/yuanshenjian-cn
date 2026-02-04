@@ -23,10 +23,10 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 max-w-3xl mx-auto px-4 text-center py-20">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium mb-6 text-foreground drop-shadow-sm">
-            个人博客
+            你好
           </h1>
           <p className="text-lg md:text-xl text-foreground/80 mb-10 max-w-xl mx-auto">
-            分享技术、生活感悟与想法
+            分享技术知识、生活感悟与个人想法
           </p>
           <div className="flex gap-4 justify-center">
             <Link
