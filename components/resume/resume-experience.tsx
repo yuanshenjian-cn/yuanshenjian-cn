@@ -1,3 +1,5 @@
+import { ScrollAnimation } from "./scroll-animation";
+
 export function ResumeExperience() {
   const experiences = [
     {
@@ -37,54 +39,57 @@ export function ResumeExperience() {
   ];
 
   return (
-    <section id="experience" className="py-16 px-6 max-w-4xl mx-auto animate-fade-in">
-      <h2
-        className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
-        style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-      >
-        经历概览
-      </h2>
+    <section id="experience" className="py-16 px-6 max-w-4xl mx-auto">
+      <ScrollAnimation>
+        <h2
+          className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
+          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
+        >
+          经历概览
+        </h2>
+      </ScrollAnimation>
 
-      <div className="bg-card rounded-2xl p-8 shadow-sm border">
-        <div className="relative pl-8">
-          <div className="absolute left-[11px] top-0 bottom-0 w-0.5 rounded-full bg-primary/50" />
+      <ScrollAnimation>
+        <div className="bg-card rounded-2xl p-8 shadow-sm border">
+          <div className="relative pl-8">
+            <div className="absolute left-[11px] top-0 bottom-0 w-0.5 rounded-full bg-primary/50" />
 
-          {experiences.map((exp, index) => (
-            <div
-              key={index}
-              className="relative pb-10 pl-8 last:pb-0"
-            >
-              <div className="absolute left-[-26px] top-5 w-3 h-3 rounded-full bg-primary shadow-sm border-2 border-background" />
+            {experiences.map((exp, index) => (
+              <ScrollAnimation key={index}>
+                <div className="relative pb-10 pl-8 last:pb-0">
+                  <div className="absolute left-[-26px] top-5 w-3 h-3 rounded-full bg-primary shadow-sm border-2 border-background" />
 
-              <p className="text-primary font-medium text-sm mb-2">
-                {exp.period}
-              </p>
-              <h3 className="text-foreground text-lg font-medium mb-3">
-                {exp.title}
-              </h3>
+                  <p className="text-primary font-medium text-sm mb-2">
+                    {exp.period}
+                  </p>
+                  <h3 className="text-foreground text-lg font-medium mb-3">
+                    {exp.title}
+                  </h3>
 
-              {exp.description && (
-                <div className="text-muted-foreground text-sm leading-relaxed">
-                  <p>{exp.description}</p>
+                  {exp.description && (
+                    <div className="text-muted-foreground text-sm leading-relaxed">
+                      <p>{exp.description}</p>
+                    </div>
+                  )}
+
+                  {exp.list && (
+                    <ul className="text-muted-foreground text-sm leading-relaxed space-y-2">
+                      {exp.list.map((item, i) => (
+                        <li key={i} className="relative pl-5">
+                          <span className="absolute left-0 text-primary font-medium">
+                            ▸
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              )}
-
-              {exp.list && (
-                <ul className="text-muted-foreground text-sm leading-relaxed space-y-2">
-                  {exp.list.map((item, i) => (
-                    <li key={i} className="relative pl-5">
-                      <span className="absolute left-0 text-primary font-medium">
-                        ▸
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
+              </ScrollAnimation>
+            ))}
+          </div>
         </div>
-      </div>
+      </ScrollAnimation>
     </section>
   );
 }
