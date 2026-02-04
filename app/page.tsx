@@ -37,7 +37,7 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/about"
+              href="/resume"
               className="inline-flex items-center px-6 py-3 bg-background/80 backdrop-blur-sm border border-foreground/20 rounded-md hover:bg-background transition-colors font-medium"
             >
               关于我

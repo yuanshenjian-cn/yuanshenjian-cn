@@ -12,7 +12,7 @@ export default function AboutPage() {
         <div className="mb-12 text-center">
           <h1 className="text-2xl font-medium mb-4">关于我</h1>
           <p className="text-muted-foreground">
-            程序员
+            袁慎建
           </p>
         </div>
 
@@ -20,9 +20,9 @@ export default function AboutPage() {
           <section>
             <h2 className="text-lg font-medium mb-3">简介</h2>
             <div className="text-sm text-muted-foreground space-y-2">
-              <p><span className="text-foreground">姓名：</span>袁慎建 | YUAN SHENJIAN</p>
+              <p><span className="text-foreground">姓名：</span>袁慎建</p>
               <p><span className="text-foreground">职业：</span>程序员</p>
-              <p><span className="text-foreground">领域：</span>软件研发</p>
+              <p><span className="text-foreground">领域：</span>软件开发</p>
               <p><span className="text-foreground">兴趣：</span>运动健身、投资理财</p>
             </div>
           </section>
