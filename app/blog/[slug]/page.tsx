@@ -84,7 +84,9 @@ export default async function PostPage({ params }: Props) {
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    {new Date(post.date).toLocaleDateString("zh-CN")}
+                    <time dateTime={post.date}>
+                      {new Date(post.date).toLocaleDateString("zh-CN")}
+                    </time>
                   </span>
                   <span>·</span>
                   <span className="flex items-center gap-1">

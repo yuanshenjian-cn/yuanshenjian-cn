@@ -6,6 +6,7 @@ const navItems = [
   { href: "/", label: "首页" },
   { href: "/blog", label: "博客" },
   { href: "/about", label: "关于" },
+  { href: "/resume", label: "简历" },
 ];
 
 export async function Header() {

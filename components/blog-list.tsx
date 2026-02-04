@@ -65,13 +65,15 @@ export function BlogList({ posts, tags, initialTag }: BlogListProps) {
           </div>
         ) : (
           filteredPosts.map((post) => (
-            <article key={post.slug}>
-              <Link href={`/blog/${post.slug}`} className="group block">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(post.date).toLocaleDateString("zh-CN")}
-                  </span>
+              <article key={post.slug}>
+                <Link href={`/blog/${post.slug}`} className="group block">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      <time dateTime={post.date}>
+                        {new Date(post.date).toLocaleDateString("zh-CN")}
+                      </time>
+                    </span>
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />

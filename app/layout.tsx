@@ -19,6 +19,11 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "个人博客 | Personal Blog",
   description: "A beautiful personal blog built with Next.js",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

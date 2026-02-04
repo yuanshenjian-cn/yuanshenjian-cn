@@ -66,7 +66,9 @@ export default function Home() {
                   <Link href={`/blog/${post.slug}`} className="group block">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="w-4 h-4" />
-                      {new Date(post.date).toLocaleDateString("zh-CN")}
+                      <time dateTime={post.date}>
+                        {new Date(post.date).toLocaleDateString("zh-CN")}
+                      </time>
                     </div>
                     <h3 className="text-lg font-medium mb-2 group-hover:text-primary transition-colors">
                       {post.title}
