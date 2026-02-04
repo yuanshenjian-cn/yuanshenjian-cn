@@ -30,7 +30,7 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link
-              href="/blog"
+              href="/articles"
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-md hover:bg-foreground/90 transition-colors font-medium"
             >
               浏览文章
@@ -53,7 +53,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-medium">最新文章</h2>
               <Link
-                href="/blog"
+href="/articles"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 查看全部
@@ -63,7 +63,7 @@ export default function Home() {
             <div className="space-y-6">
               {recentPosts.map((post) => (
                 <article key={post.slug}>
-                  <Link href={`/blog/${post.slug}`} className="group block">
+                  <Link href={`/articles/${post.slug}`} className="group block">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="w-4 h-4" />
                       <time dateTime={post.date}>

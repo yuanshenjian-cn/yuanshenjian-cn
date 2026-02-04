@@ -12,7 +12,7 @@ export function PostNavigation({ prev, next }: PostNavigationProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {prev ? (
         <Link
-          href={`/blog/${prev.slug}`}
+          href={`/articles/${prev.slug}`}
           className="group p-4 rounded-lg border hover:border-primary/50 transition-colors"
         >
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
@@ -29,7 +29,7 @@ export function PostNavigation({ prev, next }: PostNavigationProps) {
 
       {next ? (
         <Link
-          href={`/blog/${next.slug}`}
+          href={`/articles/${next.slug}`}
           className="group p-4 rounded-lg border hover:border-primary/50 transition-colors text-right"
         >
           <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground mb-1">

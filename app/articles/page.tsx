@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 
-export default async function BlogPage({
+export default async function ArticlesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

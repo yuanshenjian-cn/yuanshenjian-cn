@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props) {
   }
 
   return {
-    title: `${post.title} | 博客`,
+    title: `${post.title} | 文章`,
     description: post.excerpt,
   };
 }
@@ -70,7 +70,7 @@ export default async function PostPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-12">
             <div className="order-2 lg:order-1 max-w-3xl">
               <Link
-                href="/blog"
+                href="/articles"
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -99,7 +99,7 @@ export default async function PostPage({ params }: Props) {
                     {post.tags.map((tag) => (
                       <Link
                         key={tag}
-                        href={`/blog?tag=${encodeURIComponent(tag)}`}
+                        href={`/articles?tag=${encodeURIComponent(tag)}`}
                         className="text-xs px-2 py-1 bg-muted rounded hover:bg-primary hover:text-primary-foreground transition-colors"
                       >
                         {tag}
