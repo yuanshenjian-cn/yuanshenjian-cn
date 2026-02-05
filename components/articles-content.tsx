@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Post } from "@/types/blog";
 import { Pagination } from "./pagination";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Rss } from "lucide-react";
 
 interface ArticlesContentProps {
   allPosts: Post[];
@@ -73,23 +73,37 @@ export function ArticlesContent({
   return (
     <>
       {/* 标题区域 - 高级简约风格 */}
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-3 text-foreground">
-          {selectedTag ? selectedTag : "全部文章"}
-        </h1>
-        <p className="text-sm text-foreground/60 font-light">
-          {selectedTag ? (
-            <>
-              共 {filteredPosts.length} 篇相关文章
-              {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
-            </>
-          ) : (
-            <>
-              {allPosts.length} 篇文章 · {tags.length} 个标签
-              {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
-            </>
-          )}
-        </p>
+      <div className="mb-10 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-3 text-foreground">
+            {selectedTag ? selectedTag : "全部文章"}
+          </h1>
+          <p className="text-sm text-foreground/60 font-light">
+            {selectedTag ? (
+              <>
+                共 {filteredPosts.length} 篇相关文章
+                {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
+              </>
+            ) : (
+              <>
+                {allPosts.length} 篇文章 · {tags.length} 个标签
+                {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
+              </>
+            )}
+          </p>
+        </div>
+        {!selectedTag && (
+          <Link
+            href="/feed"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-foreground/60 hover:text-foreground border border-border/50 hover:border-foreground/30 rounded-full transition-all"
+            aria-label="RSS 订阅"
+          >
+            <Rss className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">订阅</span>
+          </Link>
+        )}
       </div>
 
       {/* 标签筛选 - 简约风格 */}
