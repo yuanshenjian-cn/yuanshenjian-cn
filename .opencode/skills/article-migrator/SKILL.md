@@ -20,12 +20,13 @@ allowed-tools: Read, Glob, Grep, Write, Bash, question, Edit
 
 ### 1. 文件命名规范
 
-**格式**：`[YYYY-MM-DD]-[slug].mdx`
+**格式**：`[slug].mdx`
 
 **规则**：
 - 从标题或用户指定获取slug（使用中文拼音或英文关键词）
 - 使用kebab-case格式
 - 文件保存到 `content/blog/[category]/` 目录
+- 文件名**不包含日期前缀**，日期信息仅存储在 frontmatter 中
 
 ### 2. Category自动识别
 
