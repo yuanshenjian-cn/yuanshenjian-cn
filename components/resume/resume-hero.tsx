@@ -5,9 +5,9 @@ export function ResumeHero() {
     <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80')`,
-        }}
+          style={{
+            backgroundImage: `url('/images/resume/hero-bg.webp')`,
+          }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
 

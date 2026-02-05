@@ -14,7 +14,7 @@ export default function Home() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1920&q=80')`,
+            backgroundImage: `url('/images/home/hero-bg.webp')`,
           }}
         />
         {/* Overlay Gradient */}
