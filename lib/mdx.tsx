@@ -10,16 +10,20 @@ export type MDXComponents = Record<string, React.ComponentType<any>>;
 
 const mdxComponents: MDXComponents = {
   h1: (props: any) => {
-    return <h1 {...props} className="text-3xl font-bold mt-8 mb-4" />;
+    const { id, children, ...rest } = props;
+    return <h1 id={id} className="text-3xl font-bold mt-8 mb-4 scroll-mt-24" {...rest}>{children}</h1>;
   },
   h2: (props: any) => {
-    return <h2 {...props} className="text-2xl font-bold mt-6 mb-3" />;
+    const { id, children, ...rest } = props;
+    return <h2 id={id} className="text-2xl font-bold mt-6 mb-3 scroll-mt-24" {...rest}>{children}</h2>;
   },
   h3: (props: any) => {
-    return <h3 {...props} className="text-xl font-semibold mt-5 mb-2" />;
+    const { id, children, ...rest } = props;
+    return <h3 id={id} className="text-xl font-semibold mt-5 mb-2 scroll-mt-24" {...rest}>{children}</h3>;
   },
   h4: (props: any) => {
-    return <h4 {...props} className="text-lg font-semibold mt-4 mb-2" />;
+    const { id, children, ...rest } = props;
+    return <h4 id={id} className="text-lg font-semibold mt-4 mb-2 scroll-mt-24" {...rest}>{children}</h4>;
   },
   p: (props: any) => <p {...props} className="my-4 leading-relaxed" />,
   ul: (props: any) => <ul {...props} className="list-disc list-inside my-4 space-y-2" />,

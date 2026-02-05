@@ -32,10 +32,13 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
     return () => observer.disconnect();
   }, [headings]);
 
-  const handleClick = (id: string) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      // 更新 URL hash
+      window.history.pushState(null, "", `#${id}`);
     }
   };
 
@@ -44,10 +47,11 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   return (
     <nav className="space-y-0.5">
       {headings.map((heading) => (
-        <button
+        <a
           key={heading.id}
-          onClick={() => handleClick(heading.id)}
-          className={`block w-full text-left text-sm py-1 px-2 rounded transition-colors ${
+          href={`#${heading.id}`}
+          onClick={(e) => handleClick(e, heading.id)}
+          className={`block w-full text-left text-sm py-1 px-2 rounded transition-colors cursor-pointer ${
             activeId === heading.id
               ? "bg-muted text-foreground"
               : "text-muted-foreground hover:text-foreground"
@@ -57,7 +61,7 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
           }}
         >
           {heading.text}
-        </button>
+        </a>
       ))}
     </nav>
   );
