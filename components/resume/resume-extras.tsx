@@ -45,7 +45,7 @@ export function ResumeExtras() {
                     className="text-primary hover:text-primary/80 transition-colors text-sm flex items-center gap-1.5"
                   >
                     <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-                    TW十年，我敏捷了吗？
+                    我敏捷了吗？
                   </a>
                 </li>
               </ul>
