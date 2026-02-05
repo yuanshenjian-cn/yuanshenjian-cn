@@ -11,20 +11,20 @@ interface Skill {
 const skills: Skill[] = [
   {
     level: "master",
-    icon: "A",
-    title: "敏捷工程实践",
+    icon: "敏",
+    title: "敏捷开发",
     description:
       "精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计",
   },
   {
     level: "master",
-    icon: "D",
+    icon: "软",
     title: "软件设计",
     description: "精通面向对象、设计模式、整洁软件设计",
   },
   {
     level: "master",
-    icon: "T",
+    icon: "测",
     title: "测试策略",
     description:
       "精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建",
@@ -38,14 +38,14 @@ const skills: Skill[] = [
   },
   {
     level: "proficient",
-    icon: "A",
+    icon: "架",
     title: "架构设计",
     description: "熟练掌握高可用架构设计，以及DDD实践、微服务设计、分层架构",
   },
   {
     level: "proficient",
-    icon: "I",
-    title: "AI Agent开发",
+    icon: "AI",
+    title: "AI Agent",
     description:
       "熟练使用Spring AI、LangGraph开发AI Agent应用；熟练掌握AI软件工程实践，如Agent Skills、SDD框架",
   },
@@ -59,12 +59,12 @@ const skills: Skill[] = [
   {
     level: "familiar",
     icon: "P",
-    title: "Python技术栈",
+    title: "Python",
     description: "熟悉Python、FastAPI、LangChain",
   },
   {
     level: "familiar",
-    icon: "B",
+    icon: "业",
     title: "业务分析",
     description:
       "熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
