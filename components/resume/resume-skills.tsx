@@ -58,17 +58,18 @@ const skills: Skill[] = [
   },
   {
     level: "familiar",
-    icon: "P",
-    title: "Python",
-    description: "熟悉Python、FastAPI、LangChain",
-  },
-  {
-    level: "familiar",
     icon: "业",
     title: "业务分析",
     description:
       "熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
   },
+  {
+    level: "familiar",
+    icon: "P",
+    title: "Python",
+    description: "熟悉Python、FastAPI、LangChain",
+  },
+
 ];
 
 const certificates = [
