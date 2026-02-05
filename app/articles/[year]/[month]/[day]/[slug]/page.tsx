@@ -78,7 +78,7 @@ export default async function PostPage({ params }: Props) {
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
               >
                 <ArrowLeft className="w-4 h-4" />
-                返回
+                返回文章列表
               </Link>
 
               <header className="mb-8">

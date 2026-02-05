@@ -72,33 +72,35 @@ export function ArticlesContent({
 
   return (
     <>
-      {/* 标题 */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-medium mb-2">全部文章</h1>
-        <p className="text-xs text-muted-foreground">
+      {/* 标题区域 - 高级简约风格 */}
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-3 text-foreground">
+          {selectedTag ? selectedTag : "全部文章"}
+        </h1>
+        <p className="text-sm text-foreground/60 font-light">
           {selectedTag ? (
             <>
-              标签「{selectedTag}」共 {filteredPosts.length} 篇文章
+              共 {filteredPosts.length} 篇相关文章
               {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
             </>
           ) : (
             <>
-              共 {allPosts.length} 篇文章 · {tags.length} 个标签
+              {allPosts.length} 篇文章 · {tags.length} 个标签
               {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
             </>
           )}
         </p>
       </div>
 
-      {/* 标签筛选 */}
+      {/* 标签筛选 - 简约风格 */}
       {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-1.5 mb-10">
           <button
             onClick={() => handleTagClick(null)}
-            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
               selectedTag === null
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted hover:bg-muted/80"
+                ? "bg-foreground text-background font-medium"
+                : "bg-muted/50 text-foreground/70 hover:bg-muted hover:text-foreground"
             }`}
           >
             全部
@@ -107,10 +109,10 @@ export function ArticlesContent({
             <button
               key={tag}
               onClick={() => handleTagClick(tag)}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+              className={`px-3 py-1 text-xs rounded-full transition-all duration-200 ${
                 selectedTag === tag
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted hover:bg-muted/80"
+                  ? "bg-foreground text-background font-medium"
+                  : "bg-muted/50 text-foreground/70 hover:bg-muted hover:text-foreground"
               }`}
             >
               {tag}
@@ -186,26 +188,26 @@ export function ArticlesContent({
           {selectedTag ? (
             // 标签筛选模式：客户端分页
             <nav className="flex items-center justify-center" aria-label="分页">
-              {/* 桌面端 */}
-              <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(validPage - 1)}
-                  disabled={validPage <= 1}
-                  className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  ← 上一页
-                </button>
-                <span className="px-3 py-2 text-sm">
-                  第 {validPage} / {totalPages} 页
-                </span>
-                <button
-                  onClick={() => handlePageChange(validPage + 1)}
-                  disabled={validPage >= totalPages}
-                  className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  下一页 →
-                </button>
-              </div>
+          {/* 桌面端 */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={() => handlePageChange(validPage - 1)}
+              disabled={validPage <= 1}
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              上一页
+            </button>
+            <span className="px-3 py-2 text-sm">
+              第 {validPage} / {totalPages} 页
+            </span>
+            <button
+              onClick={() => handlePageChange(validPage + 1)}
+              disabled={validPage >= totalPages}
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              下一页
+            </button>
+          </div>
               {/* 移动端 */}
               <div className="flex md:hidden items-center gap-4">
                 <button
