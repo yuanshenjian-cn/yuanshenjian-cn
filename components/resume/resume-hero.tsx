@@ -41,12 +41,12 @@ export function ResumeHero() {
           <span>敏捷开发教练</span>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6 mb-8 text-foreground/70">
-          <div className="flex items-center gap-2 text-sm">
+        <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-6 mb-8 text-foreground/70">
+          <div className="flex items-center justify-center gap-2 text-sm">
             <Phone className="w-4 h-4" />
             <span>18192235667</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center justify-center gap-2 text-sm">
             <Mail className="w-4 h-4" />
             <span>yuanshenjian@foxmail.com</span>
           </div>
