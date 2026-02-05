@@ -21,7 +21,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         
         {/* Content */}
-        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
+        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
           {/* 主标题 - 更有质感的排版 */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
             记录思考，分享成长
@@ -56,8 +56,8 @@ export default function Home() {
 
       {/* Latest Posts */}
       {recentPosts.length > 0 && (
-        <section className="py-16 px-4">
-          <div className="max-w-3xl mx-auto">
+        <section className="py-16 px-6">
+          <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-lg font-medium text-foreground">最新文章</h2>
               <Link

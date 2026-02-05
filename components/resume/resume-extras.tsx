@@ -4,7 +4,7 @@ import { ExternalLink } from "lucide-react";
 
 export function ResumeExtras() {
   return (
-    <section id="extras" className="py-16 px-6 max-w-4xl mx-auto">
+    <section id="extras" className="py-16 max-w-2xl mx-auto">
       <SectionTitle title="兴趣爱好" />
 
       <ScrollAnimation>

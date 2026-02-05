@@ -69,10 +69,10 @@ export default async function PostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="py-12 px-4">
+      <article className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-12">
-            <div className="order-2 lg:order-1 max-w-3xl">
+            <div className="order-2 lg:order-1 max-w-4xl">
               <Link
                 href="/articles"
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"

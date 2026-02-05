@@ -13,8 +13,8 @@ export default async function ArticlesPage() {
   const tags = getAllTags();
   
   return (
-    <main className="py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="py-12 px-6">
+      <div className="max-w-2xl mx-auto">
         <Suspense fallback={<ArticlesSkeleton />}>
           <ArticlesContent 
             allPosts={allPosts} 

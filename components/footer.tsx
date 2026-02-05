@@ -8,28 +8,40 @@ export function Footer() {
   const tags = getAllTags();
 
   return (
-    <footer className="border-t mt-auto">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-          <div className="text-center md:text-left">
-            <p className="text-sm text-muted-foreground">
-              © {currentYear}{" "}
-              <Link href="/" className="hover:text-foreground transition-colors">
-                Yuan Shenjian
-              </Link>
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {posts.length} 篇文章 · {tags.length} 个标签
-            </p>
+    <footer className="border-t border-border/50 mt-auto">
+      <div className="max-w-2xl mx-auto py-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* 左侧信息 */}
+          <div className="flex items-center gap-4 text-xs">
+            <Link 
+              href="/" 
+              className="text-sm font-light text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Yuan Shenjian
+            </Link>
+            <span className="text-foreground/40">
+              © {currentYear}
+            </span>
+            <span className="text-foreground/30">·</span>
+            <span className="text-foreground/40">
+              {posts.length} 篇 · {tags.length} 标签
+            </span>
           </div>
-          <div className="w-12 h-12 bg-background rounded border p-1 flex-shrink-0">
-            <Image
-              src="/images/resume/ysj-qrcode.webp"
-              alt="微信公众号"
-              width={48}
-              height={48}
-              className="w-full h-full object-cover rounded"
-            />
+          
+          {/* 右侧二维码和指引 */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-foreground/40">
+              扫码关注公众号
+            </span>
+            <div className="w-8 h-8 rounded-lg overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+              <Image
+                src="/images/resume/ysj-qrcode.webp"
+                alt="微信公众号二维码"
+                width={32}
+                height={32}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </div>

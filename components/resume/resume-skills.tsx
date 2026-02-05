@@ -80,7 +80,7 @@ const certificates = [
 
 export function ResumeSkills() {
   return (
-    <section id="skills" className="py-16 px-6 max-w-4xl mx-auto">
+    <section id="skills" className="py-16 max-w-2xl mx-auto">
       <SectionTitle title="技能证书" />
 
       <ScrollAnimation>

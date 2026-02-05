@@ -40,7 +40,7 @@ export function ResumeExperience() {
   ];
 
   return (
-    <section id="experience" className="py-16 px-6 max-w-4xl mx-auto">
+    <section id="experience" className="py-16 max-w-2xl mx-auto">
       <SectionTitle title="经历概览" />
 
       <div className="bg-card rounded-2xl p-8 shadow-sm border">
