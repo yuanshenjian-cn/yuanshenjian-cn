@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{NAME}} - {{JOB_TITLE}}简历</title>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="scripts/profile.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">{{INITIALS}}</div>
+            <ul class="nav-links">
+                <li><a href="#skills">技能</a></li>
+                <li><a href="#education">教育</a></li>
+                <li><a href="#experience">经历</a></li>
+                <li><a href="#projects">项目</a></li>
+                <li><a href="#extras">兴趣爱好</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+
+    <!-- 头部区域 -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <div class="hero-avatar">
+                <img src="images/avator.jpg" alt="个人头像">
+            </div>
+            <h1 class="hero-name">{{NAME}}</h1>
+            <p class="hero-title">{{JOB_TITLE}}</p>
+            <div class="hero-contact">
+                <div class="contact-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                    <span>{{PHONE}}</span>
+                </div>
+                <div class="contact-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <span>{{EMAIL}}</span>
+                </div>
+            </div>
+            <p class="hero-summary">
+                {{SUMMARY}}
+            </p>
+        </div>
+        <div class="scroll-indicator">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </header>
+
+    <!-- 技能证书 -->
+    <section class="section skills-section" id="skills">
+        <h2 class="section-title fade-in">技能证书</h2>
+        <div class="white-card fade-in">
+            <div class="skills-grid">
+                {{SKILL_CARDS}}
+            </div>
+
+            <div class="certificates">
+                <h3>🏆 专业认证</h3>
+                <div class="cert-list">
+                    {{CERTIFICATES}}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 教育背景 -->
+    <section class="section education-section" id="education">
+        <h2 class="section-title fade-in">教育背景</h2>
+        <div class="education-card fade-in">
+            <div class="edu-icon"><img src="images/university-logo.png" alt="学校校徽"></div>
+            <div class="edu-info">
+                <h3><a href="{{SCHOOL_URL}}" target="_blank" rel="noopener noreferrer" class="edu-link">{{SCHOOL_NAME}}</a></h3>
+                <p>{{MAJOR}}</p>
+                <p class="edu-date">{{EDU_DATE}}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 经历概览 -->
+    <section class="section experience-section" id="experience">
+        <h2 class="section-title fade-in">经历概览</h2>
+        <div class="white-card fade-in">
+            <div class="timeline">
+                {{TIMELINE_ITEMS}}
+            </div>
+        </div>
+    </section>
+
+    <!-- 重要项目 -->
+    <section class="section projects-section" id="projects">
+        <h2 class="section-title fade-in">重要项目</h2>
+        {{PROJECT_CARDS}}
+    </section>
+
+    <!-- 著作和爱好 -->
+    <section class="section extras-section" id="extras">
+        <h2 class="section-title fade-in">兴趣爱好</h2>
+        <div class="white-card fade-in">
+            <div class="extras-grid">
+                <div class="extra-card">
+                    <h3>📝 著作发表</h3>
+                    <ul>
+                        {{PUBLICATIONS}}
+                    </ul>
+                </div>
+                <div class="extra-card">
+                    <h3>💪 运动健身</h3>
+                    <ul>
+                        {{FITNESS}}
+                    </ul>
+                </div>
+                <div class="extra-card">
+                    <h3>📈 理财投资</h3>
+                    <ul>
+                        {{INVESTMENT}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-main">
+                <div class="footer-text-section">
+                    <p class="footer-text">感谢您的阅读</p>
+                    <p class="footer-contact">{{NAME}} | {{PHONE}} | {{EMAIL}}</p>
+                </div>
+                <div class="footer-wechat">
+                    <div class="footer-wechat-qrcode">
+                        <img src="images/ysj-qrcode.jpg" alt="微信公众号">
+                    </div>
+                    <span class="footer-wechat-label">扫码关注公众号</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop" aria-label="返回顶部">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <script src="scripts/profile.js"></script>
+</body>
+</html>
