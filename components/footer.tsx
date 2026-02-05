@@ -45,12 +45,12 @@ export function Footer() {
             <span className="text-xs text-foreground/40">
               扫码关注作者
             </span>
-            <div className="w-8 h-8 rounded-lg overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+            <div className="w-[50px] h-[50px] rounded-lg overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
               <Image
                 src="/images/resume/ysj-qrcode.webp"
                 alt="微信公众号二维码"
-                width={32}
-                height={32}
+                width={50}
+                height={50}
                 className="w-full h-full object-cover"
               />
             </div>
