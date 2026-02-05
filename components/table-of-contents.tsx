@@ -45,24 +45,30 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="space-y-0.5">
-      {headings.map((heading) => (
-        <a
-          key={heading.id}
-          href={`#${heading.id}`}
-          onClick={(e) => handleClick(e, heading.id)}
-          className={`block w-full text-left text-sm py-1 px-2 rounded transition-colors cursor-pointer ${
-            activeId === heading.id
-              ? "bg-muted text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          style={{
-            paddingLeft: `${(heading.level - 1) * 12 + 8}px`,
-          }}
-        >
-          {heading.text}
-        </a>
-      ))}
-    </nav>
+    <div>
+      <div className="mb-3">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2">目录</h3>
+        <div className="h-px bg-border" />
+      </div>
+      <nav className="space-y-0.5 -mx-2">
+        {headings.map((heading) => (
+          <a
+            key={heading.id}
+            href={`#${heading.id}`}
+            onClick={(e) => handleClick(e, heading.id)}
+            className={`block w-full text-left text-sm py-1 px-2 rounded transition-colors cursor-pointer ${
+              activeId === heading.id
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            style={{
+              paddingLeft: `${(heading.level - 1) * 12}px`,
+            }}
+          >
+            {heading.text}
+          </a>
+        ))}
+      </nav>
+    </div>
   );
 }

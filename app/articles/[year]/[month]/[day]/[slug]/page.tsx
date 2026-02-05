@@ -79,9 +79,6 @@ export default async function PostPage({ params }: Props) {
               <aside className="w-60 flex-shrink-0">
                 <div className="sticky top-24">
                   <div className="bg-card rounded-lg p-4 border">
-                    <h3 className="text-sm font-medium mb-3 text-muted-foreground">
-                      目录
-                    </h3>
                     <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse"></div>}>
                       <TableOfContents headings={headings} />
                     </Suspense>
@@ -95,9 +92,6 @@ export default async function PostPage({ params }: Props) {
               <ArticleHeader post={post} />
               <div className="my-8">
                 <div className="bg-card rounded-lg p-4 border">
-                  <h3 className="text-sm font-medium mb-3 text-muted-foreground">
-                    目录
-                  </h3>
                   <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse"></div>}>
                     <TableOfContents headings={headings} />
                   </Suspense>
