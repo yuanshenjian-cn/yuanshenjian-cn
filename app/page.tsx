@@ -28,7 +28,7 @@ export default function Home() {
           </h1>
           
           {/* 副标题 - 更简洁的描述 */}
-          <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-lg mx-auto leading-relaxed font-light">
+          <p className="text-base md:text-lg text-foreground/80 mb-12 max-w-lg mx-auto leading-relaxed font-light">
             技术实践 · 敏捷方法 · 生活随笔
           </p>
           
