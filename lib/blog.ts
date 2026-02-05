@@ -86,6 +86,7 @@ export function getAllPosts(): Post[] {
 }
 
 function findFileBySlug(slug: string, dir: string): string | null {
+  const decodedSlug = decodeURIComponent(slug);
   const items = fs.readdirSync(dir);
   
   for (const item of items) {
@@ -97,8 +98,8 @@ function findFileBySlug(slug: string, dir: string): string | null {
       if (result) return result;
     } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
       const itemSlug = item.replace(/\.mdx?$/, "");
-      // 只检查文件名是否匹配
-      if (itemSlug === slug) {
+      // 解码 slug 后比较
+      if (itemSlug === decodedSlug) {
         return fullPath;
       }
     }
@@ -113,12 +114,13 @@ export function getPostBySlug(slug: string): Post | null {
     const filePath = findFileBySlug(slug, postsDirectory);
     
     if (!filePath) {
-      // 回退：直接尝试拼接路径
-      const directPath = path.join(postsDirectory, `${slug}.mdx`);
+      // 回退：直接尝试拼接路径（使用解码后的 slug）
+      const decodedSlug = decodeURIComponent(slug);
+      const directPath = path.join(postsDirectory, `${decodedSlug}.mdx`);
       if (fs.existsSync(directPath)) {
         return parsePostFile(directPath);
       }
-      const mdPath = path.join(postsDirectory, `${slug}.md`);
+      const mdPath = path.join(postsDirectory, `${decodedSlug}.md`);
       if (fs.existsSync(mdPath)) {
         return parsePostFile(mdPath);
       }
