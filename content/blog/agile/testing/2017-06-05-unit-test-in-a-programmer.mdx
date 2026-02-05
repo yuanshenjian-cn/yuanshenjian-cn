@@ -23,7 +23,7 @@ published: true
 
 
 
-![ku-xing-seng.png](/images/agile/testing/ku-xing-seng.png)
+![ku-xing-seng.png](/images/agile/testing/ku-xing-seng.webp)
 
 在我看来，程序员应该是：
 
@@ -74,7 +74,7 @@ class StringUtilsTest {
 
 ***开发人员编写一小段代码，用于检验被检测代码的一个很小的、很明确的功能是否正确。***
 
-![test-pyramid.png](/images/agile/testing/test-pyramid.png)
+![test-pyramid.png](/images/agile/testing/test-pyramid.webp)
 
 >广义上的测试并不总是像上面这段代码这么简单，熟为人知的 [测试金字塔](https://martinfowler.com/bliki/TestPyramid.html) 将测试分为三大类，单元测试位于测试金字塔底端，旨在传达单元测试应该来得更凶猛一些，而它们正是由开发人员亲手编写出来。本文也是围绕单元测试来开展。
 
@@ -94,7 +94,7 @@ class StringUtilsTest {
 
 再来说说有形的代码。缺陷减少了则证明你的代码质量提高了，代码质量衡量指标总离不开`可读性`、`可扩展性`、`可维护性`。这三个指标的增强反映了良好的代码整洁度、OO设计、模块化等。实践证明，这些良好的设计往往不是一蹴而就的，而当你为一个类或方法编写单元测试却举步维艰的时候，你就应该考虑去**改良你的设计了**。
 
-![value-of-unit-test.png](/images/agile/testing/value-of-unit-test.png)
+![value-of-unit-test.png](/images/agile/testing/value-of-unit-test.webp)
 
 理想情况下，编写完的代码应该是可以工作的。但现实并不那么美好，当你在验证代码正确性的时候遇到问题，你就不得不频繁地启用调试模式，而调试正是吞噬你宝贵时间的恶魔。此时我们要拔出单元测试这把神剑，使出浑身解数将恶魔驱赶到尘封的黑暗角落，从而**缩减我们花在调式上的时间**。
 
@@ -152,7 +152,7 @@ class StringUtilsTest {
 
 实践证明，随着时间推移，产品的功能性的变化趋势受测试代码编写的时机的影响如下图所示：
 
-![productivity.png](/images/agile/testing/productivity.png)
+![productivity.png](/images/agile/testing/productivity.webp)
 
 好想法抵挡不住现实的打击，代码库随着项目的进展越发复杂，由于没有测试的保护，一些不良的设计偷偷溜了进来，代码越发娇气，慢慢地没有人敢去动它。最糟糕的结果可能是，DEVs顶着巨大交付压力，唯唯诺诺的写着代码，而灾难正在酝酿，交付最终失败。
 
