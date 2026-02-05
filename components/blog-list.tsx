@@ -66,7 +66,7 @@ export function BlogList({ posts, tags, initialTag }: BlogListProps) {
         ) : (
           filteredPosts.map((post) => (
               <article key={post.slug}>
-                <Link href={`/articles/${post.slug}`} className="group block">
+                <Link href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} className="group block">
                   <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />

@@ -33,38 +33,46 @@ function getRelativePath(fullPath: string): string {
 }
 
 function generateSlug(filePath: string): string {
-  // 只使用文件名作为 slug，去掉目录前缀
   const fileName = path.basename(filePath);
   return fileName.replace(/\.mdx?$/i, "");
+}
+
+function parseDate(dateStr: string): { year: string; month: string; day: string } {
+  const date = new Date(dateStr);
+  const year = date.getFullYear().toString();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return { year, month, day };
 }
 
 function parsePostFile(filePath: string): Post {
   const fileContents = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(fileContents);
 
-  // 计算阅读时间：中文按字符数，英文按单词数
-  // 移除 markdown 标记、空格和换行符后统计
   const cleanContent = content
-    .replace(/```[\s\S]*?```/g, '') // 移除代码块
-    .replace(/`[^`]+`/g, '')         // 移除行内代码
-    .replace(/[#*_`\[\]\(\)\{\}]/g, '') // 移除 markdown 标记
-    .replace(/\s+/g, '');            // 移除所有空白
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]+`/g, '')
+    .replace(/[#*_`\[\]\(\)\{\}]/g, '')
+    .replace(/\s+/g, '');
   
   const charCount = cleanContent.length;
-  // 中文阅读速度约 600 字/分钟
   const readingTime = Math.max(1, Math.ceil(charCount / 600));
 
   const slug = generateSlug(filePath);
+  const dateObj = parseDate(data.date);
+  const dateISO = data.date ? new Date(data.date).toISOString() : new Date().toISOString();
 
-  // 从文件路径提取分类
   const relativePath = getRelativePath(filePath);
   const pathParts = relativePath.split(/[\\/]/);
   const category = pathParts.length > 1 ? pathParts[0] : undefined;
 
   return {
     slug,
+    year: dateObj.year,
+    month: dateObj.month,
+    day: dateObj.day,
     title: data.title || slug,
-    date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+    date: dateISO,
     excerpt: data.brief || content.slice(0, 200).replace(/[#*_]/g, "") + "...",
     content,
     tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []),
@@ -108,26 +116,25 @@ function findFileBySlug(slug: string, dir: string): string | null {
   return null;
 }
 
-export function getPostBySlug(slug: string): Post | null {
+export function getPostByDateAndSlug(year: string, month: string, day: string, slug: string): Post | null {
   try {
-    // 在子目录中递归查找文件
-    const filePath = findFileBySlug(slug, postsDirectory);
+    const decodedSlug = decodeURIComponent(slug);
+    const files = getAllMarkdownFiles(postsDirectory);
     
-    if (!filePath) {
-      // 回退：直接尝试拼接路径（使用解码后的 slug）
-      const decodedSlug = decodeURIComponent(slug);
-      const directPath = path.join(postsDirectory, `${decodedSlug}.mdx`);
-      if (fs.existsSync(directPath)) {
-        return parsePostFile(directPath);
+    for (const filePath of files) {
+      const fileSlug = generateSlug(filePath);
+      const post = parsePostFile(filePath);
+      
+      if (fileSlug === decodedSlug && 
+          post.year === year && 
+          post.month === month && 
+          post.day === day &&
+          post.published) {
+        return post;
       }
-      const mdPath = path.join(postsDirectory, `${decodedSlug}.md`);
-      if (fs.existsSync(mdPath)) {
-        return parsePostFile(mdPath);
-      }
-      return null;
     }
-
-    return parsePostFile(filePath);
+    
+    return null;
   } catch {
     return null;
   }
@@ -153,9 +160,14 @@ export function getAllCategories(): string[] {
   return Array.from(categories).sort();
 }
 
-export function getAdjacentPosts(slug: string): { prev: Post | null; next: Post | null } {
+export function getAdjacentPosts(year: string, month: string, day: string, slug: string): { prev: Post | null; next: Post | null } {
   const posts = getAllPosts();
-  const currentIndex = posts.findIndex((post) => post.slug === slug);
+  const currentIndex = posts.findIndex((post) => 
+    post.slug === slug && 
+    post.year === year && 
+    post.month === month && 
+    post.day === day
+  );
 
   if (currentIndex === -1) {
     return { prev: null, next: null };

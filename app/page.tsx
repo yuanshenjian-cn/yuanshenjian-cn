@@ -63,7 +63,7 @@ href="/articles"
             <div className="space-y-6">
               {recentPosts.map((post) => (
                 <article key={post.slug}>
-                  <Link href={`/articles/${post.slug}`} className="group block">
+                  <Link href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} className="group block">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="w-4 h-4" />
                       <time dateTime={post.date}>

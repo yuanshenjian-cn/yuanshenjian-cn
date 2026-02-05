@@ -76,7 +76,7 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
           e.preventDefault();
           if (displayPosts.length > 0 && selectedIndex < displayPosts.length) {
             const post = displayPosts[selectedIndex];
-            router.push(`/articles/${post.slug}`);
+            router.push(`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`);
             handleClose();
           }
           break;
@@ -146,7 +146,7 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
                     <div
                       key={post.slug}
                       onClick={() => {
-                        router.push(`/articles/${post.slug}`);
+                        router.push(`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`);
                         handleClose();
                       }}
                       onMouseEnter={() => setSelectedIndex(index)}

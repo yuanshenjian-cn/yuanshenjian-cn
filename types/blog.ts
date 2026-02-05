@@ -1,5 +1,8 @@
 export interface Post {
   slug: string;
+  year: string;
+  month: string;
+  day: string;
   title: string;
   date: string;
   excerpt: string;

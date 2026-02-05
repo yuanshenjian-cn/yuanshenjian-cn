@@ -1,28 +1,31 @@
 import { notFound } from "next/navigation";
 import { Suspense, lazy } from "react";
-import { getPostBySlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
+import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
 import { MDXContent, extractHeadings } from "@/lib/mdx";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import Script from "next/script";
+import { PostNavigation } from "@/components/post-navigation";
 
 const TableOfContents = lazy(() => import("@/components/table-of-contents").then((mod) => ({ default: mod.TableOfContents })));
-const PostNavigation = lazy(() => import("@/components/post-navigation").then((mod) => ({ default: mod.PostNavigation })));
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ year: string; month: string; day: string; slug: string }>;
 }
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
   return posts.map((post) => ({
+    year: post.year,
+    month: post.month,
+    day: post.day,
     slug: post.slug,
   }));
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const { year, month, day, slug } = await params;
+  const post = getPostByDateAndSlug(year, month, day, slug);
 
   if (!post) {
     return {
@@ -37,14 +40,14 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function PostPage({ params }: Props) {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const { year, month, day, slug } = await params;
+  const post = getPostByDateAndSlug(year, month, day, slug);
 
   if (!post) {
     notFound();
   }
 
-  const { prev, next } = getAdjacentPosts(slug);
+  const { prev, next } = getAdjacentPosts(year, month, day, slug);
   const headings = extractHeadings(post.content);
 
   const jsonLd = {
@@ -117,9 +120,7 @@ export default async function PostPage({ params }: Props) {
               </div>
 
               <div className="mt-12 pt-8 border-t">
-                <Suspense fallback={<div className="h-16 bg-muted rounded animate-pulse"></div>}>
-                  <PostNavigation prev={prev} next={next} />
-                </Suspense>
+                <PostNavigation prev={prev} next={next} />
               </div>
             </div>
 
