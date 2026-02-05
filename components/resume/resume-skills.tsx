@@ -1,3 +1,4 @@
+import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
 
 interface Skill {
@@ -80,53 +81,44 @@ const certificates = [
 export function ResumeSkills() {
   return (
     <section id="skills" className="py-16 px-6 max-w-4xl mx-auto">
-      <ScrollAnimation>
-        <h2
-          className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
-          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-        >
-          技能证书
-        </h2>
-      </ScrollAnimation>
+      <SectionTitle title="技能证书" />
 
       <ScrollAnimation>
         <div className="bg-card rounded-2xl p-8 shadow-sm border">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {skills.map((skill, index) => (
-              <ScrollAnimation key={index}>
-                <div
-                  className={`p-5 rounded-xl border-l-4 ${
-                    skill.level === "master"
-                      ? "border-l-neutral-800"
-                      : skill.level === "proficient"
-                      ? "border-l-neutral-500"
-                      : "border-l-neutral-300"
-                  } bg-secondary/30`}
-                >
-                  <h4 className="text-foreground font-medium mb-2 flex items-center gap-2">
-                    <span
-                      className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${
-                        skill.level === "master"
-                          ? "bg-neutral-800 text-white"
-                          : skill.level === "proficient"
-                          ? "bg-neutral-500 text-white"
-                          : "bg-neutral-300 text-neutral-800"
-                      }`}
-                    >
-                      {skill.icon}
-                    </span>
-                    {skill.title}
-                  </h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {skill.description}
-                  </p>
-                </div>
-              </ScrollAnimation>
+              <div
+                key={index}
+                className={`p-5 rounded-xl border-l-4 ${
+                  skill.level === "master"
+                    ? "border-l-neutral-800"
+                    : skill.level === "proficient"
+                    ? "border-l-neutral-500"
+                    : "border-l-neutral-300"
+                } bg-secondary/30`}
+              >
+                <h4 className="text-foreground font-medium mb-2 flex items-center gap-2">
+                  <span
+                    className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${
+                      skill.level === "master"
+                        ? "bg-neutral-800 text-white"
+                        : skill.level === "proficient"
+                        ? "bg-neutral-500 text-white"
+                        : "bg-neutral-300 text-neutral-800"
+                    }`}
+                  >
+                    {skill.icon}
+                  </span>
+                  {skill.title}
+                </h4>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {skill.description}
+                </p>
+              </div>
             ))}
           </div>
 
-          <ScrollAnimation>
-            <div className="mt-6 p-5 rounded-xl bg-secondary/30">
+          <div className="mt-6 p-5 rounded-xl bg-secondary/30">
               <h3 className="text-lg font-medium mb-3 text-foreground">
                 专业认证
               </h3>
@@ -141,7 +133,6 @@ export function ResumeSkills() {
                 ))}
               </div>
             </div>
-          </ScrollAnimation>
         </div>
       </ScrollAnimation>
     </section>

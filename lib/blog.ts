@@ -93,28 +93,6 @@ export function getAllPosts(): Post[] {
   return posts;
 }
 
-function findFileBySlug(slug: string, dir: string): string | null {
-  const decodedSlug = decodeURIComponent(slug);
-  const items = fs.readdirSync(dir);
-  
-  for (const item of items) {
-    const fullPath = path.join(dir, item);
-    const stat = fs.statSync(fullPath);
-    
-    if (stat.isDirectory()) {
-      const result = findFileBySlug(slug, fullPath);
-      if (result) return result;
-    } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
-      const itemSlug = item.replace(/\.mdx?$/, "");
-      // 解码 slug 后比较
-      if (itemSlug === decodedSlug) {
-        return fullPath;
-      }
-    }
-  }
-  
-  return null;
-}
 
 export function getPostByDateAndSlug(year: string, month: string, day: string, slug: string): Post | null {
   try {
@@ -181,4 +159,56 @@ export function getAdjacentPosts(year: string, month: string, day: string, slug:
 
 export function getPostsByCategory(category: string): Post[] {
   return getAllPosts().filter((post) => post.category === category);
+}
+
+// 分页相关函数
+export const POSTS_PER_PAGE = 12;
+
+export interface PaginatedPosts {
+  posts: Post[];
+  totalPosts: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export function getPaginatedPosts(page: number, postsPerPage: number = POSTS_PER_PAGE): PaginatedPosts {
+  const allPosts = getAllPosts();
+  const totalPosts = allPosts.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  
+  // 确保页码在有效范围内
+  const validPage = Math.max(1, Math.min(page, totalPages));
+  const startIndex = (validPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  
+  return {
+    posts: allPosts.slice(startIndex, endIndex),
+    totalPosts,
+    totalPages,
+    currentPage: validPage,
+  };
+}
+
+// 获取标签相关的分页文章
+export function getPaginatedPostsByTag(
+  tag: string, 
+  page: number, 
+  postsPerPage: number = POSTS_PER_PAGE
+): PaginatedPosts {
+  const allPosts = getAllPosts();
+  const filteredPosts = allPosts.filter((post) => post.tags.includes(tag));
+  const totalPosts = filteredPosts.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  
+  // 确保页码在有效范围内
+  const validPage = Math.max(1, Math.min(page, totalPages || 1));
+  const startIndex = (validPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  
+  return {
+    posts: filteredPosts.slice(startIndex, endIndex),
+    totalPosts,
+    totalPages,
+    currentPage: validPage,
+  };
 }

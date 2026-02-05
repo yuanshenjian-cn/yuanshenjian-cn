@@ -1,0 +1,17 @@
+# Cloudflare Pages / Netlify 缓存头配置
+
+# HTML 文件 - 允许 CDN 缓存，但快速重新验证
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 静态资源 - 长期缓存（因为文件名有 hash）
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 图片资源 - 较长缓存
+/images/*
+  Cache-Control: public, max-age=2592000
+
+# 字体文件 - 长期缓存
+*.woff2
+  Cache-Control: public, max-age=31536000, immutable

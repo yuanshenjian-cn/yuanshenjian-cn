@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Suspense, lazy } from "react";
 import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
-import { MDXContent, extractHeadings } from "@/lib/mdx";
+import { MDXContent as MDXRemoteContent, extractHeadings } from "@/lib/mdx";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import Script from "next/script";
@@ -115,7 +115,7 @@ export default async function PostPage({ params }: Props) {
 
               <div className="prose prose-neutral dark:prose-invert max-w-none">
                 <Suspense fallback={<div className="text-muted-foreground">加载中...</div>}>
-                  <MDXContent source={post.content} />
+                  <MDXRemoteContent source={post.content} />
                 </Suspense>
               </div>
 

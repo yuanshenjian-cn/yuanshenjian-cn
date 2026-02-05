@@ -7,7 +7,7 @@ export default function Home() {
   const recentPosts = posts.slice(0, 3);
 
   return (
-    <main>
+    <>
       {/* Hero Section with Background Image */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -60,7 +60,7 @@ href="/articles"
               </Link>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {recentPosts.map((post) => (
                 <article key={post.slug}>
                   <Link href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} className="group block">
@@ -83,6 +83,6 @@ href="/articles"
           </div>
         </section>
       )}
-    </main>
+    </>
   );
 }

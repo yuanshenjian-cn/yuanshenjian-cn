@@ -1,3 +1,4 @@
+import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
 
 interface ProjectAchievement {
@@ -170,14 +171,7 @@ const projects: Project[] = [
 export function ResumeProjects() {
   return (
     <section id="projects" className="py-16 px-6 max-w-4xl mx-auto">
-      <ScrollAnimation>
-        <h2
-          className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
-          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-        >
-          重要项目
-        </h2>
-      </ScrollAnimation>
+      <SectionTitle title="重要项目" />
 
       <div className="bg-card rounded-2xl p-8 shadow-sm border">
         <div className="space-y-6">

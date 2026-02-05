@@ -1,16 +1,11 @@
+import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
+import { ExternalLink } from "lucide-react";
 
 export function ResumeExtras() {
   return (
     <section id="extras" className="py-16 px-6 max-w-4xl mx-auto">
-      <ScrollAnimation>
-        <h2
-          className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
-          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-        >
-          兴趣爱好
-        </h2>
-      </ScrollAnimation>
+      <SectionTitle title="兴趣爱好" />
 
       <ScrollAnimation>
         <div className="bg-card rounded-2xl p-8 shadow-sm border">
@@ -27,19 +22,7 @@ export function ResumeExtras() {
                     rel="noopener noreferrer"
                     className="text-primary hover:text-primary/80 transition-colors text-sm flex items-center gap-1.5"
                   >
-                    <svg
-                      className="w-3.5 h-3.5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
+                    <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                     整洁软件设计
                   </a>
                 </li>
@@ -50,19 +33,7 @@ export function ResumeExtras() {
                     rel="noopener noreferrer"
                     className="text-primary hover:text-primary/80 transition-colors text-sm flex items-center gap-1.5"
                   >
-                    <svg
-                      className="w-3.5 h-3.5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
+                    <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                     敏捷那些事儿
                   </a>
                 </li>
@@ -73,19 +44,7 @@ export function ResumeExtras() {
                     rel="noopener noreferrer"
                     className="text-primary hover:text-primary/80 transition-colors text-sm flex items-center gap-1.5"
                   >
-                    <svg
-                      className="w-3.5 h-3.5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
+                    <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                     TW十年，我敏捷了吗？
                   </a>
                 </li>

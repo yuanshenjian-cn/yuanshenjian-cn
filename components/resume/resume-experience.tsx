@@ -1,3 +1,4 @@
+import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
 
 export function ResumeExperience() {
@@ -40,14 +41,7 @@ export function ResumeExperience() {
 
   return (
     <section id="experience" className="py-16 px-6 max-w-4xl mx-auto">
-      <ScrollAnimation>
-        <h2
-          className="text-2xl font-medium mb-8 text-left pb-3 inline-block"
-          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-        >
-          经历概览
-        </h2>
-      </ScrollAnimation>
+      <SectionTitle title="经历概览" />
 
       <div className="bg-card rounded-2xl p-8 shadow-sm border">
         <div className="relative pl-8">

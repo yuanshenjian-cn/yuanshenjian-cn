@@ -1,17 +1,11 @@
 import Image from "next/image";
+import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
 
 export function ResumeEducation() {
   return (
     <section id="education" className="py-16 px-6 max-w-4xl mx-auto">
-      <ScrollAnimation>
-        <h2
-          className="text-2xl font-medium mb-6 text-left pb-3 inline-block"
-          style={{ borderBottom: "2px solid hsl(var(--primary))" }}
-        >
-          教育背景
-        </h2>
-      </ScrollAnimation>
+      <SectionTitle title="教育背景" />
 
       <ScrollAnimation>
         <div className="bg-card rounded-2xl p-8 shadow-sm border">
