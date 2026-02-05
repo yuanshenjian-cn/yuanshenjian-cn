@@ -38,12 +38,6 @@ const skills: Skill[] = [
   },
   {
     level: "proficient",
-    icon: "架",
-    title: "架构设计",
-    description: "熟练掌握高可用架构设计，以及DDD实践、微服务设计、分层架构",
-  },
-  {
-    level: "proficient",
     icon: "AI",
     title: "AI Agent",
     description:
@@ -55,6 +49,12 @@ const skills: Skill[] = [
     title: "AI辅助编程",
     description:
       "熟练使用AI辅助编程工具，如：Claude code、Cursor、OpenCode、Trae；熟悉提示词工程、MCP、RAG",
+  },
+  {
+    level: "proficient",
+    icon: "架",
+    title: "架构设计",
+    description: "熟练掌握高可用架构设计，以及DDD实践、微服务设计、分层架构",
   },
   {
     level: "familiar",
