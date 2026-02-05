@@ -101,8 +101,44 @@ app/
     └── page.tsx
 ```
 
+## 部署信息
+
+### GitHub Pages 部署
+- **部署平台**: GitHub Pages
+- **自定义域名**: `yuanshenjian.cn`
+- **CDN 加速**: Cloudflare（已配置缓存）
+- **构建输出**: `/dist` 目录
+
+### 域名配置
+- **域名文件**: 项目根目录 `CNAME` 文件包含 `yuanshenjian.cn`
+- **DNS 解析**: 指向 GitHub Pages 服务器
+- **SSL/TLS**: Cloudflare 提供 HTTPS 加密
+
+### 部署工作流
+- **触发条件**: `main` 分支推送或手动触发
+- **CI/CD**: GitHub Actions (`.github/workflows/deploy.yml`)
+- **Node.js 版本**: 20.x
+- **构建流程**:
+  1. Checkout 代码
+  2. 安装依赖 (`npm ci`)
+  3. 恢复 Next.js 构建缓存
+  4. 执行构建 (`npm run build`)
+  5. 上传构建产物
+  6. 部署到 GitHub Pages
+
+## 环境变量
+
+复制 `.env.example` 创建 `.env` 文件：
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://yuanshenjian.cn
+NEXT_PUBLIC_WALINE_SERVER_URL=https://your-waline-server.com
+```
+
 ## 其他说明
 - 静态导出：所有路由在构建时预渲染
 - 无数据库：内容从 `/content/` 目录的 MDX 文件读取
 - 图片未优化（静态导出限制）
 - 基础路径：空字符串（`""`）
+- 评论系统：Waline（基于 NEXT_PUBLIC_WALINE_SERVER_URL）
+- 主题：支持明暗模式切换（next-themes）
