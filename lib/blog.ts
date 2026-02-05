@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { Post } from "@/types/blog";
+import { config } from "@/lib/config";
+
+export const POSTS_PER_PAGE = config.posts.perPage;
 
 const postsDirectory = path.join(process.cwd(), "content/blog");
 
@@ -56,7 +59,7 @@ function parsePostFile(filePath: string): Post {
     .replace(/\s+/g, '');
   
   const charCount = cleanContent.length;
-  const readingTime = Math.max(1, Math.ceil(charCount / 600));
+  const readingTime = Math.max(1, Math.ceil(charCount / config.readingTime.charactersPerMinute));
 
   const slug = generateSlug(filePath);
   const dateObj = parseDate(data.date);
@@ -161,9 +164,6 @@ export function getPostsByCategory(category: string): Post[] {
   return getAllPosts().filter((post) => post.category === category);
 }
 
-// 分页相关函数
-export const POSTS_PER_PAGE = 12;
-
 export interface PaginatedPosts {
   posts: Post[];
   totalPosts: number;
@@ -171,15 +171,16 @@ export interface PaginatedPosts {
   currentPage: number;
 }
 
-export function getPaginatedPosts(page: number, postsPerPage: number = POSTS_PER_PAGE): PaginatedPosts {
+export function getPaginatedPosts(page: number, postsPerPage?: number): PaginatedPosts {
+  const perPage = postsPerPage ?? POSTS_PER_PAGE;
   const allPosts = getAllPosts();
   const totalPosts = allPosts.length;
-  const totalPages = Math.ceil(totalPosts / postsPerPage);
-  
+  const totalPages = Math.ceil(totalPosts / perPage);
+
   // 确保页码在有效范围内
   const validPage = Math.max(1, Math.min(page, totalPages));
-  const startIndex = (validPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
+  const startIndex = (validPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
   
   return {
     posts: allPosts.slice(startIndex, endIndex),
@@ -191,19 +192,20 @@ export function getPaginatedPosts(page: number, postsPerPage: number = POSTS_PER
 
 // 获取标签相关的分页文章
 export function getPaginatedPostsByTag(
-  tag: string, 
-  page: number, 
-  postsPerPage: number = POSTS_PER_PAGE
+  tag: string,
+  page: number,
+  postsPerPage?: number
 ): PaginatedPosts {
+  const perPage = postsPerPage ?? POSTS_PER_PAGE;
   const allPosts = getAllPosts();
   const filteredPosts = allPosts.filter((post) => post.tags.includes(tag));
   const totalPosts = filteredPosts.length;
-  const totalPages = Math.ceil(totalPosts / postsPerPage);
-  
+  const totalPages = Math.ceil(totalPosts / perPage);
+
   // 确保页码在有效范围内
   const validPage = Math.max(1, Math.min(page, totalPages || 1));
-  const startIndex = (validPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
+  const startIndex = (validPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
   
   return {
     posts: filteredPosts.slice(startIndex, endIndex),

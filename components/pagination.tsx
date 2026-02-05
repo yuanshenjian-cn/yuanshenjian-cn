@@ -14,34 +14,34 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
 
   const getVisiblePages = () => {
     const pages: (number | string)[] = [];
-    
+
     // 总是显示第一页
     pages.push(1);
-    
+
     // 当前页附近的页码
     const start = Math.max(2, currentPage - 1);
     const end = Math.min(totalPages - 1, currentPage + 1);
-    
+
     // 添加省略号
     if (start > 2) {
       pages.push("...");
     }
-    
+
     // 添加中间页码
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-    
+
     // 添加省略号
     if (end < totalPages - 1) {
       pages.push("...");
     }
-    
+
     // 总是显示最后一页
     if (totalPages > 1) {
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 

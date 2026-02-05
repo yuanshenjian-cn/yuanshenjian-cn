@@ -5,6 +5,7 @@ import rehypePrismPlus from 'rehype-prism-plus';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import GitHubSlugger from 'github-slugger';
+import { config } from "@/lib/config";
 
 export type MDXComponents = Record<string, React.ComponentType<any>>;
 
@@ -85,8 +86,13 @@ export function isValidMDX(source: string): boolean {
 }
 
 export function calculateReadingTime(content: string): number {
-  const wordCount = content.split(/\s+/g).length;
-  return Math.ceil(wordCount / 200);
+  const cleanContent = content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]+`/g, '')
+    .replace(/[#*_`\[\]\(\)\{\}]/g, '')
+    .replace(/\s+/g, '');
+  const charCount = cleanContent.length;
+  return Math.max(1, Math.ceil(charCount / config.readingTime.charactersPerMinute));
 }
 
 export interface Heading {

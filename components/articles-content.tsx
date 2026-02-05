@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Post } from "@/types/blog";
 import { Pagination } from "./pagination";
+import { PaginationNav } from "./pagination-nav";
 import { Calendar, Clock, Rss } from "lucide-react";
 
 interface ArticlesContentProps {
@@ -201,52 +202,12 @@ export function ArticlesContent({
         <div className="mt-12">
           {selectedTag ? (
             // 标签筛选模式：客户端分页
-            <nav className="flex items-center justify-center" aria-label="分页">
-          {/* 桌面端 */}
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => handlePageChange(validPage - 1)}
-              disabled={validPage <= 1}
-              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              上一页
-            </button>
-            <span className="px-3 py-2 text-sm">
-              第 {validPage} / {totalPages} 页
-            </span>
-            <button
-              onClick={() => handlePageChange(validPage + 1)}
-              disabled={validPage >= totalPages}
-              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              下一页
-            </button>
-          </div>
-              {/* 移动端 */}
-              <div className="flex md:hidden items-center gap-4">
-                <button
-                  onClick={() => handlePageChange(validPage - 1)}
-                  disabled={validPage <= 1}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 disabled:bg-muted/50 disabled:cursor-not-allowed transition-colors"
-                  aria-label="上一页"
-                >
-                  ←
-                </button>
-                <div className="flex items-center gap-1 text-sm min-w-[60px] justify-center">
-                  <span className="font-medium text-foreground">{validPage}</span>
-                  <span className="text-muted-foreground">/</span>
-                  <span className="text-muted-foreground">{totalPages}</span>
-                </div>
-                <button
-                  onClick={() => handlePageChange(validPage + 1)}
-                  disabled={validPage >= totalPages}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 disabled:bg-muted/50 disabled:cursor-not-allowed transition-colors"
-                  aria-label="下一页"
-                >
-                  →
-                </button>
-              </div>
-            </nav>
+            <PaginationNav
+              currentPage={validPage}
+              totalPages={totalPages}
+              mode="button"
+              onPageChange={handlePageChange}
+            />
           ) : (
             // 全部文章模式：链接分页（支持 SEO）
             <Pagination

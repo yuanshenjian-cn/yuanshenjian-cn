@@ -41,14 +41,14 @@ const skills: Skill[] = [
     icon: "AI",
     title: "AI Agent",
     description:
-      "熟练使用Spring AI、LangGraph开发AI Agent应用；熟练掌握AI软件工程实践，如Agent Skills、SDD框架",
+      "熟练使用Spring AI、LangGraph开发AI Agent应用，熟悉提示词工程、MCP、RAG",
   },
   {
     level: "proficient",
     icon: "AI",
-    title: "AI辅助编程",
+    title: "AI软开工程",
     description:
-      "熟练使用AI辅助编程工具，如：Claude code、Cursor、OpenCode、Trae；熟悉提示词工程、MCP、RAG",
+      "熟练使用AI提效工具，如：Claude code、Cursor、OpenCode、Agent Skills、SDD框架",
   },
   {
     level: "proficient",
