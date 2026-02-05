@@ -16,7 +16,7 @@ export function Footer() {
           <div className="flex items-center gap-4 text-xs">
             <Link 
               href="/" 
-              className="text-sm font-light text-foreground/80 hover:text-foreground transition-colors"
+              className="text-foreground/40 hover:text-foreground transition-colors"
             >
               Yuan Shenjian
             </Link>
