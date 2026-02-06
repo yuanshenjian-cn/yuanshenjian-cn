@@ -55,7 +55,13 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
 
     // 监听脚本加载完成
     script.onload = () => {
-      setIsLoading(false);
+      // 延迟检查 iframe 是否存在
+      setTimeout(() => {
+        const iframe = document.querySelector("iframe.giscus-frame");
+        if (iframe) {
+          setIsLoading(false);
+        }
+      }, 1000);
     };
 
     // 监听加载错误
@@ -63,14 +69,6 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
       setIsLoading(false);
       setHasError(true);
     };
-
-    // 设置加载超时（6秒）
-    const timeoutId = setTimeout(() => {
-      if (isLoading) {
-        setIsLoading(false);
-        setHasError(true);
-      }
-    }, 6000);
 
     container.appendChild(script);
 
@@ -94,7 +92,6 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
     observer.observe(document.documentElement, { attributes: true });
 
     return () => {
-      clearTimeout(timeoutId);
       observer.disconnect();
       container.innerHTML = "";
     };
