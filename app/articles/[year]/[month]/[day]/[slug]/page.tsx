@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Suspense, lazy } from "react";
 import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
-import { MDXContent as MDXRemoteContent, extractHeadings } from "@/lib/mdx";
+import { extractHeadings } from "@/lib/mdx";
 import Script from "next/script";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";

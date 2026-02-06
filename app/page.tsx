@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { ArrowRight, Calendar } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
+  description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+  openGraph: {
+    title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
+    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+    type: "website",
+  },
+};
 
 export default function Home() {
   const posts = getAllPosts();

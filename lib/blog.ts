@@ -1,33 +1,39 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { Post } from "@/types/blog";
+import { Post, PostFrontmatter } from "@/types/blog";
 import { config } from "@/lib/config";
+import { cleanContent } from "@/lib/utils";
 
 export const POSTS_PER_PAGE = config.posts.perPage;
 
 const postsDirectory = path.join(process.cwd(), "content/blog");
 
+// 缓存文章数据
+let cachedPosts: Post[] | null = null;
+let cachedTags: string[] | null = null;
+let cachedCategories: string[] | null = null;
+
 function getAllMarkdownFiles(dir: string): string[] {
   const files: string[] = [];
-  
+
   if (!fs.existsSync(dir)) {
     return files;
   }
 
   const items = fs.readdirSync(dir);
-  
+
   for (const item of items) {
     const fullPath = path.join(dir, item);
     const stat = fs.statSync(fullPath);
-    
+
     if (stat.isDirectory()) {
       files.push(...getAllMarkdownFiles(fullPath));
     } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
       files.push(fullPath);
     }
   }
-  
+
   return files;
 }
 
@@ -48,52 +54,100 @@ function parseDate(dateStr: string): { year: string; month: string; day: string 
   return { year, month, day };
 }
 
-function parsePostFile(filePath: string): Post {
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  const { data, content } = matter(fileContents);
+function parseTags(tags: string | string[] | undefined): string[] {
+  if (Array.isArray(tags)) {
+    return tags.filter((tag): tag is string => typeof tag === "string");
+  }
+  if (typeof tags === "string") {
+    return [tags];
+  }
+  return [];
+}
 
-  const cleanContent = content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]+`/g, '')
-    .replace(/[#*_`\[\]\(\)\{\}]/g, '')
-    .replace(/\s+/g, '');
-  
-  const charCount = cleanContent.length;
-  const readingTime = Math.max(1, Math.ceil(charCount / config.readingTime.charactersPerMinute));
+function validateFrontmatter(data: PostFrontmatter, filePath: string): { isValid: boolean; error?: string } {
+  if (!data.title) {
+    return { isValid: false, error: `Missing required field "title" in ${filePath}` };
+  }
+  if (!data.date) {
+    return { isValid: false, error: `Missing required field "date" in ${filePath}` };
+  }
+  const dateObj = new Date(data.date);
+  if (isNaN(dateObj.getTime())) {
+    return { isValid: false, error: `Invalid date format "${data.date}" in ${filePath}` };
+  }
+  return { isValid: true };
+}
 
-  const slug = generateSlug(filePath);
-  const dateObj = parseDate(data.date);
-  const dateISO = data.date ? new Date(data.date).toISOString() : new Date().toISOString();
+function parsePostFile(filePath: string): Post | null {
+  try {
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data, content } = matter(fileContents);
+    const frontmatter = data as PostFrontmatter;
 
-  const relativePath = getRelativePath(filePath);
-  const pathParts = relativePath.split(/[\\/]/);
-  const category = pathParts.length > 1 ? pathParts[0] : undefined;
+    // 验证 frontmatter
+    const validation = validateFrontmatter(frontmatter, filePath);
+    if (!validation.isValid) {
+      console.warn(validation.error);
+      return null;
+    }
 
-  return {
-    slug,
-    year: dateObj.year,
-    month: dateObj.month,
-    day: dateObj.day,
-    title: data.title || slug,
-    date: dateISO,
-    excerpt: data.brief || content.slice(0, 200).replace(/[#*_]/g, "") + "...",
-    content,
-    tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []),
-    published: data.published !== false,
-    readingTime,
-    category,
-  } as Post;
+    const cleanText = cleanContent(content);
+    const charCount = cleanText.length;
+    const readingTime = Math.max(1, Math.ceil(charCount / config.readingTime.charactersPerMinute));
+
+    const slug = generateSlug(filePath);
+    const dateObj = parseDate(frontmatter.date!);
+    const dateISO = new Date(frontmatter.date!).toISOString();
+
+    const relativePath = getRelativePath(filePath);
+    const pathParts = relativePath.split(/[\\/]/);
+    const category = pathParts.length > 1 ? pathParts[0] : undefined;
+
+    const excerpt = frontmatter.brief || content.slice(0, 200).replace(/[#*_]/g, "") + "...";
+
+    return {
+      slug,
+      year: dateObj.year,
+      month: dateObj.month,
+      day: dateObj.day,
+      title: frontmatter.title!,
+      date: dateISO,
+      excerpt,
+      content,
+      tags: parseTags(frontmatter.tags),
+      published: frontmatter.published !== false,
+      readingTime,
+      category,
+    };
+  } catch (error) {
+    console.error(`Error parsing post file ${filePath}:`, error);
+    return null;
+  }
 }
 
 export function getAllPosts(): Post[] {
+  // 生产构建时使用缓存，开发模式禁用以保证实时更新
+  if (cachedPosts && process.env.NODE_ENV === 'production') {
+    return cachedPosts;
+  }
+
   const files = getAllMarkdownFiles(postsDirectory);
 
   const posts = files
     .map(parsePostFile)
-    .filter((post) => post.published)
-    .sort((a, b) => (new Date(b.date) > new Date(a.date) ? 1 : -1));
+    .filter((post): post is Post => post !== null && post.published)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  // 缓存结果
+  cachedPosts = posts;
   return posts;
+}
+
+// 清除缓存（用于开发环境重新加载）
+export function clearPostsCache(): void {
+  cachedPosts = null;
+  cachedTags = null;
+  cachedCategories = null;
 }
 
 
@@ -106,7 +160,8 @@ export function getPostByDateAndSlug(year: string, month: string, day: string, s
       const fileSlug = generateSlug(filePath);
       const post = parsePostFile(filePath);
       
-      if (fileSlug === decodedSlug && 
+      if (post && 
+          fileSlug === decodedSlug && 
           post.year === year && 
           post.month === month && 
           post.day === day &&
@@ -122,15 +177,28 @@ export function getPostByDateAndSlug(year: string, month: string, day: string, s
 }
 
 export function getAllTags(): string[] {
+  // 生产构建时使用缓存，开发模式禁用以保证实时更新
+  if (cachedTags && process.env.NODE_ENV === 'production') {
+    return cachedTags;
+  }
+
   const posts = getAllPosts();
   const tags = new Set<string>();
   posts.forEach((post) => {
-    post.tags?.forEach((tag: string) => tags.add(tag));
+    post.tags.forEach((tag: string) => tags.add(tag));
   });
-  return Array.from(tags).sort();
+
+  const sortedTags = Array.from(tags).sort();
+  cachedTags = sortedTags;
+  return sortedTags;
 }
 
 export function getAllCategories(): string[] {
+  // 生产构建时使用缓存，开发模式禁用以保证实时更新
+  if (cachedCategories && process.env.NODE_ENV === 'production') {
+    return cachedCategories;
+  }
+
   const posts = getAllPosts();
   const categories = new Set<string>();
   posts.forEach((post) => {
@@ -138,7 +206,10 @@ export function getAllCategories(): string[] {
       categories.add(post.category);
     }
   });
-  return Array.from(categories).sort();
+
+  const sortedCategories = Array.from(categories).sort();
+  cachedCategories = sortedCategories;
+  return sortedCategories;
 }
 
 export function getAdjacentPosts(year: string, month: string, day: string, slug: string): { prev: Post | null; next: Post | null } {
