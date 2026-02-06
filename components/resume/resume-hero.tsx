@@ -55,10 +55,10 @@ export function ResumeHero() {
         {/* 个人简介 - 分成两段 */}
         <div className="space-y-4 text-base text-foreground/75 leading-relaxed max-w-2xl mx-auto">
           <p>
-            在Thoughtworks 10年多年，经历多个国内外交付、咨询和技术人员培养项目，精通敏捷软件工程实践和研发效能提升，擅长软件架构设计和服务器端应用开发。
+            在Thoughtworks 10年多年，经历多个国内外交付、咨询和技术人员培养项目，精通敏捷软件工程实践和研发效能提升，擅长软件架构设计和服务器端应用开发
           </p>
           <p>
-            有代码洁癖和优秀的业务Sense，具备良好的快速学习、解决问题和团队协作能力，热爱技术写作和分享。
+            有代码洁癖和优秀的业务Sense，具备良好的快速学习、解决问题和团队协作能力，热爱技术写作和分享
           </p>
         </div>
       </div>

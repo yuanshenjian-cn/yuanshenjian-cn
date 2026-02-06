@@ -62,18 +62,18 @@ export function ResumeExperience() {
 
                   {exp.description && (
                     <div className="text-muted-foreground text-sm leading-relaxed">
-                      <p>{exp.description}</p>
+                      <p className="text-sm">{exp.description}</p>
                     </div>
                   )}
 
                   {exp.list && (
                     <ul className="text-muted-foreground text-sm leading-relaxed space-y-2">
                       {exp.list.map((item, i) => (
-                        <li key={i} className="relative pl-5">
+                        <li key={i} className="relative pl-5 text-sm">
                           <span className="absolute left-0 text-primary font-medium">
                             ▸
                           </span>
-                          {item}
+                          <span className="text-sm">{item}</span>
                         </li>
                       ))}
                     </ul>
