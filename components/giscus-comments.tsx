@@ -64,13 +64,13 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
       setHasError(true);
     };
 
-    // 设置加载超时（10秒）
+    // 设置加载超时（6秒）
     const timeoutId = setTimeout(() => {
       if (isLoading) {
         setIsLoading(false);
         setHasError(true);
       }
-    }, 10000);
+    }, 6000);
 
     container.appendChild(script);
 
