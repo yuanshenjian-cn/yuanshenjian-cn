@@ -1,6 +1,6 @@
 ---
 agent: build
-description: 执行 git commit 来提交当前工作区的变更
+description: 执行 git commit 来提交当前工作区的变更（带参数"1"时需要确认）
 model: zhipuai-coding-plan/glm-4.7
 ---
 <CommitMessage>
@@ -9,7 +9,11 @@ model: zhipuai-coding-plan/glm-4.7
 
 ## 你的任务
 
-分析当前工作区代码变更，智能生成符合 Conventional Commits 规范的英文提交信息，并帮用户执行git commit，执行前一定要让用户确认。
+分析当前工作区代码变更，智能生成符合 Conventional Commits 规范的英文提交信息，并帮用户执行git commit。
+
+**确认机制**：
+- **不带参数或参数不是"1"**：直接执行 commit，不需要用户确认
+- **参数为"1"**：执行前让用户确认，保持原有的确认流程
 
 ## 执行流程
 
@@ -54,7 +58,14 @@ git diff HEAD
 - 样式调整 → `style`
 - 测试相关 → `test`
 
-### 4. 生成提交信息
+### 4. 判断是否需要用户确认
+
+**检查参数 {CommitMessage}**：
+
+- 如果参数为 `"1"` → 需要用户确认，进入步骤 5.1
+- 其他情况 → 不需要确认，进入步骤 5.2
+
+### 5. 生成提交信息
 
 **如果用户在斜杠命令参数后填充了{CommitMessage}，就使用{CommitMessage}作为参考信息，否则就为用户智能生成。**
 
@@ -78,7 +89,9 @@ git diff HEAD
 - 更新文档 → `docs: update readme with setup instructions`
 - 重构代码 → `refactor: simplify error handling logic`
 
-### 5. 用户确认
+### 6. 用户确认（仅在参数为"1"时执行）
+
+**展示变更统计和建议提交信息**：
 
 **展示变更统计和建议提交信息**：
 
@@ -100,7 +113,7 @@ git diff HEAD
 - **修改信息** → 使用 `question` 工具让用户输入新信息，然后重新确认
 - **取消** → 结束流程，不执行提交
 
-### 6. 执行提交并反馈
+### 7. 执行提交并反馈（无需确认时直接执行，确认时在用户选择后执行）
 
 **执行命令**：
 
@@ -125,15 +138,16 @@ git commit -m "{CommitMessage}"
 ## 使用示例
 
 ```
-/git-commit                          # 完全自动分析
-/git-commit "添加用户认证模块"          # 提供提示辅助分析
-/git-commit "fix memory leak"        # 直接使用提供英文描述
+/git-commit                          # 直接提交，无需确认
+/git-commit 1                        # 需要确认后再提交
+/git-commit "添加用户认证模块"      # 使用提示信息，直接提交
+/git-commit "fix memory leak"        # 直接使用提供的英文描述，无需确认
 ```
 
 ## 规范要求
 
 - 提交信息使用英文
 - 遵循 Conventional Commits 规范（feat/fix/docs/refactor/chore/style/test）
-- 提交前必须经用户确认
+- 参数为"1"时需要用户确认，其他情况直接执行
 - 展示详细的变更统计供参考
 - 支持用户自定义提交信息
