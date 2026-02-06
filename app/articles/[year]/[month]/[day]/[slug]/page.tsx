@@ -81,7 +81,7 @@ export default async function PostPage({ params }: Props) {
             </div>
 
             {/* 正文内容 - 只渲染一次 */}
-            <div className="w-full max-w-2xl mx-auto lg:mx-0">
+            <div className="w-full max-w-2xl mx-auto lg:mx-0 overflow-hidden">
               {/* 桌面版 header */}
               <div className="hidden lg:block">
                 <ArticleContent post={post} prev={prev} next={next} slug={slug} />
@@ -102,7 +102,7 @@ export default async function PostPage({ params }: Props) {
             </aside>
           </div>
         ) : (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto overflow-hidden">
             <ArticleContent post={post} prev={prev} next={next} slug={slug} />
           </div>
         )}

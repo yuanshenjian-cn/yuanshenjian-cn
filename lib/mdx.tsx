@@ -19,6 +19,11 @@ interface ElementProps {
   className?: string;
 }
 
+interface ImageProps extends ElementProps {
+  src?: string;
+  alt?: string;
+}
+
 const mdxComponents: MDXComponents = {
   h1: ({ id, children }: HeadingProps) => (
     <h1 id={id} className="text-3xl font-bold mt-8 mb-4 scroll-mt-24">{children}</h1>
@@ -32,27 +37,30 @@ const mdxComponents: MDXComponents = {
   h4: ({ id, children }: HeadingProps) => (
     <h4 id={id} className="text-lg font-semibold mt-4 mb-2 scroll-mt-24">{children}</h4>
   ),
-  p: ({ children }: ElementProps) => <p className="my-4 leading-relaxed">{children}</p>,
+  p: ({ children }: ElementProps) => <p className="my-4 leading-relaxed break-words">{children}</p>,
+  img: ({ src, alt }: ImageProps) => (
+    <img src={src} alt={alt} className="max-w-full h-auto my-4 rounded-lg" />
+  ),
   ul: ({ children }: ElementProps) => <ul className="list-disc list-inside my-4 space-y-2">{children}</ul>,
   ol: ({ children }: ElementProps) => <ol className="list-decimal list-inside my-4 space-y-2">{children}</ol>,
-  li: ({ children }: ElementProps) => <li className="my-1">{children}</li>,
+  li: ({ children }: ElementProps) => <li className="my-1 break-words">{children}</li>,
   blockquote: ({ children }: ElementProps) => (
-    <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>
+    <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground break-words">{children}</blockquote>
   ),
   code: ({ children }: ElementProps) => (
-    <code className="bg-muted/60 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>
+    <code className="bg-muted/60 px-1.5 py-0.5 rounded text-sm font-mono break-all">{children}</code>
   ),
   pre: ({ children }: ElementProps) => (
-    <pre className="bg-muted/80 dark:bg-muted p-4 rounded-lg overflow-x-auto my-4">{children}</pre>
+    <pre className="bg-muted/80 dark:bg-muted p-4 rounded-lg overflow-x-auto my-4 max-w-full">{children}</pre>
   ),
-  a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline">{children}</a>,
+  a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline break-all">{children}</a>,
   hr: () => <hr className="my-8 border-border" />,
   table: ({ children }: ElementProps) => <table className="w-full border-collapse my-4">{children}</table>,
   th: ({ children }: ElementProps) => (
-    <th className="border border-border px-4 py-2 text-left font-semibold">{children}</th>
+    <th className="border border-border px-4 py-2 text-left font-semibold break-words">{children}</th>
   ),
   td: ({ children }: ElementProps) => (
-    <td className="border border-border px-4 py-2">{children}</td>
+    <td className="border border-border px-4 py-2 break-words">{children}</td>
   ),
 };
 
