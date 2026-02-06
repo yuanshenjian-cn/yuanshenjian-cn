@@ -5,6 +5,7 @@ import Script from "next/script";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
 import { TableOfContents } from "@/components/table-of-contents";
+import { FloatingTocButton } from "@/components/floating-toc-button";
 
 interface Props {
   params: Promise<{ year: string; month: string; day: string; slug: string }>;
@@ -106,6 +107,9 @@ export default async function PostPage({ params }: Props) {
           </div>
         )}
       </article>
+      
+      {/* 移动端浮动目录按钮 */}
+      {headings.length > 0 && <FloatingTocButton headings={headings} />}
     </>
   );
 }

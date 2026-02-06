@@ -57,12 +57,32 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     setIsOpen(false);
   }, []);
 
+  // 获取可见的 heading 元素（修复重复ID问题）
+  const getVisibleElement = useCallback((id: string): HTMLElement | null => {
+    const elements = document.querySelectorAll(`[id="${CSS.escape(id)}"]`);
+    
+    for (const el of elements) {
+      const element = el as HTMLElement;
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      
+      if (style.display !== 'none' && 
+          style.visibility !== 'hidden' &&
+          rect.height > 0) {
+        return element;
+      }
+    }
+    
+    return null;
+  }, []);
+
   const handleClick = (id: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    const element = document.getElementById(id);
+    const element = getVisibleElement(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.pushState(null, '', `#${id}`);
       handleClose();
     }
   };
@@ -107,11 +127,14 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     <>
       <button
         ref={buttonRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         className={`lg:hidden fixed bottom-20 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-300 hover:opacity-90 z-40 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
-        aria-label="打开目录"
+        aria-label={isOpen ? "关闭目录" : "打开目录"}
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
