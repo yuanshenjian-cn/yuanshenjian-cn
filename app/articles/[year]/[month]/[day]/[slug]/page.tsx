@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation";
-import { Suspense, lazy } from "react";
 import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
 import { extractHeadings } from "@/lib/mdx";
 import Script from "next/script";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
-
-const TableOfContents = lazy(() => import("@/components/table-of-contents").then((mod) => ({ default: mod.TableOfContents })));
+import { TableOfContents } from "@/components/table-of-contents";
 
 interface Props {
   params: Promise<{ year: string; month: string; day: string; slug: string }>;
@@ -70,36 +68,38 @@ export default async function PostPage({ params }: Props) {
       />
       <article className="py-12 px-6">
         {headings.length > 0 ? (
-          <>
-            {/* Desktop: 阅读区和目录一起整体居中 */}
-            <div className="hidden lg:flex lg:justify-center lg:gap-8">
-              <div className="w-full max-w-2xl">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} />
-              </div>
-              <aside className="w-60 flex-shrink-0">
-                <div className="sticky top-24">
-                  <div className="bg-card rounded-lg p-4 border">
-                    <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse"></div>}>
-                      <TableOfContents headings={headings} />
-                    </Suspense>
-                  </div>
-                </div>
-              </aside>
-            </div>
-
-            {/* Mobile: 标题 → 目录 → 正文 */}
-            <div className="lg:hidden max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto lg:flex lg:justify-center lg:gap-8">
+            {/* 移动端目录（在正文前，不固定） */}
+            <div className="lg:hidden max-w-2xl mx-auto mb-8">
               <ArticleHeader post={post} />
               <div className="my-8">
                 <div className="bg-card rounded-lg p-4 border">
-                  <Suspense fallback={<div className="h-48 bg-muted rounded animate-pulse"></div>}>
-                    <TableOfContents headings={headings} />
-                  </Suspense>
+                  <TableOfContents headings={headings} />
                 </div>
               </div>
-              <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} />
             </div>
-          </>
+
+            {/* 正文内容 - 只渲染一次 */}
+            <div className="w-full max-w-2xl mx-auto lg:mx-0">
+              {/* 桌面版 header */}
+              <div className="hidden lg:block">
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} />
+              </div>
+              {/* 移动版正文（无 header） */}
+              <div className="lg:hidden">
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} />
+              </div>
+            </div>
+
+            {/* 桌面端目录（固定） */}
+            <aside className="hidden lg:block w-60 flex-shrink-0">
+              <div className="sticky top-24">
+                <div className="bg-card rounded-lg p-4 border">
+                  <TableOfContents headings={headings} />
+                </div>
+              </div>
+            </aside>
+          </div>
         ) : (
           <div className="max-w-2xl mx-auto">
             <ArticleContent post={post} prev={prev} next={next} slug={slug} />
