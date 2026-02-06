@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface GiscusCommentsProps {
   path?: string;
@@ -8,8 +8,6 @@ interface GiscusCommentsProps {
 
 export function GiscusComments({ path }: GiscusCommentsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     // Giscus 配置（硬编码，确保线上可用）
@@ -30,8 +28,6 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
 
     // 清理现有内容
     container.innerHTML = "";
-    setIsLoading(true);
-    setHasError(false);
 
     // 创建 script 元素
     const script = document.createElement("script");
@@ -52,23 +48,6 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
     script.setAttribute("data-theme", getTheme());
     script.setAttribute("data-lang", "zh-CN");
     script.setAttribute("data-loading", "lazy");
-
-    // 监听脚本加载完成
-    script.onload = () => {
-      // 延迟检查 iframe 是否存在
-      setTimeout(() => {
-        const iframe = document.querySelector("iframe.giscus-frame");
-        if (iframe) {
-          setIsLoading(false);
-        }
-      }, 1000);
-    };
-
-    // 监听加载错误
-    script.onerror = () => {
-      setIsLoading(false);
-      setHasError(true);
-    };
 
     container.appendChild(script);
 
@@ -99,28 +78,6 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
 
   return (
     <div className="mt-8 mb-0">
-      {/* 加载状态 */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-8 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
-          <span className="text-sm">正在加载评论...</span>
-        </div>
-      )}
-
-      {/* 错误提示 */}
-      {hasError && (
-        <div className="text-center py-6 text-muted-foreground">
-          <p className="text-sm mb-2">评论加载失败，请稍后重试</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="text-xs px-3 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
-          >
-            刷新页面
-          </button>
-        </div>
-      )}
-
-      {/* Giscus 容器 */}
       <div 
         ref={containerRef} 
         className="giscus-wrapper" 
@@ -128,7 +85,7 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
           transform: "scale(0.92)", 
           transformOrigin: "top left",
           width: "108.7%",
-          minHeight: isLoading || hasError ? "auto" : "300px"
+          minHeight: "300px"
         }} 
       />
     </div>
