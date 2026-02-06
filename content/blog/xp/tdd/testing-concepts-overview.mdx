@@ -1,0 +1,98 @@
+---
+title: 闲话测试
+date: '2020-01-01'
+tags:
+  - extreme programming
+  - tdd
+published: true
+brief: >-
+  测试概念众多且易混淆，如单元测试、集成测试、端到端测试等缺乏统一标准。测试金字塔和敏捷测试四象限提供了分类框架。理解测试概念更重要的是在团队内达成共识，并明确每种测试能解决什么问题。合理的测试策略能提升软件交付效率和质量，是团队的重要实践。
+---
+
+写了多年代码，做了多场培训，我发现众多开发人员，无论经验丰富与否，对测试类型和测试概念的理解难以趋同。一些场景下，同一个测试概念，彼此理解相差甚远，导致很多时候在讨论过程中，都要重新对齐定义。借用一个段子来形容这个现象：你去问9个人单元测试是什么，可能会得到10种不同的答案。
+
+本文我尝试抛出我听过和了解过的测试概念，内容如题 -- 杂谈。文末我分享了一些业界前辈对这些概念的解读。希望在未来，你我江湖再见，聊起测试，不再大眼瞪小眼。
+
+## 测试这锅粥
+
+如果你了解过 Mike Cohn 的经典测试金字塔，位于金字塔底层的 **单元测试** 你肯定耳熟能详，位于顶层的 **UI测试** 你大概也知道是面向用户界面的测试，或者你还可能听人把 **UI测试** 叫做 **端到端测试**（E2E）。中间层 **服务测试**，深入了解后，你就会知道，它很多时候跟你所理解的 **API功能测试** 是一回事儿，另外，它还有另一个较为形象的名字 -- **皮下测试**，不知你是否也觉得它有点像中国的象形文字。
+
+![](/images/xp/tdd/test-pyramid-classic.webp)
+
+图片源自： [https://martinfowler.com/bliki/TestPyramid.html](https://martinfowler.com/bliki/TestPyramid.html)
+
+经典测试金字塔流传较为广泛，好学的你可能在社区看到过不同的版本，比如后来写下 [测试金字塔实战](https://www.yuque.com/yuanshenjian/agile/practical-test-pyramid) Thoughtworks 德国办公室的同事 Ham Vocke 就画过这个版本的金字塔：
+
+![](/images/xp/tdd/test-pyramid-ham.webp)
+
+图片源自： [https://martinfowler.com/articles/practical-test-pyramid.html](https://martinfowler.com/articles/practical-test-pyramid.html)
+
+塔底的 单元测试 跟原来的保持一致，中间层被赋名 **集成测试**。我在第一次听到集成测试时心生困惑：两个类的集成？两个模块的集成？两个系统的集成？前后端集成？跟数据库的集成？跟文件系统的集成......
+
+如果你跟我一样也有类似的困惑，别慌，不妨阅读一下 [测试金字塔实战](https://www.yuque.com/yuanshenjian/agile/practical-test-pyramid)，读完你就清晰了：集成测试确实是需要一些限定上下文的。Ham 在文章就提到了两个：跟数据库的集成测试、跟外部服务的集成测试。
+
+细心地你可能还发现 Ham 还提到了前几年开始流行的 **契约测试**，仔细想想，你会发现契约测试其实也属于一种集成测试，它验证的是两个系统集成的接口规范。
+
+对于集成测试，老马（Martin Folwer）提出过两种做法，一种是 **宽集成测试**，一种是 **窄集成测试**，这种视角的细分让也为开发团队实际落地集成测试在技术上提供了更多的选择。
+
+塔顶则变成了 **E2E测试**，这可能是很多人认为 **UI测试** 等同于 E2E测试 的一个原由。而广义上的用户界面有一些不同的解读，它可以是用户可见的Web页面或App界面，也可以是 REST API界面，还可以是命令行界面，这也是为什么一些人某些时候将 E2E测试 理解成 **API功能测试** 的原因。
+
+同时，如果仅仅是测试UI，也可以不走端到端流程，借助测试替身隔离服务端，只测试UI端的JavaScript的功能和页面布局样式，甚至某些团队可以聚焦到布局样式的验证。如果是这种做法，它变不再能称得上是端到端测试了，所以当你再听到有人说 UI测试 是 端到端测试 的时候，你或许就明白他在说什么了。
+
+你可能还听过有人将 端到端测试 也叫 集成测试，琢磨一下也没毛病，因为他说这是 **系统集成测试**，有人也简化称其为 **系统测试**，而这种 系统测试 就跟老马说的 宽集成测试 异曲同工。
+
+老马还发明了一个跟上述命名不在一个维度上的名字 -- **宽栈测试**（BroadStackTest），**宽栈测试通常也被称为 端到端测试** 或 全栈测试。这个名字也很形象，宽嘛，涵盖范围大，但明确的边界呢，也是没有的。
+
+## 一些延伸
+
+如果你经历过正规的迭代开发，你大概率经历过迭代的 Showcase，Showcase 啰嗦点讲是 给客户展示迭代开发的功能是否符合预期，简单来讲叫 **用户/客户验收测试**，甚至有人直接就喊 **验收测试**。而如果当你单独说验收测试的时候，也会有人会理解为 **故事验收测试**，还有少数人会当成 **API功能验收测试**。这里面还是存在一个隐性的限定上下文 -- 验收什么的测试？
+
+等你多做几个项目后，你会看到有些敏捷实践玩得很6的高战斗力团队，QA看着比较清闲，能自动化的功能方面的测试她都想办法自动化了，做好了这个，就到了发挥她更大价值的时候。她可能会做一些 **探索性测试** 和 **易用性测试**，充分发挥她的创造性思维来弥补 自动化测试 之光照不到的黑暗焦虑，为产品用户体验和市场竞争力添砖加瓦。
+
+如果你做过稍微大型的商业系统，尤其是To C的，用户的隐私安全、大量用户访问的性能或许曾经困扰过你。针对这些跨功能需求（CFR）问题，你们团队大概率会在上线前进行必要且有效的 **性能测试 **和 **安全测试**，避免在某些极端情况可能导致项目失败。**CFR测试 **很多时候是团队TL和QA重点关注的。
+
+## 稳住，别乱
+
+这些概念，我曾经几乎都听过，大部分也跟人讨论过，却依然不能指望上了一个新的项目，很有信心地认为当我跟项目中的小伙伴同时说出某个一样的概念时，我俩理解是一致的，仍然需要必要的限定上下文对齐，进而对齐在该项目团队中的概念定义和落地形式。
+
+其实，说了这么多测试概念，它们的名字本身不重要，要我说，重要的有两点，一个是在同一个开发团队中，大家是否对概念的理解是一致的？我尝试从程序员视角，给出几个平时可以帮助我们去审视这些概念的几个提问：
+
+1. 单元测试，你理解的单元是什么？
+2. 组件测试，什么被称为组件？
+3. 集成测试，谁和谁的集成？
+4. 验收测试，验收什么呢？
+5. UI测试，UI还有其他的含义吗？
+6. 端到端测试，从哪端到哪端？
+7. 系统测试，系统的范围是多大？
+
+另一个是，这些测试能帮助我们解决什么问题？这个问题我想先留给你去思考。如果你思考过后仍有疑惑，去看看高效能工程实践（SEELE）框架课程，或许你能从 [工程效能](https://drive.google.com/file/d/1kQ6CSGLs6BgLGGSs3HSLtwt0hIEtRDGg/view)[1] 那里找到一些答案，其内容借助 Brian Marick 的测试四象限对测试的目的和类型做了一个系统的分类。
+
+![](/images/xp/tdd/testing-quadrants-full.webp)
+
+## 为了好日子
+
+[测试金字塔实战](https://www.yuque.com/yuanshenjian/agile/practical-test-pyramid) 的作者 Ham 是德国 Thoughtworks 的一名软件开发和咨询师。由于厌倦了在凌晨 3 点手动部署软件，他开始持续交付实践，加紧自动化步伐，并着手帮助团队高效可靠地交付高质量软件。这样他就可以把省出来的时间用在别的有趣的事情上了。
+
+如果你也希望跟 Ham 一样，可以有更多的时间做一些有趣的事情，如果你还想落地好 [主干开发](https://docs.google.com/presentation/d/1nI20qe4a-OzP18bkgPJet3we4Qfs8bhYH6RKi1lu9ZE/edit#slide=id.g12afdfe59b5_0_89)。我诚恳地建议你：多了解一些行业中测试相关的理论以及落地实践，如果你非要问我为什么，我认为前者是为了方便交流，后者则是为了将来的好日子。
+
+文末关于测试的译文，原文主要出自老马（Martin Folwer）之手，希望为好学乐思的你提供一些阅读上的便利。翻译水平有限，也请大家慷慨斧正。如果恰巧你那也有关于测试的知识，特别感谢你能够分享出来。
+
++ [测试金字塔](https://www.yuque.com/yuanshenjian/agile/test-pyramid)
++ [自测试代码](https://www.yuque.com/yuanshenjian/agile/self-testing-code)
++ [测试驱动开发](https://www.yuque.com/yuanshenjian/agile/tdd)
++ [单元测试](https://www.yuque.com/yuanshenjian/agile/unit-test)
++ [组件测试](https://www.yuque.com/yuanshenjian/agile/component-test)
++ [集成测试](https://www.yuque.com/yuanshenjian/agile/integration-test)
++ [契约测试](https://www.yuque.com/yuanshenjian/agile/contract-test)
++ [皮下测试](https://www.yuque.com/yuanshenjian/agile/subcutaneous-test)
++ [宽栈测试](https://www.yuque.com/yuanshenjian/agile/broad-stack-test)
++ [探索性测试](https://www.yuque.com/yuanshenjian/agile/exploratory-testing)
++ [用户故事测试](https://www.yuque.com/yuanshenjian/agile/user-story-test)
++ [面向业务的测试](https://www.yuque.com/yuanshenjian/agile/business-facing-test)
++ [用户旅程测试](https://www.yuque.com/yuanshenjian/agile/user-journey-test)
++ [测试替身](https://www.yuque.com/yuanshenjian/agile/test-double)
++ [Mocks 不是 Stubs](/articles/2025/02/04/mocks-arent-stubs)
+
+#### 说明
+
+1. 工程效能 为TW内部视频链接，外部无权限访问，可搜索 "敏捷测试四象限" 进行相关学习
