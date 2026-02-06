@@ -10,15 +10,11 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const repo = process.env.NEXT_PUBLIC_GISCUS_REPO;
-    const repoId = process.env.NEXT_PUBLIC_GISCUS_REPO_ID;
-    const category = process.env.NEXT_PUBLIC_GISCUS_CATEGORY;
-    const categoryId = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID;
-
-    if (!repo || !repoId || !category || !categoryId) {
-      console.warn("Giscus: Environment variables are not set");
-      return;
-    }
+    // Giscus 配置（硬编码，确保线上可用）
+    const repo = "yuanshenjian-cn/yuanshenjian-cn";
+    const repoId = "R_kgDORINV5g";
+    const category = "General";
+    const categoryId = "DIC_kwDORINV5s4C19yc";
 
     // 检测当前主题
     const getTheme = () => {
