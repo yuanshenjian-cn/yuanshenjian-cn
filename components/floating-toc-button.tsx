@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Menu, X } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Heading } from "@/lib/mdx";
 
 interface FloatingTocButtonProps {
@@ -79,6 +79,18 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     return () => observer.disconnect();
   }, [isOpen, headings, getVisibleElement]);
 
+  // 禁止背景滚动当抽屉打开时
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const handleClick = (id: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -86,6 +98,7 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
       window.history.pushState(null, '', `#${id}`);
+      // 点击后自动关闭抽屉
       handleClose();
     }
   };
@@ -94,65 +107,72 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
 
   return (
     <>
-      {/* 背景遮罩 - z-50 */}
-      {isOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
-          onClick={handleClose}
-        />
-      )}
+      {/* 背景遮罩 */}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-all duration-300 ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={handleClose}
+      />
 
+      {/* 左侧触发按钮 - 垂直居中 */}
       <button
         ref={buttonRef}
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`lg:hidden fixed bottom-20 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-300 hover:opacity-90 z-50 ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-        }`}
+        className={`lg:hidden fixed left-0 top-1/2 -translate-y-1/2 px-[3px] py-6 bg-card dark:bg-muted border border-l-0 border-border dark:border-muted-foreground/20 rounded-r-lg transition-all duration-300 hover:bg-muted dark:hover:bg-muted/80 z-50 ${
+          isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"
+        } ${isOpen ? "translate-x-64" : ""}`}
         aria-label={isOpen ? "关闭目录" : "打开目录"}
       >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {isOpen ? (
+          <ChevronLeft className="w-3 h-6 text-muted-foreground dark:text-foreground" />
+        ) : (
+          <ChevronRight className="w-3 h-6 text-muted-foreground dark:text-foreground" />
+        )}
       </button>
 
-      {/* 目录面板 - 在屏幕中央居中显示 */}
-      {isOpen && (
-        <div
-          ref={panelRef}
-          className="lg:hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-full sm:max-w-md bg-card border rounded-lg shadow-2xl z-50 max-h-[70vh] overflow-y-auto"
-        >
-          <div className="sticky top-0 bg-card border-b px-4 py-3 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-muted-foreground">目录</h3>
-            <button
-              onClick={handleClose}
-              className="p-1 hover:bg-muted rounded transition-colors"
-              aria-label="关闭"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <nav className="py-3 space-y-1">
-            {headings.map((heading) => (
-              <button
-                key={heading.id}
-                onClick={(e) => handleClick(heading.id, e)}
-                className={`block w-full text-left text-sm py-2 rounded transition-colors text-left ${
-                  activeId === heading.id
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
-                style={{
-                  paddingLeft: `${(heading.level - 2) * 12 + 16}px`,
-                  paddingRight: '16px',
-                }}
-              >
-                {heading.text}
-              </button>
-            ))}
-          </nav>
+      {/* 左侧抽屉目录 */}
+      <div
+        ref={panelRef}
+        className={`lg:hidden fixed top-0 left-0 h-full w-64 bg-card border-r border-border shadow-2xl z-50 transition-transform duration-300 ease-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* 抽屉头部 */}
+        <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
+          <h3 className="text-sm font-medium text-foreground">目录</h3>
+          <button
+            onClick={handleClose}
+            className="p-1.5 hover:bg-muted rounded-md transition-colors"
+            aria-label="关闭"
+          >
+            <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
-      )}
+
+        {/* 目录内容 */}
+        <nav className="py-3 px-2 space-y-0.5 overflow-y-auto h-[calc(100%-3.5rem)]">
+          {headings.map((heading) => (
+            <button
+              key={heading.id}
+              onClick={(e) => handleClick(heading.id, e)}
+              className={`block w-full text-left text-sm py-2 px-3 rounded-md transition-colors ${
+                activeId === heading.id
+                  ? "bg-muted text-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+              style={{
+                paddingLeft: `${(heading.level - 2) * 12 + 12}px`,
+              }}
+            >
+              {heading.text}
+            </button>
+          ))}
+        </nav>
+      </div>
     </>
   );
 }
