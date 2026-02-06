@@ -15,49 +15,6 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const toggleVisibility = () => {
-      // 比返回顶部按钮(300px)稍晚出现
-      if (window.scrollY > 400) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-20% 0% -80% 0%" }
-    );
-
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [isOpen, headings]);
-
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-
   // 获取可见的 heading 元素（修复重复ID问题）
   const getVisibleElement = useCallback((id: string): HTMLElement | null => {
     const elements = document.querySelectorAll(`[id="${CSS.escape(id)}"]`);
@@ -77,6 +34,51 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     return null;
   }, []);
 
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  // 监听滚动显示按钮
+  useEffect(() => {
+    const toggleVisibility = () => {
+      // 比返回顶部按钮(300px)稍晚出现
+      if (window.scrollY > 400) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  // 监听当前活动的 heading
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-20% 0% -80% 0%" }
+    );
+
+    headings.forEach((heading) => {
+      const element = getVisibleElement(heading.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [isOpen, headings, getVisibleElement]);
+
   const handleClick = (id: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -88,13 +90,11 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     }
   };
 
-
-
   if (headings.length === 0) return null;
 
   return (
     <>
-      {/* 背景遮罩 - z-50，在按钮之上 */}
+      {/* 背景遮罩 - z-50 */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
@@ -116,13 +116,13 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
 
-      {/* 目录面板 - z-50 */}
+      {/* 目录面板 - 在屏幕中央居中显示 */}
       {isOpen && (
         <div
           ref={panelRef}
-          className="lg:hidden fixed bottom-32 left-4 right-4 bg-card border rounded-lg shadow-xl z-50 max-h-[60vh] overflow-y-auto"
+          className="lg:hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] sm:w-full sm:max-w-md bg-card border rounded-lg shadow-2xl z-50 max-h-[70vh] overflow-y-auto"
         >
-          <div className="sticky top-0 bg-card border-b p-4 flex items-center justify-between">
+          <div className="sticky top-0 bg-card border-b px-4 py-3 flex items-center justify-between">
             <h3 className="text-sm font-medium text-muted-foreground">目录</h3>
             <button
               onClick={handleClose}
@@ -132,18 +132,19 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
               <X className="w-4 h-4" />
             </button>
           </div>
-          <nav className="p-2 space-y-0.5">
+          <nav className="py-3 space-y-1">
             {headings.map((heading) => (
               <button
                 key={heading.id}
                 onClick={(e) => handleClick(heading.id, e)}
-                className={`block w-full text-left text-sm py-2 px-3 rounded transition-colors text-left ${
+                className={`block w-full text-left text-sm py-2 rounded transition-colors text-left ${
                   activeId === heading.id
                     ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 style={{
-                  paddingLeft: `${(heading.level - 1) * 16 + 12}px`,
+                  paddingLeft: `${(heading.level - 2) * 12 + 16}px`,
+                  paddingRight: '16px',
                 }}
               >
                 {heading.text}

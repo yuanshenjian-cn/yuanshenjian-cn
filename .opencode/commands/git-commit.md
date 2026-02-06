@@ -37,7 +37,7 @@ git diff HEAD
 **判断状态**：
 
 - 无变更 → 通知用户 "没有需要提交的更改"，结束流程
-- 有变更 → 进入步骤 3
+- 有变更 → 自动执行 `git add -A` 添加所有变更，进入步骤 3
 
 ### 3. 分析变更内容
 
@@ -118,6 +118,7 @@ git diff HEAD
 **执行命令**：
 
 ```bash
+git add -A
 git commit -m "{CommitMessage}"
 ```
 
