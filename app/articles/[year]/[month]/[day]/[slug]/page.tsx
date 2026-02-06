@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
 import { extractHeadings } from "@/lib/mdx";
+import { config } from "@/lib/config";
 import Script from "next/script";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
@@ -47,6 +48,7 @@ export default async function PostPage({ params }: Props) {
 
   const { prev, next } = getAdjacentPosts(year, month, day, slug);
   const headings = extractHeadings(post.content);
+  const postUrl = `${config.site.url}/articles/${year}/${month}/${day}/${slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -84,11 +86,11 @@ export default async function PostPage({ params }: Props) {
             <div className="w-full max-w-2xl mx-auto lg:mx-0 overflow-hidden">
               {/* 桌面版 header */}
               <div className="hidden lg:block">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} />
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} />
               </div>
               {/* 移动版正文（无 header） */}
               <div className="lg:hidden">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} />
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} url={postUrl} />
               </div>
             </div>
 
@@ -103,7 +105,7 @@ export default async function PostPage({ params }: Props) {
           </div>
         ) : (
           <div className="max-w-2xl mx-auto overflow-hidden">
-            <ArticleContent post={post} prev={prev} next={next} slug={slug} />
+            <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} />
           </div>
         )}
       </article>

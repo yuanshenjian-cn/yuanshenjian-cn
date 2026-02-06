@@ -3,6 +3,7 @@ import { MDXContent as MDXRemoteContent } from "@/lib/mdx";
 import { PostNavigation } from "@/components/post-navigation";
 import { WalineCommentsContainer } from "@/components/waline-comments-container";
 import { ArticleHeader } from "@/components/article-header";
+import { ShareButtons } from "@/components/share-buttons";
 import type { Post } from "@/types/blog";
 
 interface ArticleContentProps {
@@ -11,9 +12,12 @@ interface ArticleContentProps {
   next: Post | null;
   slug: string;
   showHeader?: boolean;
+  url?: string;
 }
 
-export function ArticleContent({ post, prev, next, slug, showHeader = true }: ArticleContentProps) {
+export function ArticleContent({ post, prev, next, slug, showHeader = true, url }: ArticleContentProps) {
+  const shareUrl = url || `${typeof window !== 'undefined' ? window.location.origin : ''}/articles/${post.year}/${post.month}/${post.day}/${slug}`;
+
   return (
     <>
       {showHeader && <ArticleHeader post={post} />}
@@ -24,7 +28,16 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true }: Ar
         </Suspense>
       </div>
 
-      <div className="mt-12 pt-8 border-t">
+      {/* 分享按钮 - 无上边框，更简洁 */}
+      <div className="mt-10">
+        <ShareButtons
+          url={shareUrl}
+          title={post.title}
+          description={post.excerpt}
+        />
+      </div>
+
+      <div className="mt-8">
         <PostNavigation prev={prev} next={next} />
       </div>
 
