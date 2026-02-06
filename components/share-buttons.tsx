@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { X, Check, Link2 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -40,26 +40,7 @@ async function copyToClipboard(url: string): Promise<boolean> {
 
 export function ShareButtons({ url, title, description, className }: ShareButtonsProps) {
   const [showWeChatModal, setShowWeChatModal] = useState(false);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [copied, setCopied] = useState(false);
-
-  // 生成二维码
-  useEffect(() => {
-    if (showWeChatModal && !qrCodeDataUrl) {
-      import("qrcode").then((QRCode) => {
-        QRCode.toDataURL(url, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: "#000000",
-            light: "#ffffff",
-          },
-        }).then((dataUrl: string) => {
-          setQrCodeDataUrl(dataUrl);
-        });
-      });
-    }
-  }, [showWeChatModal, url, qrCodeDataUrl]);
 
   // 处理复制链接
   const handleCopyLink = useCallback(async () => {
@@ -147,7 +128,7 @@ export function ShareButtons({ url, title, description, className }: ShareButton
         )}
       </button>
 
-      {/* 微信二维码弹窗 */}
+      {/* 微信分享提示弹窗 */}
       {showWeChatModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -170,27 +151,35 @@ export function ShareButtons({ url, title, description, className }: ShareButton
             <div className="text-center mb-4">
               <h3 className="text-lg font-semibold">分享到微信</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                打开微信扫一扫，分享至好友或朋友圈
+                复制下方链接，发送给微信好友
               </p>
             </div>
 
-            {/* 二维码 */}
-            <div className="flex justify-center mb-4">
-              {qrCodeDataUrl ? (
-                <img
-                  src={qrCodeDataUrl}
-                  alt="微信分享二维码"
-                  className="w-48 h-48 rounded-lg"
-                />
-              ) : (
-                <div className="w-48 h-48 rounded-lg bg-muted flex items-center justify-center">
-                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                </div>
-              )}
+            {/* 链接显示 */}
+            <div className="bg-muted p-3 rounded-lg mb-4">
+              <p className="text-sm break-all font-mono">{url}</p>
             </div>
 
+            {/* 复制按钮 */}
+            <button
+              onClick={handleCopyLink}
+              className="w-full py-2 bg-[#07C160] text-white rounded-lg hover:bg-[#06ae56] transition-colors flex items-center justify-center gap-2"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>已复制</span>
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-4 h-4" />
+                  <span>复制链接</span>
+                </>
+              )}
+            </button>
+
             {/* 文章信息 */}
-            <div className="text-center">
+            <div className="text-center mt-4">
               <p className="text-sm font-medium truncate">{title}</p>
               {description && (
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -201,7 +190,7 @@ export function ShareButtons({ url, title, description, className }: ShareButton
 
             {/* 提示 */}
             <div className="mt-4 pt-4 border-t text-xs text-muted-foreground text-center">
-              扫描二维码后，在微信内点击右上角「···」进行分享
+              复制后打开微信，粘贴给好友或分享到朋友圈
             </div>
           </div>
         </div>

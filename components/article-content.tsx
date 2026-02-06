@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { MDXContent as MDXRemoteContent } from "@/lib/mdx";
 import { PostNavigation } from "@/components/post-navigation";
-import { WalineCommentsContainer } from "@/components/waline-comments-container";
+import { GiscusCommentsContainer } from "@/components/giscus-comments-container";
 import { ArticleHeader } from "@/components/article-header";
 import { ShareButtons } from "@/components/share-buttons";
 import type { Post } from "@/types/blog";
@@ -41,7 +41,7 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url 
         <PostNavigation prev={prev} next={next} />
       </div>
 
-      <WalineCommentsContainer path={`/articles/${post.year}/${post.month}/${post.day}/${slug}`} />
+      <GiscusCommentsContainer path={`/articles/${post.year}/${post.month}/${post.day}/${slug}`} />
     </>
   );
 }
