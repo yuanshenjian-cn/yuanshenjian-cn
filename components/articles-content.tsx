@@ -94,7 +94,7 @@ export function ArticlesContent({
           </p>
         </div>
         {!selectedTag && (
-          <Link
+          <a
             href="/feed"
             target="_blank"
             rel="noopener noreferrer"
@@ -103,7 +103,7 @@ export function ArticlesContent({
           >
             <Rss className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">订阅</span>
-          </Link>
+          </a>
         )}
       </div>
 

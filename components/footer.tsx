@@ -28,7 +28,7 @@ export function Footer() {
               {posts.length} 篇 · {tags.length} 标签
             </span>
             <span className="text-foreground/30">·</span>
-            <Link 
+            <a 
               href="/feed" 
               target="_blank"
               rel="noopener noreferrer"
@@ -37,7 +37,7 @@ export function Footer() {
             >
               <Rss className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">订阅</span>
-            </Link>
+            </a>
           </div>
           
           {/* 右侧二维码和指引 */}
