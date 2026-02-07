@@ -16,7 +16,8 @@ interface ArticleContentProps {
 }
 
 export function ArticleContent({ post, prev, next, slug, showHeader = true, url }: ArticleContentProps) {
-  const shareUrl = url || `${typeof window !== 'undefined' ? window.location.origin : ''}/articles/${post.year}/${post.month}/${post.day}/${slug}`;
+  // URL 由父组件（服务端）传入，确保 SSR 和客户端一致
+  const shareUrl = url || `${post.year}/${post.month}/${post.day}/${slug}`;
 
   return (
     <>

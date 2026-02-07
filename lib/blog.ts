@@ -17,21 +17,31 @@ let cachedCategories: string[] | null = null;
 function getAllMarkdownFiles(dir: string): string[] {
   const files: string[] = [];
 
-  if (!fs.existsSync(dir)) {
-    return files;
-  }
-
-  const items = fs.readdirSync(dir);
-
-  for (const item of items) {
-    const fullPath = path.join(dir, item);
-    const stat = fs.statSync(fullPath);
-
-    if (stat.isDirectory()) {
-      files.push(...getAllMarkdownFiles(fullPath));
-    } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
-      files.push(fullPath);
+  try {
+    if (!fs.existsSync(dir)) {
+      console.warn(`[Blog] Posts directory not found: ${dir}`);
+      return files;
     }
+
+    const items = fs.readdirSync(dir);
+
+    for (const item of items) {
+      try {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+          files.push(...getAllMarkdownFiles(fullPath));
+        } else if (item.endsWith(".mdx") || item.endsWith(".md")) {
+          files.push(fullPath);
+        }
+      } catch (itemError) {
+        // 单个文件/目录读取失败不影响其他文件
+        console.warn(`[Blog] Failed to read item "${item}" in ${dir}:`, itemError instanceof Error ? itemError.message : itemError);
+      }
+    }
+  } catch (dirError) {
+    console.error(`[Blog] Failed to read directory ${dir}:`, dirError instanceof Error ? dirError.message : dirError);
   }
 
   return files;
@@ -157,21 +167,27 @@ export function getPostByDateAndSlug(year: string, month: string, day: string, s
     const files = getAllMarkdownFiles(postsDirectory);
     
     for (const filePath of files) {
-      const fileSlug = generateSlug(filePath);
-      const post = parsePostFile(filePath);
-      
-      if (post && 
-          fileSlug === decodedSlug && 
-          post.year === year && 
-          post.month === month && 
-          post.day === day &&
-          post.published) {
-        return post;
+      try {
+        const fileSlug = generateSlug(filePath);
+        const post = parsePostFile(filePath);
+        
+        if (post && 
+            fileSlug === decodedSlug && 
+            post.year === year && 
+            post.month === month && 
+            post.day === day &&
+            post.published) {
+          return post;
+        }
+      } catch (fileError) {
+        // 单个文件解析失败不影响其他文件
+        console.warn(`[Blog] Failed to parse file while searching: ${filePath}`, fileError instanceof Error ? fileError.message : fileError);
       }
     }
     
     return null;
-  } catch {
+  } catch (error) {
+    console.error(`[Blog] Failed to find post ${year}/${month}/${day}/${slug}:`, error instanceof Error ? error.message : error);
     return null;
   }
 }
