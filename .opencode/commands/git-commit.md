@@ -12,6 +12,7 @@ model: zhipuai-coding-plan/glm-4.7
 分析当前工作区代码变更，智能生成符合 Conventional Commits 规范的英文提交信息，并帮用户执行git commit。
 
 **确认机制**：
+
 - **不带参数或参数不是"1"**：直接执行 commit，不需要用户确认
 - **参数为"1"**：执行前让用户确认，保持原有的确认流程
 
