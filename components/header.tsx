@@ -17,9 +17,15 @@ export async function Header() {
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         <Link
           href="/"
-          className="text-lg font-medium tracking-tight hover:opacity-70 transition-opacity"
+          className="hover:opacity-70 transition-opacity"
         >
-          YSJ
+          <img
+            src="/favicon.ico"
+            alt="YSJ Blog"
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-sm"
+          />
         </Link>
 
         <HeaderClient navItems={navItems} posts={posts} />
