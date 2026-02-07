@@ -37,12 +37,8 @@ async function convertScreenshots() {
       console.log(`   原始尺寸: ${metadata.width}x${metadata.height}`);
       console.log(`   原始大小: ${(fs.statSync(inputPath).size / 1024).toFixed(1)} KB`);
       
-      // 转换为 WebP，最高质量设置
+      // 转换为 WebP，保持原始分辨率
       await sharp(inputPath)
-        .resize(1280, 720, { 
-          fit: 'inside',
-          withoutEnlargement: true 
-        })
         .webp({ 
           quality: 95,
           effort: 6,

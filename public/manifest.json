@@ -63,13 +63,13 @@
   "screenshots": [
     {
       "src": "/screenshots/home.webp",
-      "sizes": "1280x720",
+      "sizes": "3598x1692",
       "type": "image/webp",
       "form_factor": "wide"
     },
     {
       "src": "/screenshots/article.webp",
-      "sizes": "1280x720",
+      "sizes": "3594x1678",
       "type": "image/webp",
       "form_factor": "wide"
     }
