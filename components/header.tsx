@@ -17,15 +17,12 @@ export async function Header() {
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         <Link
           href="/"
-          className="hover:opacity-70 transition-opacity"
+          className="group relative"
         >
-          <img
-            src="/icons/icon-128x128.png"
-            alt="YSJ Blog"
-            width={28}
-            height={28}
-            className="w-7 h-7 rounded-sm"
-          />
+          <span className="text-xl font-serif font-medium tracking-[0.12em] bg-gradient-to-br from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent transition-all duration-300 group-hover:via-foreground group-hover:to-foreground/80">
+            YSJ
+          </span>
+          <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gradient-to-r from-transparent via-foreground/50 to-transparent transition-all duration-300 group-hover:w-full"></span>
         </Link>
 
         <HeaderClient navItems={navItems} posts={posts} />
