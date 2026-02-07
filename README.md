@@ -1,6 +1,6 @@
 # 袁慎建的个人博客
 
-基于 Next.js 15 构建的现代化个人博客，专注于技术知识分享、敏捷方法探讨和生活随笔。
+基于 Next.js 15 构建的现代化个人博客，专注于敏捷开发、测试驱动开发（TDD）、极限编程（XP）等技术知识分享。目前已发布 **42 篇**技术文章，分布在 4 个核心主题分类。
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.6-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
@@ -14,8 +14,8 @@
 - 💬 **评论系统**: 集成 Giscus 评论系统，基于 GitHub Discussions，支持 Markdown
 - 📱 **响应式设计**: 完美适配桌面端和移动端
 - 🔧 **代码高亮**: 使用 Prism Plus 实现语法高亮
-- 📊 **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 JSON-LD 结构化数据
-- 📰 **RSS 订阅**: 自动生成 RSS Feed，方便读者订阅
+- 📊 **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 Open Graph 元数据
+- 📰 **RSS 订阅**: 支持 RSS Feed，方便读者订阅
 - 🚀 **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
 - 📲 **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
 - ⚡ **性能优化**: 代码分割、懒加载、缓存机制等优化
@@ -40,7 +40,7 @@
 - **rehype-slug**: 自动生成标题锚点
 
 ### 评论系统
-- **@giscus/react**: 基于 GitHub Discussions 的评论系统
+- **Giscus**: 基于 GitHub Discussions 的评论系统
 
 ### 图标库
 - **lucide-react**: 现代化图标库
@@ -127,25 +127,25 @@ personal-blog/
 │   ├── robots.ts           # Robots.txt
 │   ├── error.tsx           # 错误页面
 │   └── not-found.tsx       # 404 页面
-├── components/             # React 组件
+├── components/             # React 组件（22 个组件）
 │   ├── header.tsx         # 站点导航
 │   ├── footer.tsx         # 页脚
 │   ├── articles-content.tsx  # 文章列表
-│   ├── waline-comments.tsx  # 评论系统
-│   ├── global-search.tsx    # 全局搜索
-│   ├── image.tsx            # 图片组件
+│   ├── giscus-comments.tsx  # Giscus 评论系统
+│   ├── global-search.tsx    # 全局搜索（支持 ⌘K 快捷键）
+│   ├── table-of-contents.tsx # 文章目录
+│   ├── code-block.tsx     # 代码高亮显示
 │   └── resume/              # 简历相关组件
 ├── lib/                    # 工具库
 │   ├── blog.ts            # 博客数据逻辑
 │   ├── mdx.tsx            # MDX 渲染
 │   ├── config.ts          # 配置文件
 │   └── utils.ts           # 工具函数
-├── content/blog/           # MDX 文章内容
-│   ├── agile/             # 敏捷开发相关
-│   ├── career/            # 职业发展
-│   ├── tdd/               # 测试驱动开发
-│   ├── xp/                # 极限编程
-│   └── ...
+├── content/blog/           # MDX 文章内容（42 篇文章）
+│   ├── agile/             # 敏捷开发（8 篇）
+│   ├── career/            # 职业发展（12 篇）
+│   ├── oo/                # 面向对象（4 篇）
+│   └── xp/                # 极限编程（18 篇）
 ├── public/                # 静态资源
 ├── types/                 # TypeScript 类型定义
 ├── scripts/               # 工具脚本
@@ -168,7 +168,7 @@ export const config = {
   },
   readingTime: {
     charactersPerMinute: 600,  // 阅读速度（字符/分钟）
-    wordsPerMinute: 200,       # 阅读速度（词/分钟）
+    wordsPerMinute: 200,       // 阅读速度（词/分钟）
   },
 } as const;
 ```
@@ -193,8 +193,8 @@ MDX 插件配置位于 `next.config.ts`：
 ```typescript
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypePrismPlus],
+    remarkPlugins: [remarkGfm],           // GitHub Flavored Markdown
+    rehypePlugins: [rehypeSlug, rehypePrismPlus],  // 自动生成标题 ID + 代码高亮
   },
   extension: /\.mdx?$/,
 });
@@ -208,14 +208,13 @@ const withMDX = createMDX({
 
 ```
 content/blog/
-├── agile/
-│   ├── article-1.mdx
-│   └── article-2.mdx
-├── career/
-│   ├── article-1.mdx
-│   └── article-2.mdx
-└── ...
+├── agile/      # 敏捷开发（8 篇）
+├── career/     # 职业发展（12 篇）
+├── oo/         # 面向对象（4 篇）
+└── xp/         # 极限编程（18 篇）
 ```
+
+每个分类目录下包含对应主题的 `.mdx` 文件。
 
 ### Frontmatter 格式
 
