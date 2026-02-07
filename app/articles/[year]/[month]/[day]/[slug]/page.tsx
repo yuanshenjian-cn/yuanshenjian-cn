@@ -7,6 +7,7 @@ import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
 import { TableOfContents } from "@/components/table-of-contents";
 import { FloatingTocButton } from "@/components/floating-toc-button";
+import { ReadingProgress } from "@/components/reading-progress";
 
 interface Props {
   params: Promise<{ year: string; month: string; day: string; slug: string }>;
@@ -64,6 +65,7 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <>
+      <ReadingProgress />
       <Script
         id="json-ld"
         type="application/ld+json"
