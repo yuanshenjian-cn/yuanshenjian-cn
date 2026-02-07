@@ -143,12 +143,28 @@ personal-blog/
 │   └── utils.ts           # 工具函数
 ├── content/blog/           # MDX 文章内容（42 篇文章）
 │   ├── agile/             # 敏捷开发（8 篇）
+│   │   ├── coaching/      # 敏捷教练
+│   │   └── *.mdx
 │   ├── career/            # 职业发展（12 篇）
 │   ├── oo/                # 面向对象（4 篇）
 │   └── xp/                # 极限编程（18 篇）
+│       ├── tdd/           # 测试驱动开发
+│       ├── testing/       # 测试策略
+│       ├── simple-design/ # 简单设计
+│       └── refactoring/   # 代码重构
 ├── public/                # 静态资源
+│   ├── icons/             # PWA 图标
+│   ├── screenshots/       # PWA 截图
+│   ├── docs/              # 文档资源（简历 PDF）
+│   ├── sw.js              # Service Worker
+│   └── manifest.json      # PWA 配置
 ├── types/                 # TypeScript 类型定义
 ├── scripts/               # 工具脚本
+│   ├── optimize-images.js # 图片优化
+│   ├── check-images.js    # 图片检查
+│   └── pwa/               # PWA 相关脚本
+├── .github/workflows/     # GitHub Actions
+│   └── deploy.yml         # 自动部署配置
 ├── tailwind.config.ts     # Tailwind 配置
 ├── tsconfig.json          # TypeScript 配置
 ├── next.config.ts         # Next.js 配置
@@ -273,13 +289,17 @@ brief: 文章摘要，用于列表展示和 SEO
 
 ### 环境变量配置
 
-在 GitHub 仓库设置中添加以下 Secrets：
+在 GitHub 仓库设置 **Settings → Secrets and variables → Actions** 中添加以下环境变量（Variables）：
 
-- `NEXT_PUBLIC_SITE_URL`: 站点 URL
-- `NEXT_PUBLIC_GISCUS_REPO`: GitHub 仓库（用于评论）
-- `NEXT_PUBLIC_GISCUS_REPO_ID`: 仓库 ID
-- `NEXT_PUBLIC_GISCUS_CATEGORY`: 讨论分类
-- `NEXT_PUBLIC_GISCUS_CATEGORY_ID`: 分类 ID
+| 变量名 | 说明 |
+|--------|------|
+| `NEXT_PUBLIC_SITE_URL` | 站点 URL，如 `https://yuanshenjian.cn` |
+| `NEXT_PUBLIC_GISCUS_REPO` | GitHub 仓库，格式 `username/repo` |
+| `NEXT_PUBLIC_GISCUS_REPO_ID` | 仓库 ID（从 Giscus 配置获取） |
+| `NEXT_PUBLIC_GISCUS_CATEGORY` | 讨论分类名称，如 `General` |
+| `NEXT_PUBLIC_GISCUS_CATEGORY_ID` | 分类 ID（从 Giscus 配置获取） |
+
+**注意**: 这些配置为 GitHub Variables（而非 Secrets），因为需要在构建时注入到客户端代码中。
 
 ## 开发规范
 
@@ -290,6 +310,23 @@ brief: 文章摘要，用于列表展示和 SEO
 ```bash
 npm run lint
 ```
+
+### 脚本工具
+
+项目包含以下实用脚本：
+
+| 脚本 | 说明 |
+|------|------|
+| `npm run optimize-images` | 批量优化图片（转换为 WebP，生成多种尺寸） |
+| `node scripts/check-images.js` | 检查文章中引用的图片是否存在 |
+| `node scripts/extract-excerpts.js` | 批量提取文章摘要 |
+
+### 性能优化
+
+- **图片优化**: 构建时自动将图片转换为 WebP 格式
+- **代码分割**: Next.js 自动进行路由级代码分割
+- **静态导出**: 预渲染所有页面，提升首屏加载速度
+- **PWA 缓存**: Service Worker 缓存静态资源，支持离线访问
 
 ### TypeScript
 
@@ -340,6 +377,14 @@ const mdxComponents: MDXComponents = {
 
 修改 `lib/config.ts` 中的 `posts.perPage` 配置。
 
+### PWA 如何配置？
+
+PWA 配置位于 `public/manifest.json`，图标放置在 `public/icons/` 目录。使用以下命令生成图标：
+
+```bash
+node scripts/pwa/generate-pwa-icons.js
+```
+
 ## 许可证
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
@@ -358,3 +403,14 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 - [Tailwind CSS](https://tailwindcss.com/)
 - [shadcn/ui](https://ui.shadcn.com/)
 - [Giscus](https://giscus.app/)
+
+---
+
+## 浏览器兼容性
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+> 支持 ES2020+ 语法的现代浏览器
