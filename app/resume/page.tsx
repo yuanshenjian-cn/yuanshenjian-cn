@@ -7,6 +7,7 @@ import { ResumeProjects } from "@/components/resume/resume-projects";
 import { ResumeExtras } from "@/components/resume/resume-extras";
 import { ShareButtons } from "@/components/share-buttons";
 import { config } from "@/lib/config";
+import { Download } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "简历 | 袁慎建",
@@ -28,12 +29,22 @@ export default function ResumePage() {
 
       {/* 简历分享 */}
       <section className="py-8 px-6">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
           <ShareButtons
             url={resumeUrl}
             title="袁慎建的简历 - 后端工程师 | AI Agent 开发者"
             description="后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练"
           />
+          <a
+            href="/docs/yuanshenjian_resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-medium rounded-full transition-colors"
+            aria-label="下载简历 PDF"
+          >
+            <Download className="w-3 h-3" />
+            <span>下载 PDF</span>
+          </a>
         </div>
       </section>
     </main>

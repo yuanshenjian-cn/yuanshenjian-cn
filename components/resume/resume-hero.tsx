@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Download } from "lucide-react";
 
 export function ResumeHero() {
   return (
@@ -27,6 +27,20 @@ export function ResumeHero() {
           />
         </div>
 
+        {/* 下载 PDF 按钮 */}
+        <div className="mb-4">
+          <a
+            href="/docs/yuanshenjian_resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-primary/70 hover:bg-primary text-primary-foreground text-[10px] font-medium rounded-full transition-colors"
+            aria-label="下载简历 PDF"
+          >
+            <Download className="w-2.5 h-2.5" />
+            <span>下载 PDF</span>
+          </a>
+        </div>
+
         {/* 主标题 - 更有质感的排版 */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4 text-foreground">
           袁慎建
@@ -34,7 +48,7 @@ export function ResumeHero() {
 
         {/* 三个角色 - 小屏幕三行显示 */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-base md:text-lg text-foreground/90 mb-8 font">
-          <span>后端工程师（AI Agent）</span>
+          <span>AI 软件工程师</span>
           <span className="hidden sm:inline text-foreground/40">·</span>
           <span>研发效能专家</span>
           <span className="hidden sm:inline text-foreground/40">·</span>
