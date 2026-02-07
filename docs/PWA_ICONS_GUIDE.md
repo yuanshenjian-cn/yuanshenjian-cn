@@ -42,8 +42,13 @@ sharp input.png \
 ### 方法 3：使用提供的脚本
 
 ```bash
-# 将原始图片命名为 logo.png 放在项目根目录
-node scripts/generate-pwa-icons.js
+# 自动生成 YSJ Logo 图标
+node scripts/pwa/generate-pwa-icons.js
+```
+
+或者使用浏览器可视化编辑器：
+```bash
+open scripts/pwa/logo-generator.html
 ```
 
 ## 图标设计要求

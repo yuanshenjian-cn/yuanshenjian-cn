@@ -5,7 +5,7 @@
  * 自动生成所有 PWA 图标尺寸
  * 
  * 使用方法:
- * node scripts/generate-pwa-icons.js
+ * node scripts/pwa/generate-pwa-icons.js
  */
 
 const fs = require('fs');
