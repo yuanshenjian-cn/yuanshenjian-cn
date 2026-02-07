@@ -20,11 +20,11 @@ export async function Header() {
           className="hover:opacity-70 transition-opacity"
         >
           <img
-            src="/favicon.ico"
+            src="/icons/icon-128x128.png"
             alt="YSJ Blog"
-            width={32}
-            height={32}
-            className="w-8 h-8 rounded-sm"
+            width={28}
+            height={28}
+            className="w-7 h-7 rounded-sm"
           />
         </Link>
 
