@@ -30,7 +30,7 @@ export function ResumeHero() {
         {/* 下载 PDF 按钮 */}
         <div className="mb-4">
           <a
-            href="/docs/yuanshenjian_resume.pdf"
+            href="/docs/resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-primary/70 hover:bg-primary text-primary-foreground text-[10px] font-medium rounded-full transition-colors"

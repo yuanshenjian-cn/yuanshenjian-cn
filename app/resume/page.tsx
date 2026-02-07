@@ -32,17 +32,17 @@ export default function ResumePage() {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <ShareButtons
             url={resumeUrl}
-            title="袁慎建的简历 - 后端工程师 | AI Agent 开发者"
-            description="后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练"
+            title="袁慎建的简历"
+            description="AI 软件工程师 | 研发效能专家 | 敏捷开发教练"
           />
           <a
-            href="/docs/yuanshenjian_resume.pdf"
+            href="/docs/resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-medium rounded-full transition-colors"
+            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-medium rounded-full transition-colors"
             aria-label="下载简历 PDF"
           >
-            <Download className="w-3 h-3" />
+            <Download className="w-2.5 h-2.5" />
             <span>下载 PDF</span>
           </a>
         </div>

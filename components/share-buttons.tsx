@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { X, Check, Link2 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { QRCodeSVG } from "qrcode.react";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -103,31 +104,6 @@ export function ShareButtons({ url, title, description, className }: ShareButton
         </svg>
       </button>
 
-      {/* 复制链接 */}
-      <button
-        onClick={handleCopyLink}
-        className={cn(
-          "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors",
-          copied
-            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-            : "bg-muted hover:bg-muted/80 text-muted-foreground"
-        )}
-        title="复制链接"
-        aria-label="复制链接"
-      >
-        {copied ? (
-          <>
-            <Check className="w-3 h-3" />
-            <span>已复制</span>
-          </>
-        ) : (
-          <>
-            <Link2 className="w-3 h-3" />
-            <span>复制</span>
-          </>
-        )}
-      </button>
-
       {/* 微信分享提示弹窗 */}
       {showWeChatModal && (
         <div
@@ -151,24 +127,34 @@ export function ShareButtons({ url, title, description, className }: ShareButton
             <div className="text-center mb-4">
               <h3 className="text-lg font-semibold">分享到微信</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                复制下方链接，发送给微信好友
+                用微信扫描下方二维码
               </p>
             </div>
 
-            {/* 链接显示 */}
-            <div className="bg-muted p-3 rounded-lg mb-4">
-              <p className="text-sm break-all font-mono">{url}</p>
+            {/* 二维码 */}
+            <div className="flex justify-center mb-4 bg-white p-4 rounded-lg">
+              <QRCodeSVG
+                value={url}
+                size={200}
+                level="M"
+                includeMargin={false}
+              />
             </div>
 
-            {/* 复制按钮 */}
+            {/* 复制链接按钮 - 次要选项 */}
             <button
               onClick={handleCopyLink}
-              className="w-full py-2 bg-[#07C160] text-white rounded-lg hover:bg-[#06ae56] transition-colors flex items-center justify-center gap-2"
+              className={cn(
+                "w-full py-2 rounded-lg transition-colors flex items-center justify-center gap-2",
+                copied
+                  ? "bg-green-500 hover:bg-green-600 text-white"
+                  : "bg-muted hover:bg-muted/80 text-muted-foreground"
+              )}
             >
               {copied ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>已复制</span>
+                  <span>已复制链接</span>
                 </>
               ) : (
                 <>
@@ -186,11 +172,6 @@ export function ShareButtons({ url, title, description, className }: ShareButton
                   {description}
                 </p>
               )}
-            </div>
-
-            {/* 提示 */}
-            <div className="mt-4 pt-4 border-t text-xs text-muted-foreground text-center">
-              复制后打开微信，粘贴给好友或分享到朋友圈
             </div>
           </div>
         </div>
