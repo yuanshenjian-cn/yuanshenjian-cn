@@ -34,7 +34,7 @@ SOA的问世促使系统架构发生了跨越式的演变，它提出了面向�
 
 在这种单线流水线模式下，如果团队的自动化实践做得很好，开发人员只需要关注自己编写代码时所编写的测试的质量和数量。整个应用的测试策略简单直接:
 
-![image](/images/xp/single-app-ci.webp)
+![image](/images/xp/testing/single-app-ci.webp)
 
 ***保证足够的单元测试的覆盖率，保持一定数量的Servcie测试，添加一些重要业务流程的E2E测试。***
 
@@ -45,7 +45,7 @@ SOA的问世促使系统架构发生了跨越式的演变，它提出了面向�
 ## 微服务测试的演变
 微服务架构是一种演进式架构，开发团队跟领域专家在一起进行业务分析（Event Storming），从而划分出独立的服务，系统一开始确定为独立服务的数量可能是几个，伴随着业务的复杂深入，会不断地衍生出新的服务。下图是一个包含了四个服务的微服务架构的系统：
 
-![image](/images/xp/microservice-architecture.webp)
+![image](/images/xp/testing/microservice-architecture.webp)
 
 微服务体系中的诸多服务不可避免跨服务调用，它们通常使用轻量级的HTTP RESTful API。那么如何保证跨服务调用的可靠性以及整个系统集成的质量？尤其是当不同服务由不同小团队负责开发和测试。
 
@@ -75,7 +75,7 @@ Unit测试使得开发人员可以快活地活在自己的世界中，每个开�
 ### Pair集成测试
 系统级别的集成测试阻碍重重，我们不妨退一步思考，将集成的范围缩小 *保证服务俩俩的集成的可靠性*。有了这个想法，我们开始对服务俩俩配对做集成测试。测试架构演变成：
 
-![image](/images/xp/pair-integration-test.webp)
+![image](/images/xp/testing/pair-integration-test.webp)
 
 我们需要真实运行待测试的服务，并且对其他服务使用替身。不难看出这种方式存在以下问题：
 
@@ -101,7 +101,7 @@ Unit测试使得开发人员可以快活地活在自己的世界中，每个开�
 
 前后端本质上等价于服务提供方和服务消费方，所以该理念运用在微服务之间的集成测试中，系统的测试架构会得到进一步演进：
 
-![image](/images/xp/contract-concept-test.webp)
+![image](/images/xp/testing/contract-concept-test.webp)
 
 我么在享受着它带来的好处的同时，问题也偷偷地潜入系统中。不久后，CI就报警了：*UI测试测试挂了*
 

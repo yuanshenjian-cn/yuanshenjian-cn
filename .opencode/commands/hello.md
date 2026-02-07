@@ -1,7 +1,7 @@
 ---
 agent: build
 description: 全面分析当前工程，提供项目改进建议
-model: zhipuai-coding-plan/glm-4.7
+model: opencode/kimi-k2.5-free
 ---
 ## 你的任务
 
