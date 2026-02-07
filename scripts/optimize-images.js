@@ -131,6 +131,12 @@ function generateReport(processedFiles) {
     files: processedFiles
   };
   
+  // 确保 .next 目录存在
+  const reportDir = path.dirname(reportPath);
+  if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+  }
+  
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
   console.log(`\n📝 报告已保存: ${reportPath}`);
 }
