@@ -86,7 +86,7 @@ export function PaginationNav({
         currentPage > 1 ? (
           <Link
             href={currentPage === 2 ? "/articles" : `${baseUrl}/${currentPage - 1}`}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 transition-all"
             aria-label="上一页"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -100,7 +100,7 @@ export function PaginationNav({
         <button
           onClick={() => onPageChange?.(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 disabled:bg-muted/50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 disabled:bg-muted/50 disabled:cursor-not-allowed disabled:hover:bg-muted/50 disabled:active:scale-100 transition-all"
           aria-label="上一页"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -119,7 +119,7 @@ export function PaginationNav({
         currentPage < totalPages ? (
           <Link
             href={`${baseUrl}/${currentPage + 1}`}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 transition-all"
             aria-label="下一页"
           >
             <ChevronRight className="w-5 h-5" />
@@ -133,7 +133,7 @@ export function PaginationNav({
         <button
           onClick={() => onPageChange?.(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 disabled:bg-muted/50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 disabled:bg-muted/50 disabled:cursor-not-allowed disabled:hover:bg-muted/50 disabled:active:scale-100 transition-all"
           aria-label="下一页"
         >
           <ChevronRight className="w-5 h-5" />

@@ -112,7 +112,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
         {currentPage > 1 ? (
           <Link
             href={currentPage === 2 ? "/articles" : `${baseUrl}/${currentPage - 1}`}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 transition-all"
             aria-label="上一页"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -134,7 +134,7 @@ export function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps
         {currentPage < totalPages ? (
           <Link
             href={`${baseUrl}/${currentPage + 1}`}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground active:scale-95 active:bg-muted/60 transition-all"
             aria-label="下一页"
           >
             <ChevronRight className="w-5 h-5" />
