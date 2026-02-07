@@ -59,19 +59,5 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["blog", "technology"],
-  "screenshots": [
-    {
-      "src": "/screenshots/home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/article.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ]
+  "categories": ["blog", "technology"]
 }
