@@ -11,12 +11,13 @@
 - 📝 **MDX 支持**: 使用 Markdown + JSX 撰写文章，支持在文章中嵌入 React 组件
 - 🎨 **现代化设计**: 基于 Tailwind CSS 和 shadcn/ui 设计系统，支持明暗主题切换
 - 🔍 **全局搜索**: 支持快捷键搜索（⌘K），快速找到目标文章
-- 💬 **评论系统**: 集成 Waline 评论系统，支持 Markdown 和表情
+- 💬 **评论系统**: 集成 Giscus 评论系统，基于 GitHub Discussions，支持 Markdown
 - 📱 **响应式设计**: 完美适配桌面端和移动端
 - 🔧 **代码高亮**: 使用 Prism Plus 实现语法高亮
 - 📊 **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 JSON-LD 结构化数据
 - 📰 **RSS 订阅**: 自动生成 RSS Feed，方便读者订阅
 - 🚀 **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
+- 📲 **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
 - ⚡ **性能优化**: 代码分割、懒加载、缓存机制等优化
 
 ## 技术栈
@@ -39,7 +40,7 @@
 - **rehype-slug**: 自动生成标题锚点
 
 ### 评论系统
-- **@waline/client**: 轻量级评论系统
+- **@giscus/react**: 基于 GitHub Discussions 的评论系统
 
 ### 图标库
 - **lucide-react**: 现代化图标库
@@ -81,8 +82,12 @@ cp .env.example .env.local
 # 站点基础配置
 NEXT_PUBLIC_SITE_URL=https://yuanshenjian.cn
 
-# Waline 评论系统配置
-NEXT_PUBLIC_WALINE_SERVER_URL=https://your-waline-domain.vercel.app
+# Giscus 评论系统配置
+# 在 https://giscus.app 配置后获取以下值
+NEXT_PUBLIC_GISCUS_REPO=yourusername/blog-comments
+NEXT_PUBLIC_GISCUS_REPO_ID=R_kgDxxxxxxxx
+NEXT_PUBLIC_GISCUS_CATEGORY=General
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_kwDxxxxxxxx
 ```
 
 ### 启动开发服务器
@@ -272,7 +277,10 @@ brief: 文章摘要，用于列表展示和 SEO
 在 GitHub 仓库设置中添加以下 Secrets：
 
 - `NEXT_PUBLIC_SITE_URL`: 站点 URL
-- `NEXT_PUBLIC_WALINE_SERVER_URL`: Waline 服务地址
+- `NEXT_PUBLIC_GISCUS_REPO`: GitHub 仓库（用于评论）
+- `NEXT_PUBLIC_GISCUS_REPO_ID`: 仓库 ID
+- `NEXT_PUBLIC_GISCUS_CATEGORY`: 讨论分类
+- `NEXT_PUBLIC_GISCUS_CATEGORY_ID`: 分类 ID
 
 ## 开发规范
 
@@ -350,4 +358,4 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 - [React](https://react.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [shadcn/ui](https://ui.shadcn.com/)
-- [Waline](https://waline.js.org/)
+- [Giscus](https://giscus.app/)

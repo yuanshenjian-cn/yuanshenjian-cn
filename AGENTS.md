@@ -132,7 +132,12 @@ app/
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://yuanshenjian.cn
-NEXT_PUBLIC_WALINE_SERVER_URL=https://your-waline-server.com
+
+# Giscus 评论系统配置
+NEXT_PUBLIC_GISCUS_REPO=yourusername/blog-comments
+NEXT_PUBLIC_GISCUS_REPO_ID=R_kgDxxxxxxxx
+NEXT_PUBLIC_GISCUS_CATEGORY=General
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_kwDxxxxxxxx
 ```
 
 ## 其他说明
@@ -140,5 +145,6 @@ NEXT_PUBLIC_WALINE_SERVER_URL=https://your-waline-server.com
 - 无数据库：内容从 `/content/` 目录的 MDX 文件读取
 - 图片未优化（静态导出限制）
 - 基础路径：空字符串（`""`）
-- 评论系统：Waline（基于 NEXT_PUBLIC_WALINE_SERVER_URL）
+- 评论系统：Giscus（基于 GitHub Discussions）
 - 主题：支持明暗模式切换（next-themes）
+- PWA：支持离线访问，配置位于 `public/manifest.json` 和 `public/sw.js`

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { config } from "@/lib/config";
 
 interface GiscusCommentsProps {
   path?: string;
@@ -10,11 +11,8 @@ export function GiscusComments({ path }: GiscusCommentsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Giscus 配置（硬编码，确保线上可用）
-    const repo = "yuanshenjian-cn/yuanshenjian-cn";
-    const repoId = "R_kgDORINV5g";
-    const category = "General";
-    const categoryId = "DIC_kwDORINV5s4C19yc";
+    // Giscus 配置（从配置文件读取，优先使用环境变量）
+    const { repo, repoId, category, categoryId } = config.giscus;
 
     // 检测当前主题
     const getTheme = () => {

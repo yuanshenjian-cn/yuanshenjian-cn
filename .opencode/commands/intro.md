@@ -1,7 +1,6 @@
 ---
 agent: build
 description: 创建或更新项目的 README.md来介绍项目
-model: zhipuai-coding-plan/glm-4.7
 ---
 ## 你的任务
 
