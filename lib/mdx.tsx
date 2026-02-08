@@ -41,9 +41,9 @@ const mdxComponents: MDXComponents = {
   img: ({ src, alt }: ImageProps) => (
     <img src={src} alt={alt} className="max-w-full h-auto my-4 rounded-lg" />
   ),
-  ul: ({ children }: ElementProps) => <ul className="list-disc list-inside my-4 space-y-2">{children}</ul>,
-  ol: ({ children }: ElementProps) => <ol className="list-decimal list-inside my-4 space-y-2">{children}</ol>,
-  li: ({ children }: ElementProps) => <li className="my-1 break-words">{children}</li>,
+  ul: ({ children }: ElementProps) => <ul className="list-disc list-outside pl-5 my-4 space-y-2">{children}</ul>,
+  ol: ({ children }: ElementProps) => <ol className="list-decimal list-outside pl-5 my-4 space-y-2">{children}</ol>,
+  li: ({ children }: ElementProps) => <li className="my-1 break-words pl-1">{children}</li>,
   blockquote: ({ children }: ElementProps) => (
     <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground break-words">{children}</blockquote>
   ),
