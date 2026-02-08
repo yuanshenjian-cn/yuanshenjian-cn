@@ -7,6 +7,7 @@
     "build": "npm run optimize-images && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "optimize-images": "node scripts/optimize-images.js"
   },
   "dependencies": {

@@ -41,7 +41,7 @@ OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 **anomaly
 | **双模式工作** | Build 模式（全权限编辑）+ Plan 模式（只读规划） |
 | **多平台支持** | macOS、Windows（WSL）、Linux |
 | **模型丰富** | 支持 75+ 提供商，提供限时免费体验模型（Kimi K2.5、GLM-4.7、MiniMax M2.1 等），体验期间无需配置即可使用 |
-| **工具集** | bash 执行、文件读写、grep 搜索、LSP 诊断等 |
+| **工具集** | bash 执行、文件读写、grep 搜索等 |
 | **上下文感知** | 自动生成 `AGENTS.md`，理解项目结构 |
 | **分享协作** | 一键生成会话分享链接 |
 
@@ -322,7 +322,6 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 | **list** | 列出目录内容 | allow |
 | **webfetch** | 抓取网页内容 | allow |
 | **websearch** | 网络搜索 | allow（需 `OPENCODE_ENABLE_EXA=1`）|
-| **lsp** | 代码导航和提示（实验性） | allow（需环境变量）|
 | **skill** | 加载 SKILL.md 技能文件 | allow |
 | **todowrite** | 创建/更新任务清单 | allow |
 | **todoread** | 读取任务清单 | allow |
@@ -344,7 +343,7 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 | `/sessions` | 列出并切换会话 | Ctrl+X L |
 | `/export` | 导出对话为 Markdown | Ctrl+X X |
 | `/undo` | 撤销更改 | Ctrl+X U |
-| `/redo` | 重做更改 | Ctrl+X R |
+| `/review` | 审查代码变更 | - |
 | `/share` | 分享会话 | Ctrl+X S |
 | `/exit` | 退出 | Ctrl+X Q |
 

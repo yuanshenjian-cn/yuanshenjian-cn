@@ -36,7 +36,8 @@ brief: >-
 - 响应速度快
 
 **社区活跃**
-- 近 100K GitHub stars，704+ 贡献者
+- 近 100K GitHub stars，700+ 贡献者，8,500+ commits
+- 250万+月活开发者
 - 丰富的插件生态（如 oh-my-opencode）
 - 文档完善，更新频繁
 
@@ -48,9 +49,9 @@ brief: >-
 - 配置相对复杂
 
 **Windows 支持**
-- 原生 Windows 支持仍在完善
-- 建议配合 WSL 使用
-- 部分功能受限
+- 桌面应用 Beta 版已支持 Windows（包括 arm64）
+- 建议配合 WSL 使用以获得最佳体验
+- 部分高级功能仍在完善中
 
 **模型依赖**
 - 免费模型能力有限
@@ -65,13 +66,53 @@ brief: >-
 
 | 工具 | 类型 | 价格 | 开源 | 特点 |
 |------|------|------|------|------|
-| **OpenCode** | 终端代理 | 免费（Zen 付费） | ✅ | 开源、模型灵活、75+ 提供商 |
-| **Cursor** | IDE | $20/月 | ❌ | 集成度高、体验好 |
-| **Claude Code** | 终端代理 | $20-200/月 | ❌ | 功能强大、Claude 模型 |
-| **GitHub Copilot** | IDE 插件 | $10/月 | ❌ | 代码补全强 |
-| **Codeium** | IDE 插件 | 免费/付费 | ❌ | 免费版可用 |
+| **OpenCode** | 终端代理 | 免费（Zen 付费） | ✅ | 开源、模型灵活、75+ 提供商、2.5M+用户 |
+| **Cursor** | IDE | $20/月 | ❌ | 集成度高、体验好、支持GPT-5.2/Opus 4.6 |
+| **Claude Code** | 终端/桌面 | $20-200/月 | ❌ | Claude模型、桌面应用、Cowork功能 |
+| **GitHub Copilot** | IDE插件 | 免费-$39/月 | ❌ | Free计划含50次agent/2000次补全 |
+| **Windsurf** | IDE | 免费/付费 | ❌ | Cascade AI、100万+用户、MCP支持 |
+| **OpenAI Codex** | 桌面/终端 | ChatGPT订阅 | ❌ | OpenAI官方、GPT-5.3-Codex、多代理工作流 |
+| **Trae** | IDE | 免费/付费 | ❌ | 字节跳动出品、SOLO模式、10x工程师 |
+| **CodeBuddy** | IDE插件 | 免费/付费 | ❌ | 腾讯出品、混元大模型、国际版+中国版 |
 
 > 💡 **提示**：Claude Code 价格取决于使用层级，范围为 $20-200/月。
+
+### 各工具详细介绍
+
+#### Windsurf（原 Codeium）
+
+- **用户规模**：100万+用户，4000+企业客户
+- **核心功能**：Cascade AI 支持代码库记忆、自动修复 lint 错误
+- **特色**：MCP 支持（Figma、Slack、Stripe）、拖放图片生成代码、Turbo 模式自动执行终端命令
+- **定价**：基于 token 的使用计划，透明公平
+- **优势**：Cascade 代理可自动追踪工作流，Arena Mode 让模型竞争选择最优方案
+
+#### OpenAI Codex
+
+- **定位**：OpenAI 推出的专业 AI 编程代理工具
+- **核心特点**：基于 GPT-5.3-Codex 模型，支持多代理并行工作流
+- **Skills 系统**：超越写代码，支持代码理解、原型设计和文档编写
+- **自动化能力**：Automations 功能支持 issue 分类、CI/CD 监控等后台任务
+- **定价**：ChatGPT Free 和 Go 计划可用，其他订阅用户享 2x 速率限制
+
+#### Trae（字节跳动）
+
+- **定位**：字节跳动推出的"10x AI 工程师"
+- **核心特点**：SOLO 模式独立构建软件解决方案，Understand → Execute → Deliver 工作流
+- **优势**：字节大厂背书，可能深度集成字节生态（飞书等）
+- **定价**：免费版可用，付费版功能待公布
+- **适合人群**：国内开发者，需要快速原型开发
+
+#### CodeBuddy（腾讯云）
+
+**国际版**：[codebuddy.ai](https://codebuddy.ai)
+- 面向全球开发者，基于腾讯混元代码大模型
+- 提升编码效率 90%，降低代码错误率 35%
+
+**中国版**：[copilot.tencent.com](https://copilot.tencent.com)
+- 面向中国开发者，访问速度更快，深度集成腾讯云生态
+
+**核心特点**：双版本服务、中文代码理解优秀、企业级应用支持
 
 **选择建议**：
 - 追求开源免费 → OpenCode + 限时免费体验模型（Kimi K2.5、GLM-4.7）
@@ -79,6 +120,17 @@ brief: >-
 - 追求开箱即用 → Claude Code
 - 追求性价比 → OpenCode + Zen 按量付费
 - 预算有限 → OpenCode + 限时免费体验模型，必要时可复用已有订阅（GitHub Copilot、ChatGPT Plus）
+
+**地域选择建议**：
+- 中国大陆用户 → CodeBuddy 中国版 或 Trae
+- 海外华人/中文开发者 → CodeBuddy 国际版
+- 全球通用 → OpenCode、Cursor、GitHub Copilot
+- 日本/韩国 → Windsurf、Cursor（有本地化）
+
+**企业合规考虑**：
+- 中国数据合规 → CodeBuddy 中国版、Trae
+- 国际合规认证 → GitHub Copilot Enterprise、Cursor Enterprise
+- 隐私敏感 → OpenCode（本地运行）
 
 ## 适合谁使用
 
@@ -156,10 +208,61 @@ OpenCode 支持多种模型，定期尝试新的免费体验模型，找到最�
 
 利用 `/init` 生成的 `AGENTS.md`，不断完善项目文档，让 AI 更好地理解你的项目结构。
 
+**11. 善用 MCP 扩展能力**
+
+OpenCode 现已支持 MCP (Model Context Protocol)，可以连接外部工具和服务。建议配置常用 MCP 服务器（如数据库、API 工具），利用 MCP 扩展 AI 的能力边界，在复杂任务中结合 MCP 和 Agent 使用。
+
+**12. 充分利用多会话并行**
+
+OpenCode 支持 Multi-session，可以同时启动多个代理处理不同任务。将大任务拆分为多个子任务并行处理，在不同会话中尝试不同模型对比效果，保持主会话专注于核心开发任务。
+
+**13. 善用分享链接协作**
+
+利用 OpenCode 的分享链接功能，将会话链接分享给团队成员进行代码审查，保存重要会话链接作为知识库，用于调试问题时与社区交流。
+
+**14. 复用已有订阅降低成本**
+
+OpenCode 支持复用现有 AI 订阅：使用 GitHub Copilot 账户登录无需额外付费，使用 ChatGPT Plus/Pro 账户访问 OpenAI 模型，充分利用这些集成减少模型 API 成本。
+
+## 跨工具通用最佳实践
+
+无论使用哪款 AI 编程工具，以下实践都适用：
+
+**掌握 "自主性滑块" 概念**
+- 低自主性：使用 Tab 补全、简单编辑
+- 中自主性：使用 Agent 模式，人工确认关键步骤
+- 高自主性：全自动任务，适合重复性工作
+
+**建立个人知识库**
+- 整理常用 Prompt 模板
+- 记录成功案例和失败教训
+- 形成团队内部的 AI 编程规范
+
+**代码审查不可少**
+- AI 生成的代码必须经过人工审查
+- 特别关注安全敏感代码（SQL、认证等）
+- 使用静态分析工具辅助检查
+
+**保持学习更新**
+- AI 工具发展极快，每月关注更新日志
+- 尝试新功能（如 Cursor 的 Skills、Codex 的 Automations）
+- 参与社区讨论，学习他人技巧
+
 ## 资源链接
 
+### OpenCode
 - **官网**：[https://opencode.ai](https://opencode.ai)
 - **GitHub**：[https://github.com/anomalyco/opencode](https://github.com/anomalyco/opencode)
 - **文档**：[https://opencode.ai/docs](https://opencode.ai/docs)
 - **Discord 社区**：[https://opencode.ai/discord](https://opencode.ai/discord)
 - **下载页面**：[https://opencode.ai/download](https://opencode.ai/download)
+
+### 其他工具
+- **Cursor**：[https://cursor.com](https://cursor.com)
+- **Claude Code**：[https://claude.ai/download](https://claude.ai/download)
+- **GitHub Copilot**：[https://github.com/features/copilot](https://github.com/features/copilot)
+- **Windsurf**：[https://windsurf.com](https://windsurf.com)
+- **OpenAI Codex**：[https://openai.com/codex](https://openai.com/codex)
+- **Trae**：[https://www.trae.ai](https://www.trae.ai)
+- **CodeBuddy 国际版**：[https://codebuddy.ai](https://codebuddy.ai)
+- **CodeBuddy 中国版**：[https://www.codebuddy.cn](https://www.codebuddy.cn)
