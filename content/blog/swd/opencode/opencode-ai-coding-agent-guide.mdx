@@ -18,7 +18,7 @@ brief: >-
 
 每天面对重复性编码任务、繁琐的代码审查、复杂的重构工作，你是否想过有一个智能助手能分担这些工作？传统的 AI 编程工具要么价格昂贵，要么隐私堪忧。
 
-OpenCode 的出现改变了这一局面。它是一款**完全开源**的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，内置免费模型（如 Kimi K2.5、GLM-4.7、MiniMax M2.1），无需订阅即可使用。
+OpenCode 的出现改变了这一局面。它是一款**完全开源**的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，提供**限时免费体验模型**（如 Kimi K2.5、GLM-4.7、MiniMax M2.1），体验期间无需订阅和配置 API Key 即可直接使用。
 
 本文将带你全面了解 OpenCode，从安装配置到进阶使用，帮助你快速上手这款效率工具。
 
@@ -40,7 +40,7 @@ OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 **anomaly
 |------|------|
 | **双模式工作** | Build 模式（全权限编辑）+ Plan 模式（只读规划） |
 | **多平台支持** | macOS、Windows（WSL）、Linux |
-| **模型丰富** | 支持 75+ 提供商，内置 Kimi K2.5、GLM-4.7、MiniMax M2.1 等免费模型 |
+| **模型丰富** | 支持 75+ 提供商，提供限时免费体验模型（Kimi K2.5、GLM-4.7、MiniMax M2.1 等），体验期间无需配置即可使用 |
 | **工具集** | bash 执行、文件读写、grep 搜索、LSP 诊断等 |
 | **上下文感知** | 自动生成 `AGENTS.md`，理解项目结构 |
 | **分享协作** | 一键生成会话分享链接 |
@@ -181,7 +181,7 @@ opencode
 
 1. **欢迎界面**：看到 OpenCode 的 TUI（终端用户界面）
 2. **模型选择**：首次启动会提示选择 AI 模型
-   - 选择标注 **Free** 的免费模型（如 Kimi K2.5、MiniMax M2.1、GLM-4.7）
+   - 选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、MiniMax M2.1、GLM-4.7），体验期间无需配置 API Key
    - 或选择 `/connect` 配置自己的 API Key 或登录已有账户
 3. **开始使用**：进入主界面后，输入 `/help` 查看帮助
 
@@ -206,9 +206,11 @@ opencode
 
 ### 配置模型
 
-**使用免费模型（无需 API Key）**：
+**使用免费体验模型（限时，无需 API Key）**：
 
-启动后输入 `/models` 查看可用模型，选择标注 **Free** 的模型（如 Kimi K2.5、GLM-4.7、MiniMax M2.1）。
+启动后输入 `/models` 查看可用模型，选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、GLM-4.7、MiniMax M2.1）。体验期间无需连接供应商或配置 API Key 即可直接使用。
+
+> ⚠️ **注意**：免费体验模型可能有使用限制或时限，建议长期使用前配置自己的 API Key 或考虑 OpenCode Zen 服务。
 
 **连接商业模型**：
 
@@ -317,9 +319,14 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 | **patch** | 应用代码补丁 | allow/ask |
 | **grep** | 搜索文件内容 | allow |
 | **glob** | 列出匹配文件 | allow |
+| **list** | 列出目录内容 | allow |
 | **webfetch** | 抓取网页内容 | allow |
-| **lsp** | 代码导航和提示 | allow |
-| **todo** | 管理任务清单 | allow |
+| **websearch** | 网络搜索 | allow（需 `OPENCODE_ENABLE_EXA=1`）|
+| **lsp** | 代码导航和提示（实验性） | allow（需环境变量）|
+| **skill** | 加载 SKILL.md 技能文件 | allow |
+| **todowrite** | 创建/更新任务清单 | allow |
+| **todoread** | 读取任务清单 | allow |
+| **question** | 向用户提问 | allow |
 
 ### 常用 Slash 命令
 
@@ -333,6 +340,9 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 | `/init` | 初始化项目 | Ctrl+X I |
 | `/models` | 切换模型 | Ctrl+X M |
 | `/new` | 新会话 | Ctrl+X N |
+| `/compact` | 压缩当前会话（总结上下文） | Ctrl+X C |
+| `/sessions` | 列出并切换会话 | Ctrl+X L |
+| `/export` | 导出对话为 Markdown | Ctrl+X X |
 | `/undo` | 撤销更改 | Ctrl+X U |
 | `/redo` | 重做更改 | Ctrl+X R |
 | `/share` | 分享会话 | Ctrl+X S |
@@ -655,7 +665,16 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
       - uses: anomalyco/opencode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -737,7 +756,7 @@ AI 会：
 
 **开源免费**
 - 代码完全开源，可审查和定制
-- 内置免费模型，零成本入门
+- 提供限时免费体验模型，零成本入门
 - 无订阅费用压力
 
 **隐私可控**
@@ -794,11 +813,11 @@ AI 会：
 > 💡 **提示**：Claude Code 价格取决于使用层级，范围为 $20-200/月。
 
 **选择建议**：
-- 追求开源免费 → OpenCode + 免费模型（Kimi K2.5、GLM-4.7）
+- 追求开源免费 → OpenCode + 限时免费体验模型（Kimi K2.5、GLM-4.7）
 - 追求 IDE 体验 → Cursor
 - 追求开箱即用 → Claude Code
 - 追求性价比 → OpenCode + Zen 按量付费
-- 预算有限 → OpenCode + 免费模型，必要时可复用已有订阅（GitHub Copilot、ChatGPT Plus）
+- 预算有限 → OpenCode + 限时免费体验模型，必要时可复用已有订阅（GitHub Copilot、ChatGPT Plus）
 
 ## 总结与建议
 
@@ -820,7 +839,7 @@ AI 会：
 
 **第一周：熟悉基础**
 - 完成安装和配置
-- 使用免费模型体验基本功能
+- 使用限时免费体验模型体验基本功能
 - 练习常用命令
 
 **第二周：提高效率**
@@ -846,7 +865,7 @@ AI 会：
 
 OpenCode 代表了 AI 编程工具的一种新趋势：**开源、自由、可控**。它不试图锁定用户，而是提供灵活的基础设施，让开发者自主选择最适合自己的方案。
 
-在当前 AI 工具动辄月费数十美元的环境下，OpenCode 提供了一条零成本入门的路径。即使使用免费模型，也能显著提升日常编码效率。
+在当前 AI 工具动辄月费数十美元的环境下，OpenCode 提供了一条零成本入门的路径。即使使用限时免费体验模型，也能显著提升日常编码效率。
 
 如果你正在寻找一款既能保护隐私、又能灵活配置、还不用花钱的 AI 编程工具，OpenCode 值得一试。
 
