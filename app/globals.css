@@ -134,6 +134,43 @@
   }
 }
 
+/* 代码块滚动条样式 - 适配深浅色模式 */
+pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.5);
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+/* Firefox 滚动条 */
+pre {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+}
+
+/* 深色模式下的滚动条 */
+.dark pre::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+.dark pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+.dark pre {
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+}
+
 /* 文章布局响应式控制 - 确保只渲染一份内容 */
 .article-layout-desktop {
   display: none;
