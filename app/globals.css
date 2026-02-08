@@ -144,31 +144,31 @@ pre::-webkit-scrollbar-track {
 }
 
 pre::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.5);
+  background: rgba(148, 163, 184, 0.25);
   border-radius: 4px;
 }
 
 pre::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background: rgba(148, 163, 184, 0.4);
 }
 
 /* Firefox 滚动条 */
 pre {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
 }
 
-/* 深色模式下的滚动条 */
+/* 深色模式下的滚动条 - 颜色稍深一些以便在深色背景上可见 */
 .dark pre::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.2);
 }
 
 .dark pre::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: rgba(148, 163, 184, 0.35);
 }
 
 .dark pre {
-  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
 }
 
 /* 文章布局响应式控制 - 确保只渲染一份内容 */
