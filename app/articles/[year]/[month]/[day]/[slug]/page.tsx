@@ -8,6 +8,8 @@ import { ArticleHeader } from "@/components/article-header";
 import { TableOfContents } from "@/components/table-of-contents";
 import { FloatingTocButton } from "@/components/floating-toc-button";
 import { ReadingProgress } from "@/components/reading-progress";
+import { generateOpenGraph, generateTwitterCard } from "@/lib/seo-utils";
+import { generateArticleStructuredData, generateBreadcrumbStructuredData } from "@/lib/structured-data";
 
 interface Props {
   params: Promise<{ year: string; month: string; day: string; slug: string }>;
@@ -33,9 +35,31 @@ export async function generateMetadata({ params }: Props) {
     };
   }
 
+  const postUrl = `${config.site.url}/articles/${year}/${month}/${day}/${slug}`;
+  const og = generateOpenGraph(post, postUrl);
+  const twitter = generateTwitterCard(post);
+
   return {
-    title: `${post.title} | 文章`,
+    title: `${post.title} | 袁慎建的技术博客`,
     description: post.excerpt,
+    keywords: post.tags,
+    authors: [{ name: "袁慎建" }],
+    alternates: {
+      canonical: postUrl,
+    },
+    openGraph: og,
+    twitter: twitter,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
@@ -51,17 +75,19 @@ export default async function PostPage({ params }: Props) {
   const headings = extractHeadings(post.content);
   const postUrl = `${config.site.url}/articles/${year}/${month}/${day}/${slug}`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.date,
-    author: {
-      "@type": "Person",
-      name: "博客作者",
-    },
-  };
+  // 生成结构化数据
+  const articleStructuredData = generateArticleStructuredData(post, postUrl);
+
+  // 生成面包屑导航结构化数据
+  const breadcrumbs = [
+    { name: "首页", url: config.site.url },
+    { name: "文章", url: `${config.site.url}/articles` },
+    { name: post.title, url: postUrl },
+  ];
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData(breadcrumbs);
+
+  // 合并所有结构化数据
+  const allStructuredData = [articleStructuredData, breadcrumbStructuredData];
 
   return (
     <>
@@ -69,7 +95,9 @@ export default async function PostPage({ params }: Props) {
       <Script
         id="json-ld"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(allStructuredData),
+        }}
       />
       <article className="py-12 px-6">
         {headings.length > 0 ? (
