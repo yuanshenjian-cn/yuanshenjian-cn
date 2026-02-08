@@ -109,6 +109,23 @@ wsl --install
 curl -fsSL https://opencode.ai/install | bash
 ```
 
+**WSL 目录关联说明**
+
+在 WSL 中，Windows 磁盘被挂载到 `/mnt` 目录下。了解路径对应关系有助于在 WSL 中访问 Windows 文件：
+
+| Windows 路径              | WSL 路径                      |
+| ----------------------- | --------------------------- |
+| `C:\Users\Name\project` | `/mnt/c/Users/Name/project` |
+| `D:\workspace`          | `/mnt/d/workspace`          |
+| `E:\data`               | `/mnt/e/data`               |
+
+例如，要在 WSL 中打开 Windows 的 D 盘工作目录：
+
+```bash
+cd /mnt/d/workspace
+opencode
+```
+
 **方式二：Chocolatey 安装**
 
 ```powershell
