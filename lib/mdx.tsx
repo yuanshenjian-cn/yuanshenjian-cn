@@ -52,9 +52,9 @@ const mdxComponents: MDXComponents = {
     return <CodeBlock>{children}</CodeBlock>;
   },
   code: ({ children }: ElementProps) => {
-    // 行内代码 - 与代码块保持一致的背景色
+    // 行内代码 - 与代码块保持一致的背景色，不加粗
     return (
-      <code className="bg-muted text-slate-800 dark:text-foreground px-1.5 py-0.5 rounded text-sm font-mono break-all">
+      <code className="bg-muted text-slate-800 dark:text-foreground px-1.5 py-0.5 rounded text-sm font-normal font-mono break-all">
         {children}
       </code>
     );
