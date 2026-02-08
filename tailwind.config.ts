@@ -6,6 +6,7 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -95,6 +96,19 @@ export default {
       transitionTimingFunction: {
         "ease-out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
         "ease-in-expo": "cubic-bezier(0.7, 0, 0.84, 0)",
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            // 只针对行内 code（不在 pre 中的）移除反引号
+            ':not(pre) > code::before': {
+              content: '""',
+            },
+            ':not(pre) > code::after': {
+              content: '""',
+            },
+          },
+        },
       },
     },
   },

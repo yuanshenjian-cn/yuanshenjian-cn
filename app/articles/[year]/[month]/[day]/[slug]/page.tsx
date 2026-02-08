@@ -98,7 +98,7 @@ export default async function PostPage({ params }: Props) {
 
             {/* 桌面端目录（固定） */}
             <aside className="hidden lg:block w-60 flex-shrink-0">
-              <div className="sticky top-24">
+              <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
                 <div className="bg-card rounded-lg p-4 border">
                   <TableOfContents headings={headings} />
                 </div>

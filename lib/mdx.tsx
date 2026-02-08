@@ -1,7 +1,6 @@
 import React from 'react';
 import matter from 'gray-matter';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import rehypePrismPlus from 'rehype-prism-plus';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import GitHubSlugger from 'github-slugger';
@@ -48,9 +47,18 @@ const mdxComponents: MDXComponents = {
   blockquote: ({ children }: ElementProps) => (
     <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground break-words">{children}</blockquote>
   ),
-  pre: ({ children, className }: ElementProps) => (
-    <CodeBlock className={className}>{children}</CodeBlock>
-  ),
+  pre: ({ children }: ElementProps) => {
+    // pre 元素包裹的是代码块，提取 code 子元素传递给 CodeBlock
+    return <CodeBlock>{children}</CodeBlock>;
+  },
+  code: ({ children }: ElementProps) => {
+    // 行内代码 - 与代码块保持一致的背景色
+    return (
+      <code className="bg-muted text-slate-800 dark:text-foreground px-1.5 py-0.5 rounded text-sm font-mono break-all">
+        {children}
+      </code>
+    );
+  },
   a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline break-all">{children}</a>,
   hr: () => <hr className="my-8 border-border" />,
   table: ({ children }: ElementProps) => <table className="w-full border-collapse my-4">{children}</table>,
@@ -74,7 +82,6 @@ export async function MDXContent({ source }: { source: string }) {
           remarkPlugins: [remarkGfm],
           rehypePlugins: [
             rehypeSlug, // 自动生成 id
-            rehypePrismPlus
           ],
         },
       }}
@@ -124,14 +131,27 @@ export function extractHeadings(content: string): Heading[] {
   // 重置 slugger 以确保每次调用都是独立的
   slugger.reset();
 
+  let inCodeBlock = false;
+
   for (const line of lines) {
-    const match = line.match(/^(#{1,6})\s+(.+)$/);
-    if (match) {
-      const level = match[1].length;
-      const text = match[2].trim();
-      const id = slugger.slug(text);
-      
-      headings.push({ id, text, level });
+    // 检测代码块开始/结束
+    const codeBlockMatch = line.match(/^(\s*)(`{3,}|~{3,})\s*([a-zA-Z0-9+-]*)?\s*$/);
+    
+    if (codeBlockMatch) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    
+    // 只在代码块外匹配标题
+    if (!inCodeBlock) {
+      const match = line.match(/^(#{1,6})\s+(.+)$/);
+      if (match) {
+        const level = match[1].length;
+        const text = match[2].trim();
+        const id = slugger.slug(text);
+        
+        headings.push({ id, text, level });
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, ReactNode, isValidElement, ReactElement } from "react";
+import { useState, useCallback, ReactNode, isValidElement } from "react";
 import { Check, Copy } from "lucide-react";
 
 interface CodeBlockProps {
@@ -35,16 +35,6 @@ function extractTextFromChildren(children: ReactNode): string {
   }
   
   return "";
-}
-
-/**
- * 检查是否是代码块（包含语言类名）
- */
-function isCodeBlock(children: ReactNode): boolean {
-  if (!isValidElement(children)) return false;
-  const props = (children as ReactElement<ElementProps>).props;
-  const className = props.className || "";
-  return className.includes("language-");
 }
 
 /**
@@ -86,14 +76,11 @@ function addLineNumbers(code: string): ReactNode {
   );
 }
 
-export function CodeBlock({ children, className }: CodeBlockProps) {
+export function CodeBlock({ children }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   
   // 提取代码文本
   const codeText = extractTextFromChildren(children);
-  
-  // 检查是否是代码块（而非行内代码）
-  const isBlock = isCodeBlock(children);
   
   const handleCopy = useCallback(async () => {
     try {
@@ -104,15 +91,6 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
       console.error("复制失败:", err);
     }
   }, [codeText]);
-
-  // 如果是行内代码，保持原有样式
-  if (!isBlock) {
-    return (
-      <code className="bg-slate-200 dark:bg-muted/60 text-slate-800 dark:text-foreground px-1.5 py-0.5 rounded text-sm font-mono break-all">
-        {children}
-      </code>
-    );
-  }
 
   return (
     <div className="relative group">
@@ -131,21 +109,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
       </button>
       
       {/* 代码块内容 */}
-      <pre 
-        className={`
-          bg-muted dark:bg-muted 
-          text-slate-800 dark:text-foreground
-          border border-slate-200 dark:border-border
-          p-4 pt-10 
-          rounded-lg 
-          overflow-x-auto 
-          my-4 
-          max-w-full
-          text-sm
-          relative
-          ${className || ""}
-        `}
-      >
+      <pre className="bg-muted dark:bg-muted text-slate-800 dark:text-foreground border border-slate-200 dark:border-border p-4 pt-10 rounded-lg overflow-x-auto my-4 max-w-full text-sm relative">
         {isValidElement(children) ? (
           // 提取 code 元素的文本并添加行号
           addLineNumbers(extractTextFromChildren(children))
