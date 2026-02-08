@@ -1,0 +1,366 @@
+---
+title: OpenCode 新手入门：从零开始使用
+date: '2026-02-06'
+tags:
+  - 软件开发
+  - AI编程
+  - 效率工具
+  - OpenCode
+published: true
+brief: >-
+  OpenCode 是一款开源的 AI Coding Agent，支持终端、桌面应用和主流 IDE。本文从零开始，带你完成 OpenCode 的安装配置和初次使用，快速上手这款提升编程效率的神器。
+---
+
+
+> 一款开源、免费、支持 75+ 模型提供商的 AI 编程代理，拥有近 100K GitHub stars，让你的终端变成智能编程助手。
+
+## 引言：为什么需要 OpenCode
+
+每天面对重复性编码任务、繁琐的代码审查、复杂的重构工作，你是否想过有一个智能助手能分担这些工作？传统的 AI 编程工具要么价格昂贵，要么隐私堪忧。
+
+OpenCode 的出现改变了这一局面。它是一款**完全开源**的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，提供**限时免费体验模型**（如 Kimi K2.5、GLM-4.7、MiniMax M2.1），体验期间无需订阅和配置 API Key 即可直接使用。
+
+本文将带你全面了解 OpenCode，从安装配置到核心功能，帮助你快速上手这款效率工具。
+
+## OpenCode 简介
+
+### 什么是 OpenCode
+
+OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 **anomalyco** 开发并在 GitHub 开源。它允许开发者通过自然语言与 AI 交互，完成代码编写、重构、调试、审查等任务。
+
+**核心定位**：
+- 开源免费，代码透明
+- 隐私优先，数据可控
+- 终端原生，高效便捷
+- 模型灵活，支持多提供商
+
+### 主要特性
+
+| 特性 | 说明 |
+|------|------|
+| **双模式工作** | Build 模式（全权限编辑）+ Plan 模式（只读规划） |
+| **多平台支持** | macOS、Windows（WSL）、Linux |
+| **模型丰富** | 支持 75+ 提供商，提供限时免费体验模型（Kimi K2.5、GLM-4.7、MiniMax M2.1 等），体验期间无需配置即可使用 |
+| **工具集** | bash 执行、文件读写、grep 搜索、LSP 诊断等 |
+| **上下文感知** | 自动生成 `AGENTS.md`，理解项目结构 |
+| **分享协作** | 一键生成会话分享链接 |
+
+### 适用场景
+
+- **快速原型开发**：通过自然语言描述生成代码
+- **代码审查与重构**：自动化代码改进建议
+- **Bug 修复**：定位问题并提供修复方案
+- **技术学习**：解释复杂代码逻辑
+- **文档编写**：自动生成代码注释和文档
+
+## 安装与配置
+
+### macOS 安装
+
+**方式一：一键安装脚本（推荐）**
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+**方式二：Homebrew 安装**
+
+```bash
+# 使用官方 tap 获取最新版本
+brew install anomalyco/tap/opencode
+```
+
+**方式三：npm 安装**
+
+```bash
+npm install -g opencode-ai
+```
+
+**验证安装**：
+
+```bash
+opencode --version
+# 输出示例：1.1.53
+```
+
+### Windows 安装
+
+**推荐：使用 WSL（Windows Subsystem for Linux）**
+
+WSL（Windows Subsystem for Linux）是 Windows 10/11 的可选功能，**需要手动开启**，不是系统默认自带的。
+
+**第一步：安装 WSL**
+
+以管理员身份打开 PowerShell，执行：
+
+```powershell
+wsl --install
+```
+
+这会安装默认的 Ubuntu 发行版。安装完成后重启电脑，按提示设置 Ubuntu 用户名和密码。
+
+如果已经安装了 WSL，可以跳过此步骤。
+
+**第二步：在 WSL 中安装 OpenCode**
+
+打开 WSL 终端（在开始菜单搜索 "Ubuntu" 或 "WSL"），然后执行：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+**方式二：Chocolatey 安装**
+
+```powershell
+choco install opencode
+```
+
+**方式三：Scoop 安装**
+
+```powershell
+scoop bucket add extras
+scoop install extras/opencode
+```
+
+**方式四：npm 安装**
+
+```powershell
+npm install -g opencode-ai
+```
+
+**注意**：Windows 原生支持已完善，桌面应用同样支持 Windows。Bun 安装支持目前正在开发中（预计未来版本提供）。
+
+
+### Linux 安装
+
+**Arch Linux**：
+
+```bash
+paru -S opencode-bin
+```
+
+**其他发行版**：
+
+使用通用安装脚本：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+或通过 npm：
+
+```bash
+npm install -g opencode-ai
+```
+
+### 桌面应用安装（BETA）
+
+从官方发布页下载对应平台安装包：
+
+| 平台 | 下载文件 |
+|------|----------|
+| macOS (Apple Silicon) | opencode-desktop-darwin-aarch64.dmg |
+| macOS (Intel) | opencode-desktop-darwin-x64.dmg |
+| Windows | opencode-desktop-windows-x64.exe |
+| Linux | .deb / .rpm / AppImage |
+
+下载地址：[https://opencode.ai/download](https://opencode.ai/download)
+
+> ⚠️ **注意**：桌面应用目前处于 BETA 阶段，功能可能不如终端版本稳定。
+
+
+### 启动与初次使用
+
+安装完成后，在终端输入以下命令启动 OpenCode：
+
+```bash
+opencode
+```
+
+**首次启动流程**：
+
+1. **欢迎界面**：看到 OpenCode 的 TUI（终端用户界面）
+2. **模型选择**：首次启动会提示选择 AI 模型
+   - 选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、MiniMax M2.1、GLM-4.7），体验期间无需配置 API Key
+   - 或选择 `/connect` 配置自己的 API Key 或登录已有账户
+3. **开始使用**：进入主界面后，输入 `/help` 查看帮助
+
+**验证安装成功**：
+
+```bash
+opencode --version
+# 应显示版本号，如：1.1.53
+```
+
+**快速测试**：
+
+```bash
+# 启动 OpenCode
+opencode
+
+# 在界面中输入
+你好，OpenCode！
+```
+
+如果看到 AI 回复，说明安装成功。
+
+### 配置模型
+
+**使用免费体验模型（限时，无需 API Key）**：
+
+启动后输入 `/models` 查看可用模型，选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、GLM-4.7、MiniMax M2.1）。体验期间无需连接供应商或配置 API Key 即可直接使用。
+
+> ⚠️ **注意**：免费体验模型可能有使用限制或时限，建议长期使用前配置自己的 API Key 或考虑 OpenCode Zen 服务。
+
+**连接商业模型**：
+
+```bash
+# 方式一：命令行
+opencode auth login
+
+# 方式二：TUI 中输入
+/connect
+```
+
+按提示选择提供商（OpenAI、Anthropic、Google 等）并粘贴 API Key。
+
+**使用已有账号登录**：
+
+OpenCode 支持直接登录你已经付费的 AI 服务账号：
+
+- **GitHub Copilot**：输入 `/connect`，选择 GitHub，按提示完成登录
+- **ChatGPT Plus/Pro**：输入 `/connect`，选择 OpenAI，登录你的 ChatGPT 账户
+- **Claude**：输入 `/connect`，选择 Anthropic，粘贴 API Key
+
+这样可以复用你已经订阅的服务，无需额外付费。
+
+**使用 OpenCode Zen（精选付费模型）**：
+
+Zen 是 OpenCode 官方提供的精选模型服务，为用户测试和优化过最适合编程任务的模型组合，提供稳定可靠的性能：
+
+1. 输入 `/connect`
+2. 选择 opencode
+3. 访问 [opencode.ai/auth](https://opencode.ai/auth) 注册并充值（首次最低充值 $20）
+4. 粘贴 API Key 完成配置
+
+**Zen 特点**：
+- 按量计费，无额外加价
+- 支持设置每月消费上限
+- 模型经过 OpenCode 团队专门测试和优化
+- 适合需要高质量模型的开发者
+
+> 💡 **提示**：新手可以先使用免费模型体验，需要更好性能时再考虑使用 Zen。
+
+### 推荐终端工具
+
+OpenCode 在现代化终端中体验更佳：
+
+| 终端 | 平台 | 特点 |
+|------|------|------|
+| WezTerm | 跨平台 | 功能丰富，配置灵活 |
+| Alacritty | 跨平台 | 极速，GPU 加速 |
+| Ghostty | Linux/macOS | 新兴，性能优秀 |
+| Kitty | Linux/macOS | 功能全面，插件丰富 |
+
+## 核心功能详解
+
+### 双模式工作流
+
+OpenCode 提供两种工作模式，通过 **Tab 键** 切换：
+
+**Build 模式（默认）**
+- AI 拥有完整编辑权限
+- 可直接修改文件、执行命令
+- 适合直接编码任务
+
+**Plan 模式**
+- AI 只读，不修改文件
+- 提供实施方案和步骤
+- 适合规划和审查
+
+**使用建议**：
+- 复杂任务先 Plan 后 Build
+- 简单任务直接 Build
+- 关键代码人工确认后再执行
+
+### 项目初始化
+
+进入项目目录后执行：
+
+```bash
+cd /path/to/your/project
+opencode
+```
+
+在 TUI 中输入：
+
+```bash
+/init
+```
+
+这会：
+- 创建 `.opencode/` 配置目录
+- 分析项目结构
+- 生成 `AGENTS.md` 项目指南
+- 建立代码索引
+
+**建议**：将 `AGENTS.md` 提交到 Git，便于团队协作。
+
+### 内置工具集
+
+OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
+
+| 工具 | 功能 | 权限选项 |
+|------|------|----------|
+| **bash** | 执行 shell 命令 | allow/deny/ask |
+| **read** | 读取文件内容 | allow |
+| **write** | 创建新文件 | allow/ask |
+| **edit** | 修改文件内容 | allow/ask |
+| **patch** | 应用代码补丁 | allow/ask |
+| **grep** | 搜索文件内容 | allow |
+| **glob** | 列出匹配文件 | allow |
+| **list** | 列出目录内容 | allow |
+| **webfetch** | 抓取网页内容 | allow |
+| **websearch** | 网络搜索 | allow（需 `OPENCODE_ENABLE_EXA=1`）|
+| **lsp** | 代码导航和提示（实验性） | allow（需环境变量）|
+| **skill** | 加载 SKILL.md 技能文件 | allow |
+| **todowrite** | 创建/更新任务清单 | allow |
+| **todoread** | 读取任务清单 | allow |
+| **question** | 向用户提问 | allow |
+
+### 常用 Slash 命令
+
+在 TUI 中输入 `/` 查看所有命令：
+
+**核心命令**：
+
+| 命令 | 功能 | 快捷键 |
+|------|------|--------|
+| `/connect` | 配置模型提供商 | - |
+| `/init` | 初始化项目 | Ctrl+X I |
+| `/models` | 切换模型 | Ctrl+X M |
+| `/new` | 新会话 | Ctrl+X N |
+| `/compact` | 压缩当前会话（总结上下文） | Ctrl+X C |
+| `/sessions` | 列出并切换会话 | Ctrl+X L |
+| `/export` | 导出对话为 Markdown | Ctrl+X X |
+| `/undo` | 撤销更改 | Ctrl+X U |
+| `/redo` | 重做更改 | Ctrl+X R |
+| `/share` | 分享会话 | Ctrl+X S |
+| `/exit` | 退出 | Ctrl+X Q |
+
+### 文件引用语法
+
+使用 `@` 快速引用项目文件：
+
+```
+解释 @src/main.ts 中的逻辑
+```
+
+支持模糊搜索，输入 `@` 后按文件名自动补全。
+
+## 资源链接
+
+- **官网**：[https://opencode.ai](https://opencode.ai)
+- **GitHub**：[https://github.com/anomalyco/opencode](https://github.com/anomalyco/opencode)
+- **文档**：[https://opencode.ai/docs](https://opencode.ai/docs)
+- **下载页面**：[https://opencode.ai/download](https://opencode.ai/download)
