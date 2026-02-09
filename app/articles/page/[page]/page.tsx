@@ -25,6 +25,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `文章 | 第 ${page} 页 | 袁慎建`,
     description: "分享技术知识、生活感悟与个人想法",
+    openGraph: {
+      title: `文章 | 第 ${page} 页 | 袁慎建`,
+      description: "分享技术知识、生活感悟与个人想法",
+      type: "website",
+      images: [
+        {
+          url: "/images/og-default.webp",
+          width: 1200,
+          height: 630,
+          alt: "袁慎建的文章",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `文章 | 第 ${page} 页 | 袁慎建`,
+      description: "分享技术知识、生活感悟与个人想法",
+      images: ["/images/og-default.webp"],
+    },
   };
 }
 

@@ -4,6 +4,25 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "关于 | 袁慎建",
   description: "关于博客作者的信息",
+  openGraph: {
+    title: "关于 | 袁慎建",
+    description: "关于博客作者的信息",
+    type: "profile",
+    images: [
+      {
+        url: "/images/og-default.webp",
+        width: 1200,
+        height: 630,
+        alt: "关于袁慎建",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "关于 | 袁慎建",
+    description: "关于博客作者的信息",
+    images: ["/images/og-default.webp"],
+  },
 };
 
 export default function AboutPage() {

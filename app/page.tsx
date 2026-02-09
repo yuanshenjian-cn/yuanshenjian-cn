@@ -10,6 +10,20 @@ export const metadata: Metadata = {
     title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
     description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
     type: "website",
+    images: [
+      {
+        url: "/images/og-default.webp",
+        width: 1200,
+        height: 630,
+        alt: "袁慎建的博客",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
+    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+    images: ["/images/og-default.webp"],
   },
 };
 

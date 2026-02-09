@@ -101,7 +101,7 @@ export function generateListPageSEO(
     ? pageTitle 
     : `${pageTitle} | 袁慎建的技术博客`;
 
-  const ogImage = options?.image || `${config.site.url}/images/og-default.jpg`;
+  const ogImage = options?.image || `${config.site.url}/images/og-default.webp`;
 
   return {
     title: fullTitle,
@@ -150,7 +150,7 @@ function generateOGImage(_post: Post): string {
   // }
 
   // 否则使用默认 OG 图片
-  return `${config.site.url}/images/og-default.jpg`;
+  return `${config.site.url}/images/og-default.webp`;
 }
 
 /**

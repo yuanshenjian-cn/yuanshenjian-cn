@@ -13,6 +13,25 @@ export const metadata: Metadata = {
   title: "简历 | 袁慎建",
   description:
     "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练 - 袁慎建的个人简历",
+  openGraph: {
+    title: "简历 | 袁慎建",
+    description: "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练",
+    type: "profile",
+    images: [
+      {
+        url: "/images/og-default.webp",
+        width: 1200,
+        height: 630,
+        alt: "袁慎建的简历",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "简历 | 袁慎建",
+    description: "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练",
+    images: ["/images/og-default.webp"],
+  },
 };
 
 export default function ResumePage() {
