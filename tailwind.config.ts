@@ -107,6 +107,12 @@ export default {
             ':not(pre) > code::after': {
               content: '""',
             },
+            'blockquote p::before': {
+              content: 'none',
+            },
+            'blockquote p::after': {
+              content: 'none',
+            },
           },
         },
       },

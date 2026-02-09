@@ -1,0 +1,88 @@
+{
+  "name": "security-scanner",
+  "description": "A security scanning subagent that detects vulnerabilities, sensitive data exposure, and insecure coding practices in codebases. Use when: (1) Reviewing code for security vulnerabilities like XSS, SQL injection, CSRF, (2) Scanning for hardcoded secrets, API keys, passwords, or tokens, (3) Analyzing dependencies for known vulnerabilities, (4) Identifying insecure coding patterns, (5) Performing security audits before deployment",
+  "version": "1.0.0",
+  "author": "opencode",
+  "capabilities": [
+    "vulnerability-detection",
+    "secret-scanning",
+    "dependency-analysis",
+    "code-pattern-analysis"
+  ],
+  "settings": {
+    "scanLevel": "comprehensive",
+    "severityThreshold": "low",
+    "checkPatterns": [
+      "xss",
+      "csrf",
+      "sql-injection",
+      "command-injection",
+      "path-traversal",
+      "ldap-injection",
+      "xml-injection",
+      "ssrf",
+      "open-redirect",
+      "insecure-deserialization",
+      "weak-cryptography",
+      "hardcoded-secrets",
+      "insecure-cookies",
+      "missing-auth",
+      "insecure-cors",
+      "information-exposure"
+    ]
+  },
+  "fileTypes": [
+    "*.js", "*.jsx", "*.ts", "*.tsx",
+    "*.py", "*.rb", "*.php",
+    "*.java", "*.kt", "*.scala",
+    "*.go", "*.rs",
+    "*.c", "*.cpp", "*.h",
+    "*.cs", "*.vb",
+    "*.swift",
+    "*.sql",
+    "*.json", "*.yaml", "*.yml", "*.xml",
+    "*.env*", "*.config", "*.properties",
+    "*.md", "*.txt",
+    "Dockerfile", "docker-compose*",
+    "package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "requirements.txt", "Pipfile", "Pipfile.lock", "poetry.lock",
+    "Gemfile", "Gemfile.lock",
+    "Cargo.toml", "Cargo.lock",
+    "go.mod", "go.sum",
+    "pom.xml", "build.gradle", "build.gradle.kts",
+    "composer.json", "composer.lock"
+  ],
+  "excludePatterns": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    ".next/**",
+    "coverage/**",
+    "*.min.js",
+    "*.min.css",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.d.ts"
+  ],
+  "severityLevels": {
+    "critical": {
+      "description": "可以被远程利用的漏洞，可能导致系统完全 compromised",
+      "examples": ["SQL注入", "远程代码执行", "硬编码的生产环境密钥"]
+    },
+    "high": {
+      "description": "可以被利用但需要一定条件的漏洞，可能导致敏感数据泄露",
+      "examples": ["XSS", "不安全的反序列化", "弱加密算法"]
+    },
+    "medium": {
+      "description": "利用难度较高的漏洞，或影响有限的配置问题",
+      "examples": ["CSRF", "不安全的CORS配置", "信息泄露"]
+    },
+    "low": {
+      "description": "理论上的安全问题，实际利用难度极大",
+      "examples": ["注释中的敏感信息", "过时的依赖版本"]
+    }
+  }
+}

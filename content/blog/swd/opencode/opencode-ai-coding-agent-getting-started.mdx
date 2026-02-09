@@ -76,7 +76,7 @@ brew install anomalyco/tap/opencode
 npm install -g opencode-ai
 ```
 
-**验证安装**：
+**验证安装成功*：
 
 ```bash
 opencode --version
@@ -126,47 +126,9 @@ cd /mnt/d/workspace
 opencode
 ```
 
-**方式二：Chocolatey 安装**
+**方式二：npm 安装**
 
 ```powershell
-choco install opencode
-```
-
-**方式三：Scoop 安装**
-
-```powershell
-scoop bucket add extras
-scoop install extras/opencode
-```
-
-**方式四：npm 安装**
-
-```powershell
-npm install -g opencode-ai
-```
-
-**注意**：Windows 原生支持已完善，桌面应用同样支持 Windows。Bun 安装支持目前正在开发中（预计未来版本提供）。
-
-
-### Linux 安装
-
-**Arch Linux**：
-
-```bash
-paru -S opencode-bin
-```
-
-**其他发行版**：
-
-使用通用安装脚本：
-
-```bash
-curl -fsSL https://opencode.ai/install | bash
-```
-
-或通过 npm：
-
-```bash
 npm install -g opencode-ai
 ```
 
@@ -194,6 +156,8 @@ npm install -g opencode-ai
 opencode
 ```
 
+![OpenCode 启动界面](/images/swd/opencode/opencode-start-ui.webp)
+
 **首次启动流程**：
 
 1. **欢迎界面**：看到 OpenCode 的 TUI（终端用户界面）
@@ -204,11 +168,6 @@ opencode
 
 **验证安装成功**：
 
-```bash
-opencode --version
-# 应显示版本号，如：1.1.53
-```
-
 **快速测试**：
 
 ```bash
@@ -216,7 +175,7 @@ opencode --version
 opencode
 
 # 在界面中输入
-你好，OpenCode！
+你好，是现在使用的LLM是什么？你擅长做什么？
 ```
 
 如果看到 AI 回复，说明安装成功。
@@ -231,6 +190,7 @@ opencode
 
 **连接商业模型**：
 
+
 ```bash
 # 方式一：命令行
 opencode auth login
@@ -244,42 +204,14 @@ opencode auth login
 **使用已有账号登录**：
 
 OpenCode 支持直接登录你已经付费的 AI 服务账号：
-
-- **GitHub Copilot**：输入 `/connect`，选择 GitHub，按提示完成登录
-- **ChatGPT Plus/Pro**：输入 `/connect`，选择 OpenAI，登录你的 ChatGPT 账户
 - **Claude**：输入 `/connect`，选择 Anthropic，粘贴 API Key
+- **ChatGPT Plus/Pro**：输入 `/connect`，选择 OpenAI，登录你的 ChatGPT 账户
 
 这样可以复用你已经订阅的服务，无需额外付费。
 
-**使用 OpenCode Zen（精选付费模型）**：
+>💡 **提示**：新手可以先使用免费模型体验，需要更好性能时再考虑使用 Zen。
 
-Zen 是 OpenCode 官方提供的精选模型服务，为用户测试和优化过最适合编程任务的模型组合，提供稳定可靠的性能：
-
-1. 输入 `/connect`
-2. 选择 opencode
-3. 访问 [opencode.ai/auth](https://opencode.ai/auth) 注册并充值（首次最低充值 $20）
-4. 粘贴 API Key 完成配置
-
-**Zen 特点**：
-- 按量计费，无额外加价
-- 支持设置每月消费上限
-- 模型经过 OpenCode 团队专门测试和优化
-- 适合需要高质量模型的开发者
-
-> 💡 **提示**：新手可以先使用免费模型体验，需要更好性能时再考虑使用 Zen。
-
-### 推荐终端工具
-
-OpenCode 在现代化终端中体验更佳：
-
-| 终端 | 平台 | 特点 |
-|------|------|------|
-| WezTerm | 跨平台 | 功能丰富，配置灵活 |
-| Alacritty | 跨平台 | 极速，GPU 加速 |
-| Ghostty | Linux/macOS | 新兴，性能优秀 |
-| Kitty | Linux/macOS | 功能全面，插件丰富 |
-
-## 核心功能详解
+## 核心功能
 
 ### 双模式工作流
 
@@ -295,10 +227,7 @@ OpenCode 提供两种工作模式，通过 **Tab 键** 切换：
 - 提供实施方案和步骤
 - 适合规划和审查
 
-**使用建议**：
-- 复杂任务先 Plan 后 Build
-- 简单任务直接 Build
-- 关键代码人工确认后再执行
+**使用建议**：复杂任务先 Plan 后 Build，简单任务直接 Build，关键代码人工确认后再执行。
 
 ### 项目初始化
 
