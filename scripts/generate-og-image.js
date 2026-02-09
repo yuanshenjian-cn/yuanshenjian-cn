@@ -59,12 +59,12 @@ const svg = `
   <!-- 左下角圆环装饰 -->
   <circle cx="180" cy="510" r="50" fill="none" stroke="${accentMuted}" stroke-width="1" opacity="0.12"/>
   
-  <!-- 袁慎建的博客 - 继续下移 -->
-  <text x="600" y="185" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="36" font-weight="500" fill="${accentColor}" text-anchor="middle" letter-spacing="6">
+  <!-- 袁慎建的博客 - 字体放大 -->
+  <text x="600" y="175" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="44" font-weight="500" fill="${accentColor}" text-anchor="middle" letter-spacing="6">
     袁慎建的博客
   </text>
   
-  <!-- YSJ 超大字体 - 继续下移 -->
+  <!-- YSJ 超大字体 - 保持不动 -->
   <text x="600" y="375" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="220" font-weight="800" fill="${primaryColor}" text-anchor="middle" letter-spacing="-2" filter="url(#glow)">
     YSJ
   </text>
@@ -72,13 +72,13 @@ const svg = `
   <!-- 分隔线 -->
   <line x1="480" y1="475" x2="720" y2="475" stroke="${accentSubtle}" stroke-width="1" opacity="0.4"/>
   
-  <!-- 三个关键词 - 大幅上移 -->
-  <text x="600" y="430" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="26" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="10">
+  <!-- 三个关键词 - 稍微下移，字体放大 -->
+  <text x="600" y="445" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="30" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="10">
     软件 · 投资 · 健康
   </text>
   
-  <!-- 域名 - 大幅上移 -->
-  <text x="600" y="470" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="17" font-weight="400" fill="${accentMuted}" text-anchor="middle" letter-spacing="4">
+  <!-- 域名 - 稍微下移，字体放大 -->
+  <text x="600" y="495" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="20" font-weight="400" fill="${accentMuted}" text-anchor="middle" letter-spacing="4">
     yuanshenjian.cn
   </text>
 </svg>
