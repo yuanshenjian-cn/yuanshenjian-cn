@@ -35,22 +35,22 @@ const svg = `
   <circle cx="200" cy="530" r="40" fill="none" stroke="${accentMuted}" stroke-width="1" opacity="0.15"/>
   
   <!-- 袁慎建的博客 - 上方 -->
-  <text x="600" y="140" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="42" font-weight="600" fill="${primaryColor}" text-anchor="middle" letter-spacing="4">
+  <text x="600" y="135" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="42" font-weight="600" fill="${primaryColor}" text-anchor="middle" letter-spacing="4">
     袁慎建的博客
   </text>
   
-  <!-- YSJ 超大字体 - 距离上下文字对称 -->
-  <text x="600" y="300" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
+  <!-- YSJ 超大字体 - 竖直居中 -->
+  <text x="600" y="315" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
     YSJ
   </text>
   
   <!-- 三个关键词 - 底部居中 -->
-  <text x="600" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="8">
+  <text x="600" y="495" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="8">
     软件 · 投资 · 健康
   </text>
   
-  <!-- 域名 - 底部，字体加大调亮 -->
-  <text x="600" y="540" font-family="system-ui, -apple-system, monospace" font-size="20" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="3">
+  <!-- 域名 - 底部 -->
+  <text x="600" y="575" font-family="system-ui, -apple-system, monospace" font-size="20" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="3">
     yuanshenjian.cn
   </text>
 </svg>
