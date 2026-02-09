@@ -34,20 +34,17 @@ const svg = `
   <!-- 左下角圆环装饰 -->
   <circle cx="200" cy="530" r="40" fill="none" stroke="${accentMuted}" stroke-width="1" opacity="0.15"/>
   
-  <!-- 袁慎建的博客 - 上方，往上挪 -->
-  <text x="600" y="150" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="42" font-weight="600" fill="${primaryColor}" text-anchor="middle" letter-spacing="4">
+  <!-- 袁慎建的博客 - 上方 -->
+  <text x="600" y="140" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="42" font-weight="600" fill="${primaryColor}" text-anchor="middle" letter-spacing="4">
     袁慎建的博客
   </text>
   
-  <!-- 分隔线 -->
-  <rect x="480" y="180" width="240" height="2" fill="${accentColor}" rx="1"/>
-  
-  <!-- YSJ 超大字体 - 居中对称 -->
-  <text x="600" y="320" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
+  <!-- YSJ 超大字体 - 距离上下文字对称 -->
+  <text x="600" y="300" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
     YSJ
   </text>
   
-  <!-- 三个关键词 - 底部居中，与横线对称 -->
+  <!-- 三个关键词 - 底部居中 -->
   <text x="600" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="8">
     软件 · 投资 · 健康
   </text>
