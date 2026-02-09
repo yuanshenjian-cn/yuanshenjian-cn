@@ -29,10 +29,10 @@ const mdxComponents: MDXComponents = {
     <h1 id={id} className="text-3xl font-bold mt-8 mb-4 scroll-mt-24">{children}</h1>
   ),
   h2: ({ id, children }: HeadingProps) => (
-    <h2 id={id} className="text-2xl font-bold mt-6 mb-3 scroll-mt-24">{children}</h2>
+    <h2 id={id} className="text-2xl font-bold mt-12 mb-3 scroll-mt-24">{children}</h2>
   ),
   h3: ({ id, children }: HeadingProps) => (
-    <h3 id={id} className="text-xl font-semibold mt-5 mb-2 scroll-mt-24">{children}</h3>
+    <h3 id={id} className="text-xl font-semibold mt-8 mb-2 scroll-mt-24">{children}</h3>
   ),
   h4: ({ id, children }: HeadingProps) => (
     <h4 id={id} className="text-lg font-semibold mt-4 mb-2 scroll-mt-24">{children}</h4>
