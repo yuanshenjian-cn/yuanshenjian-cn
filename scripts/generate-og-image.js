@@ -11,9 +11,9 @@ const bgDark = '#0f0f11';          // 更深背景，突出中心
 const bgCenter = '#1f1f23';        // 中心区域背景
 const bgCenterLight = '#2a2a30';   // 中心区域亮部
 const primaryColor = '#ffffff';    // 纯白主文字
-const accentColor = '#a1a1aa';     // 浅灰强调色
-const accentMuted = '#52525b';     // 中灰装饰色
-const accentSubtle = '#3f3f46';    // 细线颜色
+const accentColor = '#d4d4d8';     // 更亮的浅灰强调色（提高亮度）
+const accentMuted = '#71717a';     // 更亮的中灰装饰色（提高亮度）
+const accentSubtle = '#52525b';    // 细线颜色
 
 // 创建 SVG - 居中对齐设计，优化圆形区域
 const svg = `
