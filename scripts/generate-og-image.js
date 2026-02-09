@@ -42,18 +42,18 @@ const svg = `
   <!-- 分隔线 -->
   <rect x="480" y="210" width="240" height="2" fill="${accentColor}" rx="1"/>
   
-  <!-- YSJ 超大字体 - 正中间 -->
-  <text x="600" y="360" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
+  <!-- YSJ 超大字体 - 正中间，距离横线更远 -->
+  <text x="600" y="380" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="200" font-weight="800" fill="${primaryColor}" text-anchor="middle">
     YSJ
   </text>
   
   <!-- 三个关键词 - 底部居中 -->
-  <text x="600" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="8">
+  <text x="600" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="8">
     软件 · 投资 · 健康
   </text>
   
-  <!-- 域名 - 底部 -->
-  <text x="600" y="520" font-family="system-ui, -apple-system, monospace" font-size="16" font-weight="400" fill="${accentMuted}" text-anchor="middle" letter-spacing="3">
+  <!-- 域名 - 底部，字体加大调亮 -->
+  <text x="600" y="540" font-family="system-ui, -apple-system, monospace" font-size="20" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="3">
     yuanshenjian.cn
   </text>
 </svg>
