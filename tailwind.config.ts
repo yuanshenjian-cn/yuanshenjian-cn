@@ -113,6 +113,13 @@ export default {
             'blockquote p::after': {
               content: 'none',
             },
+            // 补充 blockquote 整体样式
+            'blockquote': {
+              borderLeftWidth: '4px',
+              borderLeftColor: 'var(--tw-prose-quote-borders)',
+              paddingLeft: '1rem',
+              fontStyle: 'normal', // 取消斜体
+            },
           },
         },
       },
