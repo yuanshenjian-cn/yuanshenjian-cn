@@ -14,10 +14,10 @@ const ogImageUrl = `${config.site.url}/images/og-default.webp`;
 export const metadata: Metadata = {
   title: "简历 | 袁慎建",
   description:
-    "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练 - 袁慎建的个人简历",
+    "AI 软件工程师 · 研发效能专家 · 敏捷开发教练 - 袁慎建的个人简历",
   openGraph: {
     title: "简历 | 袁慎建",
-    description: "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练",
+    description: "AI 软件工程师 · 研发效能专家 · 敏捷开发教练",
     type: "profile",
     images: [
       {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "简历 | 袁慎建",
-    description: "后端工程师（AI Agent） | 研发效能专家 | 敏捷开发教练",
+    description: "AI 软件工程师 · 研发效能专家 · 敏捷开发教练",
     images: [ogImageUrl],
   },
 };
