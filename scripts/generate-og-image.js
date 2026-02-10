@@ -6,14 +6,14 @@ const path = require('path');
 const width = 1200;
 const height = 630;
 
-// 优化后的配色 - 更有层次感的灰调
-const bgDark = '#0f0f11';          // 更深背景，突出中心
-const bgCenter = '#1f1f23';        // 中心区域背景
-const bgCenterLight = '#2a2a30';   // 中心区域亮部
+// 高级雅灰配色
+const bgDark = '#2d2d2d';          // 主背景 - 高级雅灰
+const bgCenter = '#3d3d3d';        // 中心区域背景
+const bgCenterLight = '#4a4a4a';   // 中心区域亮部
 const primaryColor = '#ffffff';    // 纯白主文字
-const accentColor = '#d4d4d8';     // 更亮的浅灰强调色（提高亮度）
-const accentMuted = '#71717a';     // 更亮的中灰装饰色（提高亮度）
-const accentSubtle = '#52525b';    // 细线颜色
+const accentColor = '#e4e4e7';     // 浅灰强调色
+const accentMuted = '#a1a1aa';     // 中灰装饰色
+const accentSubtle = '#71717a';    // 细线颜色
 
 // 创建 SVG - 居中对齐设计，优化圆形区域
 const svg = `
@@ -43,8 +43,8 @@ const svg = `
   <circle cx="600" cy="315" r="290" fill="url(#centerGradient)"/>
   
   <!-- 中心圆形边框 - 细线装饰 -->
-  <circle cx="600" cy="315" r="260" fill="none" stroke="${accentSubtle}" stroke-width="1" opacity="0.4"/>
-  <circle cx="600" cy="315" r="235" fill="none" stroke="${accentMuted}" stroke-width="0.5" opacity="0.3"/>
+  <circle cx="600" cy="315" r="280" fill="none" stroke="${accentSubtle}" stroke-width="1" opacity="0.4"/>
+  <circle cx="600" cy="315" r="255" fill="none" stroke="${accentMuted}" stroke-width="0.5" opacity="0.3"/>
   
   <!-- 左上角装饰 -->
   <polygon points="0,0 180,0 0,180" fill="${accentMuted}" opacity="0.06"/>
@@ -59,26 +59,21 @@ const svg = `
   <!-- 左下角圆环装饰 -->
   <circle cx="180" cy="510" r="50" fill="none" stroke="${accentMuted}" stroke-width="1" opacity="0.12"/>
   
-  <!-- 袁慎建的博客 - 字体放大 -->
-  <text x="600" y="175" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="44" font-weight="500" fill="${accentColor}" text-anchor="middle" letter-spacing="6">
-    袁慎建的博客
-  </text>
-  
-  <!-- YSJ 超大字体 - 保持不动 -->
-  <text x="600" y="375" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="220" font-weight="800" fill="${primaryColor}" text-anchor="middle" letter-spacing="-2" filter="url(#glow)">
+  <!-- YSJ 主标题 - 衬线体 + 加宽字间距，匹配 header logo 样式 -->
+  <text x="600" y="340" font-family="Georgia, 'Noto Serif SC', 'Songti SC', serif" font-size="200" font-weight="500" fill="${primaryColor}" text-anchor="middle" letter-spacing="0.12em" filter="url(#glow)">
     YSJ
   </text>
   
   <!-- 分隔线 -->
-  <line x1="480" y1="475" x2="720" y2="475" stroke="${accentSubtle}" stroke-width="1" opacity="0.4"/>
-  
-  <!-- 三个关键词 - 稍微下移，字体放大 -->
-  <text x="600" y="445" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="30" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="10">
+  <line x1="440" y1="380" x2="760" y2="380" stroke="${accentSubtle}" stroke-width="1" opacity="0.5"/>
+
+  <!-- 三个关键词 - 上移、放大、加亮 -->
+  <text x="600" y="425" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="36" font-weight="400" fill="${primaryColor}" text-anchor="middle" letter-spacing="14">
     软件 · 投资 · 健康
   </text>
-  
-  <!-- 域名 - 稍微下移，字体放大 -->
-  <text x="600" y="495" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="20" font-weight="400" fill="${accentMuted}" text-anchor="middle" letter-spacing="4">
+
+  <!-- 域名 - 上移、放大、加亮 -->
+  <text x="600" y="470" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="24" font-weight="400" fill="${accentColor}" text-anchor="middle" letter-spacing="6">
     yuanshenjian.cn
   </text>
 </svg>
