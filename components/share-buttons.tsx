@@ -2,13 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { X, Check, Link2 } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { QRCodeSVG } from "qrcode.react";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/utils";
 
 interface ShareButtonsProps {
   url: string;
