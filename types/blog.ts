@@ -13,6 +13,17 @@ export interface Post {
   category?: string;
 }
 
+// 搜索用的轻量级文章类型（不包含完整content）
+export interface SearchPost {
+  slug: string;
+  year: string;
+  month: string;
+  day: string;
+  title: string;
+  date: string;
+  excerpt: string;
+}
+
 export interface PostMetadata {
   title: string;
   date: string;

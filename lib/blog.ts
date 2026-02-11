@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { Post, PostFrontmatter } from "@/types/blog";
+import { Post, PostFrontmatter, SearchPost } from "@/types/blog";
 import { config } from "@/lib/config";
 import { cleanContent } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ const postsDirectory = path.join(process.cwd(), "content/blog");
 let cachedPosts: Post[] | null = null;
 let cachedTags: string[] | null = null;
 let cachedCategories: string[] | null = null;
+let cachedSearchPosts: SearchPost[] | null = null;
 
 function getAllMarkdownFiles(dir: string): string[] {
   const files: string[] = [];
@@ -158,6 +159,7 @@ export function clearPostsCache(): void {
   cachedPosts = null;
   cachedTags = null;
   cachedCategories = null;
+  cachedSearchPosts = null;
 }
 
 
@@ -300,4 +302,58 @@ export function getPaginatedPostsByTag(
     totalPages,
     currentPage: validPage,
   };
+}
+
+// 获取用于搜索的文章列表（轻量级，不包含完整content）
+export function getPostsForSearch(): SearchPost[] {
+  // 生产构建时使用缓存，开发模式禁用以保证实时更新
+  if (cachedSearchPosts && process.env.NODE_ENV === 'production') {
+    return cachedSearchPosts;
+  }
+
+  const files = getAllMarkdownFiles(postsDirectory);
+
+  const posts = files
+    .map((filePath): SearchPost | null => {
+      try {
+        const fileContents = fs.readFileSync(filePath, 'utf8');
+        const { data, content } = matter(fileContents);
+        const frontmatter = data as PostFrontmatter;
+
+        // 验证必需的frontmatter字段
+        if (!frontmatter.title || !frontmatter.date) {
+          return null;
+        }
+
+        const dateObj = parseDate(frontmatter.date);
+        const dateISO = new Date(frontmatter.date).toISOString();
+        const slug = generateSlug(filePath);
+        const excerpt = frontmatter.brief || content.slice(0, 200).replace(/[#*_]/g, '') + '...';
+
+        // 检查文章是否已发布
+        const published = frontmatter.published !== false;
+        if (!published) {
+          return null;
+        }
+
+        return {
+          slug,
+          year: dateObj.year,
+          month: dateObj.month,
+          day: dateObj.day,
+          title: frontmatter.title,
+          date: dateISO,
+          excerpt,
+        };
+      } catch (error) {
+        console.warn(`[Blog] Failed to parse file for search: ${filePath}`, error instanceof Error ? error.message : error);
+        return null;
+      }
+    })
+    .filter((post): post is SearchPost => post !== null)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // 缓存结果
+  cachedSearchPosts = posts;
+  return posts;
 }

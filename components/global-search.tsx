@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { Post } from "@/types/blog";
+import { SearchPost } from "@/types/blog";
 
 interface GlobalSearchProps {
-  posts: Post[];
+  posts: SearchPost[];
 }
 
 export function GlobalSearch({ posts }: GlobalSearchProps) {

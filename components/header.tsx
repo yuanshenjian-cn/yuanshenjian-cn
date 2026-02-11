@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HeaderClient } from "./header-client";
-import { getAllPosts } from "@/lib/blog";
+import { getPostsForSearch } from "@/lib/blog";
 
 const navItems = [
   { href: "/", label: "首页" },
@@ -10,7 +10,7 @@ const navItems = [
 ];
 
 export async function Header() {
-  const posts = getAllPosts();
+  const posts = getPostsForSearch();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">

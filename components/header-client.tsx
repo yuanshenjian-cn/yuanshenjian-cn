@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { GlobalSearch } from "./global-search";
-import { Post } from "@/types/blog";
+import { SearchPost } from "@/types/blog";
 
 interface NavItem {
   href: string;
@@ -15,7 +15,7 @@ interface NavItem {
 
 interface HeaderClientProps {
   navItems: NavItem[];
-  posts: Post[];
+  posts: SearchPost[];
 }
 
 export function HeaderClient({ navItems, posts }: HeaderClientProps) {
