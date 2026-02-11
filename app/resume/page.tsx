@@ -14,10 +14,10 @@ const ogImageUrl = `${config.site.url}/images/og-default.webp`;
 export const metadata: Metadata = {
   title: "简历 | 袁慎建",
   description:
-    "AI 软件工程师：研发效能专家：敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
+    "AI 软件工程师·研发效能专家·敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
   openGraph: {
     title: "简历 | 袁慎建",
-    description: "AI 软件工程师：研发效能专家：敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
+    description: "AI 软件工程师·研发效能专家·敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
     type: "profile",
     images: [
       {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "简历 | 袁慎建",
-    description: "AI 软件工程师：研发效能专家：敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
+    description: "AI 软件工程师·研发效能专家·敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
     images: [ogImageUrl],
   },
 };
