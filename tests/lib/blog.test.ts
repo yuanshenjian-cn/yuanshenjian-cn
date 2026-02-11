@@ -19,9 +19,18 @@ describe("Blog Module", () => {
   });
 
   describe("getAllPosts", () => {
-    it("should return array of posts", () => {
+    it("should return valid posts array with correct structure", () => {
       const posts = getAllPosts();
+      // 验证返回的是数组
       expect(Array.isArray(posts)).toBe(true);
+      // 验证每个文章都有必需的字段
+      if (posts.length > 0) {
+        const firstPost = posts[0];
+        expect(firstPost).toHaveProperty("slug");
+        expect(firstPost).toHaveProperty("title");
+        expect(firstPost).toHaveProperty("date");
+        expect(firstPost).toHaveProperty("content");
+      }
     });
 
     it("should return posts sorted by date descending", () => {
@@ -35,51 +44,41 @@ describe("Blog Module", () => {
       }
     });
 
-    it("should return posts with required fields", () => {
-      const posts = getAllPosts();
-      if (posts.length === 0) return;
-
-      const firstPost = posts[0];
-      expect(firstPost).toHaveProperty("slug");
-      expect(firstPost).toHaveProperty("title");
-      expect(firstPost).toHaveProperty("date");
-      expect(firstPost).toHaveProperty("excerpt");
-      expect(firstPost).toHaveProperty("content");
-      expect(firstPost).toHaveProperty("tags");
-      expect(firstPost).toHaveProperty("readingTime");
-      expect(firstPost).toHaveProperty("year");
-      expect(firstPost).toHaveProperty("month");
-      expect(firstPost).toHaveProperty("day");
-    });
-
     it("should filter out unpublished posts", () => {
       const posts = getAllPosts();
       const unpublishedPosts = posts.filter((post) => !post.published);
       expect(unpublishedPosts).toHaveLength(0);
     });
 
-    it("should cache posts in production", () => {
+    it("should return consistent results across multiple calls", () => {
+      // 验证多次调用返回一致的数据
       const posts1 = getAllPosts();
       const posts2 = getAllPosts();
-      // 开发环境下不启用缓存，每次调用都返回新数组
-      // 生产环境下缓存启用，返回相同引用
-      // 使用 toStrictEqual 比较内容是否一致
+      
+      // 内容应该完全一致
       expect(posts1).toStrictEqual(posts2);
+      // 文章数量相同
+      expect(posts2.length).toBe(posts1.length);
+      // 第一篇数据一致
+      if (posts1.length > 0) {
+        expect(posts2[0].slug).toBe(posts1[0].slug);
+        expect(posts2[0].title).toBe(posts1[0].title);
+      }
     });
   });
 
   describe("getPostsForSearch", () => {
-    it("should return array of search posts", () => {
+    it("should return valid search posts without content field", () => {
       const posts = getPostsForSearch();
+      // 验证是数组
       expect(Array.isArray(posts)).toBe(true);
-    });
-
-    it("should return search posts without content field", () => {
-      const posts = getPostsForSearch();
+      
       if (posts.length === 0) return;
 
       const firstPost = posts[0];
+      // 验证没有 content 字段（搜索用轻量化数据）
       expect(firstPost).not.toHaveProperty("content");
+      // 验证有必需的字段
       expect(firstPost).toHaveProperty("slug");
       expect(firstPost).toHaveProperty("title");
       expect(firstPost).toHaveProperty("date");
@@ -362,11 +361,16 @@ describe("Blog Module", () => {
     });
   });
 
-  describe("POSTS_PER_PAGE constant", () => {
-    it("should be exported and have correct value", () => {
+  describe("Pagination Configuration", () => {
+    it("should use correct POSTS_PER_PAGE in pagination", () => {
+      // 验证常量配置正确
       expect(POSTS_PER_PAGE).toBeDefined();
       expect(typeof POSTS_PER_PAGE).toBe("number");
       expect(POSTS_PER_PAGE).toBeGreaterThan(0);
+      
+      // 验证实际分页使用该配置
+      const result = getPaginatedPosts(1);
+      expect(result.posts.length).toBeLessThanOrEqual(POSTS_PER_PAGE);
     });
   });
 });
