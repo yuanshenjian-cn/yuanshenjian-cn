@@ -170,22 +170,3 @@ pre {
 .dark pre {
   scrollbar-color: rgba(148, 163, 184, 0.12) transparent;
 }
-
-/* 文章布局响应式控制 - 确保只渲染一份内容 */
-.article-layout-desktop {
-  display: none;
-}
-
-.article-layout-mobile {
-  display: block;
-}
-
-@media (min-width: 1024px) {
-  .article-layout-desktop {
-    display: flex;
-  }
-  
-  .article-layout-mobile {
-    display: none;
-  }
-}

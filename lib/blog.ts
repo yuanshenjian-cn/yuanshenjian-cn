@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { Post, PostFrontmatter, SearchPost } from "@/types/blog";
+import { PaginatedPosts } from "@/types/pagination";
 import { config } from "@/lib/config";
 import { cleanContent } from "@/lib/utils";
 
@@ -15,6 +16,11 @@ let cachedTags: string[] | null = null;
 let cachedCategories: string[] | null = null;
 let cachedSearchPosts: SearchPost[] | null = null;
 
+/**
+ * 递归获取指定目录下的所有 Markdown/MDX 文件
+ * @param dir - 要扫描的目录路径
+ * @returns 文件路径数组
+ */
 function getAllMarkdownFiles(dir: string): string[] {
   const files: string[] = [];
 
@@ -48,15 +54,30 @@ function getAllMarkdownFiles(dir: string): string[] {
   return files;
 }
 
+/**
+ * 获取相对于文章目录的相对路径
+ * @param fullPath - 文件的绝对路径
+ * @returns 相对路径
+ */
 function getRelativePath(fullPath: string): string {
   return path.relative(postsDirectory, fullPath);
 }
 
+/**
+ * 从文件路径生成文章 slug
+ * @param filePath - 文件路径
+ * @returns 不带扩展名的文件名
+ */
 function generateSlug(filePath: string): string {
   const fileName = path.basename(filePath);
   return fileName.replace(/\.mdx?$/i, "");
 }
 
+/**
+ * 解析日期字符串为年月日对象
+ * @param dateStr - ISO 日期字符串
+ * @returns 包含 year、month、day 的对象
+ */
 function parseDate(dateStr: string): { year: string; month: string; day: string } {
   const date = new Date(dateStr);
   const year = date.getFullYear().toString();
@@ -65,6 +86,11 @@ function parseDate(dateStr: string): { year: string; month: string; day: string 
   return { year, month, day };
 }
 
+/**
+ * 解析标签，支持字符串和数组格式
+ * @param tags - 标签字符串或数组
+ * @returns 标准化后的标签数组
+ */
 function parseTags(tags: string | string[] | undefined): string[] {
   if (Array.isArray(tags)) {
     return tags.filter((tag): tag is string => typeof tag === "string");
@@ -75,6 +101,12 @@ function parseTags(tags: string | string[] | undefined): string[] {
   return [];
 }
 
+/**
+ * 验证文章 frontmatter 数据
+ * @param data - frontmatter 数据
+ * @param filePath - 文件路径（用于错误信息）
+ * @returns 验证结果对象
+ */
 function validateFrontmatter(data: PostFrontmatter, filePath: string): { isValid: boolean; error?: string } {
   if (!data.title) {
     return { isValid: false, error: `Missing required field "title" in ${filePath}` };
@@ -89,6 +121,11 @@ function validateFrontmatter(data: PostFrontmatter, filePath: string): { isValid
   return { isValid: true };
 }
 
+/**
+ * 解析单个文章文件
+ * @param filePath - 文章文件的绝对路径
+ * @returns 解析后的 Post 对象，失败返回 null
+ */
 function parsePostFile(filePath: string): Post | null {
   try {
     const fileContents = fs.readFileSync(filePath, "utf8");
@@ -136,6 +173,11 @@ function parsePostFile(filePath: string): Post | null {
   }
 }
 
+/**
+ * 获取所有已发布的文章
+ * 生产环境使用缓存，开发环境实时读取
+ * @returns 按日期降序排列的文章数组
+ */
 export function getAllPosts(): Post[] {
   // 生产构建时使用缓存，开发模式禁用以保证实时更新
   if (cachedPosts && process.env.NODE_ENV === 'production') {
@@ -154,7 +196,9 @@ export function getAllPosts(): Post[] {
   return posts;
 }
 
-// 清除缓存（用于开发环境重新加载）
+/**
+ * 清除所有缓存（用于开发环境重新加载）
+ */
 export function clearPostsCache(): void {
   cachedPosts = null;
   cachedTags = null;
@@ -251,13 +295,6 @@ export function getAdjacentPosts(year: string, month: string, day: string, slug:
 
 export function getPostsByCategory(category: string): Post[] {
   return getAllPosts().filter((post) => post.category === category);
-}
-
-export interface PaginatedPosts {
-  posts: Post[];
-  totalPosts: number;
-  totalPages: number;
-  currentPage: number;
 }
 
 export function getPaginatedPosts(page: number, postsPerPage?: number): PaginatedPosts {

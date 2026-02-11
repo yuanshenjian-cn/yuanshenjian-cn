@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Post } from "@/types/blog";
 import { Pagination } from "./pagination";
-import { PaginationNav } from "./pagination-nav";
 import { Calendar, Clock, Rss } from "lucide-react";
 
 interface ArticlesContentProps {
@@ -202,10 +201,11 @@ export function ArticlesContent({
         <div className="mt-12">
           {selectedTag ? (
             // 标签筛选模式：客户端分页
-            <PaginationNav
+            <Pagination
               currentPage={validPage}
               totalPages={totalPages}
               mode="button"
+              variant="simple"
               onPageChange={handlePageChange}
             />
           ) : (
@@ -213,6 +213,8 @@ export function ArticlesContent({
             <Pagination
               currentPage={validPage}
               totalPages={totalPages}
+              mode="link"
+              variant="full"
               baseUrl="/articles/page"
             />
           )}

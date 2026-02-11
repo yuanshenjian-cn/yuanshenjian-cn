@@ -8,6 +8,12 @@ export const config = {
   },
   site: {
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://yuanshenjian.cn",
+    name: "袁慎建的博客",
+    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+  },
+  author: {
+    name: "袁慎建",
+    email: "yuanshenjian@foxmail.com",
   },
   giscus: {
     repo: process.env.NEXT_PUBLIC_GISCUS_REPO || "yuanshenjian-cn/yuanshenjian-cn",

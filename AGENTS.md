@@ -11,10 +11,14 @@
 ## 核心命令
 
 ```bash
-npm run dev           # 开发服务器
-npm run build         # 构建生产版本（输出到 /dist）
-npm run lint          # 代码检查
+npm run dev              # 开发服务器
+npm run build            # 构建生产版本（输出到 /dist）
+npm run lint             # 代码检查
+npm run typecheck        # TypeScript 类型检查
 npm run optimize-images  # 图片优化
+npm run test             # 运行单元测试
+npm run test:watch       # 监视模式运行测试
+npm run test:coverage    # 运行测试并生成覆盖率报告
 ```
 
 ## TypeScript 规范
@@ -119,7 +123,7 @@ NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxx
 
 ## 待改进项
 
-- [ ] 添加单元测试（Vitest）
+- [x] 添加单元测试（Vitest）
 - [ ] 添加 E2E 测试（Playwright）
 - [ ] 图片运行时优化（WebP）
 - [ ] Bundle 大小监控

@@ -62,8 +62,8 @@ export default async function ArticlesPage({ params }: Props) {
   const tags = getAllTags();
   
   return (
-    <main className="py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="py-12 px-6">
+      <div className="max-w-2xl mx-auto">
         <Suspense fallback={<div className="py-8 text-center">加载中...</div>}>
           <ArticlesContent 
             allPosts={allPosts} 
