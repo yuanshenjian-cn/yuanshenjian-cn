@@ -61,12 +61,16 @@ const mdxComponents: MDXComponents = {
   },
   a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline break-all">{children}</a>,
   hr: () => <hr className="my-8 border-border" />,
-  table: ({ children }: ElementProps) => <table className="w-full border-collapse my-4">{children}</table>,
+  table: ({ children }: ElementProps) => (
+    <div className="overflow-x-auto my-4">
+      <table className="w-full border-collapse min-w-full table-auto">{children}</table>
+    </div>
+  ),
   th: ({ children }: ElementProps) => (
-    <th className="border border-border px-4 py-2 text-left font-semibold break-words">{children}</th>
+    <th className="border border-border px-4 py-2 text-left font-semibold break-words min-w-[100px]">{children}</th>
   ),
   td: ({ children }: ElementProps) => (
-    <td className="border border-border px-4 py-2 break-words">{children}</td>
+    <td className="border border-border px-4 py-2 break-words min-w-[100px]">{children}</td>
   ),
 };
 

@@ -25,17 +25,26 @@ allowed-tools: Read, Glob, Grep, Write, Bash, question, Edit
 **规则**：
 - 从标题或用户指定获取slug（使用中文拼音或英文关键词）
 - 使用kebab-case格式
-- 文件保存到 `content/blog/[category]/` 目录
+- 文件保存到 `content/blog/[category]/` 目录（保持完整路径）
+- 例如：category 为 `swd/opencode`，保存到 `content/blog/swd/opencode/`
 - 文件名**不包含日期前缀**，日期信息仅存储在 frontmatter 中
 
 ### 2. Category自动识别
 
 **规则**：
-- 自动读取源目录下的子目录名称作为目标category
-- 如果源目录有多个子目录，逐个处理或由用户选择
-- 如果无子目录，使用源目录名作为category
+- 识别源文件相对于源目录的**完整父路径**作为目标category
+- 例如：`old-posts/swd/opencode/article.md` → category 为 `swd/opencode`
+- 例如：`old-posts/agile/article.md` → category 为 `agile`
+- 目标目录结构：`content/blog/[category]/` 保持完整路径
 
-### 2. Frontmatter规范
+**目录映射示例**：
+```
+源文件: old-posts/swd/opencode/omo-agent-guides.md
+目标:   content/blog/swd/opencode/omo-agent-guides.mdx
+图片:   public/images/swd/opencode/
+```
+
+### 3. Frontmatter规范
 
 ```yaml
 ---
@@ -59,10 +68,19 @@ brief: >-
 - brief：根据文章内容提炼300字左右的摘要
 
 **Tags自动生成规则**：
-- 标签直接使用 category 名称（小写）
-- 中文 category 会转换为对应的英文关键词
-- 例如：`simple-design` 分类 → tags: `["simple design"]`
-- 例如：`agile` 分类 → tags: `["agile"]`
+- 对于多层 category，每一层都生成一个 tag
+- 例如：category 为 `swd/opencode` → tags: `["软件开发", "opencode"]`
+- 例如：category 为 `agile` → tags: `["agile"]`
+
+**中文映射表**（常用缩写转中文）：
+| 缩写 | 中文名称 |
+|------|----------|
+| swd      | 软件开发 |
+| ai-coding| AI 编程 |
+| opencode | OpenCode |
+| xp       | 极限编程 |
+| tdd      | 测试驱动开发 |
+| oo       | 面向对象 |
 
 **用户自定义Tags**：
 - 支持输入多个标签，以逗号分隔
@@ -118,7 +136,7 @@ brief: >-
 7. **清理临时文件**：迁移完成后删除 `tmp/` 目录
 
 **图片目录规范**：
-- 与文章分类对应（如 `tdd` 分类 → `images/tdd/`）
+- 与文章分类对应，保持完整路径（如 `swd/opencode` 分类 → `images/swd/opencode/`）
 - 命名使用英文描述：`<功能描述>.webp`
 
 **图片格式转换**：
@@ -129,7 +147,8 @@ brief: >-
 
 **格式要求**：
 - 必须以 `/` 开头：`](/images/[category]/xxx.webp)`
-- 示例：`![](/images/tdd/tdd-user-scenario.webp)`
+- 示例：`![](/images/swd/opencode/agent-flow.webp)`
+- 多层 category 保持完整路径
 
 **处理逻辑**：
 - 原文：`![](images/xp/xxx.webp)` → 改为 `](/images/[category]/xxx.webp)`
