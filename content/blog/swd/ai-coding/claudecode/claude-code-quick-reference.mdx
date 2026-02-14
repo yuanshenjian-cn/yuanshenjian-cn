@@ -117,6 +117,21 @@ claude --resume abc123 --fork-session
 | **Auto-Accept** | 自动接受所有工具调用，无需确认 |
 | **Plan Mode** | 只读研究和规划模式，不修改代码 |
 
+### 模式对比与选择
+
+| 模式 | 快捷键 | 工具调用 | 效率 | 安全性 | 主要用途 |
+|------|---------|----------|------|--------|----------|
+| **Normal** | 默认 | 每次都询问 | 中等 | 高 | 日常编码 |
+| **Auto-Accept** | Shift+Tab 按一次 | 自动执行，无确认 | 最高 | 低 | 批量操作 |
+| **Plan Mode** | Shift+Tab 按两次 | 只读可用 | 较低 | 最高 | 规划审查 |
+
+**模式切换：** 按 `Shift+Tab` 循环切换（Normal → Auto-Accept → Plan Mode → Normal）
+
+**选择建议：**
+- 日常编码，不确定影响 → Normal（每步确认）
+- 批量重命名/格式化 → Auto-Accept（自动执行）
+- 大型重构/架构设计/代码审查 → Plan Mode（先规划）
+
 ## TUI 常用命令
 
 启动 `claude` 进入 TUI（Text User Interface）后，可以使用以下内置命令和操作。
@@ -149,14 +164,15 @@ claude --continue
 # 或简写
 claude -c
 
-## Plan Mode
+# 方法 2：按会话名恢复
+claude --resume "会话名"
 # 或简写
 claude -r
 ```
 
 使用 `--resume` 启动时会显示**会话选择器**，允许你选择要恢复的历史会话。恢复后会完整保留上下文，包括消息、工具使用和结果。
 
-## Plan Mode
+## TUI 快捷键
 
 | 操作 | 快捷键/命令 | 描述 |
 |------|---------------|------|
