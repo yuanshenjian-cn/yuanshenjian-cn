@@ -715,45 +715,6 @@ React Server Components 的工作原理是什么？
 
 **预计耗时**: 1-2分钟
 
-## 快速参考表
-
-### 模型配置
-
-| Agent | 主模型 | Fallback 链 |
-|-------|--------|-------------|
-| Sisyphus | `anthropic/claude-opus-4-6` | glm-5 → kimi-k2.5 → gpt-5.3-codex → gemini-3-pro |
-| Hephaestus | `openai/gpt-5.3-codex` | glm-5 → glm-4.7 |
-| Atlas | `anthropic/claude-sonnet-4-5` | glm-5 → kimi-k2.5 → gpt-5.2 |
-| Prometheus | `anthropic/claude-opus-4-6` | kimi-k2.5 → gpt-5.2 → gemini-3-pro |
-| Oracle | `openai/gpt-5.2` | glm-5 → claude-opus-4-6 |
-| Librarian | `zai-coding-plan/glm-4.7` | glm-4.7-free → claude-sonnet-4-5 |
-| Explore | `anthropic/claude-haiku-4-5` | glm-4.7-free -> gpt-5-mini → gpt-5-nano |
-| Multimodal Looker | `google/gemini-3-flash` | gpt-5.2 → glm-4.6v → kimi-k2.5 → claude-haiku-4-5 → gpt-5-nano |
-| Metis | `anthropic/claude-opus-4-6` | kimi-k2.5 → gpt-5.2 → gemini-3-pro |
-| Momus | `openai/gpt-5.2` | glm-5 → gpt-5.2 → claude-opus-4-6 → gemini-3-pro |
-| Sisyphus Junior | `anthropic/claude-sonnet-4-5` | 继承对应category任务的模型配置，用户手动配置会被忽略 |
-
-### Agent 速选
-
-| 你的需求 | 启动 Agent | TUI 中输入示例 |
-|----------|------------|----------|
-| "实现一个功能" | **Hephaestus（赫菲斯托斯）** | `实现用户认证` |
-| "协调复杂项目" | **Sisyphus（西西弗斯）** | `ulw 重构项目` |
-| "长期大型项目" | **Atlas（阿特拉斯）** | `开发电商平台` |
-| "先规划再执行" | **Prometheus（普罗米修斯）** | `规划系统架构` |
-| "快速找代码" | **Explore（艾克斯）** | `找到中间件` |
-| "研究技术" | **Librarian（莱布瑞恩）** | `Redux 原理` |
-| "Debug问题" | **Oracle（神谕）** | `为什么API慢？` |
-| "分析文档图片" | **Multimodal Looker（莫达尔）** | `分析这个截图` |
-
-### 魔法词速查
-
-| 关键词 | 作用 | TUI 中输入示例 |
-|--------|------|------|
-| `ulw` / `ultrawork` | 触发并行 agent、背景任务、持续执行 | `ulw 重构应用` |
-| `ask oracle` | 调用神谕咨询 | `ask oracle 分析架构` |
-| `ask librarian` | 调用莱布瑞恩研究 | `ask librarian 查文档` |
-| Tab 键 | Plan Mode ↔ Build Mode 切换 | 按 Tab 循环切换模式 / 进入规划模式后可按 Tab 开始执行 |
 
 ## 最佳实践
 
@@ -810,7 +771,47 @@ opencode
 艾克斯，找到所有使用 Redux 的地方
 ```
 
-## 附录：Agent 权限矩阵
+## 快速参考表
+
+### 模型配置
+
+| Agent | 主模型 | Fallback 链 |
+|-------|--------|-------------|
+| Sisyphus | `anthropic/claude-opus-4-6` | glm-5 → kimi-k2.5 → gpt-5.3-codex → gemini-3-pro |
+| Hephaestus | `openai/gpt-5.3-codex` | glm-5 → glm-4.7 |
+| Atlas | `anthropic/claude-sonnet-4-5` | glm-5 → kimi-k2.5 → gpt-5.2 |
+| Prometheus | `anthropic/claude-opus-4-6` | kimi-k2.5 → gpt-5.2 → gemini-3-pro |
+| Oracle | `openai/gpt-5.2` | glm-5 → claude-opus-4-6 |
+| Librarian | `zai-coding-plan/glm-4.7` | glm-4.7-free → claude-sonnet-4-5 |
+| Explore | `anthropic/claude-haiku-4-5` | glm-4.7-free -> gpt-5-mini → gpt-5-nano |
+| Multimodal Looker | `google/gemini-3-flash` | gpt-5.2 → glm-4.6v → kimi-k2.5 → claude-haiku-4-5 → gpt-5-nano |
+| Metis | `anthropic/claude-opus-4-6` | kimi-k2.5 → gpt-5.2 → gemini-3-pro |
+| Momus | `openai/gpt-5.2` | glm-5 → gpt-5.2 → claude-opus-4-6 → gemini-3-pro |
+| Sisyphus Junior | `anthropic/claude-sonnet-4-5` | 继承对应category任务的模型配置，用户手动配置会被忽略 |
+
+### Agent 速选
+
+| 你的需求 | 启动 Agent | TUI 中输入示例 |
+|----------|------------|----------|
+| "实现一个功能" | **Hephaestus（赫菲斯托斯）** | `实现用户认证` |
+| "协调复杂项目" | **Sisyphus（西西弗斯）** | `ulw 重构项目` |
+| "长期大型项目" | **Atlas（阿特拉斯）** | `开发电商平台` |
+| "先规划再执行" | **Prometheus（普罗米修斯）** | `规划系统架构` |
+| "快速找代码" | **Explore（艾克斯）** | `找到中间件` |
+| "研究技术" | **Librarian（莱布瑞恩）** | `Redux 原理` |
+| "Debug问题" | **Oracle（神谕）** | `为什么API慢？` |
+| "分析文档图片" | **Multimodal Looker（莫达尔）** | `分析这个截图` |
+
+### 魔法词速查
+
+| 关键词 | 作用 | TUI 中输入示例 |
+|--------|------|------|
+| `ulw` / `ultrawork` | 触发并行 agent、背景任务、持续执行 | `ulw 重构应用` |
+| `ask oracle` | 调用神谕咨询 | `ask oracle 分析架构` |
+| `ask librarian` | 调用莱布瑞恩研究 | `ask librarian 查文档` |
+| Tab 键 | Plan Mode ↔ Build Mode 切换 | 按 Tab 循环切换模式 / 进入规划模式后可按 Tab 开始执行 |
+
+### Agent 权限矩阵
 
 > ⚠️ **免责声明**: 以下权限矩阵基于 oh-my-opencode 官方文档整理。部分 agent 存在已知的配置 Bug，实际权限可能因版本而异。建议在 `~/.config/opencode/oh-my-opencode.json` 中查看并自定义配置。
 
