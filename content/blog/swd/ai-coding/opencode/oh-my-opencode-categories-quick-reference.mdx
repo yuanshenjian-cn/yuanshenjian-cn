@@ -10,8 +10,6 @@ brief: >-
   Oh My OpenCode Categories 系统深度解析，详细介绍 8 个内置 Category（visual-engineering、ultrabrain、deep、artistry、quick、unspecified-low、unspecified-high、writing）的工作原理、模型配置和使用场景。Category 是针对特定领域优化的 Agent 配置预设，通过 `task(category="xxx")` 调用时由 Sisyphus-Junior 执行器完成工作。本文还介绍 Category 与 Skill 的组合策略、自定义 Category 配置方法、模型解析优先级机制，以及实际开发中的最佳实践。
 ---
 
-在上一篇 [Agent 完全指南](/blog/swd/ai-coding/opencode/oh-my-opencode-agents-guides) 中，我们介绍了 Oh My OpenCode 的 11 个 AI Agent。本文将深入探讨 **Categories（类别）系统**——这是 Oh My OpenCode 任务委派机制的核心，决定了不同类型任务应该使用什么模型和配置。
-
 ## 什么是 Category？
 
 **Category 是针对特定领域优化的 Agent 配置预设**。它回答的核心问题是：**"这是什么类型的工作？"**
@@ -67,7 +65,7 @@ Oh My OpenCode 提供 **8 个内置 Category**，每个都有针对性的模型�
 | `unspecified-high` | `anthropic/claude-opus-4-6` | `max` | 不适合其他类别、高投入任务 | 高 |
 | `writing` | `google/gemini-3-flash` | - | 文档、散文、技术写作 | 低 |
 
-### 1. visual-engineering（视觉工程）
+### visual-engineering（视觉工程）
 
 | 属性 | 详情 |
 |------|------|
@@ -88,7 +86,7 @@ task(
 )
 ```
 
-### 2. ultrabrain（超脑）
+### ultrabrain（超脑）
 
 | 属性 | 详情 |
 |------|------|
@@ -112,7 +110,7 @@ task(
 
 > ⚠️ **注意**：这是最"昂贵"的 Category，仅在需要深度推理时使用。
 
-### 3. deep（深度）
+### deep（深度）
 
 | 属性 | 详情 |
 |------|------|
@@ -138,7 +136,7 @@ task(
 )
 ```
 
-### 4. artistry（艺术）
+### artistry（艺术）
 
 | 属性 | 详情 |
 |------|------|
@@ -160,7 +158,7 @@ task(
 )
 ```
 
-### 5. quick（快速）
+### quick（快速）
 
 | 属性 | 详情 |
 |------|------|
@@ -183,7 +181,7 @@ task(
 
 > 💡 **成本优势**：使用最快的模型，适合批量处理简单任务。
 
-### 6. unspecified-low（未指定-低）
+### unspecified-low（未指定-低）
 
 | 属性 | 详情 |
 |------|------|
@@ -203,7 +201,7 @@ task(
 )
 ```
 
-### 7. unspecified-high（未指定-高）
+### unspecified-high（未指定-高）
 
 | 属性 | 详情 |
 |------|------|
@@ -224,7 +222,7 @@ task(
 )
 ```
 
-### 8. writing（写作）
+### writing（写作）
 
 | 属性 | 详情 |
 |------|------|
@@ -289,7 +287,7 @@ Sisyphus → Category → Sisyphus-Junior → 专注执行 → 完成
 
 通过组合 Category 和 Skill，可以创建强大的**专业代理组合**：
 
-### 🎨 设计师组合（UI 实现）
+### 设计师组合（UI 实现）
 
 ```typescript
 task(
@@ -304,7 +302,7 @@ task(
 - `frontend-ui-ux`：注入设计原则和美学指导
 - `playwright`：完成后自动截图验证
 
-### 🏗️ 架构师组合（设计评审）
+### 架构师组合（设计评审）
 
 ```typescript
 task(
@@ -318,7 +316,7 @@ task(
 - `ultrabrain`：使用 GPT-5.3 Codex 的深度推理
 - 空 skills：纯推理，专注架构分析
 
-### ⚡ 维护者组合（快速修复）
+### 维护者组合（快速修复）
 
 ```typescript
 task(
@@ -332,7 +330,7 @@ task(
 - `quick`：使用快速的 Haiku 模型
 - `git-master`：自动生成规范的 commit message
 
-### 📚 文档专家组合
+### 文档专家组合
 
 ```typescript
 task(
@@ -421,7 +419,7 @@ interface CategoryConfig {
 }
 ```
 
-## ⚠️ 关键：模型解析优先级
+## 关键：模型解析优先级
 
 **Categories 除非被配置，否则不使用内置默认值！**
 
@@ -529,7 +527,7 @@ bunx oh-my-opencode doctor --verbose
 
 ## 实际使用场景
 
-### 场景 1：快速开发 UI 组件
+### 场景：快速开发 UI 组件
 
 **需求**：开发一个响应式的导航栏组件
 
@@ -544,7 +542,7 @@ ulw 用 visual-engineering 实现一个响应式导航栏，包含 logo、菜单
 3. 使用 `visual-engineering` Category
 4. Sisyphus-Junior 使用 Gemini 3 Pro 执行
 
-### 场景 2：深度架构分析
+### 场景：深度架构分析
 
 **需求**：分析当前系统的性能瓶颈
 
@@ -559,7 +557,7 @@ ulw 用 visual-engineering 实现一个响应式导航栏，包含 logo、菜单
 3. GPT-5.3 Codex 进行分析
 4. 输出详细的优化建议
 
-### 场景 3：批量小修改
+### 场景：批量小修改
 
 **需求**：修复项目中的所有 TypeScript 类型错误
 
@@ -574,7 +572,7 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 3. Haiku 模型批量处理
 4. 每个文件独立处理，最后汇总
 
-### 场景 4：技术文档编写
+### 场景：技术文档编写
 
 **需求**：为新功能编写文档
 
@@ -590,7 +588,7 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 
 ## 最佳实践
 
-### 1. 选择正确的 Category
+### 选择正确的 Category
 
 | 你的需求 | 推荐 Category | 理由 |
 |----------|--------------|------|
@@ -603,7 +601,7 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 | 不确定的任务（复杂） | `unspecified-high` | 高质量 |
 | 文档/写作 | `writing` | 文本生成 |
 
-### 2. 配置你的 Categories
+### 配置你的 Categories
 
 **不要依赖默认值！** 在 `oh-my-opencode.json` 中显式配置：
 
@@ -617,7 +615,7 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 }
 ```
 
-### 3. 组合 Skills 增强能力
+### 组合 Skills 增强能力
 
 ```typescript
 // UI 开发 + 设计知识 + 浏览器验证
@@ -627,7 +625,7 @@ task(category="visual-engineering", load_skills=["frontend-ui-ux", "playwright"]
 task(category="quick", load_skills=["git-master"], ...)
 ```
 
-### 4. 使用 `ulw` 自动选择
+### 使用 `ulw` 自动选择
 
 如果不确定用哪个 Category，直接用 `ulw`：
 
@@ -637,7 +635,7 @@ ulw 实现用户认证功能
 
 Sisyphus 会自动分析任务类型并选择合适的 Category。
 
-### 5. 监控成本
+### 监控成本
 
 | Category | 相对成本 | 使用频率建议 |
 |----------|---------|--------------|

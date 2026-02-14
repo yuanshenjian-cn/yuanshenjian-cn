@@ -607,7 +607,7 @@ claude
 
 ## 最佳实践
 
-### 1. 使用 Plan Mode 处理复杂任务
+### 使用 Plan Mode 处理复杂任务
 
 ```bash
 claude
@@ -618,7 +618,7 @@ claude
 规划将 Class 组件迁移到 Hooks 的完整方案
 ```
 
-### 2. 创建团队共享 Skills
+### 创建团队共享 Skills
 
 ```bash
 # 创建代码审查 Skill
@@ -636,7 +636,7 @@ EOF
 git add .claude/skills/
 ```
 
-### 3. 使用 Auto-Accept 加快重复操作
+### 使用 Auto-Accept 加快重复操作
 
 ```bash
 # 进入 Auto-Accept 模式
@@ -647,7 +647,7 @@ claude
 将所有 .jsx 文件重命名为 .tsx
 ```
 
-### 4. 配置 MCP 扩展能力
+### 配置 MCP 扩展能力
 
 ```bash
 # 配置数据库 MCP
@@ -657,7 +657,7 @@ claude mcp
 claude --mcp-config '{"mcpServers":{"filesystem":{"command":"npx","args":["-y","@modelcontextprotocol/server-filesystem","."]}}'
 ```
 
-### 5. 使用项目级 CLAUDE.md
+### 使用项目级 CLAUDE.md
 
 ```markdown
 # .claude/CLAUDE.md
@@ -737,7 +737,7 @@ claude
 
 ## 进阶技巧
 
-### 1. 结合 Git 使用
+### 结合 Git 使用
 
 ```bash
 # 结合 git 操作
@@ -747,7 +747,7 @@ claude
 根据 git diff 创建提交
 ```
 
-### 2. 背景任务
+### 背景任务
 
 ```bash
 # 启动后台任务（需配合插件）
@@ -757,7 +757,7 @@ claude --plugin-dir ./my-plugins
 # 在会话中让 agent 在后台运行长时间任务
 ```
 
-### 3. IDE 集成
+### IDE 集成
 
 ```bash
 # 自动连接 IDE
@@ -768,7 +768,7 @@ claude --ide
 # 输入 "Claude Code" 选择 "Open in New Tab"
 ```
 
-### 4. 远程会话
+### 远程会话
 
 ```bash
 # 在 claude.ai/code 上创建会话
