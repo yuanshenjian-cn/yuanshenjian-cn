@@ -109,7 +109,7 @@ export function CodeBlock({ children }: CodeBlockProps) {
       </button>
       
       {/* 代码块内容 */}
-      <pre className="bg-muted dark:bg-muted text-slate-800 dark:text-foreground border border-slate-200 dark:border-border p-4 pt-10 rounded-lg overflow-x-auto my-4 max-w-full text-sm relative">
+      <pre className="bg-muted dark:bg-muted text-slate-800 dark:text-foreground border border-slate-200 dark:border-border p-4 pt-10 rounded-lg overflow-x-auto mt-4 mb-8 max-w-full text-sm relative">
         {isValidElement(children) ? (
           // 提取 code 元素的文本并添加行号
           addLineNumbers(extractTextFromChildren(children))

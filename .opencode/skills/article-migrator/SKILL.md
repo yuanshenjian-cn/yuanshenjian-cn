@@ -78,6 +78,7 @@ brief: >-
 | swd      | 软件开发 |
 | ai-coding| AI 编程 |
 | opencode | OpenCode |
+| claudecode| ClaudeCode |
 | xp       | 极限编程 |
 | tdd      | 测试驱动开发 |
 | oo       | 面向对象 |

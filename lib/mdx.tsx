@@ -62,7 +62,7 @@ const mdxComponents: MDXComponents = {
   a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline break-all">{children}</a>,
   hr: () => <hr className="my-8 border-border" />,
   table: ({ children }: ElementProps) => (
-    <div className="overflow-x-auto my-4">
+    <div className="overflow-x-auto mt-0 mb-4">
       <table className="w-full border-collapse min-w-full table-auto">{children}</table>
     </div>
   ),
