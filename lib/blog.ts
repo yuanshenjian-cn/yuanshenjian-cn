@@ -250,7 +250,7 @@ export function getAllTags(): string[] {
     post.tags.forEach((tag: string) => tags.add(tag));
   });
 
-  const sortedTags = Array.from(tags).sort();
+  const sortedTags = Array.from(tags).sort((a, b) => a.localeCompare(b));
   cachedTags = sortedTags;
   return sortedTags;
 }
