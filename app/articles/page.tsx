@@ -50,7 +50,6 @@ function ArticlesSkeleton() {
   return (
     <div className="animate-pulse">
       <div className="mb-8">
-        <div className="h-8 w-32 bg-muted rounded mb-2"></div>
         <div className="h-4 w-48 bg-muted rounded"></div>
       </div>
       <div className="flex flex-wrap gap-2 mb-8">

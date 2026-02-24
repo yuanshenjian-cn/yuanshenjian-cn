@@ -72,26 +72,21 @@ export function ArticlesContent({
 
   return (
     <>
-      {/* 标题区域 - 高级简约风格 */}
-      <div className="mb-10 flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-3 text-foreground">
-            {selectedTag ? selectedTag : "全部文章"}
-          </h1>
-          <p className="text-sm text-foreground/60 font-light">
-            {selectedTag ? (
-              <>
-                共 {filteredPosts.length} 篇相关文章
-                {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
-              </>
-            ) : (
-              <>
-                {allPosts.length} 篇文章 · {tags.length} 个标签
-                {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
-              </>
-            )}
-          </p>
-        </div>
+      {/* 统计信息 - 简约风格 */}
+      <div className="mb-10 flex items-center justify-between">
+        <p className="text-sm text-foreground/60 font-light">
+          {selectedTag ? (
+            <>
+              共 {filteredPosts.length} 篇相关文章
+              {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
+            </>
+          ) : (
+            <>
+              共 {allPosts.length} 篇文章 · {tags.length} 个标签
+              {totalPages > 1 && ` · 第 ${validPage}/${totalPages} 页`}
+            </>
+          )}
+        </p>
         {!selectedTag && (
           <a
             href="/feed"
