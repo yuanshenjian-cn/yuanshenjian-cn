@@ -1,0 +1,688 @@
+---
+title: "Claude Code 第五篇：记忆层——CLAUDE.md、Rules 与 Auto Memory"
+date: '2026-04-07'
+tags: ['软件开发', 'AI 编程', 'ClaudeCode']
+published: true
+brief: >-
+  Claude Code 每次启动都是一张白纸——除非你给它"记忆"。CLAUDE.md 是你写给 Claude 的操作手册，Rules 是模块化的规则引擎，Auto Memory 是 Claude 自己的笔记本。三者配合，让 Claude 不再每次都从零开始。本文详解三套记忆系统的机制、写法与实战模式。
+---
+
+> **系列导读**：本文是 Claude Code 系列第 5 篇。第 1 篇讲[迁移心智模型](/articles/2026/04/07/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/2026/04/07/claude-code-getting-started)，第 3 篇讲[日常工作流](/articles/2026/04/07/claude-code-common-workflows)，第 4 篇讲[交互模式与内置命令](/articles/2026/04/07/claude-code-interactive-mode-and-built-in-commands)。本篇深入 Claude Code 的"记忆层"——让 Claude 在每次会话中都知道你的项目规范、团队约定和历史经验。
+
+---
+
+## 为什么 Claude Code 需要"记忆层"
+
+AI 编程助手有一个根本矛盾：**它的上下文窗口是有限的，但你的项目知识是无限的**。
+
+每次启动新会话，Claude Code 面对的是一张白纸。它不知道：
+
+- 你的项目用 2 空格还是 4 空格缩进
+- 提交信息要用英文还是中文
+- 测试命令是 `npm test` 还是 `pnpm vitest`
+- 项目有哪些不能碰的遗留模块
+- 上次调试某个 bug 时发现的关键线索
+
+没有记忆层，你每次都要重复说明这些。说一次两次还行，说十次就崩溃了。
+
+Claude Code 用**三套互补的记忆系统**解决这个问题：
+
+| 系统 | 谁写 | 内容类型 | 作用域 | 加载时机 |
+|------|------|---------|--------|---------|
+| **CLAUDE.md** | 你（开发者） | 指令、规范、架构说明 | 项目 / 用户 / 组织 | 每次会话自动加载 |
+| **Rules** | 你（开发者） | 模块化规则 | 项目 / 用户 | 每次会话自动加载 |
+| **Auto Memory** | Claude 自己 | 学习记录、模式总结 | 按项目（worktree） | 会话启动加载索引，按需加载详情 |
+
+三者的关系像这样：
+
+```text
+你写的（持久指令）        Claude 写的（经验积累）
+┌─────────────────┐     ┌─────────────────┐
+│   CLAUDE.md     │     │   Auto Memory   │
+│  （操作手册）    │     │  （笔记本）      │
+├─────────────────┤     └─────────────────┘
+│  .claude/rules/ │
+│  （规则卡片）    │
+└─────────────────┘
+```
+
+接下来，我们逐个深入。
+
+---
+
+## CLAUDE.md：你写给 Claude 的操作手册
+
+CLAUDE.md 是 Claude Code 最核心的记忆机制。它本质上是一个 **Markdown 文件**，内容会在每次会话开始时被注入到 Claude 的上下文中，相当于一份"开机就读"的操作手册。
+
+### 四层作用域与文件位置
+
+CLAUDE.md 支持四层作用域，优先级从高到低：
+
+| 层级 | 文件位置 | 谁维护 | 共享方式 | 典型内容 |
+|------|---------|--------|---------|---------|
+| **组织托管** | `/Library/Application Support/ClaudeCode/CLAUDE.md`（macOS）<br/>`/etc/claude-code/CLAUDE.md`（Linux） | IT / DevOps | MDM 下发 | 公司级安全策略、合规要求 |
+| **项目级** | `./CLAUDE.md` 或 `./.claude/CLAUDE.md` | 团队 | Git 提交 | 项目架构、编码规范、构建命令 |
+| **项目本地** | `./CLAUDE.local.md` 或 `./.claude/CLAUDE.local.md` | 个人 | 不共享（gitignored） | 个人对项目的特殊覆盖 |
+| **子目录级** | 任意子目录下的 `CLAUDE.md` | 团队 | Git 提交 | 模块级特殊规则 |
+| **用户级** | `~/.claude/CLAUDE.md` | 个人 | 不共享 | 个人偏好（语言、风格、快捷设定） |
+
+> **实际优先级**：当多个 CLAUDE.md 内容冲突时，Claude 会综合所有层级的信息。组织托管策略优先级最高，但实际上 Claude 会尝试协调而非简单覆盖。最佳实践是**避免冲突**——每层只写属于自己职责范围的内容。
+
+### 加载机制
+
+Claude Code 的 CLAUDE.md 加载遵循明确的规则：
+
+**会话启动时**：
+1. 从当前工作目录（CWD）开始，**向上遍历**目录树，加载沿途所有 CLAUDE.md
+2. 加载用户级 `~/.claude/CLAUDE.md`
+3. 加载组织托管的 CLAUDE.md（如果存在）
+
+**会话进行中**：
+- 当 Claude 读取某个子目录下的文件时，**按需加载**该子目录的 CLAUDE.md
+- 这意味着子目录的 CLAUDE.md 不会一开始就占用上下文，只在需要时才加入
+
+**注意事项**：
+- CLAUDE.md 的内容以**用户消息**的形式注入，不是系统提示（system prompt）
+- 如果需要系统提示级别的注入，使用 `--append-system-prompt` CLI 标志
+- HTML 块注释（`<!-- ... -->`）会在注入前被**自动剥离**——可以用来写只给人看的备注
+- `/compact` 压缩上下文时，CLAUDE.md 不会丢失——它会从磁盘**重新读取**
+
+```text
+项目根目录/
+├── CLAUDE.md              ← 会话启动时加载
+├── src/
+│   ├── CLAUDE.md          ← Claude 读 src/ 下文件时按需加载
+│   ├── components/
+│   │   └── CLAUDE.md      ← Claude 读 components/ 下文件时按需加载
+│   └── utils/
+└── tests/
+    └── CLAUDE.md          ← Claude 读 tests/ 下文件时按需加载
+```
+
+### 写出高效的 CLAUDE.md
+
+写 CLAUDE.md 不是写小说。它是给 AI 读的指令文档，需要遵循特定的写作原则。
+
+#### 核心原则
+
+| 原则 | ✅ 好的写法 | ❌ 差的写法 |
+|------|-----------|-----------|
+| **具体化** | "使用 2 空格缩进" | "格式化代码要好看" |
+| **可操作** | "提交信息用英文，格式：`type(scope): description`" | "提交信息要规范" |
+| **不矛盾** | 每层只管自己的职责范围 | 项目级说用 tabs，子目录级说用 spaces |
+| **精简** | 每个文件控制在 200 行以内 | 把整个项目文档都塞进去 |
+| **结构化** | 用 Markdown 标题 + 列表 | 写成长段落 |
+
+#### 项目级 CLAUDE.md 模板
+
+这是一个经过实战验证的模板结构：
+
+```markdown
+# 项目：我的博客
+
+## 技术栈
+- Next.js 15 + React 19 + TypeScript 5（严格模式）
+- 样式：Tailwind CSS 3.4 + shadcn/ui
+- 测试：Vitest
+- 包管理：npm
+
+## 核心命令
+- 开发：`npm run dev`
+- 构建：`npm run build`
+- 测试：`npm run test`
+- 类型检查：`npm run typecheck`
+- Lint：`npm run lint`
+
+## 编码规范
+- 缩进：2 空格
+- 组件：PascalCase（`Header.tsx`）
+- 其他文件：kebab-case（`blog-utils.ts`）
+- 提交信息：英文，格式 `type(scope): description`
+- 禁止使用 `any` 类型，用 `unknown` + 类型守卫代替
+
+## 架构约定
+- 服务器组件是默认的，不需要标注
+- 客户端组件必须在文件顶部加 `"use client"`
+- 所有 API 请求封装在 `lib/api/` 目录下
+
+## 注意事项
+- 不要修改 `lib/legacy/` 下的任何文件（遗留代码，等待重写）
+- 图片放在 `public/images/`，使用 WebP 格式
+- 环境变量模板在 `.env.example`，不要提交 `.env.local`
+```
+
+#### 用户级 CLAUDE.md 示例
+
+```markdown
+# 个人偏好
+
+## 语言
+- 与我对话用中文
+- 代码注释和提交信息用英文
+
+## 风格
+- 回答尽量简洁，不需要过多解释
+- 给出方案前先问我确认
+- 优先使用函数式编程风格
+
+## Git 习惯
+- 禁止 --no-verify
+- force push 用 --force-with-lease
+- 不要自动 push，提交后等我确认
+```
+
+### 导入语法：用 @import 组合指令
+
+CLAUDE.md 支持用 `@` 语法导入其他文件的内容，实现指令的模块化复用：
+
+```markdown
+# 项目指令
+
+@docs/coding-standards.md
+@docs/architecture.md
+@.github/CONTRIBUTING.md
+```
+
+导入规则：
+
+| 特性 | 说明 |
+|------|------|
+| **路径类型** | 支持相对路径和绝对路径 |
+| **递归深度** | 最多 5 层递归导入（A 导入 B，B 导入 C…） |
+| **文件类型** | 任意文本文件（.md、.txt、.yml 等） |
+| **跨工具兼容** | 可以导入 `AGENTS.md`，兼容 Cursor、OpenCode 等工具 |
+
+> **技巧**：如果你的团队同时使用 Cursor 和 Claude Code，可以在 CLAUDE.md 中 `@AGENTS.md`，这样一份指令文件就能同时服务两个工具。反之亦然——在 AGENTS.md 中也可以引用共享的规范文档。
+
+### 用 HTML 注释写"人读"备注
+
+CLAUDE.md 在注入 Claude 前会自动剥离 HTML 块注释，所以你可以用注释写只给人看的内容：
+
+```markdown
+# 编码规范
+
+<!-- 
+  维护者注意：这个文件会被 Claude Code 自动读取。
+  修改前请在团队频道通知。
+  最后更新：2026-04-01 by @zhangsan 
+-->
+
+- 使用 2 空格缩进
+- 组件用 PascalCase
+```
+
+Claude 只会看到规范条目，看不到注释里的维护信息。
+
+---
+
+## .claude/rules/：模块化规则引擎
+
+当 CLAUDE.md 变得太长，或者你需要**按文件类型 / 目录**应用不同规则时，`.claude/rules/` 目录是更好的选择。
+
+### 基本用法
+
+在项目根目录下创建 `.claude/rules/` 目录，放入规则文件：
+
+```text
+.claude/
+└── rules/
+    ├── typescript.md      ← TypeScript 编码规则
+    ├── testing.md         ← 测试编写规则
+    ├── git-commit.md      ← Git 提交规则
+    └── security.md        ← 安全相关规则
+```
+
+每个规则文件就是一个普通的 Markdown 文件：
+
+```markdown
+# TypeScript 规则
+
+- 始终启用严格模式
+- 禁止使用 `any`，用 `unknown` 替代
+- Props 用 `interface` 定义，联合类型用 `type`
+- 优先使用类型守卫而非 `as` 断言
+- 枚举用 `const enum` 或字面量联合类型
+```
+
+**不带 `paths` 限定的规则文件在会话启动时自动加载**，与 CLAUDE.md 一起注入上下文。带 `paths` 限定的规则则是**按需加载**——只有当 Claude 操作匹配路径的文件时才会激活。
+
+### 路径限定规则
+
+Rules 最强大的特性是**路径限定**——你可以让某条规则只在操作特定文件时生效。通过 YAML frontmatter 的 `paths` 字段实现：
+
+```markdown
+---
+paths:
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+---
+
+# 测试文件规则
+
+- 每个测试文件只测一个模块
+- 使用 `describe` 按功能分组
+- 测试名称用中文描述行为："应该在输入为空时返回默认值"
+- Mock 外部依赖，不 Mock 内部模块
+- 每个测试用例独立，不依赖执行顺序
+```
+
+```markdown
+---
+paths:
+  - "src/components/**/*.tsx"
+---
+
+# React 组件规则
+
+- 服务器组件是默认的，不需要额外标注
+- 客户端组件必须在文件开头添加 "use client"
+- Props 接口名统一用 `ComponentNameProps`
+- 使用 Tailwind CSS 类名，不写内联样式
+- 导出组件使用命名导出，不用默认导出
+```
+
+`paths` 字段支持标准 glob 模式（`*`、`?`、`**`、`[seq]` 等）。当 Claude 操作匹配路径的文件时，对应规则会被激活。
+
+### 用户级规则
+
+除了项目级规则，你还可以设置跨所有项目生效的个人规则：
+
+```text
+~/.claude/
+└── rules/
+    ├── my-style.md        ← 个人编码风格
+    ├── language.md        ← 语言偏好
+    └── git-habits.md      ← Git 操作习惯
+```
+
+用户级规则对所有项目生效，适合放入通用的个人偏好。
+
+### 跨项目共享规则
+
+如果多个项目需要共享相同的规则，可以用**符号链接**：
+
+```bash
+# 创建共享规则目录
+mkdir -p ~/shared-claude-rules
+
+# 在各项目中创建符号链接
+ln -s ~/shared-claude-rules/typescript.md \
+  ./my-project/.claude/rules/typescript.md
+
+ln -s ~/shared-claude-rules/security.md \
+  ./my-project/.claude/rules/security.md
+```
+
+这样修改共享规则时，所有链接的项目都会自动生效。
+
+### CLAUDE.md vs Rules：什么时候用哪个？
+
+| 场景 | 推荐 | 原因 |
+|------|------|------|
+| 项目整体架构说明 | CLAUDE.md | 需要连贯的上下文描述 |
+| 构建 / 测试 / 部署命令 | CLAUDE.md | 全局性信息 |
+| 特定文件类型的编码规范 | Rules（带 paths） | 按需生效，不占用无关文件的上下文 |
+| 安全策略 | Rules | 独立维护，方便审计 |
+| 个人偏好 | 用户级 CLAUDE.md 或 Rules | 不提交到项目仓库 |
+| 复杂的多模块规范 | Rules（拆多个文件） | 每个文件职责单一，易维护 |
+
+> **实践建议**：项目级 CLAUDE.md 控制在 100 行以内，放"全局上下文"（技术栈、核心命令、架构约定）。具体的编码规则拆到 `.claude/rules/` 下，按主题分文件。这样既保证 Claude 启动时有足够的项目理解，又不会让上下文被规则文本淹没。
+
+---
+
+## Auto Memory：Claude 自己的笔记本
+
+前面两套系统都是你写的——你告诉 Claude 该怎么做。Auto Memory 则反过来：**Claude 自己学到的东西，自己记下来**。
+
+### 工作原理
+
+Auto Memory 在 v2.1.59+ 版本中默认启用。工作流程：
+
+```text
+会话中 Claude 学到新知识
+        ↓
+Claude 判断是否值得记住
+        ↓
+  ┌─────┴─────┐
+  │ 是        │ 否
+  ↓           ↓
+写入 Memory   丢弃
+文件
+  ↓
+下次会话自动加载
+```
+
+Claude 会自动记录什么？
+
+| 类别 | 示例 |
+|------|------|
+| **构建 / 运行命令** | "这个项目用 `pnpm` 而不是 `npm`" |
+| **调试发现** | "MySQL 连接超时是因为连接池配置在 `config/db.ts` 第 42 行" |
+| **项目结构洞察** | "API 路由都在 `app/api/` 下，每个路由一个目录" |
+| **用户偏好** | "用户喜欢函数式风格，不喜欢类组件" |
+| **错误模式** | "跑 `npm run build` 前要先 `npm run typecheck`，否则类型错误会导致构建失败" |
+
+### 存储结构
+
+Auto Memory 的文件存储在用户目录下，**不在项目仓库内**：
+
+```text
+~/.claude/projects/
+└── <project-dir>/            ← 基于 git 仓库路径推导的目录名
+    └── memory/
+        ├── MEMORY.md         ← 索引文件（会话启动时加载前 200 行或 25KB）
+        ├── topic-a.md        ← 主题文件（按需加载）
+        ├── topic-b.md
+        └── ...
+```
+
+关键细节：
+
+| 特性 | 说明 |
+|------|------|
+| **存储位置** | `~/.claude/projects/<project-dir>/memory/` |
+| **项目识别** | 基于 git 仓库路径推导 |
+| **Worktree 共享** | 同一仓库的所有 worktree 共享同一份 memory |
+| **索引限制** | MEMORY.md 前 200 行或 25KB 在会话启动时加载 |
+| **详情加载** | 主题文件在 Claude 需要时按需加载 |
+| **自定义路径** | 可通过 `autoMemoryDirectory` 设置自定义存储目录 |
+
+> **注意**：Auto Memory 文件不会出现在你的项目仓库中，也不会被 git 跟踪。它是纯粹的本地存储。如果你换了电脑，Auto Memory 需要重新积累。
+
+### /memory 命令
+
+`/memory` 是管理记忆系统的入口命令：
+
+```text
+> /memory
+
+╭─ Memory ──────────────────────────────────╮
+│                                            │
+│  CLAUDE.md files:                          │
+│    ✓ ./CLAUDE.md (project)                │
+│    ✓ ~/.claude/CLAUDE.md (user)           │
+│                                            │
+│  Rule files:                               │
+│    ✓ .claude/rules/typescript.md          │
+│    ✓ .claude/rules/testing.md             │
+│    ✓ ~/.claude/rules/my-style.md (user)   │
+│                                            │
+│  Auto Memory: enabled                      │
+│    📁 ~/.claude/projects/abc123/memory/    │
+│    📄 MEMORY.md (47 lines)                │
+│    📄 build-patterns.md                   │
+│    📄 debugging-notes.md                  │
+│                                            │
+│  Actions:                                  │
+│    [t] Toggle auto memory                  │
+│    [o] Open memory folder                  │
+│    [e] Edit in editor                      │
+╰────────────────────────────────────────────╯
+```
+
+通过 `/memory` 你可以：
+
+- **查看**当前加载了哪些 CLAUDE.md 和规则文件
+- **开关** Auto Memory 功能
+- **打开** memory 文件夹，直接编辑或删除记忆文件
+- **确认**文件是否被正确加载（排错利器）
+
+### 手动干预 Auto Memory
+
+虽然 Auto Memory 是自动的，但你可以手动干预：
+
+```text
+# 让 Claude 记住特定信息
+> 记住：这个项目的 CI 在 GitHub Actions 上跑，
+  配置在 .github/workflows/deploy.yml
+
+# 让 Claude 忘记某条记忆
+> 忘记你之前记录的关于 MySQL 连接池的信息
+
+# 直接编辑 memory 文件
+> /memory → [o] Open memory folder → 手动编辑 .md 文件
+```
+
+### Subagent 的独立记忆
+
+Claude Code 的子代理（Subagent）拥有自己独立的 Auto Memory 目录。这意味着当你配置了多个 Agent 角色时，每个角色可以积累自己的专属经验：
+
+```text
+~/.claude/agent-memory/
+├── reviewer/               ← Code Review 代理的独立记忆目录
+│   ├── MEMORY.md
+│   └── ...
+├── tester/                 ← 测试代理的独立记忆目录
+│   ├── MEMORY.md
+│   └── ...
+└── ...
+```
+
+---
+
+## 三套系统的协作模式
+
+理解每套系统的定位后，关键是知道**怎么组合使用**。
+
+### 模式一：个人项目的最小配置
+
+```text
+项目根目录/
+├── CLAUDE.md           ← 技术栈 + 核心命令 + 基本规范（50-80 行）
+└── ~/.claude/
+    └── CLAUDE.md       ← 个人偏好（语言、风格、Git 习惯）
+```
+
+适合个人项目，简单直接。Auto Memory 自动积累，不需要额外配置。
+
+### 模式二：团队项目的标准配置
+
+```text
+项目根目录/
+├── CLAUDE.md                 ← 项目概述 + 架构 + 核心命令（80-120 行）
+├── .claude/
+│   ├── settings.json         ← 项目级设置（权限、模型等）
+│   └── rules/
+│       ├── typescript.md     ← TypeScript 规则
+│       ├── testing.md        ← 测试规则（带 paths 限定）
+│       ├── git-commit.md     ← 提交规范
+│       └── security.md       ← 安全策略
+└── 每个开发者本地/
+    └── ~/.claude/
+        ├── CLAUDE.md         ← 个人偏好
+        └── rules/
+            └── my-style.md   ← 个人风格
+```
+
+项目级文件提交到 Git，团队共享。个人级文件留在本地。
+
+### 模式三：Monorepo 多层配置
+
+```text
+monorepo/
+├── CLAUDE.md                    ← Monorepo 全局规范
+├── .claude/rules/
+│   └── shared-standards.md      ← 共享编码标准
+├── packages/
+│   ├── frontend/
+│   │   ├── CLAUDE.md            ← 前端特定规范（React、CSS）
+│   │   └── .claude/rules/
+│   │       └── react.md         ← React 组件规则（带 paths）
+│   ├── backend/
+│   │   ├── CLAUDE.md            ← 后端特定规范（Node.js、DB）
+│   │   └── .claude/rules/
+│   │       └── api-design.md    ← API 设计规则
+│   └── shared/
+│       └── CLAUDE.md            ← 共享库规范
+```
+
+Monorepo 的关键是**层级分工**：根级放通用规范，子包放模块特定规范。Claude 在操作前端代码时会自动加载前端的 CLAUDE.md 和规则，不会被后端规则干扰。
+
+### 模式四：跨工具兼容配置
+
+如果团队同时使用多个 AI 编程工具：
+
+```text
+项目根目录/
+├── AGENTS.md                    ← 通用指令（Cursor、OpenCode 等都能读）
+├── CLAUDE.md                    ← Claude Code 专用，导入通用指令
+│   内容：@AGENTS.md
+│         # Claude Code 专用设置
+│         ...
+├── .cursor/rules/               ← Cursor 专用规则
+└── .claude/rules/               ← Claude Code 专用规则
+```
+
+在 CLAUDE.md 中用 `@AGENTS.md` 导入通用指令，再追加 Claude Code 专属配置。一份规范维护一处，多工具共用。
+
+---
+
+## 常见问题与排错
+
+### 诊断清单
+
+遇到"Claude 好像没读我的 CLAUDE.md"时，按这个清单排查：
+
+| 步骤 | 操作 | 检查什么 |
+|------|------|---------|
+| 1 | 运行 `/memory` | 文件是否出现在加载列表中 |
+| 2 | 检查文件路径 | 是否放在了正确的位置（CWD 或其上级目录） |
+| 3 | 检查文件名 | 必须是 `CLAUDE.md`（大写），不是 `claude.md` |
+| 4 | 检查 @import 路径 | 导入的文件是否存在，路径是否正确 |
+| 5 | 检查文件大小 | 文件是否过大导致截断（建议少于 200 行） |
+| 6 | 检查 .gitignore | 确保 CLAUDE.md 没有被意外忽略 |
+
+### FAQ
+
+| 问题 | 回答 |
+|------|------|
+| CLAUDE.md 更新后需要重启吗？ | 不需要。`/compact` 或新消息时会从磁盘重新读取 |
+| Auto Memory 会泄露到 Git 吗？ | 不会。存储在 `~/.claude/projects/` 下，不在项目目录内 |
+| 能禁用 Auto Memory 吗？ | 能。通过 `/memory` 切换，或在 settings.json 设置 `"autoMemoryEnabled": false` |
+| 多个 CLAUDE.md 冲突怎么办？ | 避免冲突是最佳实践。如果冲突，Claude 会尝试协调；组织级优先级最高 |
+| Rules 文件支持哪些格式？ | Markdown 文件。Frontmatter（YAML）可选，用于 `paths` 限定 |
+| 能在 CLAUDE.md 里写代码块吗？ | 能。代码块会被正常传递给 Claude，适合放命令模板或代码示例 |
+| @import 最多几层嵌套？ | 5 层。A→B→C→D→E→F 是极限 |
+| 子目录 CLAUDE.md 什么时候加载？ | 当 Claude 读取该子目录下的文件时按需加载，不是启动时 |
+| 怎么让 Claude 记住跨会话的信息？ | 方法一：写入 CLAUDE.md。方法二：让 Auto Memory 自动记录。方法三：直接告诉 Claude "记住这个" |
+| Auto Memory 的 MEMORY.md 太长了怎么办？ | 只有前 200 行 / 25KB 会在启动时加载。可以手动编辑精简，或让 Claude 整理 |
+
+---
+
+## 实战：为本博客项目配置记忆层
+
+让我们用一个真实案例——就是你正在阅读的这个博客项目——展示如何配置完整的记忆层。
+
+### 项目级 CLAUDE.md
+
+```markdown
+# 个人博客
+
+## 技术栈
+- Next.js 15 + React 19 + TypeScript 5（严格模式）
+- Tailwind CSS 3.4 + shadcn/ui
+- MDX 博客内容，gray-matter 解析 frontmatter
+- Vitest 单元测试
+- 静态导出到 GitHub Pages + Cloudflare CDN
+
+## 核心命令
+- `npm run dev` — 开发服务器
+- `npm run build` — 构建（输出到 /dist）
+- `npm run test` — 运行测试
+- `npm run typecheck` — TypeScript 类型检查
+- `npm run lint` — ESLint 检查
+
+## 目录结构
+- `app/` — Next.js App Router 路由
+- `components/` — React 组件
+- `lib/` — 核心逻辑（blog.ts、mdx.tsx、config.ts）
+- `content/blog/` — MDX 文章（agile/career/oo/xp/swd）
+- `public/` — 静态资源
+- `types/` — TypeScript 类型定义
+
+## 文章 Frontmatter
+必需：title、date
+可选：tags、published、brief
+
+## 注意事项
+- 不要提交 .env.local
+- 文章文件用 kebab-case 命名
+- 组件用 PascalCase
+```
+
+### 规则文件
+
+```markdown
+<!-- .claude/rules/mdx-articles.md -->
+---
+paths:
+  - "content/blog/**/*.mdx"
+---
+
+# MDX 文章规则
+
+- Frontmatter 必须包含 title 和 date
+- date 格式：'YYYY-MM-DD'
+- tags 是字符串数组
+- 写完文章后运行 `npm run build` 验证
+- 标题使用中文
+- 代码块标注语言
+```
+
+```markdown
+<!-- .claude/rules/components.md -->
+---
+paths:
+  - "components/**/*.tsx"
+---
+
+# 组件规则
+
+- 服务器组件是默认的
+- 客户端组件顶部加 "use client"
+- Props 用 interface 定义
+- 使用 Tailwind CSS 工具类
+- 导入顺序：外部模块 → 绝对路径 → 相对路径
+```
+
+### 效果
+
+配置好后，Claude Code 的行为会发生显著变化：
+
+- **写博客文章时**：自动使用正确的 frontmatter 格式，写完后主动跑构建
+- **改组件时**：自觉遵循 PascalCase、Tailwind、正确的导入顺序
+- **跑命令时**：知道用 `npm run build` 而不是猜测
+- **跨会话时**：Auto Memory 记住了之前的调试经验，不会重复踩坑
+
+不需要每次都重复说明这些规范。**一次配置，永久生效**。
+
+---
+
+## 小结
+
+| 维度 | CLAUDE.md | .claude/rules/ | Auto Memory |
+|------|-----------|----------------|-------------|
+| **谁写** | 你 | 你 | Claude |
+| **内容** | 全局上下文、架构、命令 | 特定规则、路径限定 | 学到的经验、模式 |
+| **加载** | 启动时 + 按需 | 启动时 | 启动时索引 + 按需详情 |
+| **存储** | 项目内（Git 跟踪） | 项目内（Git 跟踪） | 本地（~/.claude/） |
+| **维护** | 手动 | 手动 | 自动 + 可手动干预 |
+| **共享** | 团队共享 | 团队共享 | 个人 |
+
+记忆层是 Claude Code 从"聊天工具"进化为"团队成员"的关键。它让 Claude 不再每次从零开始，而是带着你的项目知识、团队规范和历史经验进入每次会话。
+
+**下一篇**，我们将深入 Claude Code 的[设置系统与权限模型](/articles/2026/04/07/claude-code-settings-and-permissions)——四层配置作用域、精细化权限规则、Auto Mode 的安全分类器，以及如何在安全与效率之间找到最佳平衡点。
+
+---
+
+> 📖 **系列导航**
+>
+> - [第一篇：从 OpenCode 切到 Claude Code](/articles/2026/04/07/opencode-to-claude-code-getting-oriented)
+> - [第二篇：快速上手](/articles/2026/04/07/claude-code-getting-started)
+> - [第三篇：日常工作流](/articles/2026/04/07/claude-code-common-workflows)
+> - [第四篇：交互模式与内置命令](/articles/2026/04/07/claude-code-interactive-mode-and-built-in-commands)
+> - **第五篇：CLAUDE.md、Rules 与 Auto Memory**（本文）
+> - [第六篇：设置、权限与 Auto Mode](/articles/2026/04/07/claude-code-settings-and-permissions)
+> - [第七篇：扩展架构全景](/articles/2026/04/07/claude-code-extension-model-overview)
+> - [第八篇：高阶自动化实战](/articles/2026/04/07/claude-code-advanced-automation-with-mcp-hooks-and-agents)
