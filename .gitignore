@@ -48,3 +48,8 @@ Thumbs.db
 tmp/
 
 /drafts
+
+# AI Tools
+.serena/
+.next/
+.playwright-mcp/
