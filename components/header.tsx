@@ -3,9 +3,8 @@ import { HeaderClient } from "./header-client";
 import { getPostsForSearch } from "@/lib/blog";
 
 const navItems = [
-  { href: "/", label: "首页" },
-  { href: "/articles", label: "文章" },
   { href: "/ai", label: "AI", icon: "sparkles" },
+  { href: "/articles", label: "文章" },
   { href: "/resume", label: "简历" },
 ];
 
