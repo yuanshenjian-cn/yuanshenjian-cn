@@ -4,6 +4,20 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Heading } from "@/lib/mdx";
 
+function renderHeadingText(text: string): React.ReactNode {
+  const parts = text.split(/(`[^`]+`)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    part.startsWith("`") && part.endsWith("`") && part.length > 2 ? (
+      <code key={i} className="text-[11px] font-mono bg-muted px-0.5 rounded">
+        {part.slice(1, -1)}
+      </code>
+    ) : (
+      part
+    )
+  );
+}
+
 interface FloatingTocButtonProps {
   headings: Heading[];
 }
@@ -168,7 +182,7 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
                 paddingLeft: `${(heading.level - 2) * 12 + 12}px`,
               }}
             >
-              {heading.text}
+              {renderHeadingText(heading.text)}
             </button>
           ))}
         </nav>

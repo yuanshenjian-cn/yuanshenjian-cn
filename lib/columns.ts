@@ -113,7 +113,7 @@ export function getAIColumnBySlug(slug: string): ColumnWithPosts | null {
   const posts = getPostsByDirectory(col.contentDir);
   if (posts.length === 0) return null;
 
-  return { ...col, posts };
+  return { ...col, posts: [...posts].reverse() };
 }
 
 /**

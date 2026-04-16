@@ -52,5 +52,7 @@ tmp/
 # AI Tools
 .serena/
 .next/
+.next_bak/
 .playwright-mcp/
+.ruff_cache/
 .brainstorm/

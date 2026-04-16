@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"components/giscus-comments-container.tsx -> @/components/giscus-comments":{"id":9036,"files":["static/chunks/36.cb6b940cb4e2cce2.js"]}}';

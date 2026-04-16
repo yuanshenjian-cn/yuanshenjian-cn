@@ -3,6 +3,10 @@
 import { Heading } from "@/lib/mdx";
 import { useEffect, useState, useCallback } from "react";
 
+function renderHeadingText(text: string): string {
+  return text.replace(/`([^`]+)`/g, "$1");
+}
+
 interface TableOfContentsProps {
   headings: Heading[];
 }
@@ -87,7 +91,7 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
               paddingRight: '8px',
             }}
           >
-            {heading.text}
+            {renderHeadingText(heading.text)}
           </a>
         ))}
       </nav>
