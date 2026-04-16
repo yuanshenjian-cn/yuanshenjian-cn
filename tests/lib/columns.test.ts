@@ -53,14 +53,14 @@ describe("Columns Module", () => {
       expect(column).toBeNull();
     });
 
-    it("should return posts sorted by date ascending", () => {
+    it("should return posts sorted by date descending (newest first)", () => {
       const column = getAIColumnBySlug("claudecode");
       if (!column || column.posts.length < 2) return;
 
       for (let i = 0; i < column.posts.length - 1; i++) {
         const currentDate = new Date(column.posts[i].date).getTime();
         const nextDate = new Date(column.posts[i + 1].date).getTime();
-        expect(currentDate).toBeLessThanOrEqual(nextDate);
+        expect(currentDate).toBeGreaterThanOrEqual(nextDate);
       }
     });
   });
