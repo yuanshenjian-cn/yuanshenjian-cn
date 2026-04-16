@@ -21,6 +21,7 @@ export function ServiceWorkerRegistration() {
       try {
         const registration = await navigator.serviceWorker.register("/sw.js");
         
+        // eslint-disable-next-line no-console
         console.log("[SW] Registered successfully:", registration.scope);
         
         // 监听更新
@@ -29,6 +30,7 @@ export function ServiceWorkerRegistration() {
           if (newWorker) {
             newWorker.addEventListener("statechange", () => {
               if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                // eslint-disable-next-line no-console
                 console.log("[SW] New version available");
                 // 可以在这里提示用户刷新页面
               }

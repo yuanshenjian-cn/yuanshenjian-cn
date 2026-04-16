@@ -39,6 +39,7 @@ const mdxComponents: MDXComponents = {
   ),
   p: ({ children }: ElementProps) => <p className="my-4 leading-relaxed break-words">{children}</p>,
   img: ({ src, alt }: ImageProps) => (
+    // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt} className="max-w-full h-auto my-4 rounded-lg" />
   ),
   ul: ({ children }: ElementProps) => <ul className="list-disc list-outside pl-5 my-4 space-y-2">{children}</ul>,
