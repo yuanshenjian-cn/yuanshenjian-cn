@@ -1,0 +1,14 @@
+{
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/_not-found/page": "/_not-found",
+  "/feed/route": "/feed",
+  "/about/page": "/about",
+  "/resume/page": "/resume",
+  "/articles/page": "/articles",
+  "/ai/[column]/page": "/ai/[column]",
+  "/articles/[year]/[month]/[day]/[slug]/page": "/articles/[year]/[month]/[day]/[slug]",
+  "/articles/page/[page]/page": "/articles/page/[page]",
+  "/page": "/",
+  "/ai/page": "/ai"
+}

@@ -148,7 +148,9 @@ function parsePostFile(filePath: string): Post | null {
     const dateISO = new Date(frontmatter.date!).toISOString();
 
     const relativePath = getRelativePath(filePath);
-    const pathParts = relativePath.split(/[\\/]/);
+    // 统一标准化为 POSIX 风格路径
+    const posixRelativePath = relativePath.split(path.sep).join("/");
+    const pathParts = posixRelativePath.split("/");
     const category = pathParts.length > 1 ? pathParts[0] : undefined;
 
     const excerpt = frontmatter.brief || content.slice(0, 200).replace(/[#*_]/g, "") + "...";
@@ -166,6 +168,7 @@ function parsePostFile(filePath: string): Post | null {
       published: frontmatter.published !== false,
       readingTime,
       category,
+      relativePath: posixRelativePath,
     };
   } catch (error) {
     console.error(`Error parsing post file ${filePath}:`, error);
@@ -393,4 +396,16 @@ export function getPostsForSearch(): SearchPost[] {
   // 缓存结果
   cachedSearchPosts = posts;
   return posts;
+}
+
+/**
+ * 按目录前缀过滤文章，按日期升序排列（用于专栏阅读顺序）
+ * @param dir - 相对于 content/blog/ 的 POSIX 风格目录路径，例如 "swd/ai-coding/claudecode"
+ * @returns 按日期升序排列的已发布文章数组
+ */
+export function getPostsByDirectory(dir: string): Post[] {
+  const prefix = dir.endsWith("/") ? dir : `${dir}/`;
+  return getAllPosts()
+    .filter((post) => post.relativePath.startsWith(prefix))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }

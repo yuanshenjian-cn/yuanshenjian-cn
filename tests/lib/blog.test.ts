@@ -9,6 +9,7 @@ import {
   getAllCategories,
   getAdjacentPosts,
   getPostsByCategory,
+  getPostsByDirectory,
   clearPostsCache,
 } from "@/lib/blog";
 import { POSTS_PER_PAGE } from "@/lib/config";
@@ -371,6 +372,53 @@ describe("Blog Module", () => {
       // 验证实际分页使用该配置
       const result = getPaginatedPosts(1);
       expect(result.posts.length).toBeLessThanOrEqual(POSTS_PER_PAGE);
+    });
+  });
+
+  describe("getPostsByDirectory", () => {
+    it("should return empty array for non-existent directory", () => {
+      const posts = getPostsByDirectory("non/existent/dir");
+      expect(posts).toHaveLength(0);
+    });
+
+    it("should return posts filtered by directory prefix", () => {
+      const posts = getPostsByDirectory("swd/ai-coding/claudecode");
+      // Claude Code 系列应有文章
+      expect(posts.length).toBeGreaterThan(0);
+
+      // 验证所有文章的 relativePath 都以该目录前缀开头
+      posts.forEach((post) => {
+        expect(post.relativePath.startsWith("swd/ai-coding/claudecode/")).toBe(true);
+      });
+    });
+
+    it("should return posts sorted by date ascending (oldest first)", () => {
+      const posts = getPostsByDirectory("swd/ai-coding/claudecode");
+      if (posts.length < 2) return;
+
+      for (let i = 0; i < posts.length - 1; i++) {
+        const currentDate = new Date(posts[i].date).getTime();
+        const nextDate = new Date(posts[i + 1].date).getTime();
+        expect(currentDate).toBeLessThanOrEqual(nextDate);
+      }
+    });
+
+    it("should only return published posts", () => {
+      const posts = getPostsByDirectory("swd/ai-coding/claudecode");
+      posts.forEach((post) => {
+        expect(post.published).toBe(true);
+      });
+    });
+
+    it("should have relativePath field on all posts", () => {
+      const allPosts = getAllPosts();
+      allPosts.forEach((post) => {
+        expect(post.relativePath).toBeDefined();
+        expect(typeof post.relativePath).toBe("string");
+        expect(post.relativePath.length).toBeGreaterThan(0);
+        // 验证是 POSIX 风格路径（不含反斜杠）
+        expect(post.relativePath).not.toContain("\\");
+      });
     });
   });
 });

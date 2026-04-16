@@ -11,6 +11,7 @@ export interface Post {
   published: boolean;
   readingTime: number;
   category?: string;
+  relativePath: string;
 }
 
 // 搜索用的轻量级文章类型（不包含完整content）

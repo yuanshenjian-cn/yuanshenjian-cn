@@ -1,0 +1,6 @@
+{
+  "/ai/page": "app/ai/page.js",
+  "/articles/[year]/[month]/[day]/[slug]/page": "app/articles/[year]/[month]/[day]/[slug]/page.js",
+  "/ai/[column]/page": "app/ai/[column]/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
+}

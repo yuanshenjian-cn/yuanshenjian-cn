@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPostByDateAndSlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
+import { getColumnContextByPost } from "@/lib/columns";
 import { extractHeadings } from "@/lib/mdx";
 import { config } from "@/lib/config";
 import Script from "next/script";
@@ -74,6 +75,7 @@ export default async function PostPage({ params }: Props) {
   const { prev, next } = getAdjacentPosts(year, month, day, slug);
   const headings = extractHeadings(post.content);
   const postUrl = `${config.site.url}/articles/${year}/${month}/${day}/${slug}`;
+  const columnContext = getColumnContextByPost(post);
 
   // 生成结构化数据
   const articleStructuredData = generateArticleStructuredData(post, postUrl);
@@ -116,11 +118,11 @@ export default async function PostPage({ params }: Props) {
             <div className="w-full max-w-2xl mx-auto lg:mx-0 overflow-hidden">
               {/* 桌面版 header */}
               <div className="hidden lg:block">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} />
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} columnContext={columnContext} />
               </div>
               {/* 移动版正文（无 header） */}
               <div className="lg:hidden">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} url={postUrl} />
+                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} url={postUrl} columnContext={columnContext} />
               </div>
             </div>
 
@@ -135,7 +137,7 @@ export default async function PostPage({ params }: Props) {
           </div>
         ) : (
           <div className="max-w-2xl mx-auto overflow-hidden">
-            <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} />
+            <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} columnContext={columnContext} />
           </div>
         )}
       </article>

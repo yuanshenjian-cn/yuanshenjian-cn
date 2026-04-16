@@ -131,7 +131,7 @@ export function ArticlesContent({
       )}
 
       {/* 文章列表 */}
-      <div className="space-y-16">
+      <div className="space-y-8">
         {paginatedPosts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-muted-foreground">
@@ -143,7 +143,7 @@ export function ArticlesContent({
             <article key={post.slug}>
               <Link 
                 href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} 
-                className="group block"
+                className="group block rounded-lg py-4 px-4 -mx-4 transition-colors hover:bg-muted/50"
               >
                 <h2 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors">
                   {post.title}
