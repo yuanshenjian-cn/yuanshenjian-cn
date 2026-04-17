@@ -41,10 +41,10 @@ export async function generateMetadata({ params }: Props) {
   const twitter = generateTwitterCard(post);
 
   return {
-    title: `${post.title} | 袁慎建的技术博客`,
+    title: `${post.title} | ${config.site.name}`,
     description: post.excerpt,
     keywords: post.tags,
-    authors: [{ name: "袁慎建" }],
+    authors: [{ name: config.author.name }],
     alternates: {
       canonical: postUrl,
     },

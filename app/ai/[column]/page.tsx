@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAIColumnBySlug, getAIColumns } from "@/lib/columns";
 import { getColumnIconBySlug } from "@/components/column-icons";
+import { config } from "@/lib/config";
+import { generateListPageSEO } from "@/lib/seo-utils";
 
 interface Props {
   params: Promise<{ column: string }>;
@@ -21,32 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "专栏未找到" };
   }
 
-  const title = `${column.title} | AI 专栏 | 袁慎建`;
-  const description = column.description;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      images: [
-        {
-          url: "/images/og-default.webp",
-          width: 1200,
-          height: 630,
-          alt: column.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/images/og-default.webp"],
-    },
-  };
+  return generateListPageSEO(
+    `${column.title} | AI 专栏`,
+    column.description,
+    `${config.site.url}/ai/${column.slug}`,
+  );
 }
 
 export default async function ColumnPage({ params }: Props) {

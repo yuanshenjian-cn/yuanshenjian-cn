@@ -1,31 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
+import { config } from "@/lib/config";
+import { generateListPageSEO } from "@/lib/seo-utils";
 import { ArrowRight, Calendar } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
-  description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
-  openGraph: {
-    title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
-    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
-    type: "website",
-    images: [
-      {
-        url: "/images/og-default.webp",
-        width: 1200,
-        height: 630,
-        alt: "袁慎建的博客",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "袁慎建的主页 | Yuan Shenjian's Personal Blog",
-    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
-    images: ["/images/og-default.webp"],
-  },
-};
+export const metadata: Metadata = generateListPageSEO(
+  config.site.name,
+  config.site.description,
+  config.site.url,
+);
 
 export default function Home() {
   const posts = getAllPosts();

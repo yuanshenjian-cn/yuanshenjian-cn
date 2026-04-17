@@ -1,5 +1,6 @@
 import { config } from "./config";
 import { Post } from "@/types/blog";
+import { cleanContent } from "@/lib/utils";
 
 /**
  * 生成文章（BlogPosting）结构化数据
@@ -13,19 +14,16 @@ export function generateArticleStructuredData(post: Post, url: string) {
     description: post.excerpt,
     url: url,
     datePublished: post.date,
-    dateModified: post.date, // 如果有最后修改时间，使用 post.lastModified
+    dateModified: post.date,
     author: {
       "@type": "Person",
-      name: "袁慎建",
+      name: config.author.name,
       url: config.site.url,
-      sameAs: [
-        // 可以添加社交媒体链接
-        // "https://github.com/yourusername",
-      ],
+      sameAs: config.author.sameAs,
     },
     publisher: {
       "@type": "Organization",
-      name: "袁慎建的技术博客",
+      name: config.site.name,
       logo: {
         "@type": "ImageObject",
         url: `${config.site.url}/favicon.ico`,
@@ -37,7 +35,7 @@ export function generateArticleStructuredData(post: Post, url: string) {
     },
     keywords: post.tags.join(", "),
     articleSection: post.category || "技术",
-    wordCount: post.content.split(/\s+/).length,
+    wordCount: cleanContent(post.content).length,
     timeRequired: `PT${post.readingTime}M`,
     inLanguage: "zh-CN",
     isAccessibleForFree: true,
@@ -71,8 +69,8 @@ export function generateWebsiteStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "袁慎建的技术博客",
-    description: "分享技术知识、生活感悟与个人想法",
+    name: config.site.name,
+    description: config.site.description,
     url: config.site.url,
     potentialAction: {
       "@type": "SearchAction",
@@ -93,17 +91,13 @@ export function generatePersonStructuredData() {
   return {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "袁慎建",
+    name: config.author.name,
     url: config.site.url,
-    sameAs: [
-      // 可以添加 GitHub、Twitter 等社交链接
-      // "https://github.com/yourusername",
-      // "https://twitter.com/yourusername",
-    ],
-    jobTitle: "软件开发工程师",
+    sameAs: config.author.sameAs,
+    jobTitle: config.author.jobTitle,
     worksFor: {
       "@type": "Organization",
-      name: "ThoughtWorks",
+      name: config.author.organization,
     },
   };
 }
@@ -126,7 +120,7 @@ export function generateCollectionPageStructuredData(
     url: url,
     isPartOf: {
       "@type": "WebSite",
-      name: "袁慎建的技术博客",
+      name: config.site.name,
       url: config.site.url,
     },
     mainEntity: {

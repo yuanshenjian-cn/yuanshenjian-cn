@@ -43,8 +43,8 @@ function extractTextFromChildren(children: ReactNode): string {
 function addLineNumbers(code: string): ReactNode {
   const lines = code.split("\n");
   
-  // 如果最后一行是空的，移除它
-  if (lines[lines.length - 1] === "") {
+  // 如果最后一行是空的（含仅空白），移除它
+  if (lines[lines.length - 1].trim() === "") {
     lines.pop();
   }
   

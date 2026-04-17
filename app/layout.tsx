@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
@@ -38,9 +38,12 @@ export const metadata: Metadata = {
   },
   // 添加性能优化相关的 meta 标签
   other: {
-    "theme-color": "#000000",
     "color-scheme": "dark light",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

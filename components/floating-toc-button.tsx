@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Heading } from "@/lib/mdx";
+import { useActiveHeading } from "@/hooks/use-active-heading";
 
 function renderHeadingText(text: string): React.ReactNode {
   const parts = text.split(/(`[^`]+`)/g);
@@ -25,28 +26,11 @@ interface FloatingTocButtonProps {
 export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [activeId, setActiveId] = useState<string>("");
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // 获取可见的 heading 元素（修复重复ID问题）
-  const getVisibleElement = useCallback((id: string): HTMLElement | null => {
-    const elements = document.querySelectorAll(`[id="${CSS.escape(id)}"]`);
-    
-    for (const el of elements) {
-      const element = el as HTMLElement;
-      const rect = element.getBoundingClientRect();
-      const style = window.getComputedStyle(element);
-      
-      if (style.display !== 'none' && 
-          style.visibility !== 'hidden' &&
-          rect.height > 0) {
-        return element;
-      }
-    }
-    
-    return null;
-  }, []);
+  // 仅在抽屉打开时监听 heading，避免背景观察开销
+  const { activeId, getVisibleElement } = useActiveHeading(headings, { enabled: isOpen });
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -68,40 +52,15 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
-  // 监听当前活动的 heading
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-20% 0% -80% 0%" }
-    );
-
-    headings.forEach((heading) => {
-      const element = getVisibleElement(heading.id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [isOpen, headings, getVisibleElement]);
-
   // 禁止背景滚动当抽屉打开时
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -111,7 +70,7 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
     const element = getVisibleElement(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.history.pushState(null, '', `#${id}`);
+      window.history.pushState(null, "", `#${id}`);
       // 点击后自动关闭抽屉
       handleClose();
     }

@@ -1,6 +1,7 @@
 export const config = {
   posts: {
     perPage: 12,
+    excerptLength: 200,
   },
   readingTime: {
     charactersPerMinute: 600,
@@ -10,10 +11,16 @@ export const config = {
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://yuanshenjian.cn",
     name: "袁慎建的博客",
     description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+    ogImage: "/images/og-default.webp",
+    locale: "zh_CN",
   },
   author: {
     name: "袁慎建",
     email: "yuanshenjian@foxmail.com",
+    jobTitle: "软件开发工程师",
+    organization: "ThoughtWorks",
+    twitter: "@yuanshenjian",
+    sameAs: [] as string[],
   },
   giscus: {
     repo: process.env.NEXT_PUBLIC_GISCUS_REPO || "yuanshenjian-cn/yuanshenjian-cn",
@@ -24,3 +31,4 @@ export const config = {
 } as const;
 
 export const POSTS_PER_PAGE = config.posts.perPage;
+export const EXCERPT_LENGTH = config.posts.excerptLength;

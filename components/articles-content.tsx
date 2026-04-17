@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Post } from "@/types/blog";
 import { Pagination } from "./pagination";
@@ -20,6 +20,7 @@ export function ArticlesContent({
   postsPerPage,
   initialPage = 1,
 }: ArticlesContentProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tagFromUrl = searchParams.get("tag");
   const [selectedTag, setSelectedTag] = useState<string | null>(tagFromUrl);
@@ -47,14 +48,10 @@ export function ArticlesContent({
   const handleTagClick = (tag: string | null) => {
     setSelectedTag(tag);
     setCurrentPage(1); // 重置到第一页
-    
-    // 更新 URL
-    if (tag) {
-      const encodedTag = encodeURIComponent(tag);
-      window.history.pushState({}, "", `/articles?tag=${encodedTag}`);
-    } else {
-      window.history.pushState({}, "", "/articles");
-    }
+
+    // 更新 URL（不触发滚动）
+    const url = tag ? `/articles?tag=${encodeURIComponent(tag)}` : "/articles";
+    router.replace(url, { scroll: false });
   };
 
   // 处理分页点击
@@ -62,11 +59,11 @@ export function ArticlesContent({
     setCurrentPage(page);
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: "smooth" });
-    
+
     // 更新 URL（如果是标签筛选模式）
     if (selectedTag) {
       const url = `/articles?tag=${encodeURIComponent(selectedTag)}&page=${page}`;
-      window.history.pushState({}, "", url);
+      router.replace(url, { scroll: false });
     }
   };
 

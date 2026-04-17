@@ -117,7 +117,7 @@ NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxx
 - **样式**: Tailwind CSS 3.4 + shadcn/ui
 - **内容**: MDX + gray-matter
 - **评论**: Giscus（GitHub Discussions）
-- **主题**: next-themes（明暗模式）
+- **主题**: 自研 ThemeProvider（`components/theme-provider.tsx`，明暗模式）
 - **PWA**: manifest.json + Service Worker
 
 

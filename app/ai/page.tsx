@@ -3,30 +3,14 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { getAIColumns } from "@/lib/columns";
 import { getColumnIconBySlug } from "@/components/column-icons";
+import { config } from "@/lib/config";
+import { generateListPageSEO } from "@/lib/seo-utils";
 
-export const metadata: Metadata = {
-  title: "AI 专栏 | 袁慎建",
-  description: "AI 效率工程、AI Agent 与 AI Coding 相关的主题系列文章。",
-  openGraph: {
-    title: "AI 专栏 | 袁慎建",
-    description: "AI 效率工程、AI Agent 与 AI Coding 相关的主题系列文章。",
-    type: "website",
-    images: [
-      {
-        url: "/images/og-default.webp",
-        width: 1200,
-        height: 630,
-        alt: "AI 专栏",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AI 专栏 | 袁慎建",
-    description: "AI 效率工程、AI Agent 与 AI Coding 相关的主题系列文章。",
-    images: ["/images/og-default.webp"],
-  },
-};
+export const metadata: Metadata = generateListPageSEO(
+  "AI 专栏",
+  "AI 效率工程、AI Agent 与 AI Coding 相关的主题系列文章。",
+  `${config.site.url}/ai`,
+);
 
 export default async function AIColumnsPage() {
   const columns = getAIColumns();

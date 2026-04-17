@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ColumnContext } from "@/lib/columns";
 import { getColumnIconBySlug } from "@/components/column-icons";
+import { PrevNextNav } from "@/components/prev-next-nav";
 
 interface ColumnNavigationProps {
   context: ColumnContext;
@@ -28,41 +28,7 @@ export function ColumnNavigation({ context }: ColumnNavigationProps) {
       </div>
 
       {/* 上一篇 / 下一篇 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {prev ? (
-          <Link
-            href={`/articles/${prev.year}/${prev.month}/${prev.day}/${prev.slug}`}
-            className="group p-4 rounded-lg border hover:border-primary/50 transition-colors"
-          >
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-              <ArrowLeft className="w-4 h-4" />
-              上一篇
-            </div>
-            <div className="font-medium text-sm line-clamp-2">
-              {prev.title}
-            </div>
-          </Link>
-        ) : (
-          <div />
-        )}
-
-        {next ? (
-          <Link
-            href={`/articles/${next.year}/${next.month}/${next.day}/${next.slug}`}
-            className="group p-4 rounded-lg border hover:border-primary/50 transition-colors text-right"
-          >
-            <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground mb-1">
-              下一篇
-              <ArrowRight className="w-4 h-4" />
-            </div>
-            <div className="font-medium text-sm line-clamp-2">
-              {next.title}
-            </div>
-          </Link>
-        ) : (
-          <div />
-        )}
-      </div>
+      <PrevNextNav prev={prev} next={next} />
     </div>
   );
 }

@@ -7,34 +7,17 @@ import { ResumeProjects } from "@/components/resume/resume-projects";
 import { ResumeExtras } from "@/components/resume/resume-extras";
 import { ShareButtons } from "@/components/share-buttons";
 import { config } from "@/lib/config";
+import { generateListPageSEO } from "@/lib/seo-utils";
 import { Download } from "lucide-react";
 
-const ogImageUrl = `${config.site.url}/images/og-default.webp`;
+const RESUME_DESCRIPTION =
+  "AI 软件工程师·研发效能专家·敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者";
 
-export const metadata: Metadata = {
-  title: "简历 | 袁慎建",
-  description:
-    "AI 软件工程师·研发效能专家·敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
-  openGraph: {
-    title: "简历 | 袁慎建",
-    description: "AI 软件工程师·研发效能专家·敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
-    type: "profile",
-    images: [
-      {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: "袁慎建的简历",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "简历 | 袁慎建",
-    description: "AI 软件工程师·研发效能专家·敏捷开发教练，10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者",
-    images: [ogImageUrl],
-  },
-};
+export const metadata: Metadata = generateListPageSEO(
+  "简历",
+  RESUME_DESCRIPTION,
+  `${config.site.url}/resume`,
+);
 
 export default function ResumePage() {
   const resumeUrl = `${config.site.url}/resume`;

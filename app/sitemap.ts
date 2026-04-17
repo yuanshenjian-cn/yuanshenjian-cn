@@ -1,13 +1,14 @@
 import { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { getAIColumns } from "@/lib/columns";
+import { config } from "@/lib/config";
 
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts();
   const columns = getAIColumns();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com";
+  const baseUrl = config.site.url;
 
   const postUrls = posts.map((post) => ({
     url: `${baseUrl}/articles/${post.year}/${post.month}/${post.day}/${post.slug}`,
