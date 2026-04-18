@@ -20,9 +20,9 @@ brief: >-
 - 无订阅费用压力
 
 **隐私可控**
-- 本地运行，代码不上传
-- 可选择本地模型（Llama、Mistral 等）
-- 数据所有权归用户
+- OpenCode 本地运行，但数据是否出站取决于你接入的 provider
+- 如果你想彻底避免代码上传，需要改用本地模型或自建通道
+- 数据链路由自己掌控，合规策略也更容易按需定制
 
 **模型灵活**
 - 75+ 提供商可选
@@ -37,7 +37,7 @@ brief: >-
 **社区活跃**
 - 近 100K GitHub stars，700+ 贡献者，8,500+ commits
 - 250万+月活开发者
-- 丰富的插件生态（如 oh-my-opencode）
+- 丰富的插件生态（如 oh-my-opencode；它的仓库现已更名为 `oh-my-openagent`，npm 包和命令仍保留 `oh-my-opencode`）
 - 文档完善，更新频繁
 
 ### 局限性
@@ -114,7 +114,7 @@ brief: >-
 **核心特点**：双版本服务、中文代码理解优秀、企业级应用支持
 
 **选择建议**：
-- 追求开源免费 → OpenCode + 限时免费体验模型（Kimi K2.5、GLM-4.7）
+- 追求开源免费 → OpenCode + `/models` 中当前可用的体验模型
 - 追求 IDE 体验 → Cursor
 - 追求开箱即用 → Claude Code
 - 追求性价比 → OpenCode + Zen 按量付费
@@ -129,7 +129,7 @@ brief: >-
 **企业合规考虑**：
 - 中国数据合规 → CodeBuddy 中国版、Trae
 - 国际合规认证 → GitHub Copilot Enterprise、Cursor Enterprise
-- 隐私敏感 → OpenCode（本地运行）
+- 隐私敏感 → OpenCode + 本地模型或自建通道
 
 ## 适合谁使用
 

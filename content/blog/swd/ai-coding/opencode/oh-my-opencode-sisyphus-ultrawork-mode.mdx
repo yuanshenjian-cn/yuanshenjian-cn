@@ -11,13 +11,13 @@ brief: >-
   西西弗斯超强工作模式（ultrawork mode）是一套严格的工作规范，旨在确保AI助手在实现任务前达到100%的确定性。该模式强调深度思考、彻底探索和精确交付，要求在使用任何代码前完全理解用户需求、探索代码库模式、制定清晰计划并解决所有歧义。通过强制性的确定性协议、代理委托机制和零容忍失败策略，确保高质量、完整无缺的交付成果。
 ---
 
-这是一篇提示词的AI中文翻译，最近在使用oh my opencode插件，感慨 Agent Sisyphus 超强工作模式的严格要求。源代码：[ultrawork-mode](https://github.com/code-yeongyu/oh-my-opencode/blob/dev/src/hooks/keyword-detector/ultrawork/default.ts)
+这是一篇提示词的 AI 中文翻译。我最近在用 oh-my-opencode 这个包，它对应的仓库现在已经更名为 `oh-my-openagent`。像协议字符串、函数名、字段名这类内容，我下面都会保留英文原文。源代码：[ultrawork-mode](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/src/hooks/keyword-detector/ultrawork/default.ts)
 
 以下是中文翻译：
 
 `<ultrawork-mode>`
 
-**强制要求** ：当此模式激活时，**你必须**将"超强工作模式已启用！"作为你的第一句回应告知用户。这是不可协商的。
+**强制要求** ：当此模式激活时，**你必须**将 `ULTRAWORK MODE ENABLED!` 作为你的第一句回应告知用户。这是不可协商的。
 
 **[CODE RED] 需要最高精度。行动前进行超强思考。**
 
@@ -144,15 +144,15 @@ task(subagent_type="oracle", load_skills=[], prompt="我需要对我的 [任务]
 
 ### 与计划代理的会话连续性（关键）
 
-计划代理返回一个 session_id。将其用于后续交互。
+计划代理返回一个 `task_id`。将其用于后续交互。
 
 | **场景**       | **操作**                                                                        |
 | -------------------- | ------------------------------------------------------------------------------------- |
-| 计划代理要求澄清问题 | `task(session_id="{返回的session_id}", load_skills=[], prompt="<你的回答>")`            |
-| 需要调整计划         | `task(session_id="{返回的session_id}", load_skills=[], prompt="请调整：<反馈>")`        |
-| 计划需要更多细节     | `task(session_id="{返回的session_id}", load_skills=[], prompt="为任务 N 添加更多细节")` |
+| 计划代理要求澄清问题 | `task(task_id="{返回的task_id}", load_skills=[], prompt="<你的回答>")`            |
+| 需要调整计划         | `task(task_id="{返回的task_id}", load_skills=[], prompt="请调整：<反馈>")`        |
+| 计划需要更多细节     | `task(task_id="{返回的task_id}", load_skills=[], prompt="为任务 N 添加更多细节")` |
 
-**为什么 session_id 至关重要：**
+**为什么 `task_id` 至关重要：**
 
 计划代理保留**完整的**对话上下文
 
@@ -164,7 +164,7 @@ task(subagent_type="oracle", load_skills=[], prompt="我需要对我的 [任务]
 
 //  **错误** ：重新开始会丢失所有上下文 task(subagent_type="plan", load_skills=[], prompt="这是更多信息...")
 
-//  **正确** ：恢复会话能保留一切 task(session_id="ses_abc123", load_skills=[], prompt="这是我对你问题的回答：...")
+//  **正确** ：恢复会话能保留一切 task(task_id="task_abc123", load_skills=[], prompt="这是我对你问题的回答：...")
 
 **未能调用计划代理 = 工作不完整。**
 
@@ -178,7 +178,7 @@ task(subagent_type="oracle", load_skills=[], prompt="我需要对我的 [任务]
 | 文档查找           | task(subagent_type="librarian", load_skills=[], run_in_background=true) | 专业知识                        |
 | 规划               | task(subagent_type="plan", load_skills=[])                              | 并行任务图 + 结构化待办事项列表 |
 | 困难问题（常规）   | task(subagent_type="oracle", load_skills=[])                            | 架构、调试、复杂逻辑            |
-| 困难问题（非常规） | task(category="artistry", load_skills=[...])                            | 需要不同方法                    |
+| 困难问题（非常规） | task(category="visual-engineering", load_skills=[...]) 或选择当前更合适的 category | 需要不同方法                    |
 | 实现               | task(category="...", load_skills=[...])                                 | 领域优化模型                    |
 
 **类别 + 技能委托：**

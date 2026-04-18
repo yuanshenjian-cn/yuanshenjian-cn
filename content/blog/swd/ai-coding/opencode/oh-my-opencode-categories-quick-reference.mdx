@@ -8,10 +8,12 @@ tags:
   - Oh My OpenCode
 published: true
 brief: >-
-  Oh My OpenCode Categories 系统深度解析，详细介绍 8 个内置 Category（visual-engineering、ultrabrain、deep、artistry、quick、unspecified-low、unspecified-high、writing）的工作原理、模型配置和使用场景。Category 是针对特定领域优化的 Agent 配置预设，通过 `task(category="xxx")` 调用时由 Sisyphus-Junior 执行器完成工作。本文还介绍 Category 与 Skill 的组合策略、自定义 Category 配置方法、模型解析优先级机制，以及实际开发中的最佳实践。
+  我系统梳理 oh-my-openagent 的 Category 机制，重点介绍当前最常用的 4 个核心 Category（visual-engineering、ultrabrain、deep、quick），以及 writing、unspecified-low、unspecified-high 这些通用补位项。Category 是针对特定领域优化的 Agent 配置预设，通过 `task(category="xxx")` 调用时由 Sisyphus-Junior 执行器完成工作。本文还介绍 Category 与 Skill 的组合策略、自定义 Category 配置方法、模型解析优先级机制，以及实际开发中的最佳实践。
 ---
 
 ## 什么是 Category？
+
+仓库和推荐的 plugin entry 现在都叫 `oh-my-openagent`，但 npm 包名和命令行仍然是 `oh-my-opencode`。我下面提到安装命令时沿用旧命令名，提到仓库和配置文件时则优先用新名字。
 
 **Category 是针对特定领域优化的 Agent 配置预设**。它回答的核心问题是：**"这是什么类型的工作？"**
 
@@ -49,36 +51,31 @@ task(
 )
 ```
 
-## 8 个内置 Categories 详解
+## 当前最值得记住的 7 个 Categories
 
-Oh My OpenCode 提供 **8 个内置 Category**，每个都有针对性的模型和配置：
+我现在会先记住 4 个核心 Category，再把另外 3 个通用补位项当成兜底选项。这样选型时不会乱。
 
 ### Category 快速参考表
 
-| Category | 默认模型 | 变体 | 适用场景 | 成本 |
-|----------|---------|------|----------|------|
-| `visual-engineering` | `google/gemini-3-pro` | - | 前端、UI/UX、设计、样式、动画 | 中 |
-| `ultrabrain` | `openai/gpt-5.3-codex` | `xhigh` | 深度逻辑推理、复杂架构决策 | 高 |
-| `deep` | `openai/gpt-5.3-codex` | `medium` | 自主问题解决、需深入理解的任务 | 高 |
-| `artistry` | `google/gemini-3-pro` | `max` | 高度创意/艺术性任务、新颖想法 | 高 |
-| `quick` | `anthropic/claude-haiku-4-5` | - | 琐碎任务、单文件修改、拼写修复 | 低 |
-| `unspecified-low` | `anthropic/claude-sonnet-4-5` | - | 不适合其他类别、低投入任务 | 中 |
-| `unspecified-high` | `anthropic/claude-opus-4-6` | `max` | 不适合其他类别、高投入任务 | 高 |
-| `writing` | `google/gemini-3-flash` | - | 文档、散文、技术写作 | 低 |
+| Category | 默认模型 | 变体 / 推理强度 | 适用场景 | 成本 |
+|----------|---------|----------------|----------|------|
+| `visual-engineering` | `google/gemini-3.1-pro` | - | 前端、UI/UX、设计、样式、动画 | 中 |
+| `ultrabrain` | `openai/gpt-5.4` | `xhigh` | 硬逻辑、复杂架构、关键决策 | 高 |
+| `deep` | `openai/gpt-5.4` | `medium` | 自主研究 + 执行、复杂改造 | 高 |
+| `quick` | `openai/gpt-5.4-mini` | - | 单文件修改、拼写修复、小修小补 | 低 |
+| `writing` | `google/gemini-3-flash` | - | 文档、README、技术写作 | 低 |
+| `unspecified-low` | `anthropic/claude-sonnet-4-6` | - | 不好分类但复杂度中等的任务 | 中 |
+| `unspecified-high` | `anthropic/claude-opus-4-7` | `max` | 不好分类但要求高质量的任务 | 高 |
 
 ### visual-engineering（视觉工程）
 
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `google/gemini-3-pro` |
-| **Provider 链** | google → anthropic → zai-coding-plan |
-| **核心能力** | UI 组件开发、响应式设计、动画效果、CSS 优化 |
+这是我做前端和 UI 任务时最常用的 Category，默认路由到 `google/gemini-3.1-pro`。
 
 **适用场景**：
 - 开发 React/Vue 组件
 - 实现响应式布局
-- 添加 CSS 动画和过渡效果
-- 优化用户界面体验
+- 处理交互细节、视觉层次、动画过渡
+- 把设计稿或截图快速落成页面
 
 ```typescript
 task(
@@ -89,18 +86,13 @@ task(
 
 ### ultrabrain（超脑）
 
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `openai/gpt-5.3-codex` |
-| **变体** | `xhigh`（最高推理投入） |
-| **Provider 链** | openai → google → anthropic |
-| **核心能力** | 深度分析、复杂架构设计、系统性推理 |
+这是默认的高推理路由，走 `openai/gpt-5.4` 的 `xhigh` 配置。我通常把它留给真正需要深度权衡的任务。
 
 **适用场景**：
 - 系统架构评审和设计
 - 复杂业务逻辑分析
-- 多系统权衡决策
-- 算法设计和优化
+- 多方案权衡和关键决策
+- 很硬的算法和流程推理
 
 ```typescript
 task(
@@ -109,26 +101,19 @@ task(
 )
 ```
 
-> ⚠️ **注意**：这是最"昂贵"的 Category，仅在需要深度推理时使用。
-
 ### deep（深度）
 
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `openai/gpt-5.3-codex` |
-| **变体** | `medium`（中等推理投入） |
-| **Provider 链** | openai → anthropic → google |
-| **核心能力** | 自主问题解决、深入研究、理解复杂代码 |
+`deep` 也是 `gpt-5.4`，但推理强度降到 `medium`。它不是纯分析，而是偏向“研究明白以后继续动手做”。
 
 **适用场景**：
 - 理解复杂代码库
 - 调试疑难问题
-- 需要深入理解的实现任务
-- 代码重构规划
+- 重构已有模块
+- 需要一边研究一边实现的任务
 
 **与 ultrabrain 的区别**：
-- **ultrabrain**：纯推理，不做实现
-- **deep**：推理 + 实现，面向目标自主工作
+- **ultrabrain**：更适合硬逻辑和架构决策
+- **deep**：更适合研究之后继续推进实现
 
 ```typescript
 task(
@@ -137,41 +122,15 @@ task(
 )
 ```
 
-### artistry（艺术）
-
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `google/gemini-3-pro` |
-| **变体** | `max`（最大能力） |
-| **Provider 链** | google → anthropic → openai |
-| **核心能力** | 创意设计、新颖想法、艺术性任务 |
-
-**适用场景**：
-- 创意 Landing Page 设计
-- 独特的交互动画
-- 视觉效果创新
-- 非常规的 UI 解决方案
-
-```typescript
-task(
-  category="artistry",
-  prompt="设计一个令人印象深刻的 404 页面，要有创意和趣味性"
-)
-```
-
 ### quick（快速）
 
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `anthropic/claude-haiku-4-5` |
-| **Provider 链** | anthropic → google → opencode |
-| **核心能力** | 快速响应、简单任务处理 |
+`quick` 默认路由到 `openai/gpt-5.4-mini`。我把它当成“便宜、快、别想太多”的修补刀。
 
 **适用场景**：
 - 修复拼写错误
 - 单文件小修改
-- 简单的重命名操作
-- 格式化代码
+- 简单重命名
+- 小范围格式清理
 
 ```typescript
 task(
@@ -180,56 +139,9 @@ task(
 )
 ```
 
-> 💡 **成本优势**：使用最快的模型，适合批量处理简单任务。
-
-### unspecified-low（未指定-低）
-
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `anthropic/claude-sonnet-4-5` |
-| **Provider 链** | anthropic → openai → google |
-| **核心能力** | 通用任务处理 |
-
-**适用场景**：
-- 不适合其他 Category 的任务
-- 中等复杂度的实现
-- 不需要深度推理的工作
-
-```typescript
-task(
-  category="unspecified-low",
-  prompt="添加一个新的配置选项到设置页面"
-)
-```
-
-### unspecified-high（未指定-高）
-
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `anthropic/claude-opus-4-6` |
-| **变体** | `max` |
-| **Provider 链** | anthropic → openai → google |
-| **核心能力** | 复杂通用任务处理 |
-
-**适用场景**：
-- 不适合其他 Category 但需要高投入的任务
-- 复杂功能实现
-- 需要高质量输出的工作
-
-```typescript
-task(
-  category="unspecified-high",
-  prompt="实现一个完整的用户权限管理系统"
-)
-```
-
 ### writing（写作）
 
-| 属性 | 详情 |
-|------|------|
-| **默认模型** | `google/gemini-3-flash` |
-| **Provider 链** | google → anthropic → zai-coding-plan → openai |
-| **核心能力** | 文档撰写、技术写作、内容创作 |
+`writing` 走 `google/gemini-3-flash`，适合把思路整理成能直接给人看的文字。
 
 **适用场景**：
 - 编写技术文档
@@ -241,6 +153,38 @@ task(
 task(
   category="writing",
   prompt="为这个 API 端点编写详细的文档说明"
+)
+```
+
+### unspecified-low（未指定-低）
+
+有些任务不太适合硬塞进某个专业分类，但复杂度也没高到要开超高推理，这时我会用 `unspecified-low`。
+
+**适用场景**：
+- 不适合其他 Category 的普通任务
+- 中等复杂度的实现
+- 需要稳定输出，但不需要极高推理投入
+
+```typescript
+task(
+  category="unspecified-low",
+  prompt="添加一个新的配置选项到设置页面"
+)
+```
+
+### unspecified-high（未指定-高）
+
+如果任务难归类，但我又明确希望模型投入更高，`unspecified-high` 会比 `unspecified-low` 更稳。
+
+**适用场景**：
+- 不适合其他 Category 但需要高投入的任务
+- 复杂功能实现
+- 我更看重输出质量而不是速度的场景
+
+```typescript
+task(
+  category="unspecified-high",
+  prompt="实现一个完整的用户权限管理系统"
 )
 ```
 
@@ -299,7 +243,7 @@ task(
 ```
 
 **效果**：
-- `visual-engineering`：使用 Gemini 3 Pro 的视觉能力
+- `visual-engineering`：使用 Gemini 3.1 Pro 的视觉能力
 - `frontend-ui-ux`：注入设计原则和美学指导
 - `playwright`：完成后自动截图验证
 
@@ -314,7 +258,7 @@ task(
 ```
 
 **效果**：
-- `ultrabrain`：使用 GPT-5.3 Codex 的深度推理
+- `ultrabrain`：使用 GPT-5.4 xhigh 的深度推理
 - 空 skills：纯推理，专注架构分析
 
 ### 维护者组合（快速修复）
@@ -328,7 +272,7 @@ task(
 ```
 
 **效果**：
-- `quick`：使用快速的 Haiku 模型
+- `quick`：使用快速的 GPT-5.4 mini 路由
 - `git-master`：自动生成规范的 commit message
 
 ### 文档专家组合
@@ -347,14 +291,16 @@ task(
 
 ## 自定义 Category 配置
 
-在 `oh-my-opencode.json` 中可以自定义或覆盖 Category：
+在 `oh-my-openagent.json` 或 `oh-my-openagent.jsonc` 中可以自定义或覆盖 Category；如果你已经在用旧的 `oh-my-opencode.json[c]`，它也仍然兼容。
 
 ### 配置文件位置
 
 | 优先级 | 位置 | 说明 |
 |--------|------|------|
-| 1（最高） | `.opencode/oh-my-opencode.json` | 项目级配置 |
-| 2 | `~/.config/opencode/oh-my-opencode.json` | 用户级配置 |
+| 1（最高） | `.opencode/oh-my-openagent.jsonc` | 项目级推荐配置 |
+| 2 | `~/.config/opencode/oh-my-openagent.jsonc` | 用户级推荐配置 |
+| 3 | `.opencode/oh-my-opencode.jsonc` | legacy 项目级配置 |
+| 4 | `~/.config/opencode/oh-my-opencode.jsonc` | legacy 用户级配置 |
 
 ### 配置字段参考
 
@@ -371,7 +317,7 @@ interface CategoryConfig {
   }
   reasoningEffort?: "low" | "medium" | "high" | "xhigh"
   textVerbosity?: "low" | "medium" | "high"
-  tools?: Record<string, boolean>  // 工具控制
+  tools?: Record<string, boolean>  // 对 category 路由附加工具限制
   maxTokens?: number      // 最大响应 token
   description?: string    // 描述（显示在提示词中）
   is_unstable_agent?: boolean  // 标记不稳定，强制后台模式
@@ -392,14 +338,14 @@ interface CategoryConfig {
     
     // 2. 覆盖内置 Category
     "visual-engineering": {
-      "model": "openai/gpt-5.2",
+      "model": "google/gemini-3.1-pro",
       "temperature": 0.8,
       "prompt_append": "Use shadcn/ui components and Tailwind CSS."
     },
 
     // 3. 配置深度思考模式
     "deep-reasoning": {
-      "model": "anthropic/claude-opus-4-6",
+      "model": "anthropic/claude-opus-4-7",
       "thinking": {
         "type": "enabled",
         "budgetTokens": 32000
@@ -411,10 +357,10 @@ interface CategoryConfig {
 
     // 4. 使用国产模型
     "quick": {
-      "model": "zhipuai-coding-plan/glm-4.7"
+      "model": "zai-coding-plan/glm-4.7"
     },
     "ultrabrain": {
-      "model": "zhipuai-coding-plan/glm-5"
+      "model": "zai-coding-plan/glm-5"
     }
   }
 }
@@ -422,7 +368,7 @@ interface CategoryConfig {
 
 ## 关键：模型解析优先级
 
-**Categories 除非被配置，否则不使用内置默认值！**
+Categories 本身就带有内置默认值；如果你没有覆写，系统会先走这些默认路由。
 
 ### 解析流程
 
@@ -431,11 +377,11 @@ interface CategoryConfig {
 │                    模型解析优先级                             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  Step 1: 用户配置的模型（oh-my-opencode.json）              │
+│  Step 1: 用户配置的模型（oh-my-openagent.json[c]）          │
 │           ↓ 如果没有配置                                    │
 │  Step 2: Category 的内置默认值                              │
-│           ↓ 如果该 Category 未在配置中定义                  │
-│  Step 3: 系统默认模型（opencode.json 中的 model）           │
+│           ↓ 如果未覆写该 Category                           │
+│  Step 3: 其他系统级默认模型或 provider 回退                 │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -444,15 +390,15 @@ interface CategoryConfig {
 
 ```json
 // opencode.json
-{ "model": "anthropic/claude-sonnet-4-5" }
+{ "model": "anthropic/claude-sonnet-4-6" }
 
-// oh-my-opencode.json（空的 categories）
+// oh-my-openagent.json（空的 categories）
 {}
 
-// ❌ 结果：所有 Category 都使用 claude-sonnet-4-5
-// - quick 任务用 Sonnet（浪费！应该用 Haiku）
-// - ultrabrain 用 Sonnet（推理能力不足！应该用 GPT-5.3）
-// - visual 任务用 Sonnet（效果不佳！应该用 Gemini）
+// 结果：仍然会优先使用 Category 自带的默认模型
+// - quick 继续走 quick 的默认路由
+// - ultrabrain 继续走高推理默认路由
+// - visual 继续走 visual-engineering 的默认路由
 ```
 
 ### 推荐配置
@@ -461,38 +407,34 @@ interface CategoryConfig {
 {
   "categories": {
     "visual-engineering": {
-      "model": "google/gemini-3-pro"
+      "model": "google/gemini-3.1-pro"
     },
     "ultrabrain": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "xhigh"
     },
-    "artistry": {
-      "model": "google/gemini-3-pro",
-      "variant": "max"
-    },
     "quick": {
-      "model": "anthropic/claude-haiku-4-5"
+      "model": "openai/gpt-5.4-mini"
     },
     "unspecified-low": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "anthropic/claude-sonnet-4-6"
     },
     "unspecified-high": {
-      "model": "anthropic/claude-opus-4-6",
+      "model": "anthropic/claude-opus-4-7",
       "variant": "max"
     },
     "writing": {
       "model": "google/gemini-3-flash"
     },
     "deep": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium"
     }
   }
 }
 ```
 
-> **只配置你有访问权限的 Category**。未配置的会回退到系统默认模型。
+我自己的习惯是：只覆写我明确想改掉的 Category。其余的让它继续走内置默认值，配置反而更干净。
 
 ## Provider 优先级链
 
@@ -500,13 +442,12 @@ interface CategoryConfig {
 
 | Category | 默认模型 | Provider 优先级链 |
 |----------|---------|------------------|
-| `visual-engineering` | `gemini-3-pro` | google → anthropic → zai-coding-plan |
-| `ultrabrain` | `gpt-5.3-codex` | openai → google → anthropic |
-| `deep` | `gpt-5.3-codex` | openai → anthropic → google |
-| `artistry` | `gemini-3-pro` | google → anthropic → openai |
-| `quick` | `claude-haiku-4-5` | anthropic → google → opencode |
-| `unspecified-low` | `claude-sonnet-4-5` | anthropic → openai → google |
-| `unspecified-high` | `claude-opus-4-6` | anthropic → openai → google |
+| `visual-engineering` | `gemini-3.1-pro` | google → anthropic → zai-coding-plan |
+| `ultrabrain` | `gpt-5.4` | openai → google → anthropic |
+| `deep` | `gpt-5.4` | openai → anthropic → google |
+| `quick` | `gpt-5.4-mini` | openai → anthropic → google |
+| `unspecified-low` | `claude-sonnet-4-6` | anthropic → openai → google |
+| `unspecified-high` | `claude-opus-4-7` | anthropic → openai → google |
 | `writing` | `gemini-3-flash` | google → anthropic → zai-coding-plan → openai |
 
 ### 检查配置
@@ -519,10 +460,10 @@ bunx oh-my-opencode doctor --verbose
 
 ```
 ✓ Model Resolution
-  ├─ Sisyphus: anthropic/claude-opus-4-6 (via anthropic)
-  ├─ visual-engineering: google/gemini-3-pro (via google)
-  ├─ ultrabrain: openai/gpt-5.3-codex (via openai)
-  ├─ quick: anthropic/claude-haiku-4-5 (via anthropic)
+  ├─ Sisyphus: anthropic/claude-opus-4-7 (via anthropic)
+  ├─ visual-engineering: google/gemini-3.1-pro (via google)
+  ├─ ultrabrain: openai/gpt-5.4 (via openai)
+  ├─ quick: openai/gpt-5.4-mini (via openai)
   └─ ...
 ```
 
@@ -541,7 +482,7 @@ ulw 用 visual-engineering 实现一个响应式导航栏，包含 logo、菜单
 1. `ulw` 触发 Ultrawork 模式
 2. Sisyphus 识别为前端任务
 3. 使用 `visual-engineering` Category
-4. Sisyphus-Junior 使用 Gemini 3 Pro 执行
+4. Sisyphus-Junior 使用 Gemini 3.1 Pro 执行
 
 ### 场景：深度架构分析
 
@@ -555,7 +496,7 @@ ulw 用 visual-engineering 实现一个响应式导航栏，包含 logo、菜单
 **执行过程**：
 1. 识别需要深度推理
 2. 使用 `ultrabrain` Category
-3. GPT-5.3 Codex 进行分析
+3. GPT-5.4 xhigh 进行分析
 4. 输出详细的优化建议
 
 ### 场景：批量小修改
@@ -570,7 +511,7 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 **执行过程**：
 1. `ulw` 触发并行处理
 2. 使用 `quick` Category（快速便宜）
-3. Haiku 模型批量处理
+3. GPT-5.4 mini 批量处理
 4. 每个文件独立处理，最后汇总
 
 ### 场景：技术文档编写
@@ -596,7 +537,6 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 | 开发 UI 组件 | `visual-engineering` | 视觉能力强 |
 | 架构设计/分析 | `ultrabrain` | 深度推理 |
 | 复杂功能实现 | `deep` | 自主工作 |
-| 创意设计 | `artistry` | 高创造力 |
 | 小修改/批量处理 | `quick` | 快速便宜 |
 | 不确定的任务（简单） | `unspecified-low` | 通用 |
 | 不确定的任务（复杂） | `unspecified-high` | 高质量 |
@@ -604,14 +544,14 @@ ulw 用 quick 修复所有的 TypeScript 类型错误
 
 ### 配置你的 Categories
 
-**不要依赖默认值！** 在 `oh-my-opencode.json` 中显式配置：
+如果你要改默认路由，直接在 `oh-my-openagent.json[c]` 里覆写：
 
 ```json
 {
   "categories": {
-    "quick": { "model": "anthropic/claude-haiku-4-5" },
-    "visual-engineering": { "model": "google/gemini-3-pro" },
-    "ultrabrain": { "model": "openai/gpt-5.3-codex", "variant": "xhigh" }
+    "quick": { "model": "openai/gpt-5.4-mini" },
+    "visual-engineering": { "model": "google/gemini-3.1-pro" },
+    "ultrabrain": { "model": "openai/gpt-5.4", "variant": "xhigh" }
   }
 }
 ```
@@ -645,7 +585,6 @@ Sisyphus 会自动分析任务类型并选择合适的 Category。
 | `visual-engineering` | 🟡 中 | 按需使用 |
 | `unspecified-low` | 🟡 中 | 按需使用 |
 | `deep` | 🟠 高 | 谨慎使用 |
-| `artistry` | 🟠 高 | 谨慎使用 |
 | `ultrabrain` | 🔴 很高 | 少量使用 |
 | `unspecified-high` | 🔴 很高 | 少量使用 |
 
@@ -657,34 +596,29 @@ Sisyphus 会自动分析任务类型并选择合适的 Category。
 {
   "categories": {
     "visual-engineering": {
-      "model": "google/gemini-3-pro",
+      "model": "google/gemini-3.1-pro",
       "description": "Frontend, UI/UX, design, styling, animation"
     },
     "ultrabrain": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "xhigh",
       "description": "Deep logical reasoning, complex architecture"
     },
     "deep": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
       "description": "Goal-oriented autonomous problem-solving"
     },
-    "artistry": {
-      "model": "google/gemini-3-pro",
-      "variant": "max",
-      "description": "Highly creative/artistic tasks, novel ideas"
-    },
     "quick": {
-      "model": "anthropic/claude-haiku-4-5",
+      "model": "openai/gpt-5.4-mini",
       "description": "Trivial tasks, single file changes, typo fixes"
     },
     "unspecified-low": {
-      "model": "anthropic/claude-sonnet-4-5",
+      "model": "anthropic/claude-sonnet-4-6",
       "description": "Tasks that don't fit other categories, low effort"
     },
     "unspecified-high": {
-      "model": "anthropic/claude-opus-4-6",
+      "model": "anthropic/claude-opus-4-7",
       "variant": "max",
       "description": "Tasks that don't fit other categories, high effort"
     },
@@ -708,9 +642,6 @@ task(category="ultrabrain", prompt="分析系统架构")
 # 复杂实现
 task(category="deep", prompt="重构认证模块")
 
-# 创意设计
-task(category="artistry", prompt="设计 404 页面")
-
 # 快速修复
 task(category="quick", prompt="修复类型错误")
 
@@ -727,19 +658,19 @@ Oh My OpenCode 的 Categories 系统是一个强大的**任务分类和资源配
 
 | 核心概念 | 说明 |
 |----------|------|
-| **8 个内置 Category** | 覆盖前端、后端、创意、写作等场景 |
+| **7 个常用 Category** | 覆盖前端、通用实现、写作和高推理场景 |
 | **Sisyphus-Junior** | Category 任务的专用执行器 |
 | **模型优化** | 每个 Category 针对场景选择最优模型 |
 | **Skill 组合** | Category + Skill 创建专业代理 |
-| **自定义配置** | 在 oh-my-opencode.json 中灵活定制 |
+| **自定义配置** | 在 oh-my-openagent.json[c] 中灵活定制 |
 
-**记住**：配置你的 Categories，不要依赖默认值！
+**记住**：先吃内置默认值，只有当你明确想改路由时再覆写。
 
 ---
 
 ## 参考资料
 
-- [Oh My OpenCode 官方文档](https://github.com/code-yeongyu/oh-my-opencode)
-- [Category & Skill System Guide](https://github.com/code-yeongyu/oh-my-opencode/blob/dev/docs/category-skill-guide.md)
-- [Configuration Reference](https://github.com/code-yeongyu/oh-my-opencode/blob/dev/docs/configurations.md)
-- [Oh My OpenCode Agent 完全指南](/blog/swd/ai-coding/opencode/oh-my-opencode-agents-guides)
+- [oh-my-openagent 仓库](https://github.com/code-yeongyu/oh-my-openagent)
+- [oh-my-openagent 文档目录](https://github.com/code-yeongyu/oh-my-openagent/tree/dev/docs)
+- [Configuration Reference](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/configurations.md)
+- [Oh My OpenCode Agent 速查手册](/blog/swd/ai-coding/opencode/oh-my-opencode-agents-quick-reference)

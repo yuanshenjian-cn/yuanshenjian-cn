@@ -8,12 +8,12 @@ tags:
   - Oh My OpenCode
 published: true
 brief: >-
-  Atlas 和 Sisyphus 是 OhMyOpenCode 插件中的两个核心 orchestrator 代理。Sisyphus 定位为全能主协调器，负责意图解析、动态规划和智能委派，拥有完整的工具权限但不能直接调用特定代理。Atlas 则是纯协调指挥家，不直接写代码，专注于协调和验证，通过 4-Phase QA Protocol 严格验证每个委派任务。两者在代码权限、适用场景、状态管理、并行策略和验证职责等方面有本质差异，分别代表了高级工程师和技术负责人两种不同的 orchestration 哲学。
+  Atlas 和 Sisyphus 是 oh-my-openagent 体系里最有代表性的两条编排思路。Sisyphus 偏向全能主协调器，负责意图解析、动态规划和智能委派；Atlas 则更像纯协调指挥家，不直接写代码，专注于阶段编排和验证。两者在代码权限、适用场景、状态管理、并行策略和验证职责等方面有本质差异，分别代表了高级工程师和技术负责人两种不同的 orchestration 哲学。
 ---
 
 ## Atlas vs Sisyphus：OhMyOpenCode 双 orchestrator 架构解析
 
-在 OhMyOpenCode（OmO）插件中，Atlas 和 Sisyphus 是两个核心 orchestrator 代理，它们共同构成了多代理协调系统的双核引擎。理解它们的工作原理、设计哲学和协作关系，对于掌握 OmO 的高级用法至关重要。
+仓库现在已经更名为 `oh-my-openagent`，但我下面沿用 OmO 这个简称来讲它的双 orchestrator 结构。Atlas 和 Sisyphus 是这套多代理协调系统里最核心的两条编排链路。
 
 ### 角色定位：指挥家 vs 高级工程师
 
@@ -196,30 +196,24 @@ task(category="deep", load_skills=[], run_in_background=false, prompt="Task 3...
 | **状态管理** | 当前会话的 todo API         | Boulder State JSON + Notepad               |
 | **并行策略** | 探索类任务后台并行          | 执行类任务前台并行（多 subagent）          |
 | **验证职责** | 自我验证                    | **强制 QA Gate**（4-Phase Protocol） |
-| **模型要求** | claude-opus-4-6 / kimi-k2.5 | kimi-k2.5 / claude-sonnet-4-6              |
+| **模型要求** | claude-opus-4-7 / kimi-k2.5 / glm-5 | 以当前工作流配置为准 |
 
-**注**：以上为主模型配置。两者都有备用模型链（fallback chain）以确保高可用性：
+**注**：Sisyphus 这条线的当前核心模型链比较明确：`claude-opus-4-7` → `kimi-k2.5` → `glm-5`。Atlas 是否继续保持独立模型链，则更适合以当前 features reference 和工作流配置为准。
 
-- Sisyphus: claude-opus-4-6 → kimi-k2.5-free → glm-5 → big-pickle
-- Atlas: kimi-k2.5-free → claude-sonnet-4-6 → gpt-5.2
-
-**Fallback 链源码**（`src/shared/model-requirements`）：
+**一个可参考的模型链快照**：
 
 ```typescript
 export const AGENT_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
   sisyphus: {
     fallbackChain: [
-      { providers: ["anthropic", "github-copilot", "opencode"], model: "claude-opus-4-6", variant: "max" },
-      { providers: ["opencode"], model: "kimi-k2.5-free" },
+      { providers: ["anthropic", "github-copilot", "opencode"], model: "claude-opus-4-7", variant: "max" },
+      { providers: ["opencode"], model: "kimi-k2.5" },
       { providers: ["zai-coding-plan", "opencode"], model: "glm-5" },
-      { providers: ["opencode"], model: "big-pickle" },
     ],
   },
   atlas: {
     fallbackChain: [
-      { providers: ["opencode"], model: "kimi-k2.5-free" },
-      { providers: ["anthropic", "github-copilot", "opencode"], model: "claude-sonnet-4-6", variant: "extended" },
-      { providers: ["openai", "github-copilot", "opencode"], model: "gpt-5.2" },
+      // Atlas 的当前模型链更适合直接查看 features reference / 工作流配置
     ],
   },
 }
@@ -451,7 +445,7 @@ session.idle
      - `Read(".sisyphus/tasks/{plan-name}.yaml")`
      - Count remaining `- [ ]` tasks
      - Confirm current progress
-5. 失败的任务使用 session_id 恢复
+5. 失败的任务使用任务 ID 或当前工作流保留的上下文继续恢复
 6. Loop until all tasks complete
 
 ## 如何选择？

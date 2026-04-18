@@ -17,7 +17,7 @@ brief: >-
 
 每天面对重复性编码任务、繁琐的代码审查、复杂的重构工作，你是否想过有一个智能助手能分担这些工作？传统的 AI 编程工具要么价格昂贵，要么隐私堪忧。
 
-OpenCode 的出现改变了这一局面。它是一款**完全开源**的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，提供**限时免费体验模型**（如 Kimi K2.5、GLM-4.7、MiniMax M2.1），体验期间无需订阅和配置 API Key 即可直接使用。
+OpenCode 的出现改变了这一局面。它是一款**完全开源**的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，你既可以直接连接自己的 provider，也可以先从 `/models` 里挑当前可用的体验模型开始上手。
 
 本文将带你全面了解 OpenCode，从安装配置到核心功能，帮助你快速上手这款效率工具。
 
@@ -39,7 +39,7 @@ OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 **anomaly
 |------|------|
 | **双模式工作** | Build 模式（全权限编辑）+ Plan 模式（只读规划） |
 | **多平台支持** | macOS、Windows（WSL）、Linux |
-| **模型丰富** | 支持 75+ 提供商，提供限时免费体验模型（Kimi K2.5、GLM-4.7、MiniMax M2.1 等），体验期间无需配置即可使用 |
+| **模型丰富** | 支持 75+ 提供商，可直接连接自己的 provider，也可以先从 `/models` 中当前可用的体验模型开始 |
 | **工具集** | bash 执行、文件读写、grep 搜索等 |
 | **上下文感知** | 自动生成 `AGENTS.md`，理解项目结构 |
 | **分享协作** | 一键生成会话分享链接 |
@@ -79,7 +79,7 @@ npm install -g opencode-ai
 
 ```bash
 opencode --version
-# 输出示例：1.1.53
+# 输出示例：当前已安装版本号，如 1.4.7
 ```
 
 ### Windows 安装
@@ -133,16 +133,16 @@ npm install -g opencode-ai
 
 ### 桌面应用安装（BETA）
 
-从官方发布页下载对应平台安装包：
+桌面版直接以官方下载页当前提供的安装方式为准：
 
-| 平台 | 下载文件 |
-|------|----------|
-| macOS (Apple Silicon) | opencode-desktop-darwin-aarch64.dmg |
-| macOS (Intel) | opencode-desktop-darwin-x64.dmg |
-| Windows | opencode-desktop-windows-x64.exe |
-| Linux | .deb / .rpm / AppImage |
+- 下载页：[https://opencode.ai/download](https://opencode.ai/download)
+- GitHub Releases：[https://github.com/anomalyco/opencode/releases](https://github.com/anomalyco/opencode/releases)
 
-下载地址：[https://opencode.ai/download](https://opencode.ai/download)
+如果你在 macOS 上，也可以直接用 Homebrew 安装：
+
+```bash
+brew install --cask opencode-desktop
+```
 
 > ⚠️ **注意**：桌面应用目前处于 BETA 阶段，功能可能不如终端版本稳定。
 
@@ -161,7 +161,7 @@ opencode
 
 1. **欢迎界面**：看到 OpenCode 的 TUI（终端用户界面）
 2. **模型选择**：首次启动会提示选择 AI 模型
-   - 选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、MiniMax M2.1、GLM-4.7），体验期间无需配置 API Key
+   - 可以先从 `/models` 里当前标注 **Free** 或可直接使用的体验模型开始
    - 或选择 `/connect` 配置自己的 API Key 或登录已有账户
 3. **开始使用**：进入主界面后，输入 `/help` 查看帮助
 
@@ -183,7 +183,7 @@ opencode
 
 **使用免费体验模型（限时，无需 API Key）**：
 
-启动后输入 `/models` 查看可用模型，选择标注 **Free** 的限时免费体验模型（如 Kimi K2.5、GLM-4.7、MiniMax M2.1）。体验期间无需连接供应商或配置 API Key 即可直接使用。
+启动后输入 `/models` 查看可用模型，优先选择当前标注 **Free** 或可直接使用的体验模型。体验期间通常不需要额外连接供应商或配置 API Key，即可先把工作流跑起来。
 
 > ⚠️ **注意**：免费体验模型可能有使用限制或时限，建议长期使用前配置自己的 API Key 或考虑 OpenCode Zen 服务。
 
@@ -258,18 +258,18 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 |------|------|----------|
 | **bash** | 执行 shell 命令 | allow/deny/ask |
 | **read** | 读取文件内容 | allow |
-| **write** | 创建新文件 | allow/ask |
-| **edit** | 修改文件内容 | allow/ask |
-| **patch** | 应用代码补丁 | allow/ask |
+| **write** | 创建新文件 | 跟随 `edit` 权限 |
+| **edit** | 修改文件内容；`apply_patch` / `multiedit` 也归这一类 | allow/deny/ask |
 | **grep** | 搜索文件内容 | allow |
 | **glob** | 列出匹配文件 | allow |
-| **list** | 列出目录内容 | allow |
+| **lsp** | 语言服务分析（实验性） | allow（需 `OPENCODE_EXPERIMENTAL_LSP_TOOL=true`） |
 | **webfetch** | 抓取网页内容 | allow |
-| **websearch** | 网络搜索 | allow（需 `OPENCODE_ENABLE_EXA=1`）|
+| **websearch** | 网络搜索 | allow（需 OpenCode provider 或 `OPENCODE_ENABLE_EXA=1`） |
 | **skill** | 加载 SKILL.md 技能文件 | allow |
 | **todowrite** | 创建/更新任务清单 | allow |
-| **todoread** | 读取任务清单 | allow |
 | **question** | 向用户提问 | allow |
+
+其中 `write`、`apply_patch` 和 `multiedit` 虽然是不同的写入能力，但都统一受 `edit` permission 控制。
 
 ### 常用 Slash 命令
 
@@ -287,7 +287,6 @@ OpenCode 通过工具操作代码库，可在 `opencode.json` 中配置权限：
 | `/sessions` | 列出并切换会话 | Ctrl+X L |
 | `/export` | 导出对话为 Markdown | Ctrl+X X |
 | `/undo` | 撤销更改 | Ctrl+X U |
-| `/review` | 审查代码变更 | - |
 | `/share` | 分享会话 | Ctrl+X S |
 | `/exit` | 退出 | Ctrl+X Q |
 
