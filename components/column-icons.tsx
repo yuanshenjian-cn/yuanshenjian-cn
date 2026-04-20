@@ -37,6 +37,32 @@ export function OpenCodeIcon(props: IconProps) {
   );
 }
 
+export function AIFrontierIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* 望远镜镜筒 */}
+      <path d="M2 12L7 7l10 5-5 5-10-5z" />
+      {/* 目镜 */}
+      <path d="M17 12l2-2 2 2-2 2-2-2z" />
+      {/* 三脚架支柱 */}
+      <line x1="12" y1="17" x2="10" y2="21" />
+      <line x1="12" y1="17" x2="14" y2="21" />
+      {/* 星点（远处目标） */}
+      <circle cx="21" cy="5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="3" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 /**
  * 根据专栏 slug 获取对应的图标组件
  */
@@ -44,6 +70,8 @@ export function getColumnIconBySlug(
   slug: string,
 ): React.ComponentType<IconProps> | null {
   switch (slug) {
+    case "ai-frontier":
+      return AIFrontierIcon;
     case "claudecode":
       return ClaudeCodeIcon;
     case "opencode":

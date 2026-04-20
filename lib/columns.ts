@@ -33,6 +33,31 @@ export interface ColumnContext {
 
 const AI_COLUMNS: ColumnConfig[] = [
   {
+    slug: "ai-frontier",
+    title: "AI 前沿",
+    description:
+      "深度解析 Anthropic、OpenAI、Google 等顶级实验室的最新模型与技术趋势，帮你在快速变化的大模型格局中做出最优决策。",
+    contentDir: "swd/ai-coding/ai-frontier",
+    guide: {
+      intro:
+        "聚焦大模型领域最前沿的动态，覆盖旗舰模型深度评测、三巨头战略对比、模型选型指南等核心议题，每篇均基于官方发布与权威社区数据。",
+      paths: [
+        {
+          label: "想了解最新模型格局",
+          description: "从三巨头对比综述开始，快速建立全局视角",
+        },
+        {
+          label: "需要做模型选型决策",
+          description: "直接翻阅选型指南和横向对比表格",
+        },
+        {
+          label: "关注特定厂商",
+          description: "按标签筛选 Anthropic / OpenAI / Google 相关文章",
+        },
+      ],
+    },
+  },
+  {
     slug: "claudecode",
     title: "Claude Code",
     description:

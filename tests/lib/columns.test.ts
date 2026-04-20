@@ -83,7 +83,8 @@ describe("Columns Module", () => {
       const nonColumnPost = allPosts.find(
         (p) =>
           !p.relativePath.startsWith("swd/ai-coding/claudecode/") &&
-          !p.relativePath.startsWith("swd/ai-coding/opencode/"),
+          !p.relativePath.startsWith("swd/ai-coding/opencode/") &&
+          !p.relativePath.startsWith("swd/ai-coding/ai-frontier/"),
       );
       if (!nonColumnPost) return;
 

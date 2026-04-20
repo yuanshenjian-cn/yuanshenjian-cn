@@ -253,7 +253,7 @@ function verifyBuild() {
 
 /**
  * 主题到目录的映射
- * 软件开发相关：swd/agile, swd/oo, swd/xp
+ * AI 软开相关：swd/agile, swd/oo, swd/xp
  */
 const TOPIC_TO_DIRECTORY = {
   '运动健康': 'fitness',
@@ -268,12 +268,12 @@ const TOPIC_TO_DIRECTORY = {
 /**
  * 获取目录路径
  * @param {string} topic - 主题名称
- * @param {string} [techCategory] - 技术分类（仅软件开发主题）
+ * @param {string} [techCategory] - 技术分类（仅 AI 软开主题）
  * @param {boolean} [isCustomCategory] - 是否为自定义分类
  * @returns {string} 目录名称
  */
 function getDirectoryForTopic(topic, techCategory = null, isCustomCategory = false) {
-  if (topic === '软件开发' && techCategory) {
+  if (topic === 'AI 软开' && techCategory) {
     // 如果是自定义分类，直接使用用户输入的目录名
     if (isCustomCategory) {
       return `swd/${techCategory}`;
