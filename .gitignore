@@ -56,3 +56,4 @@ tmp/
 .playwright-mcp/
 .ruff_cache/
 .brainstorm/
+.draft/
