@@ -10,8 +10,6 @@ brief: >-
   从 OpenCode 和 Claude Code 迁移到 Codex，最大的认知转变不是语法差异，而是安全模型的设计哲学。Codex 用三层配置（全局 config.toml、项目 AGENTS.md、命令行覆盖）和严格的沙盒分级，把"信任"变成了可量化的配置项。
 ---
 
-> 同时用 OpenCode、Claude Code 和 Codex 一周后，我发现 Codex 的配置体系最简洁——但也最需要你主动理解它的安全假设。
-
 ## 为什么 Codex 的配置值得关注
 
 OpenCode 用 `opencode.json` 管理一切，Claude Code 用 `CLAUDE.md` 加上交互式设置，而 Codex 选择了**集中式 TOML 配置**加**项目级 Markdown 说明**的双层结构。这个设计不是随意的，它反映了 GitHub 对"AI 编码 Agent 应该如何被约束"的理解。
