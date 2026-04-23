@@ -66,6 +66,29 @@ export function AIFrontierIcon(props: IconProps) {
 /**
  * 根据专栏 slug 获取对应的图标组件
  */
+export function CodexIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* 终端窗口 */}
+      <rect x="2" y="3" width="20" height="18" rx="2" />
+      {/* 命令提示符 */}
+      <polyline points="7 8 9 10 7 12" />
+      {/* 光标/代码行 */}
+      <line x1="11" y1="10" x2="17" y2="10" />
+      <line x1="7" y1="15" x2="14" y2="15" />
+    </svg>
+  );
+}
+
 export function getColumnIconBySlug(
   slug: string,
 ): React.ComponentType<IconProps> | null {
@@ -76,6 +99,8 @@ export function getColumnIconBySlug(
       return ClaudeCodeIcon;
     case "opencode":
       return OpenCodeIcon;
+    case "codex":
+      return CodexIcon;
     default:
       return null;
   }

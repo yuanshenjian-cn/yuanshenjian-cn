@@ -84,7 +84,8 @@ describe("Columns Module", () => {
         (p) =>
           !p.relativePath.startsWith("swd/ai-coding/claudecode/") &&
           !p.relativePath.startsWith("swd/ai-coding/opencode/") &&
-          !p.relativePath.startsWith("swd/ai-coding/ai-frontier/"),
+          !p.relativePath.startsWith("swd/ai-coding/ai-frontier/") &&
+          !p.relativePath.startsWith("swd/ai-coding/codex/"),
       );
       if (!nonColumnPost) return;
 

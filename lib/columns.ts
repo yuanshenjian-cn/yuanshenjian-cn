@@ -115,6 +115,31 @@ const AI_COLUMNS: ColumnConfig[] = [
       ],
     },
   },
+  {
+    slug: "codex",
+    title: "Codex",
+    description:
+      "Codex CLI 的配置指南与实战技巧，覆盖 TUI 定制、沙盒策略与命令行工作流。",
+    contentDir: "swd/ai-coding/codex",
+    guide: {
+      intro:
+        "聚焦 Codex CLI 的配置体系与安全模型，从 config.toml 到 AGENTS.md，从沙盒策略到 TUI 定制，帮你快速上手这个简洁但设计严格的 AI 编码工具。",
+      paths: [
+        {
+          label: "刚接触 Codex",
+          description: "从配置模板和沙盒策略开始，理解它的安全哲学",
+        },
+        {
+          label: "从其他工具迁移",
+          description: "重点看三工具对比和迁移注意事项",
+        },
+        {
+          label: "想定制 TUI 体验",
+          description: "关注 TUI 配置章节，调整全屏模式和历史行为",
+        },
+      ],
+    },
+  },
 ];
 
 /**
