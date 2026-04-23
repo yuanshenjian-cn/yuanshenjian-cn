@@ -1,6 +1,6 @@
 # 袁慎建的个人博客
 
-基于 Next.js 15 构建的现代化个人博客，专注于敏捷开发、测试驱动开发（TDD）、极限编程（XP）等技术知识分享。目前已发布 **42 篇**技术文章，分布在 4 个核心主题分类。
+基于 Next.js 15 构建的现代化个人博客，专注于敏捷开发、测试驱动开发（TDD）、极限编程（XP）以及 AI 编程工具等技术知识分享。
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.6-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
@@ -8,17 +8,19 @@
 
 ## 功能特性
 
-- 📝 **MDX 支持**: 使用 Markdown + JSX 撰写文章，支持在文章中嵌入 React 组件
-- 🎨 **现代化设计**: 基于 Tailwind CSS 和 shadcn/ui 设计系统，支持明暗主题切换
-- 🔍 **全局搜索**: 支持快捷键搜索（⌘K），快速找到目标文章
-- 💬 **评论系统**: 集成 Giscus 评论系统，基于 GitHub Discussions，支持 Markdown
-- 📱 **响应式设计**: 完美适配桌面端和移动端
-- 🔧 **代码高亮**: 使用 Prism Plus 实现语法高亮
-- 📊 **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 Open Graph 元数据
-- 📰 **RSS 订阅**: 支持 RSS Feed，方便读者订阅
-- 🚀 **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
-- 📲 **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
-- ⚡ **性能优化**: 代码分割、懒加载、缓存机制等优化
+- **MDX 支持**: 使用 Markdown + JSX 撰写文章，支持在文章中嵌入 React 组件
+- **专栏系统**: 支持系列文章聚合展示，每个专栏有独立的阅读路径和导航
+- **现代化设计**: 基于 Tailwind CSS 和 shadcn/ui 设计系统，支持明暗主题切换
+- **全局搜索**: 支持快捷键搜索（⌘K），快速找到目标文章
+- **评论系统**: 集成 Giscus 评论系统，基于 GitHub Discussions，支持 Markdown
+- **OG 图片**: 自动生成 Open Graph 分享卡片，支持自定义封面
+- **响应式设计**: 完美适配桌面端和移动端
+- **代码高亮**: 使用 Prism Plus 实现语法高亮
+- **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 Open Graph 元数据
+- **RSS 订阅**: 支持 RSS Feed，方便读者订阅
+- **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
+- **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
+- **测试覆盖**: 使用 Vitest + Testing Library 进行单元测试
 
 ## 技术栈
 
@@ -27,28 +29,39 @@
 - **React 19**: UI 库
 - **TypeScript**: 类型安全的 JavaScript 超集
 
-### 样式方案
-- **Tailwind CSS 3.4**: 原子化 CSS 框架
-- **PostCSS**: CSS 后处理器
-- **Autoprefixer**: 自动添加浏览器前缀
-
 ### 内容管理
 - **MDX**: Markdown 扩展，支持 JSX
+- **next-mdx-remote**: 服务端 MDX 渲染
 - **gray-matter**: 解析 frontmatter
 - **remark-gfm**: GitHub Flavored Markdown 支持
 - **rehype-prism-plus**: 代码高亮
 - **rehype-slug**: 自动生成标题锚点
 
+### 样式方案
+- **Tailwind CSS 3.4**: 原子化 CSS 框架
+- **@tailwindcss/typography**: 排版插件
+- **PostCSS**: CSS 后处理器
+- **Autoprefixer**: 自动添加浏览器前缀
+
+### 图标与图片
+- **lucide-react**: 现代化图标库
+- **@vercel/og**: Open Graph 图片动态生成
+- **qrcode.react**: 分享二维码生成
+- **sharp**: 图片处理与优化
+
 ### 评论系统
 - **Giscus**: 基于 GitHub Discussions 的评论系统
 
-### 图标库
-- **lucide-react**: 现代化图标库
+### 测试
+- **Vitest**: 单元测试框架
+- **@testing-library/react**: React 组件测试
+- **jsdom**: 浏览器环境模拟
 
 ### 其他工具
 - **clsx**: 条件类名工具
 - **tailwind-merge**: 合并 Tailwind 类名
 - **github-slugger**: 生成 URL 友好的 slug
+- **husky**: Git hooks
 
 ## 快速开始
 
@@ -61,8 +74,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/blog.git
-cd blog
+git clone https://github.com/yuanshenjian-cn/yuanshenjian-cn.git
+cd yuanshenjian-cn
 
 # 安装依赖
 npm install
@@ -120,55 +133,74 @@ personal-blog/
 │   ├── layout.tsx           # 根布局（字体、Providers）
 │   ├── page.tsx             # 首页
 │   ├── articles/            # 文章列表及详情路由
-│   ├── about/              # 关于页面
-│   ├── resume/             # 简历页面
-│   ├── feed/               # RSS 订阅
-│   ├── sitemap.ts          # SEO Sitemap
-│   ├── robots.ts           # Robots.txt
-│   ├── error.tsx           # 错误页面
-│   └── not-found.tsx       # 404 页面
-├── components/             # React 组件（22 个组件）
-│   ├── header.tsx         # 站点导航
-│   ├── footer.tsx         # 页脚
-│   ├── articles-content.tsx  # 文章列表
-│   ├── giscus-comments.tsx  # Giscus 评论系统
+│   ├── ai/                  # AI 编程专栏展示页
+│   ├── about/               # 关于页面
+│   ├── resume/              # 简历页面
+│   ├── feed/                # RSS 订阅
+│   ├── sitemap.ts           # SEO Sitemap
+│   ├── robots.ts            # Robots.txt
+│   ├── error.tsx            # 错误页面
+│   └── not-found.tsx        # 404 页面
+├── components/              # React 组件
+│   ├── header.tsx           # 站点导航
+│   ├── footer.tsx           # 页脚
+│   ├── articles-content.tsx # 文章列表
+│   ├── column-icons.tsx     # 专栏图标
+│   ├── column-navigation.tsx # 专栏导航
 │   ├── global-search.tsx    # 全局搜索（支持 ⌘K 快捷键）
+│   ├── giscus-comments.tsx  # Giscus 评论系统
 │   ├── table-of-contents.tsx # 文章目录
-│   ├── code-block.tsx     # 代码高亮显示
+│   ├── code-block.tsx       # 代码高亮显示
+│   ├── share-buttons.tsx    # 分享按钮（含二维码）
+│   ├── post-navigation.tsx  # 文章上下篇导航
 │   └── resume/              # 简历相关组件
-├── lib/                    # 工具库
-│   ├── blog.ts            # 博客数据逻辑
-│   ├── mdx.tsx            # MDX 渲染
-│   ├── config.ts          # 配置文件
-│   └── utils.ts           # 工具函数
-├── content/blog/           # MDX 文章内容（42 篇文章）
-│   ├── agile/             # 敏捷开发（8 篇）
-│   │   ├── coaching/      # 敏捷教练
-│   │   └── *.mdx
-│   ├── career/            # 职业发展（12 篇）
-│   ├── oo/                # 面向对象（4 篇）
-│   └── xp/                # 极限编程（18 篇）
-│       ├── tdd/           # 测试驱动开发
-│       ├── testing/       # 测试策略
-│       ├── simple-design/ # 简单设计
-│       └── refactoring/   # 代码重构
-├── public/                # 静态资源
-│   ├── icons/             # PWA 图标
-│   ├── screenshots/       # PWA 截图
-│   ├── docs/              # 文档资源（简历 PDF）
-│   ├── sw.js              # Service Worker
-│   └── manifest.json      # PWA 配置
-├── types/                 # TypeScript 类型定义
-├── scripts/               # 工具脚本
-│   ├── optimize-images.js # 图片优化
-│   ├── check-images.js    # 图片检查
-│   └── pwa/               # PWA 相关脚本
-├── .github/workflows/     # GitHub Actions
-│   └── deploy.yml         # 自动部署配置
-├── tailwind.config.ts     # Tailwind 配置
-├── tsconfig.json          # TypeScript 配置
-├── next.config.ts         # Next.js 配置
-└── package.json           # 项目依赖
+├── lib/                     # 工具库
+│   ├── blog.ts             # 博客数据逻辑
+│   ├── columns.ts          # 专栏注册与文章关联
+│   ├── mdx.tsx             # MDX 渲染
+│   ├── config.ts           # 站点配置
+│   └── utils.ts            # 工具函数
+├── content/blog/            # MDX 文章内容
+│   ├── swd/                 # 软件开发
+│   │   ├── agile/           # 敏捷开发
+│   │   ├── ai-coding/       # AI 编程（专栏）
+│   │   │   ├── ai-frontier/ # AI 前沿
+│   │   │   ├── claudecode/  # Claude Code
+│   │   │   ├── opencode/    # OpenCode
+│   │   │   └── codex/       # Codex
+│   │   ├── oo/              # 面向对象
+│   │   └── xp/              # 极限编程
+│   │       ├── tdd/         # 测试驱动开发
+│   │       ├── testing/     # 测试策略
+│   │       ├── simple-design/ # 简单设计
+│   │       └── refactoring/ # 代码重构
+│   ├── career/              # 职业发展
+│   ├── fitness/             # 运动健康
+│   ├── investment/          # 投资理财
+│   ├── life/                # 生活杂谈
+│   └── talkshow/            # 脱口秀
+├── tests/                   # 测试文件
+│   ├── lib/                 # 工具库测试
+│   └── setup.ts             # 测试环境配置
+├── public/                  # 静态资源
+│   ├── icons/               # PWA 图标
+│   ├── screenshots/         # PWA 截图
+│   ├── images/              # 文章配图
+│   ├── docs/                # 文档资源（简历 PDF）
+│   ├── sw.js                # Service Worker
+│   └── manifest.json        # PWA 配置
+├── types/                   # TypeScript 类型定义
+├── scripts/                 # 工具脚本
+│   ├── optimize-images.js   # 图片优化
+│   ├── check-images.js      # 图片检查
+│   └── pwa/                 # PWA 相关脚本
+├── .github/workflows/       # GitHub Actions
+│   └── deploy.yml           # 自动部署配置
+├── tailwind.config.ts       # Tailwind 配置
+├── tsconfig.json            # TypeScript 配置
+├── next.config.ts           # Next.js 配置
+├── vitest.config.ts         # Vitest 配置
+└── package.json             # 项目依赖
 ```
 
 ## 配置说明
@@ -180,14 +212,47 @@ personal-blog/
 ```typescript
 export const config = {
   posts: {
-    perPage: 12,  // 每页显示文章数
+    perPage: 12,              // 每页显示文章数
+    excerptLength: 200,       // 摘要长度
   },
   readingTime: {
-    charactersPerMinute: 600,  // 阅读速度（字符/分钟）
-    wordsPerMinute: 200,       // 阅读速度（词/分钟）
+    charactersPerMinute: 600, // 阅读速度（字符/分钟）
+    wordsPerMinute: 200,      // 阅读速度（词/分钟）
+  },
+  site: {
+    url: "https://yuanshenjian.cn",
+    name: "袁慎建的博客",
+    description: "记录思考，分享成长。技术实践、敏捷方法、生活随笔。",
+    ogImage: "/images/og-default.webp",
+    locale: "zh_CN",
   },
 } as const;
 ```
+
+### 专栏配置
+
+专栏注册在 `lib/columns.ts` 的 `AI_COLUMNS` 数组中定义：
+
+```typescript
+const AI_COLUMNS: ColumnConfig[] = [
+  {
+    slug: "claudecode",
+    title: "Claude Code",
+    description: "从入门到进阶，系统整理 Claude Code 的工作流...",
+    contentDir: "swd/ai-coding/claudecode",
+    guide: {
+      intro: "共 10 篇，从心智模型到高阶自动化...",
+      paths: [
+        { label: "赶时间", description: "直接从第 2 篇开始上手..." },
+        // ...
+      ],
+    },
+  },
+  // ...
+];
+```
+
+每个专栏需要同时在 `components/column-icons.tsx` 中注册对应的 SVG 图标。
 
 ### Tailwind 主题配置
 
@@ -220,17 +285,31 @@ const withMDX = createMDX({
 
 ### 文件组织
 
-文章按类别组织在 `content/blog/` 目录下：
+文章按主题组织在 `content/blog/` 目录下：
 
 ```
 content/blog/
-├── agile/      # 敏捷开发（8 篇）
-├── career/     # 职业发展（12 篇）
-├── oo/         # 面向对象（4 篇）
-└── xp/         # 极限编程（18 篇）
+├── swd/                  # 软件开发
+│   ├── agile/            # 敏捷开发
+│   ├── ai-coding/        # AI 编程（专栏）
+│   │   ├── ai-frontier/  # AI 前沿
+│   │   ├── claudecode/   # Claude Code
+│   │   ├── opencode/     # OpenCode
+│   │   └── codex/        # Codex
+│   ├── oo/               # 面向对象
+│   └── xp/               # 极限编程
+│       ├── tdd/          # 测试驱动开发
+│       ├── testing/      # 测试策略
+│       ├── simple-design/# 简单设计
+│       └── refactoring/  # 代码重构
+├── career/               # 职业发展
+├── fitness/              # 运动健康
+├── investment/           # 投资理财
+├── life/                 # 生活杂谈
+└── talkshow/             # 脱口秀
 ```
 
-每个分类目录下包含对应主题的 `.mdx` 文件。
+专栏文章需要额外在 `lib/columns.ts` 中注册，非专栏文章直接放入对应主题目录即可。
 
 ### Frontmatter 格式
 
@@ -274,7 +353,7 @@ brief: 文章摘要，用于列表展示和 SEO
 
 ### GitHub Pages 部署
 
-本项目已配置 GitHub Actions 自动部署，推送到 `main` 分支后自动触发。
+本项目已配置 GitHub Actions 自动部署，推送到 `main` 分支后自动触发。部署流程包含类型检查、单元测试和构建三个步骤。
 
 部署配置位于 `.github/workflows/deploy.yml`。
 
@@ -311,6 +390,22 @@ brief: 文章摘要，用于列表展示和 SEO
 npm run lint
 ```
 
+类型检查：
+
+```bash
+npm run typecheck
+```
+
+### 测试
+
+使用 Vitest 运行测试：
+
+```bash
+npm run test          # 运行全部测试
+npm run test:watch    # 监听模式
+npm run test:coverage # 生成覆盖率报告
+```
+
 ### 脚本工具
 
 项目包含以下实用脚本：
@@ -319,7 +414,6 @@ npm run lint
 |------|------|
 | `npm run optimize-images` | 批量优化图片（转换为 WebP，生成多种尺寸） |
 | `node scripts/check-images.js` | 检查文章中引用的图片是否存在 |
-| `node scripts/extract-excerpts.js` | 批量提取文章摘要 |
 
 ### 性能优化
 
@@ -356,7 +450,7 @@ chore: 构建/工具配置更新
 
 ### 如何添加新文章？
 
-在 `content/blog/` 对应分类下创建新的 `.mdx` 文件，按照 frontmatter 格式编写。
+在 `content/blog/` 对应主题目录下创建新的 `.mdx` 文件，按照 frontmatter 格式编写。如果是专栏文章，还需要在 `lib/columns.ts` 的 `AI_COLUMNS` 数组中注册专栏配置，并在 `components/column-icons.tsx` 中添加对应的 SVG 图标。
 
 ### 如何修改主题？
 
@@ -392,7 +486,7 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 ## 联系方式
 
 - 博客: https://yuanshenjian.cn
-- GitHub: https://github.com/your-username
+- GitHub: https://github.com/yuanshenjian-cn
 - Email: yuanshenjian@foxmail.com
 
 ## 致谢
