@@ -222,7 +222,7 @@ function migrate() {
       ensureDir(targetSubDir);
 
       // 生成新的文件名（保持原文件名）
-      const targetFileName = file.fileName.replace('.md', '.mdx');
+      const targetFileName = file.fileName;
       const targetPath = path.join(targetSubDir, targetFileName);
 
       // 写入文件
