@@ -1,6 +1,6 @@
 # 袁慎建的个人博客
 
-基于 Next.js 15 构建的现代化个人博客，专注于敏捷开发、测试驱动开发（TDD）、极限编程（XP）以及 AI 编程工具等技术知识分享。
+基于 Next.js 15 构建的现代化个人博客，专注于 AI 软件开发、敏捷开发、测试驱动开发（TDD）、极限编程（XP）等技术知识分享。
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.6-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
