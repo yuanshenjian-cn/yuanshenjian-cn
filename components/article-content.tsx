@@ -44,7 +44,7 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
       {/* 专栏导航（含上下篇）或全局上下篇导航，二选一 */}
       {columnContext ? (
         <div className="mt-8">
-          <ColumnNavigation context={columnContext} />
+          <ColumnNavigation context={columnContext} globalPrev={prev} globalNext={next} />
         </div>
       ) : (
         <div className="mt-8">
