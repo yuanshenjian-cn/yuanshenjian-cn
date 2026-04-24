@@ -123,6 +123,7 @@ export default {
             // 调整表格上边距，减少与前文段落的间距
             'table': {
               marginTop: '0.5rem',
+              marginBottom: '0',
             },
             // 增加代码块下边距
             'pre': {

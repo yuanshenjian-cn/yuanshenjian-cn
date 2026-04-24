@@ -61,6 +61,9 @@ const mdxComponents: MDXComponents = {
     );
   },
   a: ({ children, href }: ElementProps & { href?: string }) => <a href={href} className="text-primary hover:underline break-all">{children}</a>,
+  small: ({ children }: ElementProps) => (
+    <small className="block text-xs text-muted-foreground -mt-4 mb-2">{children}</small>
+  ),
   hr: () => <hr className="my-8 border-border" />,
   table: ({ children }: ElementProps) => (
     <div className="overflow-x-auto mt-0 mb-4">
