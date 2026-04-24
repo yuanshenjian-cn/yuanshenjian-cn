@@ -80,7 +80,7 @@ export default function Home() {
             <div className="space-y-8">
               {recentPosts.map((post) => (
                 <article key={post.slug} className="group">
-                  <Link href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} className="block">
+                  <Link href={`/articles/${post.slug}`} className="block">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="w-3.5 h-3.5" />
                       <time dateTime={post.date}>

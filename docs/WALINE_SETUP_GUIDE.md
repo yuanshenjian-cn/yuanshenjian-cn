@@ -354,7 +354,7 @@ npm install @waline/client
 
 ### 步骤 3：集成到文章页面
 
-修改 `app/articles/[year]/[month]/[day]/[slug]/page.tsx`，在文章底部添加评论组件。
+修改 `app/articles/[slug]/page.tsx`，在文章底部添加评论组件。
 
 ### 步骤 4：配置服务端地址
 

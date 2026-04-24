@@ -10,7 +10,7 @@ interface PrevNextNavProps {
 }
 
 function postHref(post: Post): string {
-  return `/articles/${post.year}/${post.month}/${post.day}/${post.slug}`;
+  return `/articles/${post.slug}`;
 }
 
 /**

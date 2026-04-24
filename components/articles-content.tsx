@@ -139,7 +139,7 @@ export function ArticlesContent({
           paginatedPosts.map((post) => (
             <article key={post.slug}>
               <Link 
-                href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`} 
+                href={`/articles/${post.slug}`} 
                 className="group block rounded-lg py-4 px-4 -mx-4 transition-colors hover:bg-muted/50"
               >
                 <h2 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors">

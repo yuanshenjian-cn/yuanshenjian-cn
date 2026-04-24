@@ -77,7 +77,7 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
           e.preventDefault();
           if (displayPosts.length > 0 && selectedIndex < displayPosts.length) {
             const post = displayPosts[selectedIndex];
-            router.push(`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`);
+            router.push(`/articles/${post.slug}`);
             handleClose();
           }
           break;
@@ -159,7 +159,7 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
               ) : (
                 <div className="py-1">
                   {displayPosts.map((post, index) => {
-                    const postUrl = `/articles/${post.year}/${post.month}/${post.day}/${post.slug}`;
+                    const postUrl = `/articles/${post.slug}`;
                     return (
                       <a
                         key={post.slug}

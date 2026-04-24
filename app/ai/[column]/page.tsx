@@ -106,9 +106,9 @@ export default async function ColumnPage({ params }: Props) {
         {/* 文章列表 */}
         <ol className="space-y-0">
             {column.posts.map((post) => (
-              <li key={`${post.year}-${post.month}-${post.day}-${post.slug}`}>
+              <li key={post.slug}>
                 <Link
-                  href={`/articles/${post.year}/${post.month}/${post.day}/${post.slug}`}
+                  href={`/articles/${post.slug}`}
                   className="group block rounded-lg py-3 px-4 -mx-4 transition-colors hover:bg-muted/50"
                 >
                   <time className="text-xs text-muted-foreground">

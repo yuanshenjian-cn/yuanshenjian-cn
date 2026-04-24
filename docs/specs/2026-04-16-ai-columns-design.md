@@ -15,7 +15,7 @@
 
 - 顶部导航：`首页 / 文章 / 简历`
 - 文章总列表页：`/articles`
-- 文章详情页：`/articles/[year]/[month]/[day]/[slug]`
+- 文章详情页：`/articles/[slug]`
 
 现有分类系统只识别 `content/blog/` 下的一级目录，因此 AI 相关文章会统一归入 `swd`，无法表达“Claude Code 专栏”“OpenCode 专栏”这样的二级主题聚合关系。
 
@@ -100,7 +100,7 @@
 
 沿用现有路由：
 
-- `/articles/[year]/[month]/[day]/[slug]`：文章详情页
+- `/articles/[slug]`：文章详情页
 
 不新增专栏文章详情专用路由，避免：
 
@@ -239,7 +239,7 @@ const AI_COLUMNS: ColumnConfig[] = [
 `lib/blog.ts` 当前已经具备：
 
 - `getAllPosts()`：返回全部已发布文章，按日期降序
-- `getPostByDateAndSlug()`：根据日期与 slug 查详情
+- `getPostBySlug()`：根据 slug 查详情
 - `getAdjacentPosts()`：获取全站维度的上一篇/下一篇
 
 但 `Post` 结构中没有记录原始相对路径，因此当前无法稳定地按 `content/blog` 内的目录前缀做过滤。
@@ -374,7 +374,7 @@ const isActive = item.href === "/"
 
 现有详情页结构：
 
-- `app/articles/[year]/[month]/[day]/[slug]/page.tsx` 负责组装数据
+- `app/articles/[slug]/page.tsx` 负责组装数据
 - `components/article-content.tsx` 负责正文、分享、上一篇/下一篇、评论
 
 推荐做法：

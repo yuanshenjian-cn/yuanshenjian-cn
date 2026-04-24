@@ -184,18 +184,12 @@ export function clearPostsCache(): void {
   cachedSearchPosts = null;
 }
 
-export function getPostByDateAndSlug(year: string, month: string, day: string, slug: string): Post | null {
+export function getPostBySlug(slug: string): Post | null {
   try {
     const decodedSlug = decodeURIComponent(slug);
-    return getAllPosts().find(
-      (post) =>
-        post.slug === decodedSlug &&
-        post.year === year &&
-        post.month === month &&
-        post.day === day,
-    ) ?? null;
+    return getAllPosts().find((post) => post.slug === decodedSlug) ?? null;
   } catch (error) {
-    console.error(`[Blog] Failed to find post ${year}/${month}/${day}/${slug}:`, error instanceof Error ? error.message : error);
+    console.error(`[Blog] Failed to find post ${slug}:`, error instanceof Error ? error.message : error);
     return null;
   }
 }
@@ -226,14 +220,9 @@ export function getAllCategories(): string[] {
   );
 }
 
-export function getAdjacentPosts(year: string, month: string, day: string, slug: string): { prev: Post | null; next: Post | null } {
+export function getAdjacentPosts(slug: string): { prev: Post | null; next: Post | null } {
   const posts = getAllPosts();
-  const currentIndex = posts.findIndex((post) =>
-    post.slug === slug &&
-    post.year === year &&
-    post.month === month &&
-    post.day === day
-  );
+  const currentIndex = posts.findIndex((post) => post.slug === slug);
 
   if (currentIndex === -1) {
     return { prev: null, next: null };

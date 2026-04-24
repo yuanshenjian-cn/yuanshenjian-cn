@@ -31,7 +31,7 @@ export async function GET() {
     ${posts
       .slice(0, 20)
       .map((post) => {
-        const postUrl = `${siteUrl}/articles/${post.year}/${post.month}/${post.day}/${post.slug}`;
+        const postUrl = `${siteUrl}/articles/${post.slug}`;
         return `
     <item>
       <title><![CDATA[${post.title}]]></title>

@@ -20,7 +20,7 @@ interface ArticleContentProps {
 
 export function ArticleContent({ post, prev, next, slug, showHeader = true, url, columnContext }: ArticleContentProps) {
   // URL 由父组件（服务端）传入，确保 SSR 和客户端一致
-  const shareUrl = url || `${post.year}/${post.month}/${post.day}/${slug}`;
+  const shareUrl = url || `/articles/${slug}`;
 
   return (
     <>
@@ -52,7 +52,7 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
         </div>
       )}
 
-      <GiscusCommentsContainer path={`/articles/${post.year}/${post.month}/${post.day}/${slug}`} />
+      <GiscusCommentsContainer path={`/articles/${slug}`} />
     </>
   );
 }

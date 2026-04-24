@@ -128,7 +128,7 @@ export function generateCollectionPageStructuredData(
       itemListElement: posts.map((post, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${config.site.url}/articles/${post.year}/${post.month}/${post.day}/${post.slug}`,
+        url: `${config.site.url}/articles/${post.slug}`,
         name: post.title,
       })),
     },

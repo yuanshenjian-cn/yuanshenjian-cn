@@ -4,7 +4,7 @@ import {
   getPaginatedPostsByTag,
   getAllPosts,
   getPostsForSearch,
-  getPostByDateAndSlug,
+  getPostBySlug,
   getAllTags,
   getAllCategories,
   getAdjacentPosts,
@@ -214,23 +214,18 @@ describe("Blog Module", () => {
     });
   });
 
-  describe("getPostByDateAndSlug", () => {
+  describe("getPostBySlug", () => {
     it("should return null for non-existent post", () => {
-      const post = getPostByDateAndSlug("2099", "01", "01", "non-existent");
+      const post = getPostBySlug("non-existent");
       expect(post).toBeNull();
     });
 
-    it("should return correct post by date and slug", () => {
+    it("should return correct post by slug", () => {
       const allPosts = getAllPosts();
       if (allPosts.length === 0) return;
 
       const testPost = allPosts[0];
-      const found = getPostByDateAndSlug(
-        testPost.year,
-        testPost.month,
-        testPost.day,
-        testPost.slug
-      );
+      const found = getPostBySlug(testPost.slug);
 
       expect(found).not.toBeNull();
       expect(found?.slug).toBe(testPost.slug);
@@ -271,7 +266,7 @@ describe("Blog Module", () => {
 
   describe("getAdjacentPosts", () => {
     it("should return prev and next as null for non-existent post", () => {
-      const result = getAdjacentPosts("2099", "01", "01", "non-existent");
+      const result = getAdjacentPosts("non-existent");
       expect(result.prev).toBeNull();
       expect(result.next).toBeNull();
     });
@@ -282,12 +277,7 @@ describe("Blog Module", () => {
 
       // 使用第二篇文章测试（确保有前一篇和后一篇）
       const testPost = allPosts[1];
-      const result = getAdjacentPosts(
-        testPost.year,
-        testPost.month,
-        testPost.day,
-        testPost.slug
-      );
+      const result = getAdjacentPosts(testPost.slug);
 
       // prev = 上一篇 = 日期更早的文章（索引+1）
       expect(result.prev).not.toBeNull();
@@ -303,12 +293,7 @@ describe("Blog Module", () => {
       if (allPosts.length === 0) return;
 
       const firstPost = allPosts[0]; // 最新文章
-      const result = getAdjacentPosts(
-        firstPost.year,
-        firstPost.month,
-        firstPost.day,
-        firstPost.slug
-      );
+      const result = getAdjacentPosts(firstPost.slug);
 
       // 最新文章没有 "下一篇"（更晚的文章）
       expect(result.next).toBeNull();
@@ -323,12 +308,7 @@ describe("Blog Module", () => {
       if (allPosts.length === 0) return;
 
       const lastPost = allPosts[allPosts.length - 1]; // 最旧文章
-      const result = getAdjacentPosts(
-        lastPost.year,
-        lastPost.month,
-        lastPost.day,
-        lastPost.slug
-      );
+      const result = getAdjacentPosts(lastPost.slug);
 
       // 最旧文章没有 "上一篇"（更早的文章）
       expect(result.prev).toBeNull();
