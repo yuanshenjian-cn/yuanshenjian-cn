@@ -95,7 +95,9 @@ approval_mode = "approve"
 
 和 Claude Code 的 MCP 配置（通过交互式 `/mcp` 命令或 JSON 文件）相比，Codex 的 TOML 方式更适合版本控制和团队共享。OpenCode 也在 `opencode.json` 中支持 MCP，语法类似但用的是 JSON 结构。
 
-### TUI 界面模式
+### TUI 配置
+
+#### 界面模式
 
 Codex 的交互界面默认使用终端的**备用屏幕缓冲区**（alternate screen），提供全屏聊天体验，不会污染主终端的滚动历史。但在某些终端复用器（如 Zellij）中，备用屏幕模式会导致无法回溯对话历史——因为 Zellij 严格遵循 xterm 规范，禁用了备用屏幕的滚动回溯。
 
@@ -132,7 +134,7 @@ codex --no-alt-screen
 
 Claude Code 和 OpenCode 都没有类似的 TUI 显示模式配置——它们要么固定全屏（OpenCode），要么取决于具体入口（Claude Code CLI 是内联，Desktop App 是独立窗口）。Codex 的这个设计给了终端用户更多控制权。
 
-### 状态栏定制
+#### 状态栏定制
 
 Codex TUI 底部的状态栏默认显示当前模型和目录。但这个状态栏是**完全可定制**的——你可以决定显示什么信息、按什么顺序排列。
 
@@ -173,7 +175,7 @@ status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-use
 
 Claude Code 的状态栏是固定的（模型 + 当前目录），不支持定制。OpenCode 的状态栏信息更少。Codex 在这点上给了终端重度用户充分的自由度。
 
-### 终端标题定制
+#### 终端标题定制
 
 Codex 还可以定制终端窗口/标签页的标题，通过 `tui.terminal_title` 配置：
 
@@ -195,7 +197,7 @@ terminal_title = ["spinner", "project", "status"]
 
 默认标题是 `spinner` + `project-name`（如 `my-project ⠋`）。如果你同时开多个 Codex 会话，建议把 `thread` 或 `current-dir` 加进去，这样从终端标签就能区分不同会话。
 
-### 语法高亮主题
+#### 语法高亮主题
 
 Codex 支持自定义语法高亮主题：
 
@@ -206,7 +208,7 @@ theme = "one-dark"
 
 内置主题覆盖常见的明暗偏好。你也可以把 `.tmTheme` 文件放到 `~/.codex/themes/` 目录下，然后在 TUI 中用 `/theme` 命令浏览和切换，选中的主题会自动写入 `config.toml`。
 
-### 历史记录与搜索
+#### 历史记录与搜索
 
 Codex 的历史记录分为两层：
 
@@ -225,7 +227,7 @@ max_bytes = 10485760      # 历史文件最大 10MB
 
 这个设计比 OpenCode 的 `/sessions` 命令更轻量——不需要离开当前界面就能找回之前的提示。
 
-### TUI 完整配置示例
+#### 完整配置示例
 
 把以上内容汇总，一份实用的 TUI 配置：
 
@@ -237,7 +239,7 @@ terminal_title = ["spinner", "project", "current-dir", "status"]
 theme = "one-dark"
 ```
 
-### 通知钩子
+#### 通知钩子
 
 Codex 支持在 Agent 每轮对话完成时执行自定义脚本：
 
