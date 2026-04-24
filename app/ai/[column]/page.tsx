@@ -39,7 +39,7 @@ export default async function ColumnPage({ params }: Props) {
   }
 
   const latestDate = column.posts.length > 0
-    ? new Date(column.posts[column.posts.length - 1].date)
+    ? new Date(column.posts[0].date)
     : null;
   const Icon = getColumnIconBySlug(column.slug);
 
