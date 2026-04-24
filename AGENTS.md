@@ -71,7 +71,7 @@ import { getAllPosts } from "@/lib/blog";
 app/          # Next.js App Router（路由和页面）
 components/   # React 组件（22 个）
 lib/          # 核心业务逻辑（blog.ts、mdx.tsx、config.ts）
-content/blog/ # MDX 文章（agile、career、oo、xp）
+content/blog/ # Markdown 文章（agile、career、oo、xp）
 public/       # 静态资源
 types/        # TypeScript 类型定义
 ```

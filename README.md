@@ -8,7 +8,7 @@
 
 ## 功能特性
 
-- **MDX 支持**: 使用 Markdown + JSX 撰写文章，支持在文章中嵌入 React 组件
+- **Markdown 内容管线**: 文章以 `.md` 为主，统一通过现有渲染链支持 GFM、代码高亮与少量内联 HTML/组件能力
 - **专栏系统**: 支持系列文章聚合展示，每个专栏有独立的阅读路径和导航
 - **现代化设计**: 基于 Tailwind CSS 和 shadcn/ui 设计系统，支持明暗主题切换
 - **全局搜索**: 支持快捷键搜索（⌘K），快速找到目标文章
@@ -30,8 +30,8 @@
 - **TypeScript**: 类型安全的 JavaScript 超集
 
 ### 内容管理
-- **MDX**: Markdown 扩展，支持 JSX
-- **next-mdx-remote**: 服务端 MDX 渲染
+- **Markdown（.md）**: 文章主格式，支持 frontmatter 与 GFM 扩展
+- **next-mdx-remote**: 统一内容渲染管线（兼容 `.md` / `.mdx`）
 - **gray-matter**: 解析 frontmatter
 - **remark-gfm**: GitHub Flavored Markdown 支持
 - **rehype-prism-plus**: 代码高亮
@@ -160,7 +160,7 @@ personal-blog/
 │   ├── mdx.tsx             # MDX 渲染
 │   ├── config.ts           # 站点配置
 │   └── utils.ts            # 工具函数
-├── content/blog/            # MDX 文章内容
+├── content/blog/            # Markdown 文章内容（.md 文件）
 │   ├── swd/                 # 软件开发
 │   │   ├── agile/           # 敏捷开发
 │   │   ├── ai-coding/       # AI 编程（专栏）
@@ -267,9 +267,9 @@ const AI_COLUMNS: ColumnConfig[] = [
 }
 ```
 
-### MDX 配置
+### 内容渲染配置
 
-MDX 插件配置位于 `next.config.ts`：
+内容渲染相关插件配置位于 `next.config.ts`：
 
 ```typescript
 const withMDX = createMDX({
@@ -315,7 +315,7 @@ content/blog/
 
 每篇文章必须包含 frontmatter：
 
-```mdx
+```markdown
 ---
 title: 文章标题
 date: '2024-08-04'
@@ -339,15 +339,15 @@ brief: 文章摘要，用于列表展示和 SEO
 ### 文件命名
 
 文件名使用 kebab-case，例如：
-- `tdd-best-practices.mdx`
-- `agile-manifesto-guide.mdx`
+- `tdd-best-practices.md`
+- `agile-manifesto-guide.md`
 
-### MDX 语法支持
+### Markdown 语法支持
 
 - 标准 Markdown 语法
 - GFM（GitHub Flavored Markdown）扩展
 - 代码块语法高亮
-- 嵌入 React 组件（需要先在 `lib/mdx.tsx` 中注册）
+- 少量内联 HTML / 组件能力（如需扩展渲染映射，在 `lib/mdx.tsx` 中注册）
 
 ## 部署指南
 
@@ -450,13 +450,13 @@ chore: 构建/工具配置更新
 
 ### 如何添加新文章？
 
-在 `content/blog/` 对应主题目录下创建新的 `.mdx` 文件，按照 frontmatter 格式编写。如果是专栏文章，还需要在 `lib/columns.ts` 的 `AI_COLUMNS` 数组中注册专栏配置，并在 `components/column-icons.tsx` 中添加对应的 SVG 图标。
+在 `content/blog/` 对应主题目录下创建新的 `.md` 文件，按照 frontmatter 格式编写。如果是专栏文章，还需要在 `lib/columns.ts` 的 `AI_COLUMNS` 数组中注册专栏配置，并在 `components/column-icons.tsx` 中添加对应的 SVG 图标。
 
 ### 如何修改主题？
 
 在 `app/globals.css` 中修改 CSS 变量，或使用 Tailwind 的 dark 类。
 
-### 如何添加新的 MDX 组件？
+### 如何扩展内容渲染组件？
 
 在 `lib/mdx.tsx` 中的 `mdxComponents` 对象中注册：
 
