@@ -13,7 +13,7 @@ date: 'YYYY-MM-DD'         # 必填，格式固定
 tags:                      # 必填，字符串数组，至少一项
   - 标签1
   - 标签2
-published: true            # 布尔值；草稿默认 false，用户明确要求发布时才 true
+published: false           # 必填；草稿默认 false，用户明确要求发布时才 true
 brief: >-                  # 必填，字符串，200字左右摘要（可折行）
   摘要内容...
 ---
@@ -21,8 +21,10 @@ brief: >-                  # 必填，字符串，200字左右摘要（可折行
 
 **注意**：
 - `published` 字段若存在必须是布尔值（`true` / `false`），不能是字符串
+- 博客解析逻辑是 `published !== false` 才发布；因此草稿必须显式写 `published: false`
 - `tags` 必须是字符串数组，不能是逗号分隔的单字符串
 - `date` 格式统一为 `'YYYY-MM-DD'`（带引号）
+- 新文章默认使用当前系统日期；历史复盘或补档文章按用户指定日期
 - `brief` 建议用 `>-` 折叠式写法避免换行问题
 
 ---
@@ -38,7 +40,7 @@ brief: >-                  # 必填，字符串，200字左右摘要（可折行
 ## Slug 规则
 
 - **slug = 文件名（不含扩展名）**，例如 `tdd-introduction`
-- slug 必须在整个仓库唯一（跨目录检查）
+- slug 必须在整个仓库唯一（跨目录检查），因为文章详情页只按 slug 查找
 - 新文章写作前必须用 `npm run validate-post -- --check-path` 验证 slug 不冲突
 
 ---
@@ -67,6 +69,7 @@ content/blog/
 - 上述目录是已存在的目录，写作前无需创建
 - 只有用户明确要求新增专栏时，才走新增专栏流程（需同步更新 `lib/columns.ts` 和 `components/column-icons.tsx`）
 - 不存在"AI 软开"作为独立顶层目录，正确路径是 `swd/ai-coding/`
+- 早期真实文章可能包含章节分割线、`## 总结` 等旧格式；新文章必须遵守 `anti-patterns.md`，不要照搬旧格式
 
 ---
 
@@ -93,6 +96,25 @@ content/blog/
 - 写完文章后，**默认只运行 `npm run validate-post` 做轻量校验**
 - `npm run build` 仅作为用户明确要求时的最终验证，且需提前告知副作用
 - 本地预览用 `npm run dev`，不触发图片优化
+
+## validate-post 说明
+
+项目已提供 `scripts/validate-post.js`，命令为：
+
+```bash
+npm run validate-post -- --check-path "content/blog/.../slug.md"
+npm run validate-post -- "content/blog/.../slug.md"
+npm run validate-post -- --strict-writing "content/blog/.../slug.md"
+```
+
+校验内容包括：
+- 路径必须位于 `content/blog/`
+- 扩展名必须是 `.md`
+- 目标目录必须存在
+- slug 必须全仓唯一
+- frontmatter 必须包含合法的 `title`、`date`、`tags`、`brief`
+- `published` 必须存在且是布尔值
+- `--strict-writing` 额外校验正文一级标题、章节分割线、MDX/JSX 和常见禁用短语
 
 ---
 

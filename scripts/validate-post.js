@@ -11,6 +11,9 @@
  *
  *   npm run validate-post -- "content/blog/swd/ai-coding/ai-frontier/foo.md"
  *     校验路径 + 校验 frontmatter（文件必须存在）
+ *
+ *   npm run validate-post -- --strict-writing "content/blog/swd/ai-coding/ai-frontier/foo.md"
+ *     在完整校验基础上，额外检查新文章写作规范
  */
 
 const fs = require('fs');
@@ -24,6 +27,7 @@ const ROOT = path.resolve(__dirname, '..');
 /** @type {string[]} */
 const args = process.argv.slice(2);
 let checkPathOnly = false;
+let strictWriting = false;
 /** @type {string | null} */
 let targetPath = null;
 
@@ -32,6 +36,8 @@ for (let i = 0; i < args.length; i++) {
     checkPathOnly = true;
     targetPath = args[i + 1];
     i++;
+  } else if (args[i] === '--strict-writing') {
+    strictWriting = true;
   } else if (!args[i].startsWith('-')) {
     targetPath = args[i];
   }
@@ -41,6 +47,7 @@ if (!targetPath) {
   console.error('❌ 用法：');
   console.error('  npm run validate-post -- --check-path "content/blog/.../foo.md"');
   console.error('  npm run validate-post -- "content/blog/.../foo.md"');
+  console.error('  npm run validate-post -- --strict-writing "content/blog/.../foo.md"');
   process.exit(1);
 }
 
@@ -78,6 +85,16 @@ function parseFrontmatter(content) {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   return match[1];
+}
+
+/** @param {string} content */
+function stripFrontmatter(content) {
+  return content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
+}
+
+/** @param {string} content */
+function stripFencedCodeBlocks(content) {
+  return content.replace(/```[\s\S]*?```/g, '');
 }
 
 /** 从 YAML 文本中提取字段（仅支持基础类型和字符串数组） */
@@ -143,8 +160,58 @@ function ok(msg) {
   console.log(`✅ ${msg}`);
 }
 
-function warn(msg) {
-  console.warn(`⚠️  ${msg}`);
+/**
+ * @param {string} body
+ */
+function validateWritingRules(body) {
+  const prose = stripFencedCodeBlocks(body);
+  const forbiddenPhrases = [
+    '总的来说',
+    '综上所述',
+    '值得一提的是',
+    '值得注意的是',
+    '深入探讨',
+    '全面分析',
+    '深度解析',
+    '至关重要',
+    '尤为重要',
+    '不可或缺',
+    '不难发现',
+    '由此可见',
+    '可以说',
+    '可谓',
+    '毋庸置疑',
+    '本文将',
+    '接下来我们将',
+    '多维度分析',
+    '重新定义',
+    '颠覆式',
+    '划时代',
+  ];
+
+  if (/^#\s+/m.test(prose)) {
+    error('正文不能出现一级标题 "# "，文章标题只放在 frontmatter.title');
+  }
+
+  if (/^\s*---\s*$/m.test(prose)) {
+    error('正文不能使用独立的 "---" 章节分割线');
+  }
+
+  const hasMdxSyntax =
+    /\bclassName\s*=/.test(prose) ||
+    /^import\s.+from\s+['"].+['"];?$/m.test(prose) ||
+    /^export\s+/m.test(prose) ||
+    /<[A-Z][A-Za-z0-9]*(\s|>|\/>)/.test(prose);
+
+  if (hasMdxSyntax) {
+    error('正文疑似包含 MDX/JSX 语法；博客文章只能使用普通 Markdown');
+  }
+
+  for (const phrase of forbiddenPhrases) {
+    if (prose.includes(phrase)) {
+      error(`正文包含禁用短语："${phrase}"`);
+    }
+  }
 }
 
 // ──────────────────────────────────────────────
@@ -272,7 +339,7 @@ if (!checkPathOnly) {
     ok(`brief: ${brief.substring(0, 50)}${brief.length > 50 ? '...' : ''}`);
   }
 
-  // published：如存在，必须是布尔值
+  // published：必填，必须是布尔值。缺省会被博客运行时当作已发布。
   const publishedRaw = extractField(fmRaw, 'published');
   if (publishedRaw !== null) {
     if (publishedRaw !== 'true' && publishedRaw !== 'false') {
@@ -281,7 +348,15 @@ if (!checkPathOnly) {
       ok(`published: ${publishedRaw}`);
     }
   } else {
-    warn('published 字段不存在（建议显式设置为 false 作为草稿）');
+    error('frontmatter 缺少 published；草稿必须显式设置 published: false');
+  }
+
+  if (strictWriting) {
+    console.log('\n--- 写作规范校验 ---\n');
+    validateWritingRules(stripFrontmatter(content));
+    if (!hasError) {
+      ok('写作规范通过');
+    }
   }
 }
 
