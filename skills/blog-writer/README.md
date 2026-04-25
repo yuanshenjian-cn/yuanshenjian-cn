@@ -1,99 +1,77 @@
 # 博客写作助手 Skill
 
-智能博客写作助手，支持快速通道和引导通道，自动推断写作参数，生成符合规范的 Markdown（`.md`）文件，并提供事实准确性与个人风格的双维度校审报告。
+当前博客工程专用写作助手，深度适配 `/Users/ysj/Personal/blog` 工程结构。支持快速通道（主题明确时直接写）和引导通道（主题模糊时聊出来），生成符合规范的 `.md` 文件，并提供轻量风格校审报告。
 
 ## 快速开始
 
 ```bash
-# 描述清晰 → 进入快速通道，AI 推断参数后推荐确认
-/blog-writer 写一篇关于 Claude Opus 4.7 工具调用能力的深度分析，专业严谨，5000字
+# 描述清晰 → 快速通道，AI 推断参数后 Preflight 确认
+/blog-writer 写一篇关于 Claude Opus 4.7 工具调用能力的深度分析，AI 前沿专栏，约 4000 字
 
-# 描述模糊 → 进入引导通道，AI 通过问答聊出主题
+# 描述模糊 → 引导通道，AI 通过问答聊出主题
 /blog-writer 我想写点关于最近跑步的东西
 ```
 
-## 完整工作流
+## 工作流
 
 ```
-快速通道：推断参数 → 推荐确认 → 写作（published:false）→ 保存草稿 → 校审报告 → 用户确认修改 → 发布（published:true）→ build
-引导通道：聊出主题 → 推荐确认 → 确定大纲 → 写作（published:false）→ 保存草稿 → 校审报告 → 用户确认修改 → 发布（published:true）→ build
+快速通道：推断参数 → Preflight 确认 → 写作 → validate-post → 保存草稿 → 校审报告 → 用户确认修改
+引导通道：聊出主题 → Preflight 确认 → 确定大纲 → 写作 → validate-post → 保存草稿 → 校审报告 → 用户确认修改
 ```
 
-> **重要**：文章写作完成后默认为 `published: false`。草稿阶段不执行 `npm run build`（因为 `published: false` 的文章会被过滤，build 也会触发图片优化，有副作用）。只有通过校审、用户确认后改为 `published: true` 并执行 build。
+**重要**：
+- 草稿默认 `published: false`，只有用户在 Preflight 中明确要求发布才改为 `true`
+- 默认不运行 `npm run build`（会触发图片优化、修改 `public/images/`）；本地预览用 `npm run dev`
 
-## 两种通道
-
-| 通道 | 触发条件 | 步骤 |
-|------|---------|------|
-| **快速通道** | 描述包含具体主题 + 基本诉求 | 推断 → 推荐确认 → 写作 → 校审 |
-| **引导通道** | 描述模糊，或只有大方向 | 聊出主题 → 推荐确认 → 大纲 → 写作 → 校审 |
-
-两种通道均强制遵守 `anti-patterns.md` 中的写作禁止规则。
-
-## 发布位置
-
-文章可发布到**专栏**或作为**自由文章**：
+## 已注册目录
 
 ```
-# 专栏文章
-swd/ai-coding/ai-frontier/   ← AI 前沿专栏
-swd/ai-coding/claudecode/    ← Claude Code 专栏
-
-# 自由文章
-fitness/     career/     life/     investment/
+content/blog/career/
+content/blog/fitness/
+content/blog/investment/
+content/blog/life/
+content/blog/talkshow/                      ← 固定风格：浮夸搞笑
+content/blog/swd/agile/
+content/blog/swd/oo/
+content/blog/swd/xp/                        ← 含 tdd/ simple-design/ testing/
+content/blog/swd/ai-coding/ai-frontier/     ← AI 前沿专栏
+content/blog/swd/ai-coding/claudecode/      ← Claude Code 专栏
+content/blog/swd/ai-coding/opencode/        ← OpenCode 专栏
+content/blog/swd/ai-coding/codex/           ← Codex 专栏
 ```
-
-AI 会根据内容是否有系列性/专题性，自动推荐发布位置，用户可调整。
 
 ## 写作风格
 
 | 风格 | 适用场景 |
 |------|---------|
-| 专业严谨 | 技术深度文章、产品分析 |
+| 专业严谨 | 技术分析、AI 评测（默认） |
 | 轻松幽默 | 入门教程、经验分享 |
 | 简洁明了 | 工具推荐、快速阅读 |
-| 故事叙述 | 成长故事、经验回顾 |
+| 故事叙述 | 成长故事、经历回顾 |
 | 朴实稳重 | 踩坑总结、技术反思 |
 | 浮夸搞笑 | 脱口秀（固定风格） |
 
-## 写作禁止规则
+## 校审机制
 
-见 `anti-patterns.md`，可自由增减：
+- **事实校审**：仅对 AI 前沿/模型评测/含具体数据的文章触发，其他文章跳过
+- **风格校审**：每篇必做，对照真实文章样例（优先 `content/blog/` 真实文章）
+- 校审结果只写报告，不直接修改原文
 
-- 子标题不能有序号（`## 一、`、`### 2.1` 等全部禁止）
-- 禁止"总的来说"、"值得一提的是"等 AI 惯用短语
-- 禁止套路式开头和客套结尾
-
-## 校审协议
-
-草稿保存后自动执行双维度校审：
-
-1. **事实校审**（含版本号/数据/引用时触发）：用 WebFetch / Tavily 验证，结果分四类：✅ 已验证 / ⚠️ 可能过时 / ❌ 建议修正 / 🔍 无法验证
-2. **风格校审**（每篇必跑）：对照 `samples/` 样例，评估开头/段落节奏/语言温度/结尾/Markdown 五个维度
-
-**校审结果只写入报告，不修改原文**；报告中列出修复建议，等用户确认后再执行修改。
-
-校审报告保存至：`.draft/review-{dir}-{slug}.md`
-
-## 资源优先级
-
-```
-anti-patterns.md > patterns.md > styles/ > samples/ > categories/
-```
-
-当参考资料与禁止项冲突时，以 `anti-patterns.md` 为准。
+报告保存至：`.draft/review-{dir}-{slug}.md`
 
 ## 文件结构
 
 ```
 blog-writer/
-├── SKILL.md            # 技能定义（主流程）
-├── anti-patterns.md    # 写作禁止清单（必读，最高优先级）
-├── README.md           # 本文件
-├── categories/         # 文章类型模板（可选参考）
-├── styles/             # 风格参考（写作时读取）
-├── samples/            # 示例文章（含元数据，风格校审参照）
-└── user-input/         # 用户素材输入目录
+├── SKILL.md              # 技能定义（主流程）
+├── project-context.md    # 工程事实（路径/frontmatter/slug/tags）
+├── anti-patterns.md      # 写作禁止清单（最高优先级）
+├── patterns.md           # 写作推荐建议
+├── README.md             # 本文件
+├── categories/           # 文章结构建议（可选参考）
+├── styles/               # 风格参考
+├── samples/              # 样例节奏参考（含 index.md 导航）
+└── user-input/           # 用户素材输入目录
 ```
 
 ## 系统要求
