@@ -1,6 +1,6 @@
 ---
 title: Kimi K2.6 用 Agent Swarm 重新定义了开源编程模型的竞争维度
-date: '2026-04-24'
+date: '2026-04-21'
 tags:
   - AI前沿
   - 月之暗面
