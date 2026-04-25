@@ -12,10 +12,12 @@
 
 ```bash
 npm run dev              # 开发服务器
-npm run build            # 构建生产版本（输出到 /dist）
+npm run build            # 仅构建（next build，不含图片优化）
+npm run build:prod       # 完整生产构建（图片优化 + build，用于部署）
+npm run start            # 本地预览生产版本
 npm run lint             # 代码检查
 npm run typecheck        # TypeScript 类型检查
-npm run optimize-images  # 图片优化
+npm run optimize-images  # 图片优化（独立运行）
 npm run test             # 运行单元测试
 npm run test:watch       # 监视模式运行测试
 npm run test:coverage    # 运行测试并生成覆盖率报告

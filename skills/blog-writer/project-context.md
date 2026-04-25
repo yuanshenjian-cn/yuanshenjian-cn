@@ -81,9 +81,11 @@ content/blog/
 
 ---
 
-## npm run build 副作用
+## npm run build 说明
 
-`npm run build` 实际执行 `npm run optimize-images && next build`，会：
+`npm run build` 现在只执行 `next build`，**不再触发图片优化**。
+
+如需完整生产构建（含图片优化），请使用 `npm run build:prod`：
 1. 运行图片优化脚本，**可能修改 `public/images/` 下的文件**
 2. 构建输出到 `/dist` 目录
 

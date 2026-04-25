@@ -114,7 +114,11 @@ npm run dev
 ### 构建生产版本
 
 ```bash
+# 仅构建（不含图片优化）
 npm run build
+
+# 完整生产构建（图片优化 + 构建，用于部署）
+npm run build:prod
 ```
 
 构建产物将输出到 `dist/` 目录。
@@ -417,7 +421,7 @@ npm run test:coverage # 生成覆盖率报告
 
 ### 性能优化
 
-- **图片优化**: 构建时自动将图片转换为 WebP 格式
+- **图片优化**: 部署前通过 `npm run build:prod` 自动将图片转换为 WebP 格式
 - **代码分割**: Next.js 自动进行路由级代码分割
 - **静态导出**: 预渲染所有页面，提升首屏加载速度
 - **PWA 缓存**: Service Worker 缓存静态资源，支持离线访问

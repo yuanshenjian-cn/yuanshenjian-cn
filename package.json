@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run optimize-images && next build",
+    "build": "next build",
+    "build:prod": "npm run optimize-images && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

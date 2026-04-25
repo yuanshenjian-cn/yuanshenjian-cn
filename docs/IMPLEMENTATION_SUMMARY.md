@@ -81,10 +81,10 @@ Content-Security-Policy:
 
 ### ✅ 4. 图片优化构建脚本
 **脚本**: `scripts/optimize-images.js`
-**集成**: `package.json` build 命令
+**集成**: `package.json` 中的 `build:prod` 命令（`npm run build` 不再包含图片优化）
 
 **功能**:
-- 构建时自动转换图片为 WebP 格式
+- 部署前（通过 `build:prod`）自动转换图片为 WebP 格式
 - 生成 400w, 800w, 1200w 三种响应式尺寸
 - 自动检测并跳过已优化图片（基于修改时间）
 - 计算并显示压缩节省的百分比
@@ -106,8 +106,8 @@ Content-Security-Policy:
 
 **使用方法**:
 ```bash
-# 构建时自动运行
-npm run build
+# 完整生产构建时自动运行
+npm run build:prod
 
 # 手动运行
 npm run optimize-images

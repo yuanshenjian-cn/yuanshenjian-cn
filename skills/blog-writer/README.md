@@ -21,7 +21,7 @@
 
 **重要**：
 - 草稿默认 `published: false`，只有用户在 Preflight 中明确要求发布才改为 `true`
-- 默认不运行 `npm run build`（会触发图片优化、修改 `public/images/`）；本地预览用 `npm run dev`
+- 默认不运行 `npm run build`（耗时较长）；本地预览用 `npm run dev`
 
 ## 已注册目录
 
