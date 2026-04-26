@@ -34,25 +34,17 @@ GLM 5.1 基于混合专家（MoE）架构，采用 MIT 许可证完全开源：
 
 GLM 5.1 的 API 输入定价是 Claude Opus 4.6 的 28%，输出定价是其 17.6%。对于已经使用多模型架构的团队，这个定价意味着可以用不到五分之一的成本替换编程 Agent 的主力模型。
 
-但订阅方案的价格涨幅引发了争议。GLM 5.1 的 Coding Plan Pro 季度订阅从上一代的约 $60 涨到了 $81。DEV Community 有开发者称年度订阅涨幅接近 3 倍，但官方目前仅公布了季度方案。
+订阅方案的价格涨幅则引发了争议。GLM 5.1 的 Coding Plan Pro 季度订阅从上一代的约 $60 涨到了 $81。DEV Community 有开发者称年度订阅涨幅接近 3 倍，但官方目前仅公布了季度方案。
 
 ## 能力边界：哪里突破了，哪里仍受限
 
-GLM 5.1 的能力分布呈现明显的场景分化：
+GLM 5.1 的能力分布有明显的场景分化，值得拆开来看。
 
-**突破的部分**：
+编码是真正的突破点。SWE-Bench Pro 58.4% 超越了 GPT-5.4（57.7%）和 Claude Opus 4.6（57.3%），是开源模型首次在这个基准上登顶。Arena Code Elo 1530 分，排名第三。长程任务能力同样亮眼：官方演示了 8 小时无人工干预的自主执行，包括构建完整 Linux 桌面环境和优化 CUDA 内核。
 
-- **编程能力**：SWE-Bench Pro 58.4%，超越 GPT-5.4（57.7%）和 Claude Opus 4.6（57.3%），是开源模型史上首次在该基准上登顶
-- **长程任务**：8 小时自主执行能力，能够在无人工干预的情况下构建完整 Linux 桌面环境、优化 CUDA 内核
-- **Arena Code Elo**：1530 分，排名第三，仅次于 Claude Opus 4.6
+这个亮眼背后有几个实际限制。**速度是最明显的硬伤**：44.3 tokens/秒 是当前前沿编码模型中最慢的，对延迟敏感的场景几乎直接排除了它。推理和数学上仍落后——GPQA-Diamond 86.2，比 Gemini 3.1 Pro 的 94.3 低了 8 个百分点。8 小时任务的成功率也要打折扣：独立测试显示，顶级模型在这类长时任务中的成功率仅约 25%。
 
-**仍受限的部分**：
-
-- **推理和数学**：GPQA-Diamond 86.2，落后于 Gemini 3.1 Pro 的 94.3
-- **速度**：44.3 tokens/秒，是前沿编码模型中最慢的
-- **长时间任务成功率**：独立测试显示顶级模型在 8 小时任务中的成功率仅约 25%
-
-这种能力分布说明 GLM 5.1 不是在全维度上追赶闭源旗舰，而是在**编码和长程自主任务**这两个特定场景上实现了差异化突破。
+这种分布说明 GLM 5.1 专注于**编码和长程自主任务**这两个场景，而不是在全维度上追赶闭源旗舰。
 
 ## 媒体视角：从马拉松选手到审慎定价
 
@@ -64,13 +56,13 @@ DeepLearning.ai The Batch 则呈现了更审慎的视角。其分析指出，GLM
 
 ## 社区实测：编码优秀，速度是硬伤
 
-知名开发者 Simon Willison 在发布当天测试了 GLM 5.1，让其生成"骑自行车的鹈鹕"SVG。他的评价直接："SVG was excellent, and might be my new favorite from an open weights model"。更令他印象深刻的是，模型在后续交互中修复了一个动画 bug，还解释了原因——CSS transform 覆盖了 SVG transform 属性。
+知名开发者 Simon Willison 在发布当天测试了 GLM 5.1，让其生成"骑自行车的鹈鹕"SVG。他的评价是："SVG 效果极佳，可能是我目前见过的开源权重模型最好的输出。"更令他印象深刻的是，模型在后续交互中修复了一个动画 bug，还解释了原因——CSS transform 覆盖了 SVG transform 属性。
 
-但社区的另一面反馈不容忽视。一位用户在 Twitter 上的留言代表了部分开发者的失望："Just cancelled my GLM Coding Max plan. GLM 5.1 is one of the most unreliable models I've ever used. Slow. Hallucinates constantly." DEV Community 上的一篇文章标题更为直接："Re-evaluating the ROI of GLM-5.1 Pro After a Massive Price Hike to $680"。
+社区的另一面反馈不容忽视。一位用户在 Twitter 上的留言代表了部分开发者的失望：取消了 GLM Coding Max 订阅，直说这是他用过的最不稳定的模型之一——慢，还频繁幻觉。DEV Community 上有文章直接算账，标题是"GLM-5.1 Pro 大幅涨价至 680 美元后，重新评估 ROI"。
 
-Hacker News 上的讨论则聚焦于技术层面的质疑。有开发者指出，GLM 5.1 在处理长上下文时"you see the issue much earlier"，暗示 KV cache 机制可能存在效率问题。另一位用户算了笔账："not streaming tokens out 24/7 and at that point TCO is just drastically more expensive for self hosting"。
+Hacker News 上的讨论聚焦于技术层面的质疑。有开发者指出 GLM 5.1 在处理长上下文时问题出现得很早，暗示 KV cache 机制可能存在效率问题。另一位算了 TCO（总拥有成本）：如果不能 24/7 全速输出 token，自托管的整体成本其实高得多。
 
-Reddit r/LocalLLaMA 上的反馈同样分化。正面评价认为"13 years in dev and glm-5.1 is the first budget model that actually made me reconsider my setup"，负面则质疑"The 28% coding improvement came entirely from post-training RL, no architecture change"——即进步主要来自训练而非架构创新。
+Reddit r/LocalLLaMA 上的反馈同样分化。正面评价是"做了 13 年开发，GLM 5.1 是第一个让我认真考虑重新配置工具链的低价模型"。负面声音则质疑编码进步的来源：28% 的提升完全来自训练后的强化学习，架构本身没有本质变化。
 
 ## 使用场景建议
 
@@ -89,8 +81,8 @@ Reddit r/LocalLLaMA 上的反馈同样分化。正面评价认为"13 years in de
 
 GLM 5.1 的意义不在于它是否全面超越了闭源旗舰。它的真正价值在于：**以 MIT 许可证的形式，把顶尖编码能力送到了开源社区**。
 
-在此之前，SWE-Bench Pro 的榜首长期被 Claude Opus 和 GPT 系列垄断。GLM 5.1 的 58.4% 证明，开源模型在特定工程场景上已经具备了与闭源旗舰正面竞争的能力。对于依赖开源工具链的团队，这意味着不再需要在能力和可控性之间做妥协。
+在此之前，SWE-Bench Pro 的榜首长期被 Claude Opus 和 GPT 系列垄断。GLM 5.1 的 58.4% 证明，开源模型在编程场景上已经具备了与闭源旗舰正面竞争的能力。对于依赖开源工具链的团队，这意味着不再需要在能力和可控性之间做妥协。
 
-但选择 GLM 5.1 有两个前提：你的场景是编码或长程任务导向的，且你能接受 44.3 tokens/秒 的速度。如果你的应用需要低延迟交互、需要最前沿的数学推理能力、或者对订阅成本的稳定性有严格要求，三家闭源旗舰仍然是更稳妥的选择。
+我目前的倾向是把它用在批量代码审查和文档生成这类对延迟不敏感的任务上，把 Claude 留给需要快速交互的场景。44.3 tokens/秒 在单次问答里感受不明显，但如果你做的是实时代码补全，这个速度确实会打断节奏。
 
-开源模型的竞争正在进入一个新阶段。GLM 5.1 不是终点，而是一个信号：在编码这个高价值场景上，开源和闭源的差距已经缩小到在特定场景下可以忽略不计的程度。
+选择 GLM 5.1 有两个前提：你的场景是编码或长程任务导向的，且你能接受这个速度。如果你的应用需要低延迟交互、需要最前沿的数学推理能力、或者对订阅成本的稳定性有严格要求，三家闭源旗舰仍然是更稳妥的选择。
