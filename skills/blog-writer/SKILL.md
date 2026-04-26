@@ -8,7 +8,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 
 ## 启动前必读
 
-1. 读取 `project-context.md`：确认工程事实、路径、frontmatter、slug 和校验命令。
+1. 读取 `rules.md`：确认工程事实、路径、frontmatter、slug 和校验命令。
 2. 读取 `anti-patterns.md`：写作底线，优先级最高。
 3. 读取 `patterns.md`：写作方向和可读性标准。
 
@@ -19,7 +19,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 - `samples/index.md`：仅在真实文章不足时查看样例边界；默认不要直接打开完整样例。
 - `user-input/`：仅在用户明确指定素材文件时读取；未指定时不要自行遍历猜测。
 
-**资源优先级**：用户明确要求 > `anti-patterns.md` > `project-context.md` > `patterns.md` > `categories/` > `styles/` > 真实文章参考 > `samples/`。
+**资源优先级**：用户明确要求 > `anti-patterns.md` > `rules.md` > `patterns.md` > `categories/` > `styles/` > 真实文章参考 > `samples/`。
 
 **旧文参考边界**：真实文章可以参考口吻、节奏和读者定位；如果旧文出现分割线、套路总结、陈旧事实或当前禁止项，不要复制。
 
@@ -65,7 +65,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 
 | 参数 | 规则 |
 |------|------|
-| 目标目录 | 根据主题匹配 `project-context.md` 的真实目录。AI 编程工具优先进入对应 AI 专栏。 |
+| 目标目录 | 根据主题匹配 `rules.md` 的真实目录。AI 编程工具优先进入对应 AI 专栏。 |
 | 文件名/slug | 英文 kebab-case，基于标题生成；写入前用 `validate-post -- --check-path` 验证。 |
 | 文章类型 | 从 `categories/` 中选最贴近的一类；不确定时用“经验分享”或“观点评论”。 |
 | 写作风格 | 技术/评测默认“专业严谨”；教程默认“简洁明了”；经历复盘默认“朴实稳重”；故事默认“故事叙述”；`talkshow/` 固定“浮夸搞笑”。 |
@@ -159,7 +159,7 @@ brief: >-
 - 文件名为英文 kebab-case。
 - slug 必须全仓唯一，写入前用 `validate-post` 验证。
 - `published` 默认 `false`；只有用户明确说直接发布才改为 `true`。
-- `tags` 优先复用 `project-context.md` 中已有写法。
+- `tags` 优先复用 `rules.md` 中已有写法。
 - `brief` 是给列表页看的摘要，不要写成广告语或空泛结论。
 
 ## 写作质量标准
@@ -234,7 +234,7 @@ brief: >-
 
 - `validate-post -- --check-path` 在写入前通过。
 - `validate-post -- --strict-writing` 在写入后通过。
-- 文件路径、slug、frontmatter 与 `project-context.md` 一致。
+- 文件路径、slug、frontmatter 与 `rules.md` 一致。
 - 没有一级标题、MDX/JSX、错误标签格式或字符串布尔值。
 
 ### 报告
