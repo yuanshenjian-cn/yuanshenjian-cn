@@ -8,8 +8,8 @@ argument-hint: "[文章主题、素材或写作想法]"
 
 ## 启动前必读
 
-1. 读取 `rules.md`：确认工程事实、路径、frontmatter、slug 和校验命令。
-2. 读取 `anti-patterns.md`：写作底线，优先级最高。
+1. 读取 `anti-patterns.md`：写作底线，优先级最高，先读先内化。
+2. 读取 `rules.md`：确认工程事实、路径、frontmatter、slug 和校验命令。
 3. 读取 `patterns.md`：写作方向和可读性标准。
 
 按任务需要再读取：
@@ -109,26 +109,25 @@ argument-hint: "[文章主题、素材或写作想法]"
 
 ## 发布位置
 
-### 已注册目录（直接使用，无需创建）
+已注册目录和 AI 专栏说明见 `rules.md` 的"真实目录层级"和"4 个 AI 专栏说明"章节，此处不重复维护，以 `rules.md` 为唯一来源。
 
-```
-content/blog/career/                          # 职业发展
-content/blog/fitness/                         # 运动健康
-content/blog/investment/                      # 投资理财
-content/blog/life/                            # 生活杂谈
-content/blog/talkshow/                        # 脱口秀，固定风格：浮夸搞笑
-content/blog/swd/agile/                       # 敏捷，含 coaching/ 子目录
-content/blog/swd/oo/                          # 面向对象
-content/blog/swd/xp/                          # 极限编程，含 tdd/ simple-design/ testing/ refactoring/
-content/blog/swd/ai-coding/ai-frontier/       # AI 前沿专栏
-content/blog/swd/ai-coding/claudecode/        # Claude Code 专栏
-content/blog/swd/ai-coding/opencode/          # OpenCode 专栏
-content/blog/swd/ai-coding/codex/             # Codex 专栏
-```
+### AI 专栏路由边界
+
+判断一篇文章是否进入 AI 专栏，参考以下示例：
+
+| 文章主题 | 目标目录 | 理由 |
+|---------|---------|------|
+| Claude Code 某功能的使用教程 | `swd/ai-coding/claudecode/` | 主体是 Claude Code 工具本身 |
+| 用 Claude Code 做代码审查的经验复盘 | `swd/ai-coding/claudecode/` | 主体仍是 Claude Code 工具的具体用法 |
+| GPT-5 发布评测 | `swd/ai-coding/ai-frontier/` | 属于大模型发布/评测类 AI 前沿内容 |
+| 用 AI 工具之后对软件开发的感悟 | `career/` 或 `swd/agile/` | 主体是职业或开发实践，AI 只是背景 |
+| 健身受伤康复经历（提到用 AI 查资料） | `fitness/` | 主体是运动健康，AI 是辅助工具 |
+
+**判断原则**：文章的核心价值是否来自特定 AI 工具的使用或 AI 前沿技术本身？是则进专栏，否则进领域目录。
 
 ### 新增专栏（必须暂停确认）
 
-只有用户明确说“新建一个 XX 专栏”或等价表达时，才走新增流程。新增 AI 专栏需同步更新：
+只有用户明确说"新建一个 XX 专栏"或等价表达时，才走新增流程。新增 AI 专栏需同步更新：
 - `lib/columns.ts`
 - `components/column-icons.tsx`
 

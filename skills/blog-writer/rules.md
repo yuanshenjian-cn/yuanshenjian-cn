@@ -114,7 +114,35 @@ npm run validate-post -- --strict-writing "content/blog/.../slug.md"
 - slug 必须全仓唯一
 - frontmatter 必须包含合法的 `title`、`date`、`tags`、`brief`
 - `published` 必须存在且是布尔值
-- `--strict-writing` 额外校验正文一级标题、章节分割线、MDX/JSX 和常见禁用短语
+- `--strict-writing` 额外校验以下项目：
+  - 正文一级标题（`# `）
+  - 章节分割线（正文中独立的 `---`）
+  - MDX/JSX 语法（`className=`、`import ... from`、大写组件标签等）
+  - 以下禁用短语（出现即报错）：
+
+    | 禁用短语 |
+    |---------|
+    | 总的来说 |
+    | 综上所述 |
+    | 值得一提的是 |
+    | 值得注意的是 |
+    | 深入探讨 |
+    | 全面分析 |
+    | 深度解析 |
+    | 至关重要 |
+    | 尤为重要 |
+    | 不可或缺 |
+    | 不难发现 |
+    | 由此可见 |
+    | 可以说 |
+    | 可谓 |
+    | 毋庸置疑 |
+    | 本文将 |
+    | 接下来我们将 |
+    | 多维度分析 |
+    | 重新定义 |
+    | 颠覆式 |
+    | 划时代 |
 
 ---
 
@@ -131,6 +159,8 @@ npm run validate-post -- --strict-writing "content/blog/.../slug.md"
 **职业/生活类**：`职业成长`、`运动健康`、`投资理财`、`生活`
 
 **使用建议**：优先复用仓库里已经大量使用的标签写法，例如当前 Claude Code 系列使用的是 `ClaudeCode`，而不是 `Claude Code`。
+
+> **注意**：`AI 编程` 含空格是刻意设计——它是领域分类标签（"AI 编程"这件事），与工具类标签（`ClaudeCode`、`OpenCode`、`Codex` 无空格）区分。领域标签用"描述这件事"，工具标签用"产品名"写法。
 
 ---
 
