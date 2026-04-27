@@ -6,9 +6,7 @@ published: true
 brief: "DeepSeek V4 预览版发布，1.6 万亿参数的 Pro 版本成为当前最大的开源权重模型。但比参数更值得关注的是定价：V4 Flash 输入 $0.14/MTok，比 Gemini 2.5 Flash 还低。这篇文章分析它的能力边界、局限和使用场景。"
 ---
 
-> 2026 年 4 月 24 日，DeepSeek 发布 V4 预览版。V4 Pro 以 1.6 万亿总参数成为当前公开权重最大的模型，但比参数更值得关注的是它的定价结构——V4 Flash 标准输入 $0.14/MTok，V4 Pro 标准输入 $1.74/MTok。前者比 Gemini 2.5 Flash 的 Standard tier 低 53%，后者不到 Claude Opus 4.7 的 35%。
->
-> 如果你需要处理纯文本的推理或编程任务，且对成本敏感，V4 Flash 是目前性价比最高的选择；如果你需要多模态或最前沿的知识，OpenAI、Anthropic 和 Google 三家闭源旗舰仍然更稳妥。
+> 2026 年 4 月 24 日，DeepSeek 发布 V4 预览版。V4 Pro 以 1.6 万亿总参数成为当前公开权重最大的模型，但比参数更值得关注的是它的定价结构——V4 Flash 标准输入 $0.14/MTok，V4 Pro 标准输入 $1.74/MTok。前者比 Gemini 2.5 Flash 的 Standard tier 低 53%，后者不到 Claude Opus 4.7 的 35%。V4 的真正变量不是参数规模，而是它在推理能力上的突破配上了一个开源低价的组合——但这个组合背后有一个硬限制。
 
 ## 模型规格与定位
 
