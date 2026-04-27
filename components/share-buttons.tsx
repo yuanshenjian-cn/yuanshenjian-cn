@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { X, Check, Link2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -15,13 +15,13 @@ interface ShareButtonsProps {
 // 微博分享
 function shareToWeibo(url: string, title: string) {
   const shareUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
-  window.open(shareUrl, "_blank", "width=600,height=400");
+  window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
 }
 
 // Twitter 分享
 function shareToTwitter(url: string, title: string) {
   const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
-  window.open(shareUrl, "_blank", "width=600,height=400");
+  window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
 }
 
 // 复制链接
@@ -37,6 +37,19 @@ async function copyToClipboard(url: string): Promise<boolean> {
 export function ShareButtons({ url, title, description, className }: ShareButtonsProps) {
   const [showWeChatModal, setShowWeChatModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!showWeChatModal) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowWeChatModal(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showWeChatModal]);
 
   // 处理复制链接
   const handleCopyLink = useCallback(async () => {
@@ -103,6 +116,9 @@ export function ShareButtons({ url, title, description, className }: ShareButton
       {showWeChatModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wechat-share-title"
           onClick={() => setShowWeChatModal(false)}
         >
           <div
@@ -120,7 +136,7 @@ export function ShareButtons({ url, title, description, className }: ShareButton
 
             {/* 标题 */}
             <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold">分享到微信</h3>
+              <h3 id="wechat-share-title" className="text-lg font-semibold">分享到微信</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 用微信扫描下方二维码
               </p>

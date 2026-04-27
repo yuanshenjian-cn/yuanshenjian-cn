@@ -35,6 +35,8 @@ tags:
   - 软件开发
   - 面向对象
 published: true
+brief: >-
+  An English story-based explanation of SOLID principles. It uses Yuan's business cases to explain ISP, LSP, DIP, SRP and OCP, helping readers understand how separation of concerns, stable contracts and abstraction reduce coupling and maintenance cost in object-oriented design.
 ---
 
 
@@ -77,7 +79,7 @@ To improve the customers' experience, Yuan separated the big tool box into two s
 
 **In software design, ISP advocates not providing a large and comprehensive interface to users, but isolating the interfaces that each user really cares about.**
 
-![image](/images/swd/oo/en/ood-isp.webp)
+![Interface segregation principle toolbox example](/images/swd/oo/en/ood-isp.webp)
 
 ---
 
@@ -103,7 +105,7 @@ In 2017, the real estate market was crazily bullish, and the number of Yuan's on
 
 **A client uses a furniture factory as an abstraction on different workers (different implementation of the master) and in order to get an excellent table a client has only one way: check which master is working on his table, in other words, the client has to check `instance of worker` that violates good design principles.**
 
-![image](/images/swd/oo/en/ood-lsp.webp)
+![Liskov substitution principle carpenter example](/images/swd/oo/en/ood-lsp.webp)
 
 ---
 
@@ -136,7 +138,7 @@ Yuan finally enjoyed the perks of being a boss. Before getting off work, he type
 
 **In software design, DIP advocates that users rely on an abstract service interface, instead of relying on a specific service executor. From relying on a concrete implementation to relying on an abstract interface. That is what "inversion" means.**
 
-![image](/images/swd/oo/en/ood-dip.webp)
+![Dependency inversion principle department service list example](/images/swd/oo/en/ood-dip.webp)
 
 ---
 
@@ -192,7 +194,7 @@ Before going to bed, Yuan turned on his laptop and typed down the memo: Separati
 
 **In software design, SRP advocates allowing a class to handle only a set of related things. By controlling its direction of change, it will be better to maintain later. If there are many factors that cause change, the class will carry on a large amount of responsibilities. And it increases the difficulty of maintaining a class. The common God classes are like this.**
 
-![image](/images/swd/oo/en/ood-srp.webp)
+![Single responsibility principle department split example](/images/swd/oo/en/ood-srp.webp)
 
 ---
 
@@ -231,7 +233,7 @@ As the reading session blossomed in the company, Yuan thought that he would give
 
 **In software design, OCP advocates closing to modifications, but opening to extensions. It is recommended to provide your service caller with an abstract, high-level behavior interface. Later, when your service has a new kind, all you need to do is add a specific service that implements the abstract, high-level interface without modifying the way how caller uses.**
 
-![image](/images/swd/oo/en/ood-ocp.webp)
+![Open closed principle reading ambassador example](/images/swd/oo/en/ood-ocp.webp)
 
 ---
 
@@ -295,7 +297,6 @@ We also greatly appreciate them who has provided much support:
 - ***Kelvin Yong***, from ThoughtWorks Singapore office
 - ***Sergey Bukahrov***, from ThoughtWorks Singapore office
 - ***Natalie Chin***, from ThoughtWorks Singapore office
-
 
 
 

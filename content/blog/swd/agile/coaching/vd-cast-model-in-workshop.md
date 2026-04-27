@@ -23,15 +23,15 @@ published: true
 ###  VD CAST模型
 做任何事情之前，我们都要考虑其背后的价值，定义清楚价值，如何去实现价值，比如在这里我们如何通过Workshop达到这些目的。为了促成最终的交付，我们还要考虑影响交付的一些外在因素，最后，在成功交付之后如何将我们所交付的价值持续产生更多的价值也是等待我们去思考的。我把这些关注点提炼为*VD CAST* 模型（`价值交付投射`模型）：
 
-![image](/images/swd/agile/coaching/vd-cast-model.webp)
+![VD CAST 价值交付投射模型](/images/swd/agile/coaching/vd-cast-model.webp)
 
 最左边起点是我们做这件事的价值，中间则是影响价值落地的外在因素，主要涵盖了当前面临的`约束`、培训的目标`受众`、所能获得的`支持`以及课程交付后的`跟踪`五大方面。最右边是我们要落地的交付。能否落地以及如何建立价值与交付之间的投射？落实到操作层面，我们需要深入到各个方面中去探讨一些关键性的问题，我以提问的方式罗列出每个环节要解决的主要问题：
 
-![image](/images/swd/agile/coaching/vd-cast-question.webp)
+![VD CAST 模型关键问题清单](/images/swd/agile/coaching/vd-cast-question.webp)
 
 从这些待解决的问题中不难看出，每个环节存在一定的关联性，比如*价值*，我们给组织带来什么会决定我们能从组织上获得什么支持，而给讲师和学员带来什么会影响我们会影响讲师和学员的招募，*价值* 在很大程度上决定了我们所获得的*支撑*，*支撑* 则为成功*交付* 提供了强有力的保障。*约束* 会在一定程度缩小*受众*，并且很可能阻碍*交付*。最后，有效的*跟踪* 能够更好的突显*价值* 以及帮助改进下一次Workshop。我把它们之间的关系概括为：
 
-![image](/images/swd/agile/coaching/vd-cast-relationship.webp)
+![VD CAST 模型各要素关系图](/images/swd/agile/coaching/vd-cast-relationship.webp)
 
 它们之间关联性能够帮助我们理清这些问题的依赖顺序，让我们集中Focus在优先级更高的问题上，同时尽可能避免去解决一些根本不需要解决的问题。
 
@@ -42,7 +42,7 @@ published: true
 
 如果把一次Workshop视同敏捷开发中的一个Sprint（即迭代，请参阅 *我在ThoughtWorks中的敏捷实践*），我们需要做的是在Sprint的不同阶段中去解决对应的问题：
 
-![image](/images/swd/agile/coaching/workshop-as-a-sprint.webp)
+![将 Workshop 视为 Sprint 的阶段划分图](/images/swd/agile/coaching/workshop-as-a-sprint.webp)
 
 我把Sprint划分为5个阶段，每个阶段针对问题所提供的答案除了影响本阶段的进展，还会直接影响下个阶段的进展。比如在*需求分析* 的时候我们没法排除约束，可能会导致Sprint失败。而在*架构搭建* 中如果没有服务器资源，就会影响课程设计，而课程设计则会增大交付的风险（因为缺少特定的服务器资源，增加了环境的复杂度）。
 
@@ -63,7 +63,6 @@ published: true
 ---
 
 > 为了让学员保持较高的参与度，我们需要在课程设计上多下功夫，在课程中整合*目标*、*反馈*、*挑战* 等元素，更多精彩内容请阅读邱大师的 [反馈拯救世界](http://icodeit.org/2018/01/feedback-saves-the-world/)。
-
 
 
 

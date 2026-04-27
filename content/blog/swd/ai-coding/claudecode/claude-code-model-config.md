@@ -430,4 +430,4 @@ Claude Code 模型配置的核心逻辑可以归纳为三层：
 - [Claude Code 模型配置官方文档](https://code.claude.com/docs/en/model-config)
 - [Anthropic 模型概览](https://platform.claude.com/docs/en/about-claude/models/overview)
 - [1M Token 上下文窗口](https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window)
-- [Claude Code 省 Token 技巧](/articles/2026/04/13/claude-code-token-saving-tips)
+- [Claude Code 省 Token 技巧](/articles/claude-code-token-saving-tips)

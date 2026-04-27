@@ -15,6 +15,8 @@ excerpt: |-
 tags:
   - 职业成长
 published: true
+brief: >-
+  回顾2016年在ThoughtWorks的项目、角色、技术和心态变化。从Off Shore项目坚守、Android技术栈切换、持续学习、英语翻译、敏捷实践分享到家庭生活变化，记录一年中的成长轨迹，也反思目标设定、付出与收获之间的关系。
 ---
 
 
@@ -119,8 +121,7 @@ CI、CD，这是我加入 [ThoughtWorks](https://thoughtworks.com/) 后一直关
 
 2017，**Keep** Going:
 
-![image](/images/career/2016-keep-review.webp)
-
+![2016 年度复盘关键词和持续学习记录](/images/career/2016-keep-review.webp)
 
 
 

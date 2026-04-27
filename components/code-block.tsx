@@ -37,45 +37,6 @@ function extractTextFromChildren(children: ReactNode): string {
   return "";
 }
 
-/**
- * 为代码添加行号
- */
-function addLineNumbers(code: string): ReactNode {
-  const lines = code.split("\n");
-  
-  // 如果最后一行是空的（含仅空白），移除它
-  if (lines[lines.length - 1].trim() === "") {
-    lines.pop();
-  }
-  
-  return (
-    <div className="flex">
-      {/* 行号列 */}
-      <div 
-        className="select-none text-right pr-4 border-r border-slate-300 dark:border-border/30 text-slate-400 dark:text-muted-foreground/50 text-sm leading-6"
-        aria-hidden="true"
-      >
-        {lines.map((_, i) => (
-          <div key={i} className="h-6">
-            {i + 1}
-          </div>
-        ))}
-      </div>
-      
-      {/* 代码列 */}
-      <div className="flex-1 overflow-x-auto pl-4">
-        <code className="text-sm leading-6">
-          {lines.map((line, i) => (
-            <div key={i} className="h-6 whitespace-pre">
-              {line || "\u00A0"}
-            </div>
-          ))}
-        </code>
-      </div>
-    </div>
-  );
-}
-
 export function CodeBlock({ children }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   
@@ -110,12 +71,7 @@ export function CodeBlock({ children }: CodeBlockProps) {
       
       {/* 代码块内容 */}
       <pre className="bg-muted dark:bg-muted text-slate-800 dark:text-foreground border border-slate-200 dark:border-border p-4 pt-10 rounded-lg overflow-x-auto mt-4 mb-8 max-w-full text-sm relative">
-        {isValidElement(children) ? (
-          // 提取 code 元素的文本并添加行号
-          addLineNumbers(extractTextFromChildren(children))
-        ) : (
-          children
-        )}
+        {children}
       </pre>
     </div>
   );

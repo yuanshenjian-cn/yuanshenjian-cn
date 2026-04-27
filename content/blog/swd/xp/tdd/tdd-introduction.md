@@ -20,11 +20,11 @@ brief: >-
 
 场景1：袁帅开发了一个任务管理系统，他模拟用户的行为在界面输入正确的用户名和密码，点击登陆后能够登陆到系统的主界面，并看到自己的任务清单。
 
-![](/images/swd/xp/tdd/tdd-user-scenario.webp)
+![用户登录场景的手工功能测试示例](/images/swd/xp/tdd/tdd-user-scenario.webp)
 
 场景2，袁帅编写了一个统计字符的函数后，他会模拟调用者传入一个特定的字符串，看它执行后能否返回你预期的结果。
 
-![](/images/swd/xp/tdd/tdd-char-count.webp)
+![字符统计函数的代码级测试示例](/images/swd/xp/tdd/tdd-char-count.webp)
 
 在上述两个例子中，袁帅对自己开发的系统和函数提前进行测试，看看能否发现Bug。他心里很清楚，这么做就是想最大限度地确保软件交付给用户时功能是正确的 -- 小心驶得万年船。**交付高质量有价值的软件是他在Thoughtworks做程序员意义之一**。
 
@@ -53,7 +53,7 @@ brief: >-
 + 方式一：一种是减少新功能开发，大家都来做手工回归测试，这样才有可能完成，但项目进度会受到严重影响。
 + 方式二：另一种选择是新功能照常开发，留给回归测试的时间被挤压，而测试人员不得不把重点放在新功能上面，回归测试就会因为时间紧被简化甚至漏化了。简化的后果就是原来应该被回归的范围缩小，从而导致越来越多的缺陷被遗漏掉。
 
-![](/images/swd/xp/tdd/tdd-regression-cost.webp)
+![迭代增多后回归测试成本上升示意图](/images/swd/xp/tdd/tdd-regression-cost.webp)
 
 在大多数实际项目交付中，为了完成项目目标，袁帅见过很多团队选择了方式二，从此生产事故率开始上升，即便有幸没上生产，返工的频率也肉眼提高，而且返工的时机越晚，修复的成本大大提升。增加的修复成本，反噬了团队的宝贵资源，陷入恶性增长循环。
 
@@ -91,7 +91,7 @@ brief: >-
 
 ### 测试四象限
 
-![](/images/swd/xp/tdd/testing-quadrants.webp)
+![敏捷测试四象限图](/images/swd/xp/tdd/testing-quadrants.webp)
 
 敏捷测试四象限，分别从支撑团队和评价产品，面向技术和面向业务四个维度来划分不同的测试：
 
@@ -130,23 +130,23 @@ Q2中的测试站在更高的业务角度，把控软件的外部质量，更容
 
 就拿由Mike Cohn提出的经典测试金字塔，提倡了一种最佳测试平衡，平衡了发现问题和定位问题这两个关键因素。
 
-![](/images/swd/xp/tdd/test-pyramid.webp)
+![经典测试金字塔图](/images/swd/xp/tdd/test-pyramid.webp)
 
 ### 测试实例化
 
 为了更好地理解发现问题和定位问题的测试，袁帅编写了一个简单的Web Service。该Service提供了用户登录API。对于用户登录功能进行API功能测试时会模拟发起一个登录API请求，系统接收到请求后做一系列业务处理返回预期的结果。
 
-![](/images/swd/xp/tdd/tdd-api-service.webp)
+![用户登录 API 功能测试结构图](/images/swd/xp/tdd/tdd-api-service.webp)
 
 API功能测试很容易发现功能问题，但是当测试失败时，袁帅很快知道其功能上有问题，但不知道具体问题出在哪里。此时，袁帅进一步把Web Service打开，对内部的不同层和组件进行测试，有API 端口层的Controller组件，业务层Service组件，数据访问层的Repository组件。
 
-![](/images/swd/xp/tdd/tdd-components.webp)
+![Web Service 内部组件测试结构图](/images/swd/xp/tdd/tdd-components.webp)
 
 这类测试聚焦更细粒度的组件，更容易定位问题。配合着API功能测试，达到发现问题和定位问题的目的。
 
 在编写细粒度的代码组件测试时，SUT是不同层的组件，SUT的全称是System Under Test，即测试目标。通常它会存在一些依赖，即DOC，全称Depended-on Component。对应到刚才的例子，UserController的DOC是UserService，UserService的DOC是UserRepository，UserRepository的DOC是Database。
 
-![](/images/swd/xp/tdd/tdd-sut-doc.webp)
+![SUT 与 DOC 测试依赖关系图](/images/swd/xp/tdd/tdd-sut-doc.webp)
 
 对内部组件进行测试，需要使用Test Double来替换掉对应的DOC。关于Test Double，袁帅打算写单独的文章来聊聊。
 

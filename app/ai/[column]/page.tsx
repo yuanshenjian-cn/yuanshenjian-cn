@@ -10,6 +10,8 @@ interface Props {
   params: Promise<{ column: string }>;
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const columns = getAIColumns();
   return columns.map((col) => ({ column: col.slug }));

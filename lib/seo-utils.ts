@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { config } from "./config";
 import { Post } from "@/types/blog";
 
@@ -29,7 +30,7 @@ export function generateOpenGraph(
   return {
     title: post.title,
     description: enrichedDescription,
-    type: 'article',
+    type: 'article' as const,
     url: url,
     siteName: SITE_NAME,
     locale: config.site.locale,
@@ -41,14 +42,11 @@ export function generateOpenGraph(
         alt: post.title,
       },
     ],
-    // Article 特定属性
-    article: {
-      publishedTime: post.date,
-      modifiedTime: post.date,
-      authors: [config.author.name],
-      tags: post.tags,
-      section: post.category || '技术',
-    },
+    publishedTime: post.date,
+    modifiedTime: post.date,
+    authors: [config.author.name],
+    tags: post.tags,
+    section: post.category || '技术',
   };
 }
 
@@ -93,8 +91,9 @@ export function generateListPageSEO(
     image?: string;
     pageNumber?: number;
     totalPages?: number;
+    paginationPath?: (page: number) => string;
   }
-) {
+): Metadata {
   const pageTitle = options?.pageNumber && options.pageNumber > 1
     ? `${title} - 第 ${options.pageNumber} 页`
     : title;
@@ -104,6 +103,12 @@ export function generateListPageSEO(
     : `${pageTitle} | ${SITE_NAME}`;
 
   const ogImage = options?.image || DEFAULT_OG_IMAGE;
+  const resolvePageUrl = (page?: number) => {
+    if (!page || page <= 1) return url;
+    if (!options?.paginationPath) return `${url}?page=${page}`;
+    return new URL(options.paginationPath(page), config.site.url).toString();
+  };
+  const currentUrl = resolvePageUrl(options?.pageNumber);
 
   return {
     title: fullTitle,
@@ -112,7 +117,7 @@ export function generateListPageSEO(
       title: fullTitle,
       description,
       type: 'website',
-      url: options?.pageNumber ? `${url}?page=${options.pageNumber}` : url,
+      url: currentUrl,
       siteName: SITE_NAME,
       locale: config.site.locale,
       images: [{
@@ -128,15 +133,19 @@ export function generateListPageSEO(
       description: description.slice(0, 180),
       images: [ogImage],
     },
-    alternates: options?.totalPages ? {
-      canonical: options.pageNumber ? `${url}?page=${options.pageNumber}` : url,
-      prev: options.pageNumber && options.pageNumber > 1
-        ? (options.pageNumber === 2 ? url : `${url}?page=${options.pageNumber - 1}`)
-        : undefined,
-      next: options.pageNumber && options.totalPages && options.pageNumber < options.totalPages
-        ? `${url}?page=${options.pageNumber + 1}`
-        : undefined,
-    } : undefined,
+    alternates: {
+      canonical: currentUrl,
+      ...(options?.totalPages ? {
+        pagination: {
+          previous: options.pageNumber && options.pageNumber > 1
+            ? resolvePageUrl(options.pageNumber - 1)
+            : undefined,
+          next: options.pageNumber && options.totalPages && options.pageNumber < options.totalPages
+            ? resolvePageUrl(options.pageNumber + 1)
+            : undefined,
+        },
+      } : {}),
+    },
   };
 }
 

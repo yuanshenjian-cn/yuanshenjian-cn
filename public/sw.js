@@ -6,7 +6,10 @@
  * 3. 简单的缓存策略
  */
 
-const CACHE_NAME = 'ysj-blog-v1';
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `ysj-static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `ysj-runtime-${CACHE_VERSION}`;
+const MAX_RUNTIME_ENTRIES = 80;
 const STATIC_ASSETS = [
   '/',
   '/articles',
@@ -16,12 +19,20 @@ const STATIC_ASSETS = [
   '/favicon.ico',
 ];
 
+async function trimCache(cacheName, maxEntries) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length <= maxEntries) return;
+  await cache.delete(keys[0]);
+  await trimCache(cacheName, maxEntries);
+}
+
 // 安装时缓存核心资源
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing...');
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
         console.log('[SW] Caching static assets');
         return cache.addAll(STATIC_ASSETS);
@@ -43,7 +54,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => name !== STATIC_CACHE && name !== RUNTIME_CACHE)
           .map((name) => {
             console.log('[SW] Deleting old cache:', name);
             return caches.delete(name);
@@ -77,8 +88,9 @@ self.addEventListener('fetch', (event) => {
           fetch(request)
             .then((response) => {
               if (response.ok) {
-                caches.open(CACHE_NAME).then((cache) => {
-                  cache.put(request, response);
+                caches.open(RUNTIME_CACHE).then(async (cache) => {
+                  await cache.put(request, response);
+                  await trimCache(RUNTIME_CACHE, MAX_RUNTIME_ENTRIES);
                 });
               }
             })
@@ -100,8 +112,9 @@ self.addEventListener('fetch', (event) => {
               request.destination === 'font'
             )) {
               const responseClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, responseClone);
+              caches.open(RUNTIME_CACHE).then(async (cache) => {
+                await cache.put(request, responseClone);
+                await trimCache(RUNTIME_CACHE, MAX_RUNTIME_ENTRIES);
               });
             }
             

@@ -7,7 +7,7 @@ brief: >-
   Claude Code 的交互终端远不止"打字→回车"。六种权限模式、60+ 条内置命令、快捷键组合、上下文管理策略——掌握这些，你才算真正"住进"了 Claude Code。本文带你从权限模式、键盘操控、命令体系到上下文管理，逐层拆解 Claude Code 的交互全貌。
 ---
 
-> **系列导读**：本文是 Claude Code 系列第 4 篇。第 1 篇讲[迁移心智模型](/articles/2026/04/01/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/2026/04/02/claude-code-getting-started)，第 3 篇讲[日常工作流](/articles/2026/04/03/claude-code-common-workflows)。本篇将深入交互层——权限模式、命令体系与上下文管理，让你从"能用"进阶到"用得顺"。
+> **系列导读**：本文是 Claude Code 系列第 4 篇。第 1 篇讲[迁移心智模型](/articles/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/claude-code-getting-started)，第 3 篇讲[日常工作流](/articles/claude-code-common-workflows)。本篇将深入交互层——权限模式、命令体系与上下文管理，让你从"能用"进阶到"用得顺"。
 
 ---
 

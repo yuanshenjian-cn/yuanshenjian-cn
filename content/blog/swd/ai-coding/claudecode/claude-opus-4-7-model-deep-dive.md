@@ -427,7 +427,7 @@ Latent.Space 的标题说得精准：**"字面意义上每个维度都强一步"
 - [Anthropic 官方发布公告](https://www.anthropic.com/news/claude-opus-4-7)
 - [Claude Opus 4.7 System Card](https://anthropic.com/claude-opus-4-7-system-card)
 - [迁移指南：Opus 4.6 → 4.7](https://platform.claude.com/docs/en/about-claude/models/migration-guide#migrating-to-claude-opus-4-7)
-- [Claude Opus 4.7 模型配置](/articles/2026/04/17/claude-code-model-config)
+- [Claude Opus 4.7 模型配置](/articles/claude-code-model-config)
 - [Project Glasswing 与网络安全](https://www.anthropic.com/glasswing)
 - [Latent.Space：社区深度分析](https://www.latent.space/p/ainews-anthropic-claude-opus-47-literally)
 - [开发者 Benchmark 详解（Lushbinary）](https://lushbinary.com/blog/claude-opus-4-7-developer-guide-benchmarks-vision-migration/)

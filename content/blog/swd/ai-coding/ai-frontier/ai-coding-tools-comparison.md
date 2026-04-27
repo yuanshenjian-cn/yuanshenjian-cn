@@ -1,5 +1,5 @@
 ---
-title: "AI 编程工具选型指南：OpenCode、Claude Code 与 Codex 的深度对比"
+title: "OpenCode、Claude Code、Codex：AI 编程工具选型指南"
 date: '2026-04-26'
 tags:
   - AI前沿

@@ -21,10 +21,8 @@ let sharp;
 try {
   sharp = require('sharp');
 } catch (e) {
-  console.log('📦 正在安装 sharp 依赖...');
-  const { execSync } = require('child_process');
-  execSync('npm install sharp --save-dev', { stdio: 'inherit' });
-  sharp = require('sharp');
+  console.error('❌ sharp is required for image optimization. Run: npm install --save-dev sharp');
+  process.exit(1);
 }
 
 const QUALITY = 85;
@@ -118,8 +116,8 @@ async function cleanupOldVariants(dir) {
       if (entry.isDirectory()) {
         traverse(fullPath);
       } else if (entry.isFile()) {
-        // 删除 -400w, -800w, -1200w 结尾的 webp 文件
-        if (/\-(400|800|1200)w\.webp$/.test(entry.name)) {
+        // 只删除脚本生成的多尺寸 WebP 旧文件，避免误删源图。
+        if (/-\d+w\.webp$/.test(entry.name)) {
           fs.unlinkSync(fullPath);
           cleaned++;
           console.log(`   🗑️  清理旧文件: ${path.relative(INPUT_DIR, fullPath)}`);

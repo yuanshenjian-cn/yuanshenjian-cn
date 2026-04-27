@@ -29,7 +29,7 @@ CDCT强调契约由消费者来驱动，并由双方**共同遵守**，核心是
 
 消费者驱动契约测试中存在一个契约，双方基于契约生成可工作的测试套件：
 
-![image](/images/swd/xp/testing/cdct.webp)
+![消费者驱动契约测试流程图](/images/swd/xp/testing/cdct.webp)
 
 CDCT具备了`引入Contract概念集成测试`的诸多优点，并且通过可工作的测试套件保证了契约的一致性和实时性。
 
@@ -45,7 +45,7 @@ CDCT具备了`引入Contract概念集成测试`的诸多优点，并且通过可
 
 如果团队正在开发一个Springboot应用，[Spring cloud Contract](http://cloud.spring.io/spring-cloud-contract/spring-cloud-contract.html) 是一个不错的选择。它使用Groovy DSL定义测试契约并生成测试套件，测试套件去验证服务提供方是否满足契约，测试通过之后会生成一个jar文件，该jar文件随后会作为一个可运行的Stub server，消费方基于Stub server编写测试，从而验证功能是否满足契约：
 
-![image](/images/swd/xp/testing/spring-cloud-contract.webp)
+![Spring Cloud Contract 契约测试流程图](/images/swd/xp/testing/spring-cloud-contract.webp)
 
 在CDCT中，不管是测试生产者还是测试消费者，都需要引入一种快速失败方法。即如果任何一方违反了契约，最好在构建的第一分钟就失败，而不是等到2小时之后的集成测试中失败。所以，我们需要将CDCT作为构建Pipeline中的一个Stage集成到CI中。
 
@@ -69,11 +69,11 @@ Martin Fowller 在2012年的 [测试金字塔理论](https://martinfowler.com/bl
 
 微服务架构的盛行促使越来越多的开发团队开始引入CDCT，逐渐淡化UI测试。团队的测试策略正在发生不同的演变：
 
-![image](/images/swd/xp/testing/testpyamid-evolution.webp)
+![引入 CDCT 后的测试金字塔演进图](/images/swd/xp/testing/testpyamid-evolution.webp)
 
 引入了CDCT并摆出了正确的姿势，便可大大弱化UI测试，甚至可以使用少量的人工测试来代替自动化UI测试。CDCT帮助我们缓解了UI测试的痛点，但也要当心走极端，譬如有些团队的测试策略发生了下面的极端情况：
 
-![image](/images/swd/xp/testing/testpyramid-bad-evolution.webp)
+![过度弱化高层测试的反面测试金字塔](/images/swd/xp/testing/testpyramid-bad-evolution.webp)
 
 软件工程曾经从未产出银弹，相信未来也不会，一种新的方案的诞生只是解决了已有方案的痛点，好比微服务架构解决了单体的那些痛点之后，却又带来了足够的复杂性，从而对团队自身的能力提出了挑战。在选择测试策略的时候可以参考以下几条原则：
 
@@ -90,6 +90,5 @@ Martin Fowller 在2012年的 [测试金字塔理论](https://martinfowler.com/bl
 ## 写在最后
 
 微服务架构的复杂度不仅体现在技术上，与之相辅相成的是系统的业务架构，而技术架构总是服务于业务架构。优秀的测试策略和工程技术实践让我们更好地构建复杂的架构体系并克服它所带来的挑战，而最终决定一个系统成功与否在于人。所以，团队中每一个人应该保持Open的心态，持续学习，提升自己的高度（技能和业务），掌握实施微服务的相关技能，比如利用DDD去做服务的划分，从而能够更好的驾驭微服务架构。
-
 
 

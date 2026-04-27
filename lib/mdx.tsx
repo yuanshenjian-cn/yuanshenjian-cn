@@ -3,6 +3,7 @@ import matter from 'gray-matter';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
+import rehypePrismPlus from 'rehype-prism-plus';
 import GitHubSlugger from 'github-slugger';
 import { CodeBlock } from '@/components/code-block';
 
@@ -40,7 +41,13 @@ const mdxComponents: MDXComponents = {
   p: ({ children }: ElementProps) => <p className="my-4 leading-relaxed break-words">{children}</p>,
   img: ({ src, alt }: ImageProps) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className="max-w-full h-auto my-4 rounded-lg" />
+    <img
+      src={src}
+      alt={alt ?? ""}
+      loading="lazy"
+      decoding="async"
+      className="max-w-full h-auto my-4 rounded-lg"
+    />
   ),
   ul: ({ children }: ElementProps) => <ul className="list-disc list-outside pl-5 my-4 space-y-2">{children}</ul>,
   ol: ({ children }: ElementProps) => <ol className="list-decimal list-outside pl-5 my-4 space-y-2">{children}</ol>,
@@ -52,7 +59,11 @@ const mdxComponents: MDXComponents = {
     // pre 元素包裹的是代码块，提取 code 子元素传递给 CodeBlock
     return <CodeBlock>{children}</CodeBlock>;
   },
-  code: ({ children }: ElementProps) => {
+  code: ({ children, className }: ElementProps) => {
+    if (className?.startsWith("language-")) {
+      return <code className={className}>{children}</code>;
+    }
+
     // 行内代码 - 与代码块保持一致的背景色，不加粗
     return (
       <code className="bg-muted text-slate-800 dark:text-foreground px-1.5 py-0.5 rounded text-sm font-normal font-mono break-all">
@@ -90,6 +101,7 @@ export async function MDXContent({ source }: { source: string }) {
           remarkPlugins: [remarkGfm],
           rehypePlugins: [
             rehypeSlug, // 自动生成 id
+            [rehypePrismPlus, { ignoreMissing: true }],
           ],
         },
       }}

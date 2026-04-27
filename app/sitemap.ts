@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, getPaginatedPosts } from "@/lib/blog";
 import { getAIColumns } from "@/lib/columns";
 import { config } from "@/lib/config";
 
@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts();
   const columns = getAIColumns();
   const baseUrl = config.site.url;
+  const { totalPages } = getPaginatedPosts(1);
 
   const postUrls = posts.map((post) => ({
     url: `${baseUrl}/articles/${post.slug}`,
@@ -20,6 +21,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const columnUrls = columns.map((col) => ({
     url: `${baseUrl}/ai/${col.slug}`,
     lastModified: col.posts.length > 0 ? new Date(col.posts[col.posts.length - 1].date) : new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const paginationUrls = Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+    url: `${baseUrl}/articles/page/${index + 2}`,
+    lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
@@ -37,6 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    ...paginationUrls,
     {
       url: `${baseUrl}/ai`,
       lastModified: new Date(),
@@ -49,6 +58,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/resume`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
     ...postUrls,
   ];

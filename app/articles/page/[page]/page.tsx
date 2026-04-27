@@ -11,6 +11,8 @@ interface Props {
   params: Promise<{ page: string }>;
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const posts = getAllPosts();
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
@@ -33,7 +35,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "文章",
     "分享技术知识、生活感悟与个人想法",
     `${config.site.url}/articles`,
-    { pageNumber, totalPages },
+    {
+      pageNumber,
+      totalPages,
+      paginationPath: (page) => page === 1 ? "/articles" : `/articles/page/${page}`,
+    },
   );
 }
 

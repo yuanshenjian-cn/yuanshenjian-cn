@@ -7,7 +7,7 @@ brief: >-
   Claude Code 不只是问答机器人，而是一个能读文件、跑命令、改代码的代理式编码环境。本文通过六个真实开发场景，展示如何用 Claude Code 高效完成日常研发任务——从理解陌生代码到修 Bug、重构、写测试、提交 PR，直到一轮对话跑完完整闭环。
 ---
 
-> **系列导读**：本文是 Claude Code 系列第 3 篇。第 1 篇讲[迁移心智模型](/articles/2026/04/01/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/2026/04/02/claude-code-getting-started)。如果你已装好 Claude Code 并完成了第一个真实任务，本篇将带你走完日常研发的全部场景。
+> **系列导读**：本文是 Claude Code 系列第 3 篇。第 1 篇讲[迁移心智模型](/articles/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/claude-code-getting-started)。如果你已装好 Claude Code 并完成了第一个真实任务，本篇将带你走完日常研发的全部场景。
 
 ---
 
@@ -666,4 +666,4 @@ claude -n auth-refactor
 2. **管理上下文**——`/clear`、subagent、`/compact`，保持上下文窗口干净
 3. **及时纠偏**——`Esc` 中断、`/rewind` 回退、两次纠正后重新开始
 
-下一篇我们将深入 [Claude Code 的交互模式、内置命令与上下文管理](/articles/2026/04/04/claude-code-interactive-mode-and-built-in-commands)——掌握 Claude Code 的完整操作面板。
+下一篇我们将深入 [Claude Code 的交互模式、内置命令与上下文管理](/articles/claude-code-interactive-mode-and-built-in-commands)——掌握 Claude Code 的完整操作面板。

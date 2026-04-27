@@ -2,7 +2,7 @@
 
 基于 Next.js 15 构建的现代化个人博客，专注于 AI 软件开发、敏捷开发、测试驱动开发（TDD）、极限编程（XP）等技术知识分享。
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.6-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.15-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
@@ -13,7 +13,7 @@
 - **现代化设计**: 基于 Tailwind CSS 和 shadcn/ui 设计系统，支持明暗主题切换
 - **全局搜索**: 支持快捷键搜索（⌘K），快速找到目标文章
 - **评论系统**: 集成 Giscus 评论系统，基于 GitHub Discussions，支持 Markdown
-- **OG 图片**: 自动生成 Open Graph 分享卡片，支持自定义封面
+- **OG 图片**: 提供静态 Open Graph 默认分享卡片，支持文章级元数据
 - **响应式设计**: 完美适配桌面端和移动端
 - **代码高亮**: 使用 Prism Plus 实现语法高亮
 - **SEO 优化**: 自动生成 sitemap 和 robots.txt，支持 Open Graph 元数据
@@ -45,7 +45,6 @@
 
 ### 图标与图片
 - **lucide-react**: 现代化图标库
-- **@vercel/og**: Open Graph 图片动态生成
 - **qrcode.react**: 分享二维码生成
 - **sharp**: 图片处理与优化
 
@@ -67,7 +66,7 @@
 
 ### 环境要求
 
-- Node.js >= 20.x
+- Node.js >= 20.x < 21
 - npm >= 9.x
 
 ### 安装依赖
@@ -126,8 +125,11 @@ npm run build:prod
 ### 本地预览生产版本
 
 ```bash
+npm run build:prod
 npm run start
 ```
+
+`npm run start` 会用 `serve` 预览静态导出的 `dist/` 目录，不使用 `next start`。
 
 ## 项目结构
 
@@ -164,7 +166,7 @@ personal-blog/
 │   ├── mdx.tsx             # MDX 渲染
 │   ├── config.ts           # 站点配置
 │   └── utils.ts            # 工具函数
-├── content/blog/            # Markdown 文章内容（.md 文件）
+├── content/blog/            # Markdown/MDX 文章内容（.md / .mdx 文件）
 │   ├── swd/                 # 软件开发
 │   │   ├── agile/           # 敏捷开发
 │   │   ├── ai-coding/       # AI 编程（专栏）
@@ -273,16 +275,18 @@ const AI_COLUMNS: ColumnConfig[] = [
 
 ### 内容渲染配置
 
-内容渲染相关插件配置位于 `next.config.ts`：
+内容渲染相关插件配置位于 `lib/mdx.tsx`，由 `next-mdx-remote/rsc` 在渲染文章时执行：
 
 ```typescript
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: [remarkGfm],           // GitHub Flavored Markdown
-    rehypePlugins: [rehypeSlug, rehypePrismPlus],  // 自动生成标题 ID + 代码高亮
-  },
-  extension: /\.mdx?$/,
-});
+<MDXRemote
+  source={content}
+  options={{
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeSlug, rehypePrismPlus],
+    },
+  }}
+/>
 ```
 
 ## 文章编写规范
@@ -417,6 +421,7 @@ npm run test:coverage # 生成覆盖率报告
 | 脚本 | 说明 |
 |------|------|
 | `npm run optimize-images` | 批量优化图片（转换为 WebP，生成多种尺寸） |
+| `npm run validate-content` | 校验全仓文章 frontmatter、slug、旧内链和图片 alt |
 | `node scripts/check-images.js` | 检查文章中引用的图片是否存在 |
 
 ### 性能优化

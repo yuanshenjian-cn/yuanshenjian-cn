@@ -56,6 +56,7 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      panelRef.current?.focus();
     } else {
       document.body.style.overflow = "";
     }
@@ -63,6 +64,20 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleClose();
+        buttonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleClose]);
 
   const handleClick = (id: string, event: React.MouseEvent) => {
     event.preventDefault();
@@ -110,13 +125,17 @@ export function FloatingTocButton({ headings }: FloatingTocButtonProps) {
       {/* 左侧抽屉目录 */}
       <div
         ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mobile-toc-title"
+        tabIndex={-1}
         className={`lg:hidden fixed top-0 left-0 h-full w-64 bg-card border-r border-border shadow-2xl z-50 transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* 抽屉头部 */}
         <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-foreground">目录</h3>
+          <h3 id="mobile-toc-title" className="text-sm font-medium text-foreground">目录</h3>
           <button
             onClick={handleClose}
             className="p-1.5 hover:bg-muted rounded-md transition-colors"

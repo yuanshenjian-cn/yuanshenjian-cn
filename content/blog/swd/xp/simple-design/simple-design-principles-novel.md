@@ -68,7 +68,7 @@ brief: >-
 
 
 {/* 这是一张图片，ocr 内容为：高 通过测试 消除重复 揭示意图 最少元素 低 */}
-![](/images/swd/xp/simple-design/simple-design-pyramid.webp)
+![简单设计四条原则的优先级金字塔](/images/swd/xp/simple-design/simple-design-pyramid.webp)
 
 
 

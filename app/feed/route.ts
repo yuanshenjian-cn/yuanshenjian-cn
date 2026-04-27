@@ -2,7 +2,6 @@ import { getAllPosts } from "@/lib/blog";
 import { config } from "@/lib/config";
 
 export const dynamic = "force-static";
-export const revalidate = 3600;
 
 export async function GET() {
   const posts = getAllPosts();

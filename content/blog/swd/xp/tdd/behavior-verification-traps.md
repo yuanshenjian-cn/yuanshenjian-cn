@@ -12,11 +12,11 @@ brief: >-
 
 上周五，清扬和袁帅在探讨进程内测试验证时，先是写了进程内行为验证和状态验证的测试，最后写了触及进程边界的行为验证，测试类图如下：
 
-![](/images/swd/xp/tdd/jdbc-behavior-verification.webp)
+![JDBC 行为验证测试结构图](/images/swd/xp/tdd/jdbc-behavior-verification.webp)
 
 周一清晨，一大早来到公司，清扬就把新的测试类图展示在屏幕上，等待袁帅的到来：
 
-![](/images/swd/xp/tdd/h2-state-verification.webp)
+![使用 H2 数据库进行跨进程状态验证的结构图](/images/swd/xp/tdd/h2-state-verification.webp)
 
 "我回去想了想，`jdbcTemplateMock`按照预期执行update方法，没法证明就一定能保存到数据库中。因为，如果SQL语句哪个字段名或者表名写错了，或者语法存在错误，这个行为验证是是没办法发现的问题的，" 见袁帅到来，清扬轻快地说着自己的理解。
 

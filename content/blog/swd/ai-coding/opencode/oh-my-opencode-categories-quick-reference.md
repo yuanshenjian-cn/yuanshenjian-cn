@@ -673,4 +673,4 @@ Oh My OpenCode 的 Categories 系统是一个强大的**任务分类和资源配
 - [oh-my-openagent 仓库](https://github.com/code-yeongyu/oh-my-openagent)
 - [oh-my-openagent 文档目录](https://github.com/code-yeongyu/oh-my-openagent/tree/dev/docs)
 - [Configuration Reference](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/configurations.md)
-- [Oh My OpenCode Agent 速查手册](/blog/swd/ai-coding/opencode/oh-my-opencode-agents-quick-reference)
+- [Oh My OpenCode Agent 速查手册](/articles/oh-my-opencode-agents-quick-reference)

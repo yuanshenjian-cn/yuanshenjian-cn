@@ -14,13 +14,13 @@ brief: >-
 
 下班后，他快速修改了`CIMonitor`，示意清扬过来讨论。功能是：构建失败后给提交人发邮件，类图如下：
 
-![](/images/swd/xp/tdd/email-publisher-arch.webp)
+![CI Monitor 邮件通知架构图](/images/swd/xp/tdd/email-publisher-arch.webp)
 
 在此场景中，`CIMonitor`会调用`EmailPublisher`，`EmailPublisher`会调用进程边界交互组件`JavaMailSender`（Spring mail提供的类库）来发送邮件到邮件服务器，邮件服务器会给指定邮箱的人发通知邮件。程序正常执行后的最终状态是：提交人收到的通知邮件。
 
 在测试中，要获得最终数据状态，需要搭建一个可以发邮件的服务器，在测试执行后去验证指定邮箱的提交人是否收到邮件通知。
 
-![](/images/swd/xp/tdd/greenmail-server.webp)
+![使用 GreenMail 搭建 Fake Mail Server 的验证结构图](/images/swd/xp/tdd/greenmail-server.webp)
 
 基于这种验证方式，测试时需要安装一个Fake Mail Server，该 Server 具备实际可用发送邮件的功能，且保存了成功发送出去的邮件记录，通过接口可以获得已成功发送邮件的邮件信息，即便如此，也是退而求其次的选择，因为几乎无法从接收者那里获得接收到的邮件信息。
 
@@ -80,7 +80,7 @@ class CIMonitorTest {
 
 "在测试初始化阶段，我安装了一个轻量的JavaEmailServer，使用`mailServer.getReceivedMessages()`获得服务器接收到的邮件信息，来验证要发送的邮件成功传送到邮件服务器上，至于能不能发送给用户，这不是我关心的事儿。" 清扬流畅地讲解自己的逻辑。
 
-![](/images/swd/xp/tdd/cross-process-behavior.webp)
+![跨进程行为验证捕获邮件发送数据的结构图](/images/swd/xp/tdd/cross-process-behavior.webp)
 
 "真漂亮啊，用了「**跨进程行为验证**」，你搭建了一个轻量的 Spy Server，该 Spy Server 会记录系统发送的邮件信息，为后续验证提供查询接口。测试能够提供跟第三方邮件服务成功交互的信心。" 袁帅略带钦佩地总结着。
 

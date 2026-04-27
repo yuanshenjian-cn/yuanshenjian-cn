@@ -18,7 +18,7 @@ brief: "三个端到端蓝图串联 Claude Code 全部扩展机制——本地 C
 | **蓝图二** | GitHub CI/CD 无人值守流水线 | Hooks + 程序化运行 + GitHub Actions |
 | **蓝图三** | 跨端 Channels 协作 | Channels + MCP + Agent Teams |
 
-> **前置阅读**：本篇假设你已阅读[第七篇](/articles/2026/04/07/claude-code-extension-model-overview)，熟悉六大扩展机制的基本概念。
+> **前置阅读**：本篇假设你已阅读[第七篇](/articles/claude-code-extension-model-overview)，熟悉六大扩展机制的基本概念。
 
 ---
 

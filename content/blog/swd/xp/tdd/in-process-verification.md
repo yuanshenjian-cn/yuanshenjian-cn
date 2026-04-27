@@ -39,7 +39,7 @@ class ShoppingCartTest {
 
 "不错，继续！待测试场景：GraduateParkingBoy停车成功，车停到停车场...."袁帅还没讲完，清扬就打断："咳，这个我知道，不用介绍太多，这个需求我太熟悉了，就单刀直入吧。"
 
-![](/images/swd/xp/tdd/parking-boy-state.webp)
+![停车男孩状态验证类图](/images/swd/xp/tdd/parking-boy-state.webp)
 
 ```java
 class GraduateParkingBoyTest {
@@ -87,13 +87,13 @@ void should_park_to_first_parking_lot_with_behavior_verification() {
 
 "很好，这个测试借助测试框架Mockito来配置一个Mock Object，当然还有其他方式做 **「行为验证」。**"袁帅见清扬突然很感兴趣想打断，立即抢先："后面聊测试替身的时候咱们再一起探索其他做「**行为验证**」的方式。"
 
-![](/images/swd/xp/tdd/parking-boy-behavior.webp)
+![停车男孩行为验证类图](/images/swd/xp/tdd/parking-boy-behavior.webp)
 
 ## 触及进程边界
 
 "够简单对吧，整一个稍微复杂的场景，给你加点难度，我把写好的测试代码特意删除了，你来用两种方式实现一下。" 袁帅边说边打开了类图：
 
-![](/images/swd/xp/tdd/ci-monitor-arch.webp)
+![CI Monitor 与数据库日志服务架构图](/images/swd/xp/tdd/ci-monitor-arch.webp)
 
 "要测试一个CIMonitor的构建失败方法，当构建失败时，会调用CIFailedLogService将日志写到数据库中，这里面涉及到跨进程协作，进程边界的 `JdbcTemplate`组件会负责跟数据库进程通信。"
 
@@ -159,7 +159,7 @@ void should_log_with_mock_behavior_verification() {
 
 袁帅看出来清扬试图将 `CIMonitor`和 `CIFailedLogServiceJdbcImpl`俩当做一个黑盒来测试，使用测试替身 `jdbcTemplateMock`代替 `JdbcTemplate`，注入到 `CIFailedLogServiceJdbcImpl`，然后验证 `jdbcTemplateMock`是否按照预期执行了SQL语句，典型的 「**行为验证**」，测试类图如下：
 
-![](/images/swd/xp/tdd/jdbc-mock-verification.webp)
+![JDBC Mock 行为验证结构图](/images/swd/xp/tdd/jdbc-mock-verification.webp)
 
 "所以，你认为 `jdbcTemplateMock`执行了这个SQL语句（**因：更新操作**），就能推断出会将这条记录保存到数据库中咯（**果：表记录**）？"袁帅问道。
 

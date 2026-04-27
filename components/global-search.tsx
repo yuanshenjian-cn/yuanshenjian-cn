@@ -15,6 +15,8 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const router = useRouter();
 
   const filteredPosts = posts.filter(
@@ -33,10 +35,20 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
     setSelectedIndex(0);
   }, []);
 
+  const handleOpen = useCallback(() => {
+    previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setIsOpen(true);
+  }, []);
+
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
       setSelectedIndex(0);
+    }
+
+    if (!isOpen) {
+      previouslyFocusedRef.current?.focus();
+      previouslyFocusedRef.current = null;
     }
   }, [isOpen]);
 
@@ -49,7 +61,25 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
       if (!isOpen) {
         if ((e.metaKey || e.ctrlKey) && e.key === "k") {
           e.preventDefault();
-          setIsOpen(true);
+          handleOpen();
+        }
+        return;
+      }
+
+      if (e.key === "Tab") {
+        const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusableElements || focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
         }
         return;
       }
@@ -86,12 +116,12 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, displayPosts, selectedIndex, hasMore, router, handleClose]);
+  }, [isOpen, displayPosts, selectedIndex, hasMore, router, handleClose, handleOpen]);
 
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 rounded-md hover:text-foreground transition-colors"
         aria-label="打开搜索"
       >
@@ -114,7 +144,7 @@ export function GlobalSearch({ posts }: GlobalSearchProps) {
             }
           }}
         >
-          <div className="w-full max-w-lg bg-card border rounded-lg shadow-lg overflow-hidden">
+          <div ref={dialogRef} className="w-full max-w-lg bg-card border rounded-lg shadow-lg overflow-hidden">
             <div className="border-b relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
               <input

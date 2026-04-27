@@ -121,4 +121,4 @@ Code Review 本身没什么高大上的，自己写的代码，找其他人Revie
 
 # 注释
 1. 戴维斯双击，当一个公司利润持续增长使得每股收益提高，同时市场给予的估值也提高，股价得到了相乘倍数的上涨。即，公司业绩和市场预期同时加持推动股价快速上涨。
-2. KR环，Kick off ~ Review环，启动和检查的沟通闭环，在[_远离无效的知识管理_](/articles/2025/02/02/avoid-ineffective-knowledge-management)一文中有介绍。
+2. KR环，Kick off ~ Review环，启动和检查的沟通闭环，在[_远离无效的知识管理_](/articles/avoid-ineffective-knowledge-management)一文中有介绍。

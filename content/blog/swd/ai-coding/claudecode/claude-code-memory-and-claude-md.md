@@ -7,7 +7,7 @@ brief: >-
   Claude Code 每次启动都是一张白纸——除非你给它"记忆"。CLAUDE.md 是你写给 Claude 的操作手册，Rules 是模块化的规则引擎，Auto Memory 是 Claude 自己的笔记本。三者配合，让 Claude 不再每次都从零开始。本文详解三套记忆系统的机制、写法与实战模式。
 ---
 
-> **系列导读**：本文是 Claude Code 系列第 5 篇。第 1 篇讲[迁移心智模型](/articles/2026/04/01/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/2026/04/02/claude-code-getting-started)，第 3 篇讲[日常工作流](/articles/2026/04/03/claude-code-common-workflows)，第 4 篇讲[交互模式与内置命令](/articles/2026/04/04/claude-code-interactive-mode-and-built-in-commands)。本篇深入 Claude Code 的"记忆层"——让 Claude 在每次会话中都知道你的项目规范、团队约定和历史经验。
+> **系列导读**：本文是 Claude Code 系列第 5 篇。第 1 篇讲[迁移心智模型](/articles/opencode-to-claude-code-getting-oriented)，第 2 篇讲[安装与上手](/articles/claude-code-getting-started)，第 3 篇讲[日常工作流](/articles/claude-code-common-workflows)，第 4 篇讲[交互模式与内置命令](/articles/claude-code-interactive-mode-and-built-in-commands)。本篇深入 Claude Code 的"记忆层"——让 Claude 在每次会话中都知道你的项目规范、团队约定和历史经验。
 
 ---
 
@@ -672,4 +672,4 @@ paths:
 
 记忆层是 Claude Code 从"聊天工具"进化为"团队成员"的关键。它让 Claude 不再每次从零开始，而是带着你的项目知识、团队规范和历史经验进入每次会话。
 
-**下一篇**，我们将深入 Claude Code 的[设置系统与权限模型](/articles/2026/04/06/claude-code-settings-and-permissions)——四层配置作用域、精细化权限规则、Auto Mode 的安全分类器，以及如何在安全与效率之间找到最佳平衡点。
+**下一篇**，我们将深入 Claude Code 的[设置系统与权限模型](/articles/claude-code-settings-and-permissions)——四层配置作用域、精细化权限规则、Auto Mode 的安全分类器，以及如何在安全与效率之间找到最佳平衡点。

@@ -138,34 +138,34 @@ export function ArticlesContent({
         ) : (
           paginatedPosts.map((post) => (
             <article key={post.slug}>
-              <Link 
-                href={`/articles/${post.slug}`} 
-                className="group block rounded-lg py-4 px-4 -mx-4 transition-colors hover:bg-muted/50"
-              >
-                <h2 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors">
-                  {post.title}
-                </h2>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    <time dateTime={post.date}>
-                      {new Date(post.date).toLocaleDateString("zh-CN")}
-                    </time>
-                  </span>
-                  <span>·</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {post.readingTime} 分钟
-                  </span>
-                </div>
-                <p className="text-muted-foreground leading-relaxed mb-3">
-                  {post.excerpt}
-                </p>
+              <div className="group rounded-lg py-4 px-4 -mx-4 transition-colors hover:bg-muted/50">
+                <Link href={`/articles/${post.slug}`} className="block">
+                  <h2 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors">
+                    {post.title}
+                  </h2>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <time dateTime={post.date}>
+                        {new Date(post.date).toLocaleDateString("zh-CN")}
+                      </time>
+                    </span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {post.readingTime} 分钟
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed mb-3">
+                    {post.excerpt}
+                  </p>
+                </Link>
                 {post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.map((t) => (
-                      <span
+                      <button
                         key={t}
+                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -176,13 +176,14 @@ export function ArticlesContent({
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted hover:bg-primary hover:text-primary-foreground"
                         }`}
+                        aria-pressed={t === selectedTag}
                       >
                         {t}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 )}
-              </Link>
+              </div>
             </article>
           ))
         )}

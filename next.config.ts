@@ -1,7 +1,4 @@
 import type { NextConfig } from "next";
-import createMDX from '@next/mdx';
-import remarkGfm from 'remark-gfm';
-import rehypePrismPlus from 'rehype-prism-plus';
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -10,7 +7,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // 优化打包配置
   webpack: (config, { isServer }) => {
     // 优化 chunk 分割
@@ -53,12 +49,4 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
 };
 
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypePrismPlus],
-  },
-  extension: /\.mdx?$/,
-});
-
-export default withMDX(nextConfig);
+export default nextConfig;
