@@ -152,7 +152,7 @@ task(subagent_type="oracle", load_skills=[], prompt="我需要对我的 [任务]
 | 需要调整计划         | `task(task_id="{返回的task_id}", load_skills=[], prompt="请调整：<反馈>")`        |
 | 计划需要更多细节     | `task(task_id="{返回的task_id}", load_skills=[], prompt="为任务 N 添加更多细节")` |
 
-**为什么 `task_id` 至关重要：**
+**为什么 `task_id` 很关键：**
 
 计划代理保留**完整的**对话上下文
 

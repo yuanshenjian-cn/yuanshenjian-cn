@@ -666,8 +666,6 @@ Oh My OpenCode 的 Categories 系统是一个强大的**任务分类和资源配
 
 **记住**：先吃内置默认值，只有当你明确想改路由时再覆写。
 
----
-
 ## 参考资料
 
 - [oh-my-openagent 仓库](https://github.com/code-yeongyu/oh-my-openagent)
