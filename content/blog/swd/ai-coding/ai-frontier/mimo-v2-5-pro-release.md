@@ -53,7 +53,7 @@ MiMo V2.5 Pro 最值得关注的数据点不是某个单一的 SOTA 分数，而
 | GPT-5.4 | $2.50 | $15 |
 | Gemini 3.1 Pro | $2 | $12 |
 
-<small>*MiMo 定价来自此前 OpenRouter 测试阶段数据，官方博客表示"no change in pricing"；竞品定价来自各厂商官方公告。</small>
+<small>*MiMo 定价来自 Xiaomi MiMo API Platform 官方定价（≤256K 上下文）；竞品定价来自各厂商官方公告。</small>
 
 MiMo V2.5 Pro 的定价本身就比所有主流旗舰低一个数量级，如果再叠加 40-60% 的 token 节省，实际单次 Agent 任务的成本可能只有 Claude Opus 4.7 的 **1/10 到 1/20**。
 
@@ -129,7 +129,7 @@ MiMo V2.5 Pro 的架构创新主要体现在两个层面。
 | 上下文窗口 | 1M | 1M | 1M | 1M |
 | 开源 | **是** | 否 | 否 | 否 |
 
-<small>*Agent 效率数据：ClawEval 评测，小米官方，2026-04-27。MiMo 定价来自此前 OpenRouter 测试阶段数据，官方博客表示"no change in pricing"；竞品定价来自各厂商官方公告。</small>
+<small>*Agent 效率数据：ClawEval 评测，小米官方，2026-04-27。MiMo 定价来自 Xiaomi MiMo API Platform 官方定价（≤256K 上下文）；竞品定价来自各厂商官方公告。</small>
 
 ## 局限与边界
 
@@ -137,7 +137,7 @@ MiMo V2.5 Pro 的架构创新主要体现在两个层面。
 
 **通用推理与顶尖旗舰仍有差距**：GPQA Diamond 66.7% 虽然已经是不错的成绩，但与 Opus 4.7（94.2%）和 GPT-5.4（92.8%）相比仍有明显距离。MMLU-Pro 68.5% 也低于 Gemini 3.1 Pro 的 73.5%。如果你的核心场景是科研级别的科学推导或需要顶尖通用知识储备的问答，MiMo V2.5 Pro 可能不是首选——但它在数学（MATH 86.2%）和编程上的优势已经足以覆盖大多数工程场景。
 
-**生态成熟度**：Claude Code、OpenAI Assistants API、Google Vertex AI 都有成熟的开发者工具链和企业级服务。MiMo V2.5 Pro 目前主要通过 OpenRouter 提供 API 接入，自建部署需要较强的工程能力。
+**生态成熟度**：Claude Code、OpenAI Assistants API、Google Vertex AI 都有成熟的开发者工具链和企业级服务。MiMo V2.5 Pro 目前可通过 Xiaomi MiMo API Platform（platform.xiaomimimo.com）获取官方 API 接入，同时提供 Token Plan 订阅套餐；模型已在 Hugging Face 和 ModelScope 开源完整权重，但自建部署需要大规模 GPU 集群支持（官方 SGLang 示例需 32 张 GPU），基础设施门槛较高。
 
 **采样参数敏感**：Hugging Face 模型卡片特别提醒，本地部署时推荐 `temperature=1.0`、`top_p=0.95`。这意味着模型对采样参数较为敏感，过低的 temperature 可能导致输出质量下降——这与一些经过大量 RLHF 对齐的模型不同，后者通常在更低 temperature 下也能保持稳定性。实际部署时需要针对具体场景做参数调优。
 
