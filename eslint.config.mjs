@@ -14,6 +14,7 @@ export default defineConfig([
   {
     ignores: [
       ".next/**",
+      "blog-ai-worker/**",
       "dist/**",
       "dist_bak/**",
       "node_modules/**",

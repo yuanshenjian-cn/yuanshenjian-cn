@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:prod": "npm run optimize-images && next build",
+    "build:ai-data": "node scripts/build-ai-data.js",
+    "build": "npm run build:ai-data && next build",
+    "build:prod": "npm run optimize-images && npm run build",
     "start": "serve dist",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

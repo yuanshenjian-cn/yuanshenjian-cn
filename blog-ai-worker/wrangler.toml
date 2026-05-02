@@ -1,0 +1,17 @@
+name = "blog-ai-worker"
+main = "src/index.ts"
+compatibility_date = "2026-05-02"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
+RATE_LIMIT_WINDOW_SECONDS = "3600"
+RATE_LIMIT_MAX_REQUESTS = "10"
+AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
+
+[[routes]]
+pattern = "yuanshenjian.cn/api/ai/*"
+zone_name = "yuanshenjian.cn"

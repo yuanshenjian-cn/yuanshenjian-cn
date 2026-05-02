@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight, Calendar } from "lucide-react";
+import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
 import { getAllPosts } from "@/lib/blog";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
-import { ArrowRight, Calendar } from "lucide-react";
 
 export const metadata: Metadata = generateListPageSEO(
   config.site.name,
@@ -62,6 +63,12 @@ export default function Home() {
         {/* 底部渐变过渡 */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
+
+      <AiRecommendWidget
+        enabled={config.ai.enabled}
+        workerUrl={config.ai.workerUrl}
+        turnstileSiteKey={config.ai.turnstileSiteKey}
+      />
 
       {/* Latest Posts */}
       {recentPosts.length > 0 && (

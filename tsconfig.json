@@ -36,6 +36,8 @@
     "dist/types/**/*.ts"
   ],
   "exclude": [
+    "blog-ai-worker",
+    "blog-ai-worker/**",
     "node_modules",
     "tests",
     "vitest.config.ts",

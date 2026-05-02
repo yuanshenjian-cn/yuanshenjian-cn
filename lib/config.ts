@@ -28,6 +28,11 @@ export const config = {
     category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY || "General",
     categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || "DIC_kwDORINV5s4C19yc",
   },
+  ai: {
+    enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
+    workerUrl: process.env.NEXT_PUBLIC_AI_WORKER_URL || "/api/ai",
+    turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+  },
 } as const;
 
 export const POSTS_PER_PAGE = config.posts.perPage;
