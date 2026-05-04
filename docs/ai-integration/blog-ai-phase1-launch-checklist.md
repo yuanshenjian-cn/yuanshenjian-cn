@@ -5,7 +5,7 @@
 > 本清单默认：
 > - 博客主站继续部署到 GitHub Pages
 > - AI 接口通过 Cloudflare Worker 提供
-> - 当前只接入 **腾讯 TokenHub**
+> - 当前可通过已配置 profile 接入不同 LLM provider
 > - 当前**不包含** MiMo、文章页问答、专栏问答、搜索增强
 
 ---
@@ -14,7 +14,7 @@
 
 - [ ] 本次只上线 **Phase 1：首页 AI 推荐**
 - [ ] 本次 **不需要** 配置 MiMo
-- [ ] 本次 Worker **只走腾讯 TokenHub**
+- [ ] 本次 Worker 已选择并部署目标 LLM profile
 - [ ] 本次 AI 入口只出现在 **首页**
 
 ---
@@ -99,7 +99,7 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```bash
 cp llm-profiles.example.jsonc llm-profiles.local.jsonc
 npm run llm:list
-npm run llm:use -- tencent-tokenhub/glm-5.1
+npm run llm:use -- deepseek/deepseek-v4-pro
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
@@ -108,12 +108,12 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 #### `llm-profiles.local.jsonc`
 
 - [ ] 已从 `llm-profiles.example.jsonc` 复制生成 `llm-profiles.local.jsonc`
-- [ ] `tencent-tokenhub.baseUrl` 填：`https://tokenhub.tencentmaas.com/v1`
-- [ ] `tencent-tokenhub.baseUrl` 不要包含 `/chat/completions`
-- [ ] `tencent-tokenhub.apiKey` 填你腾讯 TokenHub 的真实 API Key
-- [ ] `models.glm-5.1.modelId` 填真实模型 ID，例如 `glm-5.1`
+- [ ] `deepseek.baseUrl` 填：`https://api.deepseek.com/v1`
+- [ ] `deepseek.baseUrl` 不要包含 `/chat/completions`
+- [ ] `deepseek.apiKey` 填你 DeepSeek 的真实 API Key
+- [ ] `models.deepseek-v4-pro.modelId` 填真实模型 ID，例如 `deepseek-v4-pro`
 - [ ] `blog-ai-worker/llm-profiles.local.jsonc` 不会提交到 git
-- [ ] `blog-ai-worker/.llm-active-profile` 已由 `npm run llm:use -- tencent-tokenhub/glm-5.1` 正确写入
+- [ ] `blog-ai-worker/.llm-active-profile` 已由 `npm run llm:use -- deepseek/deepseek-v4-pro` 正确写入
 
 #### `TURNSTILE_SECRET_KEY`
 
@@ -362,4 +362,4 @@ npm run llm:deploy
 - [ ] 用户可正常提交问题
 - [ ] Worker 成功返回推荐结果
 - [ ] 推荐文章链接能正确跳转
-- [ ] 前端构建产物中不包含腾讯 TokenHub API Key 或 Turnstile Secret Key
+- [ ] 前端构建产物中不包含 LLM API Key 或 Turnstile Secret Key

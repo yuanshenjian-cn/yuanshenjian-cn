@@ -95,7 +95,7 @@ https://yuanshenjian.cn/ai-data/index.json
 - [ ] 或 Turnstile `siteverify` 是否暂时不可用
 
 ### 返回 500 / 502
-- [ ] 优先排查 Worker secrets / vars / KV / 腾讯 TokenHub base URL
+- [ ] 优先排查 Worker secrets / vars / KV / 当前 LLM provider base URL
 - [ ] 同时检查 `https://yuanshenjian.cn/ai-data/index.json` 是否可访问
 
 ---

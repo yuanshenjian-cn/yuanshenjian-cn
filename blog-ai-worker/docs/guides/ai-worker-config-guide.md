@@ -182,12 +182,14 @@ npm run llm:deploy -- moonshot-cn/kimi-k2.6
 
 当前实现参考文件：
 
-- `blog-ai-worker/src/providers/tencent-tokenhub.ts`
+- `blog-ai-worker/src/providers/openai-compatible.ts`
+- `blog-ai-worker/src/providers/deepseek.ts`
+- `blog-ai-worker/src/providers/moonshot-cn.ts`
 - `blog-ai-worker/src/providers/index.ts`
 
 推荐步骤：
 
-1. 复制 `tencent-tokenhub.ts` 为新的 provider 文件
+1. 参考现有 provider 文件创建新的 provider 文件
 2. 按新厂商的请求/响应格式修改 `chat()` 逻辑
 3. 在 `providers/index.ts` 中按 `env.LLM_PROVIDER_NAME` 增加分支
 4. 再把对应 provider 写入 `llm-profiles.local.jsonc`

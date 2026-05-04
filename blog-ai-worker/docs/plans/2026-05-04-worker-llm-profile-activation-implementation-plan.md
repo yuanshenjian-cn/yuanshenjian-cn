@@ -112,7 +112,7 @@ Template requirements:
 ```text
 1. 使用 JSONC
 2. 包含 version 字段
-3. 至少给出一个 tencent-tokenhub provider 示例
+3. 至少给出一个 deepseek provider 示例
 4. 同一 provider 下包含多个 model 示例
 5. 不包含真实 key
 ```
@@ -273,7 +273,7 @@ Rules:
 
 ```text
 1. createProvider() 按 env.LLM_PROVIDER_NAME 选择 provider
-2. 当前至少支持 tencent-tokenhub
+2. 当前至少支持 deepseek
 3. provider 名不支持时立即失败
 ```
 
@@ -338,7 +338,7 @@ Expected:
 Test cases:
 
 ```text
-1. createProvider() 在 tencent-tokenhub 下返回正确 provider
+1. createProvider() 在 deepseek 下返回正确 provider
 2. unknown provider 抛出清晰错误
 3. recommend 场景使用 env.LLM_MODEL_ID
 4. index.ts 在 LLM_PROVIDER_NAME / LLM_MODEL_ID / LLM_PROVIDER_API_KEY / LLM_PROVIDER_BASE_URL 缺失时尽早报错

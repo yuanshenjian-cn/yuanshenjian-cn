@@ -70,7 +70,7 @@ npm run llm:deploy
 如果你想在部署时顺便切换目标 profile，也可以直接：
 
 ```bash
-npm run llm:deploy -- tencent-tokenhub/glm-5.1
+npm run llm:deploy -- deepseek/deepseek-v4-pro
 ```
 
 ### 如何确认修复生效

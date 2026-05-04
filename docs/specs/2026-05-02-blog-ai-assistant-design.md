@@ -402,22 +402,22 @@ function createProvider(env: Env, providerName: string, model: string): LLMProvi
 ```json
 {
   "article": {
-    "provider": "tencent-tokenhub",
+    "provider": "deepseek",
     "model": "deepseek-v4-pro",
     "maxTokens": 800,
     "temperature": 0.3,
     "systemPromptKey": "article_qa"
   },
   "column": {
-    "provider": "tencent-tokenhub",
-    "model": "kimi-k2.6",
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
     "maxTokens": 600,
     "temperature": 0.5,
     "systemPromptKey": "column_intro"
   },
   "recommend": {
-    "provider": "tencent-tokenhub",
-    "model": "glm-5.1",
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
     "maxTokens": 400,
     "temperature": 0.7,
     "systemPromptKey": "recommend"
