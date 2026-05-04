@@ -33,12 +33,12 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 max-w-2xl mx-auto px-6 text-center w-full py-16">
           {/* 主标题 */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-6 text-foreground">
             记录思考，分享成长
           </h1>
 
           {/* 副标题 */}
-          <p className="text-base md:text-lg text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
             技术实践 · 敏捷方法 · 生活随笔
           </p>
 
