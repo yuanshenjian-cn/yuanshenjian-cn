@@ -171,7 +171,6 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInp
 
     setIsSubmitting(true);
     setError(null);
-    setResponse(null);
 
     try {
       const turnstileToken = await getTurnstileToken();
