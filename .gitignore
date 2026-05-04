@@ -48,6 +48,7 @@ Thumbs.db
 tmp/
 
 /drafts
+.debug/
 
 # AI Tools
 .serena/
