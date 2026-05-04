@@ -771,3 +771,39 @@ AI_EMERGENCY_DISABLE = "true"
 3. 回归运行：
    - `npm run test -- tests/blog-ai-worker/index-runtime-config.test.ts tests/blog-ai-worker/article-scene.test.ts tests/lib/ai-client.test.ts`
    - `npm --prefix blog-ai-worker run typecheck`
+
+---
+
+## 2026-05-05 页面级 AI 回答直接展示 Markdown 语法
+
+### 现象
+
+- 文章页 / 作者页的页面级 AI 回答里会直接出现 Markdown 标记
+- 例如 `**加粗**`、有序列表 `1.`、行内代码等不是按富文本展示，而是原样输出
+- 首页 AI 推荐不受影响，因为它本来只展示纯文本摘要
+
+### 根因
+
+`components/ai/ai-page-assistant.tsx` 里此前直接用普通文本节点渲染：
+
+1. `currentAnswer` 被放进 `<p className="whitespace-pre-wrap ...">`
+2. 这样只能保留换行，不能解析 Markdown
+3. 流式 SSE 拿到的最终回答虽然是 Markdown 文本，但前端没有做 Markdown 渲染
+
+### 修复
+
+将页面级 AI 回答改为 Markdown 渲染：
+
+1. 新增 `react-markdown`
+2. 复用现有 `remark-gfm`，支持列表、加粗、链接等常见 Markdown
+3. 只在页面级 AI 回答区域启用，不影响首页 AI 推荐
+4. 为回答区补了轻量级 Markdown 组件样式，保持与现有页面风格一致
+
+### 如何确认修复生效
+
+1. 触发文章页或作者页 AI 回答
+2. 确认 `**重点**` 会显示为加粗，而不是星号原样输出
+3. 确认 `1. 第一条` 会显示成真正的列表项
+4. 回归运行：
+   - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/lib/ai-client.test.ts`
+   - `npm run typecheck`

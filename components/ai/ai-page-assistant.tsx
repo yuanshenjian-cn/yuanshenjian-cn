@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { usePageAIAssistant } from "@/components/ai/page-ai-assistant-provider";
 import type { AIQuickTopic } from "@/types/ai";
@@ -14,6 +16,25 @@ interface AiPageAssistantProps {
   title: string;
   variant?: "primary" | "footer";
 }
+
+const answerMarkdownComponents = {
+  p: ({ children }: { children?: ReactNode }) => <p className="my-3 break-words leading-7">{children}</p>,
+  ul: ({ children }: { children?: ReactNode }) => <ul className="my-4 list-disc space-y-2 pl-5">{children}</ul>,
+  ol: ({ children }: { children?: ReactNode }) => <ol className="my-4 list-decimal space-y-2 pl-5">{children}</ol>,
+  li: ({ children }: { children?: ReactNode }) => <li className="my-1 break-words pl-1">{children}</li>,
+  strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  a: ({ children, href }: { children?: ReactNode; href?: string }) => (
+    <a href={href} className="break-all text-primary hover:underline">
+      {children}
+    </a>
+  ),
+  code: ({ children }: { children?: ReactNode }) => (
+    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground">{children}</code>
+  ),
+  pre: ({ children }: { children?: ReactNode }) => (
+    <pre className="my-4 overflow-x-auto rounded-xl bg-muted p-4 text-sm text-foreground">{children}</pre>
+  ),
+} as const;
 
 export function AiPageAssistant({
   description,
@@ -34,7 +55,7 @@ export function AiPageAssistant({
     submitMessage,
   } = usePageAIAssistant();
 
-  const canSubmit = message.trim().length > 0;
+  const canSubmit = message.trim().length > 0 && !isStreaming;
   const shouldShowResult = variant === "primary" && (isStreaming || currentAnswer || currentError || currentReferences.length > 0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -98,9 +119,9 @@ export function AiPageAssistant({
           <button
             type="submit"
             disabled={!canSubmit}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:hover:bg-muted"
           >
-            {isStreaming ? "整理中..." : "问 AI"}
+            {isStreaming ? "思考中..." : "问 AI"}
           </button>
         </div>
       </form>
@@ -113,7 +134,11 @@ export function AiPageAssistant({
               <p className="text-sm font-medium text-foreground">AI 回答</p>
             </div>
             {currentAnswer ? (
-              <p className="whitespace-pre-wrap text-sm leading-7 text-muted-foreground">{currentAnswer}</p>
+              <div className="text-sm text-muted-foreground">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={answerMarkdownComponents}>
+                  {currentAnswer}
+                </ReactMarkdown>
+              </div>
             ) : isStreaming ? (
               <p className="text-sm text-muted-foreground">AI 正在整理当前页面内容...</p>
             ) : null}
