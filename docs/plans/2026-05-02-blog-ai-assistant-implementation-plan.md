@@ -46,7 +46,7 @@
 - Create: `blog-ai-worker/src/index.ts` — Worker 入口
 - Create: `blog-ai-worker/src/types.ts` — Env 与请求/响应类型
 - Create: `blog-ai-worker/src/providers/types.ts` — Provider 接口
-- Create: `blog-ai-worker/src/providers/tokenhub.ts` — TokenHub provider
+- Create: `blog-ai-worker/src/providers/tencent-tokenhub.ts` — Tencent TokenHub provider
 - Create: `blog-ai-worker/src/providers/index.ts` — Provider 工厂
 - Create: `blog-ai-worker/src/middleware/turnstile.ts` — Turnstile 验证
 - Create: `blog-ai-worker/src/middleware/rate-limit.ts` — KV 固定窗口限流
@@ -63,7 +63,7 @@
 ### Phase 1（本次实现）
 
 - [x] `blog-ai-worker/` 子项目落地
-- [x] TokenHub provider 可用
+- [x] Tencent TokenHub provider 可用
 - [x] MiMo 仅保留文档扩展位，不进入 Phase 1 运行时实现
 - [x] Turnstile 校验接入
 - [x] Workers KV 固定窗口限流接入
@@ -429,11 +429,11 @@ Expected:
 
 ---
 
-### Task 5: Implement Worker middleware and TokenHub provider
+### Task 5: Implement Worker middleware and Tencent TokenHub provider
 
 **Files:**
 - Create: `blog-ai-worker/src/providers/types.ts`
-- Create: `blog-ai-worker/src/providers/tokenhub.ts`
+- Create: `blog-ai-worker/src/providers/tencent-tokenhub.ts`
 - Create: `blog-ai-worker/src/providers/index.ts`
 - Create: `blog-ai-worker/src/middleware/turnstile.ts`
 - Create: `blog-ai-worker/src/middleware/rate-limit.ts`
@@ -476,7 +476,7 @@ Behavior:
 3. 返回 Retry-After 头
 ```
 
-- [ ] **Step 4: Implement TokenHub provider**
+- [ ] **Step 4: Implement Tencent TokenHub provider**
 
 Payload shape:
 
@@ -501,7 +501,7 @@ usage.completion_tokens
 
 - [ ] **Step 5: Keep MiMo out of Phase 1 runtime path**
 
-Phase 1 不实现 `mimo.ts`，只在设计与后续计划中保留扩展位。`providers/index.ts` 先只注册 TokenHub，避免把非必需复杂度混入首发代码。
+Phase 1 不实现 `mimo.ts`，只在设计与后续计划中保留扩展位。`providers/index.ts` 先只注册 Tencent TokenHub，避免把非必需复杂度混入首发代码。
 
 ---
 

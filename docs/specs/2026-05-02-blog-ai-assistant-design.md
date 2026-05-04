@@ -291,14 +291,14 @@ interface LLMProvider {
 TokenHub 完全兼容 OpenAI `/v1/chat/completions`，适配器实现简单：
 
 ```typescript
-// worker/src/providers/tokenhub.ts
+// worker/src/providers/tencent-tokenhub.ts
 
-class TokenHubProvider implements LLMProvider {
-  name = "tokenhub";
+class TencentTokenHubProvider implements LLMProvider {
+  name = "tencent-tokenhub";
 
   constructor(
     private apiKey: string,
-    private baseUrl: string,  // 如 https://api.tokenhub.xxx/v1
+    private baseUrl: string,  // 如 https://tokenhub.tencentmaas.com/v1
     private model: string,
   ) {}
 
@@ -358,8 +358,8 @@ class MiMoProvider implements LLMProvider {
 
 function createProvider(env: Env, providerName: string, model: string): LLMProvider {
   switch (providerName) {
-    case "tokenhub":
-      return new TokenHubProvider(env.LLM_PROVIDER_API_KEY, env.LLM_PROVIDER_BASE_URL, model);
+    case "tencent-tokenhub":
+      return new TencentTokenHubProvider(env.LLM_PROVIDER_API_KEY, env.LLM_PROVIDER_BASE_URL, model);
     case "mimo":
       return new MiMoProvider(env.MIMO_API_KEY, env.MIMO_BASE_URL, model); // [MiMo-TBD]
     default:
@@ -387,21 +387,21 @@ function createProvider(env: Env, providerName: string, model: string): LLMProvi
 ```json
 {
   "article": {
-    "provider": "tokenhub",
+    "provider": "tencent-tokenhub",
     "model": "deepseek-v4-pro",
     "maxTokens": 800,
     "temperature": 0.3,
     "systemPromptKey": "article_qa"
   },
   "column": {
-    "provider": "tokenhub",
+    "provider": "tencent-tokenhub",
     "model": "kimi-k2.6",
     "maxTokens": 600,
     "temperature": 0.5,
     "systemPromptKey": "column_intro"
   },
   "recommend": {
-    "provider": "tokenhub",
+    "provider": "tencent-tokenhub",
     "model": "glm-5.1",
     "maxTokens": 400,
     "temperature": 0.7,
@@ -863,7 +863,7 @@ blog-ai-worker/
     router.ts             # handleAIRequest，串联各模块
     providers/
       types.ts            # LLMProvider 接口定义
-      tokenhub.ts         # TokenHub 适配器
+      tencent-tokenhub.ts # 腾讯 TokenHub 适配器
       mimo.ts             # MiMo 适配器（[MiMo-TBD]）
       index.ts            # createProvider 工厂函数
     middleware/

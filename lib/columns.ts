@@ -140,6 +140,31 @@ const AI_COLUMNS: ColumnConfig[] = [
       ],
     },
   },
+  {
+    slug: "deepseek",
+    title: "DeepSeek",
+    description:
+      "围绕 DeepSeek 模型与终端原生 Agent 工具展开的实战专栏，覆盖 V4 系列模型评测、TUI 工具上手、与主流 AI 编码工具的差异化场景。",
+    contentDir: "swd/ai-coding/deepseek",
+    guide: {
+      intro:
+        "DeepSeek V4 把前沿推理能力压到 Claude Sonnet 1/20 的价格区间，配套的 DeepSeek-TUI 让这套低成本模型直接进入终端工作流。本专栏聚焦“怎么把 DeepSeek 用到生产里”，而不是停留在跑分。",
+      paths: [
+        {
+          label: "想了解 DeepSeek-TUI",
+          description: "从工具调研篇切入，理解它和 Claude Code、Codex 的差异",
+        },
+        {
+          label: "评估接入成本",
+          description: "结合 V4 模型与 TUI 的成本追踪机制做总成本估算",
+        },
+        {
+          label: "已有其他 AI 编码工具",
+          description: "对比沙盒、Skills、MCP 兼容性，决定是并存还是替换",
+        },
+      ],
+    },
+  },
 ];
 
 /**

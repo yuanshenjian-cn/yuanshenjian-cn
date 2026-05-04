@@ -5,7 +5,7 @@
 > 本清单默认：
 > - 博客主站继续部署到 GitHub Pages
 > - AI 接口通过 Cloudflare Worker 提供
-> - 当前只接入 **TokenHub**
+> - 当前只接入 **腾讯 TokenHub**
 > - 当前**不包含** MiMo、文章页问答、专栏问答、搜索增强
 
 ---
@@ -14,7 +14,7 @@
 
 - [ ] 本次只上线 **Phase 1：首页 AI 推荐**
 - [ ] 本次 **不需要** 配置 MiMo
-- [ ] 本次 Worker **只走 TokenHub**
+- [ ] 本次 Worker **只走腾讯 TokenHub**
 - [ ] 本次 AI 入口只出现在 **首页**
 
 ---
@@ -324,4 +324,4 @@ npx wrangler deploy
 - [ ] 用户可正常提交问题
 - [ ] Worker 成功返回推荐结果
 - [ ] 推荐文章链接能正确跳转
-- [ ] 前端构建产物中不包含 TokenHub API Key 或 Turnstile Secret Key
+- [ ] 前端构建产物中不包含腾讯 TokenHub API Key 或 Turnstile Secret Key

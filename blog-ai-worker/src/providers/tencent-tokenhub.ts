@@ -5,32 +5,60 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function extractTextFromContentParts(content: unknown): string | null {
-  if (!Array.isArray(content)) {
-    return null;
-  }
-
-  const textParts = content
-    .map((part) => {
-      if (!isRecord(part)) {
-        return null;
-      }
-
-      if (typeof part.text === "string") {
-        return part.text;
-      }
-
-      if (part.type === "text" && typeof part.content === "string") {
-        return part.content;
-      }
-
-      return null;
-    })
-    .filter((part): part is string => Boolean(part))
+function normalizeTextParts(parts: string[]): string | null {
+  const text = parts
+    .map((part) => part.trim())
+    .filter(Boolean)
     .join("\n")
     .trim();
 
-  return textParts || null;
+  return text || null;
+}
+
+function extractTextParts(value: unknown): string[] {
+  if (typeof value === "string") {
+    return value.trim() ? [value] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => extractTextParts(item));
+  }
+
+  if (!isRecord(value)) {
+    return [];
+  }
+
+  const textCandidates: string[] = [];
+
+  if (typeof value.text === "string") {
+    textCandidates.push(value.text);
+  }
+
+  if (typeof value.content === "string") {
+    textCandidates.push(value.content);
+  }
+
+  if (typeof value.output_text === "string") {
+    textCandidates.push(value.output_text);
+  }
+
+  if (typeof value.outputText === "string") {
+    textCandidates.push(value.outputText);
+  }
+
+  if (Array.isArray(value.content) || isRecord(value.content)) {
+    textCandidates.push(...extractTextParts(value.content));
+  }
+
+  if (Array.isArray(value.parts) || isRecord(value.parts)) {
+    textCandidates.push(...extractTextParts(value.parts));
+  }
+
+  if (Array.isArray(value.items) || isRecord(value.items)) {
+    textCandidates.push(...extractTextParts(value.items));
+  }
+
+  return textCandidates;
 }
 
 function getProviderErrorMessage(payload: unknown): string | null {
@@ -46,20 +74,37 @@ function getProviderErrorMessage(payload: unknown): string | null {
 }
 
 function getContent(payload: unknown): string | null {
-  if (!isRecord(payload) || !Array.isArray(payload.choices)) {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if (typeof payload.output_text === "string") {
+    return payload.output_text.trim() || null;
+  }
+
+  const outputText = normalizeTextParts(extractTextParts(payload.output));
+  if (outputText) {
+    return outputText;
+  }
+
+  if (!Array.isArray(payload.choices)) {
     return null;
   }
 
   const firstChoice = payload.choices[0];
-  if (!isRecord(firstChoice) || !isRecord(firstChoice.message)) {
+  if (!isRecord(firstChoice)) {
     return null;
   }
 
-  if (typeof firstChoice.message.content === "string") {
-    return firstChoice.message.content;
+  if (typeof firstChoice.text === "string") {
+    return firstChoice.text.trim() || null;
   }
 
-  return extractTextFromContentParts(firstChoice.message.content);
+  if (!isRecord(firstChoice.message)) {
+    return null;
+  }
+
+  return normalizeTextParts(extractTextParts(firstChoice.message.content));
 }
 
 function getUsage(payload: unknown): ChatResponse["usage"] {
@@ -82,8 +127,8 @@ function getUsage(payload: unknown): ChatResponse["usage"] {
   };
 }
 
-export class TokenHubProvider implements LLMProvider {
-  name = "tokenhub";
+export class TencentTokenHubProvider implements LLMProvider {
+  name = "tencent-tokenhub";
 
   constructor(
     private readonly apiKey: string,
@@ -109,12 +154,12 @@ export class TokenHubProvider implements LLMProvider {
 
     const payload: unknown = await response.json().catch(() => null);
     if (!response.ok) {
-      throw new HttpError(502, getProviderErrorMessage(payload) ?? "TokenHub request failed");
+      throw new HttpError(502, getProviderErrorMessage(payload) ?? "Tencent TokenHub request failed");
     }
 
     const content = getContent(payload);
     if (!content) {
-      throw new HttpError(502, "TokenHub returned empty content");
+      throw new HttpError(502, "Tencent TokenHub returned empty content");
     }
 
     return {

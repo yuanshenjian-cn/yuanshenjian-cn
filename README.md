@@ -21,6 +21,7 @@
 - **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
 - **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
 - **测试覆盖**: 使用 Vitest + Testing Library 进行单元测试
+- **首页 AI 推荐**: 首页支持基于站内已发布文章的主题推荐，由 Cloudflare Worker 承接请求并做人机校验、限流与推荐兜底
 
 ## 技术栈
 
@@ -62,6 +63,12 @@
 - **github-slugger**: 生成 URL 友好的 slug
 - **husky**: Git hooks
 
+### AI 推荐基础设施
+- **Cloudflare Workers**: 承接 `/api/ai/chat` 请求
+- **Cloudflare Turnstile**: 人机校验
+- **Workers KV**: 固定窗口限流
+- **OpenAI-compatible LLM provider**: 当前通过腾讯 TokenHub 接入
+
 ## 快速开始
 
 ### 环境要求
@@ -100,7 +107,17 @@ NEXT_PUBLIC_GISCUS_REPO=yourusername/blog-comments
 NEXT_PUBLIC_GISCUS_REPO_ID=R_kgDxxxxxxxx
 NEXT_PUBLIC_GISCUS_CATEGORY=General
 NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_kwDxxxxxxxx
+
+# 首页 AI 推荐（可选）
+NEXT_PUBLIC_AI_ENABLED=true
+NEXT_PUBLIC_AI_WORKER_URL=https://yuanshenjian.cn/api/ai
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
 ```
+
+> 注意：
+>
+> - `NEXT_PUBLIC_AI_WORKER_URL` 和 `NEXT_PUBLIC_TURNSTILE_SITE_KEY` 会注入前端，可以放 GitHub Variables / `.env.local`
+> - LLM API Key、Turnstile Secret Key 只能放在 Cloudflare Worker secrets，不能进前端
 
 ### 启动开发服务器
 
@@ -193,6 +210,7 @@ personal-blog/
 │   ├── screenshots/         # PWA 截图
 │   ├── images/              # 文章配图
 │   ├── docs/                # 文档资源（简历 PDF）
+│   ├── ai-data/             # 首页 AI 推荐静态索引
 │   ├── sw.js                # Service Worker
 │   └── manifest.json        # PWA 配置
 ├── types/                   # TypeScript 类型定义
@@ -202,6 +220,7 @@ personal-blog/
 │   └── pwa/                 # PWA 相关脚本
 ├── .github/workflows/       # GitHub Actions
 │   └── deploy.yml           # 自动部署配置
+├── blog-ai-worker/          # Cloudflare Worker（AI 推荐后端）
 ├── tailwind.config.ts       # Tailwind 配置
 ├── tsconfig.json            # TypeScript 配置
 ├── next.config.ts           # Next.js 配置
@@ -365,6 +384,43 @@ brief: 文章摘要，用于列表展示和 SEO
 
 部署配置位于 `.github/workflows/deploy.yml`。
 
+### 首页 AI 推荐 / Cloudflare Worker 部署
+
+首页 AI 推荐不是直接在前端请求模型，而是通过 `blog-ai-worker/` 目录下的 Cloudflare Worker 统一处理：
+
+- Turnstile 校验
+- 请求限流
+- 读取 `public/ai-data/index.json`
+- 调用 LLM provider
+- 在上游模型不稳定时回退为站内确定性推荐
+
+#### 本地检查
+
+```bash
+npm run build:ai-data
+npm --prefix blog-ai-worker run typecheck
+```
+
+#### 部署 Worker
+
+```bash
+cd blog-ai-worker
+npm run deploy
+```
+
+更详细的配置项说明、限流调优和防滥用止损建议见：
+
+- `docs/guides/ai-worker-config-guide.md`
+
+> 重要：根目录的 GitHub Pages workflow **不会自动部署** `blog-ai-worker/`。
+>
+> 也就是说：
+>
+> - 推送 `main` 会自动部署静态站点
+> - **但不会自动发布 Worker 新代码**
+>
+> 如果你修改了 `blog-ai-worker/`，必须单独执行一次 `npm run deploy`，否则线上 `/api/ai/chat` 仍然跑旧逻辑。
+
 ### 自定义域名
 
 1. 在项目根目录创建 `CNAME` 文件，写入域名：
@@ -381,12 +437,41 @@ brief: 文章摘要，用于列表展示和 SEO
 | 变量名 | 说明 |
 |--------|------|
 | `NEXT_PUBLIC_SITE_URL` | 站点 URL，如 `https://yuanshenjian.cn` |
+| `NEXT_PUBLIC_AI_ENABLED` | 是否启用首页 AI 推荐 |
+| `NEXT_PUBLIC_AI_WORKER_URL` | AI Worker 地址，如 `https://yuanshenjian.cn/api/ai` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile Site Key |
 | `NEXT_PUBLIC_GISCUS_REPO` | GitHub 仓库，格式 `username/repo` |
 | `NEXT_PUBLIC_GISCUS_REPO_ID` | 仓库 ID（从 Giscus 配置获取） |
 | `NEXT_PUBLIC_GISCUS_CATEGORY` | 讨论分类名称，如 `General` |
 | `NEXT_PUBLIC_GISCUS_CATEGORY_ID` | 分类 ID（从 Giscus 配置获取） |
 
 **注意**: 这些配置为 GitHub Variables（而非 Secrets），因为需要在构建时注入到客户端代码中。
+
+Cloudflare Worker 侧还需要额外配置：
+
+### Worker vars / secrets
+
+`blog-ai-worker/wrangler.toml` 中使用了以下运行时配置：
+
+- `AI_DATA_BASE_URL`
+- `ALLOWED_ORIGINS`
+- `RATE_LIMIT_WINDOW_SECONDS`
+- `RATE_LIMIT_MAX_REQUESTS`
+
+同时需要在 Worker secrets 中设置：
+
+- `LLM_PROVIDER_API_KEY`
+- `LLM_PROVIDER_BASE_URL`
+- `TURNSTILE_SECRET_KEY`
+
+设置示例：
+
+```bash
+cd blog-ai-worker
+npx wrangler secret put LLM_PROVIDER_API_KEY
+npx wrangler secret put LLM_PROVIDER_BASE_URL
+npx wrangler secret put TURNSTILE_SECRET_KEY
+```
 
 ## 开发规范
 

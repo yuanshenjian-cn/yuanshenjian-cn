@@ -89,7 +89,7 @@ https://yuanshenjian.cn/ai-data/index.json
 - [ ] 说明限流已触发，等待后重试
 
 ### 返回 500
-- [ ] 优先排查 Worker secrets / vars / KV / TokenHub base URL
+- [ ] 优先排查 Worker secrets / vars / KV / 腾讯 TokenHub base URL
 
 ---
 

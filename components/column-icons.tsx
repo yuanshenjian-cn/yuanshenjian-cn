@@ -89,6 +89,32 @@ export function CodexIcon(props: IconProps) {
   );
 }
 
+export function DeepSeekIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* 跃起的鲸鱼身躯 */}
+      <path d="M3 14c1.5-3 4-5 7.5-5 3 0 5 1.5 6 3 0.7 1 1.7 1.5 2.7 1.5h1.8" />
+      {/* 鲸鱼尾鳍 */}
+      <path d="M3 14c-0.6 0.4-1 1.1-1 1.9 1.1-0.2 2-0.6 2.7-1.2" />
+      {/* 鲸鱼眼睛 */}
+      <circle cx="16" cy="11" r="0.6" fill="currentColor" stroke="none" />
+      {/* 鲸鱼喷水 */}
+      <path d="M14 8c0-1 0.5-2 1.5-2.5" />
+      {/* 海浪 */}
+      <path d="M2 19c1.5-1 3 1 4.5 0s3 1 4.5 0 3 1 4.5 0 3 1 4.5 0" />
+    </svg>
+  );
+}
+
 export function getColumnIconBySlug(
   slug: string,
 ): React.ComponentType<IconProps> | null {
@@ -101,6 +127,8 @@ export function getColumnIconBySlug(
       return OpenCodeIcon;
     case "codex":
       return CodexIcon;
+    case "deepseek":
+      return DeepSeekIcon;
     default:
       return null;
   }

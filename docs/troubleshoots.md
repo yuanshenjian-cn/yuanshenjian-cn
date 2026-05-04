@@ -182,12 +182,12 @@ size: "invisible"
 
 否则即使请求体中可能最终带上 `cf_turnstile_response`，页面端也会出现大量 Turnstile 异常，导致提交流程卡住或表现不稳定。
 
-### 本次衍生问题：Worker 返回 `TokenHub returned empty content`
+### 本次衍生问题：Worker 返回 `Tencent TokenHub returned empty content`
 
 如果 Turnstile 已通过，但 `/api/ai/chat` 返回：
 
 ```json
-{"error":"TokenHub returned empty content"}
+{"error":"Tencent TokenHub returned empty content"}
 ```
 
 说明问题已经从前端验证码阶段进入到了 provider 解析阶段。
@@ -200,9 +200,157 @@ size: "invisible"
 
 修复方式：
 
-- 在 `blog-ai-worker/src/providers/tokenhub.ts` 中同时兼容：
+- 在 `blog-ai-worker/src/providers/tencent-tokenhub.ts` 中同时兼容：
   - `message.content: string`
   - `message.content: Array<{ text?: string }>`
   - `message.content: Array<{ type: "text", content: string }>`
 
 原则：优先把 provider 的差异吸收在 Provider 层，不把这种解析差异泄漏到场景层或前端。
+
+### 本次衍生问题：Provider 已兼容后仍然 `empty content`，真实根因是 `reasoning_content` 吃光了输出预算
+
+如果已经完成 provider 解析兼容、也确认最新 Worker 已部署，但首页 AI 推荐仍然间歇性返回：
+
+```json
+{"error":"Tencent TokenHub returned empty content"}
+```
+
+并且这次错误不是稳定必现，而是有时 502、有时又能返回结果，那么要继续看 Worker 实际拿到的上游响应结构。
+
+#### 现象
+
+- 浏览器端仍可能看到 `/api/ai/chat` 返回 502
+- Playwright / 手工测试里，页面有时卡在“推荐中...”，随后变成错误提示
+- 即使 `message.content` 已支持字符串与数组两种格式，依然可能没有最终可用答案
+
+#### 如何定位
+
+在 `blog-ai-worker/` 目录使用 `wrangler tail` 抓线上日志，确认这类关键字段：
+
+- `finish_reason`
+- `message.content`
+- `message.reasoning_content`
+
+本次线上真实数据表现为：
+
+- `finish_reason = "length"`
+- `message.content = ""`（空字符串）
+- `reasoning_content` 很长，说明模型把输出预算主要消耗在思考过程上
+
+也就是说，问题已经不是“解析不到内容”，而是**模型根本没有在预算内产出最终回答**。
+
+#### 根因
+
+这次根因有两个叠加：
+
+1. `recommend` 场景给 `glm-5.1` 的上下文过大，早期实现一次性塞入过多文章摘要
+2. 用户查询词提取过于粗糙，像 `AI` 这样的泛词会把大量并不直接相关的文章一起带进 prompt
+
+最终导致模型把 token 花在 `reasoning_content` 上，而不是最终 JSON 答案。
+
+#### 正确修复
+
+不要把 `reasoning_content` 直接透传给前端。
+
+更稳妥的修法是：
+
+1. **缩小推荐上下文**
+   - `blog-ai-worker/src/scenes/recommend.ts`
+   - 将送给模型的候选文章数从大批量缩到更小范围（本次收敛到 8 篇）
+
+2. **先做本地主题预筛**
+   - 对用户 query 做中文归一化和停用词剔除
+   - 优先按 `tags`、`title`、`excerpt` 做简单打分
+   - 只把更相关的文章送给模型
+
+3. **为 provider 5xx / empty content 增加确定性兜底**
+   - 如果上游仍因 `reasoning_content` 过长而不给最终答案
+   - Worker 直接基于已筛好的站内文章返回一版稳定推荐
+   - 这样首页 AI 推荐至少能返回 `answer + references`，不会把 502 暴露给用户
+
+#### 如何确认修复生效
+
+1. 先手动部署 Worker（见下方补充说明）
+2. 打开首页，输入：
+
+```text
+推荐几篇关于 AI 编程的文章
+```
+
+3. 期望结果：
+   - 页面出现 `AI 回答`
+   - 页面出现 1~3 篇推荐文章
+   - `/api/ai/chat` 最终能返回 200（即使上游模型偶发不稳定，也能由 Worker 兜底）
+
+#### 补充说明：根仓库的 GitHub Pages workflow 不会自动部署 Worker
+
+这次排查中还有一个很容易忽略的坑：
+
+- `.github/workflows/deploy.yml` 只部署 GitHub Pages 静态站点
+- **不会自动部署 `blog-ai-worker/`**
+
+所以如果你改了 `blog-ai-worker/` 代码，但没有额外执行：
+
+```bash
+cd blog-ai-worker
+npm run deploy
+```
+
+那么线上 `/api/ai/chat` 仍然会继续跑旧逻辑。
+
+以后遇到“本地代码已经修了，但线上行为完全没变”，优先先确认 Worker 是否已经单独部署，而不是继续怀疑前端缓存或 parser 逻辑。
+
+---
+
+## 2026-05-04 新增 AI 专栏后 `columns.test.ts` 失败，根因是测试把“非专栏文章”写死成旧目录集合
+
+### 现象
+
+提交时 pre-commit hook 运行测试失败，类似报错：
+
+```text
+FAIL tests/lib/columns.test.ts > Columns Module > getColumnContextByPost > should return null for a post not in any column
+expected { ... } to be null
+```
+
+实际返回的上下文来自新加的专栏（本次是 `deepseek`）。
+
+### 根因
+
+测试里原本通过硬编码目录前缀来寻找“非专栏文章”：
+
+- `swd/ai-coding/claudecode/`
+- `swd/ai-coding/opencode/`
+- `swd/ai-coding/ai-frontier/`
+- `swd/ai-coding/codex/`
+
+这个假设默认 AI 专栏只有上述几类。
+
+当新增 `deepseek` 之类的新专栏后，测试仍然可能把 AI 专栏文章误当成“非专栏文章”，从而导致断言失效。
+
+### 正确修复
+
+不要继续在测试里硬编码“已有专栏目录白名单”。
+
+更稳妥的写法是直接找：
+
+```ts
+const nonColumnPost = allPosts.find((p) => !p.relativePath.startsWith("swd/ai-coding/"));
+```
+
+这样测试语义会变成：
+
+- 只要文章不在 AI 专栏总目录下
+- 就应该返回 `null`
+
+新增 `claudecode` / `opencode` / `deepseek` / 未来更多 AI 专栏时，都不需要继续维护这条测试。
+
+### 补充说明
+
+如果后续继续新增 AI 专栏：
+
+1. 更新 `lib/columns.ts`
+2. 更新 `components/column-icons.tsx`
+3. 同步检查测试是否仍依赖旧的目录白名单或固定专栏数量假设
+
+原则：**测试应验证“分类规则”，不要验证一组容易过期的目录枚举。**

@@ -21,11 +21,12 @@ describe("Columns Module", () => {
       });
     });
 
-    it("should include claudecode and opencode columns", () => {
+    it("should include core AI columns", () => {
       const columns = getAIColumns();
       const slugs = columns.map((c) => c.slug);
       expect(slugs).toContain("claudecode");
       expect(slugs).toContain("opencode");
+      expect(slugs).toContain("deepseek");
     });
 
     it("should have required fields on each column", () => {
@@ -79,14 +80,8 @@ describe("Columns Module", () => {
 
     it("should return null for a post not in any column", () => {
       const allPosts = getAllPosts();
-      // 找一篇不在 AI 专栏中的文章
-      const nonColumnPost = allPosts.find(
-        (p) =>
-          !p.relativePath.startsWith("swd/ai-coding/claudecode/") &&
-          !p.relativePath.startsWith("swd/ai-coding/opencode/") &&
-          !p.relativePath.startsWith("swd/ai-coding/ai-frontier/") &&
-          !p.relativePath.startsWith("swd/ai-coding/codex/"),
-      );
+      // 找一篇不在任何 AI 专栏目录下的文章，避免新增专栏时测试假设过期
+      const nonColumnPost = allPosts.find((p) => !p.relativePath.startsWith("swd/ai-coding/"));
       if (!nonColumnPost) return;
 
       const context = getColumnContextByPost(nonColumnPost);

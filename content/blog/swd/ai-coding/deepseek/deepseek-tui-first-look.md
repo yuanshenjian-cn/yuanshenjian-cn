@@ -1,0 +1,154 @@
+---
+title: "DeepSeek 也有 TUI 了：一份认真的工具调研"
+date: '2026-05-04'
+tags:
+  - AI 编程
+  - DeepSeek
+  - 工具评测
+  - LLM
+published: true
+brief: >-
+  DeepSeek-TUI 是社区开发者 Hayden Brown 维护的 Rust 终端 Agent，围绕 DeepSeek V4 的 1M 上下文与缓存计费做了原生封装：思考流、RLM 并行子模型、跨工具 Skills 兼容、MCP、HTTP/SSE 全部塞进一个无 runtime 的二进制里。它不是 DeepSeek 官方产品，但目前是把 V4 的极端低价直接接到终端工作流的最完整选项。
+---
+
+> DeepSeek-TUI 把 DeepSeek V4 的 1M 上下文、思考流和 75% 折扣价，按 Claude Code/Codex 那一档的工程标准重新封装了一遍。它不是官方出品，社区项目最近在 GitHub 单日涨过五百多颗星，v0.8.7 也是这两天才发布的。值得拿出来认真读一遍源代码与文档，再决定要不要加进自己的工具栈。
+
+先把一个最容易被搞混的事实说在前面：DeepSeek-TUI 不是 DeepSeek 公司的官方产品。它的作者是独立开发者 Hayden Brown，仓库地址 [Hmbown/DeepSeek-TUI](https://github.com/Hmbown/DeepSeek-TUI)，MIT 协议，README 末尾明确写着 *Not affiliated with DeepSeek Inc.*。我看到中文社区已经有人开始把它叫"DeepSeek 官方 CLI"，那是误传。
+
+本文以 2026 年 5 月 3 日发布的 v0.8.7 为基准；v0.8.8 的功能虽在 README 中已写明（包括 Linux ARM64 预编译、子 Agent 上限提升至 10、OSC 8 链接支持等），但还未在 Releases 页面打 tag，验证时请以你拉到的版本为准。
+
+## 它解决的不是 UI 问题，而是模型成本问题
+
+过去一年，"AI 编码 Agent + 终端 TUI"的组合已经不是稀缺品。Claude Code、Codex CLI、OpenCode 都是成熟选项。DeepSeek-TUI 没有重新发明 TUI 这件事，它做的是把 DeepSeek V4 系列的两个硬优势——1M tokens 上下文、Cache Hit/Miss 双轨计费——直接做成原生工作流。
+
+V4 Flash 标准输入 \$0.14/MTok、缓存输入 \$0.0028/MTok、输出 \$0.28/MTok；V4 Pro 在 75% 限时折扣（截至 2026-05-31 15:59 UTC）下 Cache Miss 输入 \$0.435/MTok、输出 \$0.87/MTok。同期 Claude Sonnet 4.6 输入约 \$3/MTok、输出约 \$15/MTok。一个跑在循环里的 Agent，每天的 token 流水是固定的，定价差几十倍就直接落到月度账单上。这是 DeepSeek-TUI 出现的真正背景。
+
+把 V4 的低价兑现成可用的工程能力，仅凭 API 调用是不够的。一个长会话需要上下文压缩、需要缓存命中率管理、需要对接 MCP 与本地工具、需要跑得动并发子任务、需要在终端里看到模型的思考过程。这些事 DeepSeek 官方文档让你自己拼，DeepSeek-TUI 把它们拼好了，连成一个 Rust 单二进制。
+
+## 安装与第一次启动
+
+最快的方式是 npm：
+
+```bash
+npm install -g deepseek-tui
+deepseek
+```
+
+也可以走 Cargo（需要 Rust 1.85+）：
+
+```bash
+cargo install deepseek-tui-cli --locked
+cargo install deepseek-tui --locked
+```
+
+注意这里需要装两个 crate：`deepseek-tui-cli` 提供 `deepseek` 这个分发器入口，`deepseek-tui` 是真正的 TUI 运行时。少装一个，运行时会报 `MISSING_COMPANION_BINARY`。预编译二进制覆盖 Linux x64/ARM64、macOS x64/ARM64 和 Windows x64，校验文件是 `deepseek-artifacts-sha256.txt`。
+
+第一次启动会让你填 API key。默认走 DeepSeek 官方端点，也可以切到 NVIDIA NIM、Fireworks、SGLang（自托管）或 DeepseekCN。Provider 的切换写在 `settings.toml` 里，多 provider 支持是这个工具一开始就考虑进来的设计——你不会被锁在一个供应商上。
+
+模型列表里的 `deepseek-chat` 和 `deepseek-reasoner` 是旧别名，会被自动映射到 `deepseek-v4-flash`；新写的脚本直接用 `deepseek-v4-pro` 或 `deepseek-v4-flash` 即可。DeepSeek 官方提示这两个旧别名将在 2026 年 7 月 24 日彻底弃用。
+
+## 思考流、Plan/Agent/YOLO 与 reasoning 档位
+
+V4 默认启用思考模式（chain-of-thought），DeepSeek-TUI 把这部分推理过程做成实时流式渲染——你能在终端里看着模型一段一段把思考输出出来，再看到它给出最终答案。这点和 Codex 高 reasoning effort 时的"看模型在想"是同一件事，但 V4 的思考链通常更长、更结构化。
+
+它的运行模式分三档：
+
+- **Plan**：只生成计划、不动文件，适合让模型先给出步骤再决定要不要让它跑。
+- **Agent**：可以执行工具，但每个写入/命令默认要确认。
+- **YOLO**：跳过所有确认，直接执行——只在隔离环境里用。
+
+reasoning effort 用 `Shift+Tab` 在终端里循环切换：off → high → max。这点和 Codex 的 `model_reasoning_effort` 思路一致，但 DeepSeek-TUI 把切换做成了热键，不需要回到配置文件。
+
+## RLM：把 flash 子模型当并行 worker
+
+`rlm_query` 是这个工具最值得拿出来单独讲的能力。RLM（Recursive Language Model）的设计是这样的：主模型在某一步遇到适合并行处理的任务时，可以一次性 fan out 1 到 16 个 `deepseek-v4-flash` 子模型，每个跑独立子任务，结果再回到主对话里。
+
+它不是 sub-agent（sub-agent 是 `agent_spawn` 那条路径，主要用 Implementer 和 Verifier 两个角色做"做+验"），RLM 更像是一个面向"批量分类、并行决策、扇出采样"的轻量原语。背后有一个沙盒化的 Python REPL 用来组织调用。
+
+举一个具体例子：你让它读一个有 200 个文件的 monorepo，给每个文件打"是否涉及鉴权逻辑"的标签。Claude Code 通常会顺序读、顺序判断；DeepSeek-TUI 用 RLM 一次发 16 个 flash 实例并行打标，每个实例独立成本约等于 \$0.14/MTok 输入价里那一份。这种场景下，并行带来的速度收益和成本收益是叠加的。
+
+对 V4 Pro 来说，把会消耗大量 Pro 输入 token 的"扇形子任务"分流到 Flash，就是直接的钱省下来。这是 DeepSeek-TUI 把模型架构差异变成工具能力的最具体体现。
+
+## Skills：跨工具兼容是一个聪明决定
+
+DeepSeek-TUI 的 Skills 系统借鉴了 Claude Code 和 OpenCode 的目录约定，并直接读取这两个工具的 skills 目录。发现路径是按 first-wins 顺序：
+
+```
+.agents/skills
+./skills
+.opencode/skills
+.claude/skills
+~/.deepseek/skills
+```
+
+这意味着你已经积累的 Claude Code skills 或 OpenCode skills 可以零迁移在 DeepSeek-TUI 下使用。命令侧提供 `/skills` 列表、`/skill <name>` 调用、`/skill new` 创建、以及 `/skill install github:<owner>/<repo>` 直接从 GitHub 拉社区 skill。还有一个新增的 `load_skill` 工具，模型可以一次拿到 skill 的正文加伴随文件清单。
+
+我觉得这个决定比"自定义一套 skills 协议"重要得多。AI 编码工具最大的迁移成本是积累的工作流，跨工具兼容降低了切换门槛——也是 DeepSeek-TUI 作为后来者唯一现实的策略。
+
+## 工作区回滚与 HTTP/SSE 服务
+
+工作区回滚是另一个差异点。DeepSeek-TUI 在执行任何写入操作时，会把变更写到 side-git 快照里（不是你仓库的 `.git`），失败或你主动 `/rollback` 时直接回滚到上一个快照。Claude Code 和 Codex 都没有内建这种"独立于 Git 的变更账本"，最坏情况下你只能靠原仓库的 `git status` 撤销，有些场景（比如新生成的文件）回退起来很麻烦。
+
+`deepseek serve --http` 把 TUI 暴露成一个 HTTP/SSE 服务，让外部进程可以以非交互方式调用 Agent。它和 Codex 的 `codex app-server` 思路相似，但 DeepSeek-TUI 用的是更通用的 HTTP+SSE，配 IDE 插件或 CI 脚本时省去自己实现 stdio 协议的成本。
+
+MCP 那一侧是完整客户端：`deepseek mcp list` 看连接的服务器、`deepseek mcp validate` 校验配置、`deepseek mcp-server` 把 DeepSeek-TUI 自身作为 MCP stdio server 暴露给上游 Agent。v0.8.8 在底栏新增了 MCP health chip，能直接看到哪些 MCP 服务器在线。
+
+## 与 Claude Code / Codex 的功能差异
+
+放一张对比表，帮你决定是否要加进工具栈：
+
+| 维度 | Claude Code | Codex CLI | DeepSeek-TUI |
+|------|-------------|-----------|--------------|
+| 默认模型 | Claude Sonnet/Opus | OpenAI GPT-5.5 系列 | DeepSeek V4 Pro/Flash |
+| 上下文窗口 | 1M（Sonnet 4.6/Opus 4.7） | 200K-1M（按模型） | 1M（V4 两档统一） |
+| 思考流 | Extended thinking 可开关 | reasoning effort 六档 | Shift+Tab off/high/max |
+| 沙盒 | 无内建沙盒 | 三级沙盒 | Plan/Agent/YOLO 三档 |
+| 工作区回滚 | 无 | 无 | side-git 快照 |
+| 并行子模型原语 | sub-agent | sub-agent | RLM + sub-agent |
+| Skills 兼容 | 自有 skills | 通过 AGENTS.md 适配 | 兼容 Claude/OpenCode 目录 |
+| 外部服务模式 | 无（IDE 是封闭扩展） | `app-server` stdio/ws | `serve --http` HTTP/SSE |
+| MCP | 客户端 | 客户端 | 客户端 + 可作为 server |
+| 分发形态 | Node CLI | Rust CLI | Rust 单二进制 |
+| 多 provider | 仅 Anthropic | 仅 OpenAI | 5 种 provider |
+
+<small>*整理：各工具官方文档，2026-05-04 查询。Claude Sonnet 4.6 与 Opus 4.7 默认窗口均为 1M tokens；Codex 1M 上下文需 GPT-5.5 long-context 路径。</small>
+
+几个差异点值得展开：
+
+**1M 上下文 + 低单价的组合**。三家头部模型的长上下文窗口已经趋同——Claude Sonnet 4.6、Opus 4.7、DeepSeek V4 两档都默认到 1M——差异不再是"能不能塞进去"，而是"塞进去的成本能不能承受"。V4 Flash 输入 \$0.14/MTok、Pro 折扣价 \$0.435/MTok，对应 Claude Sonnet 4.6 的 \$3/MTok，做整仓 review、跨文件分析或长文档迭代时差距会在账单上被放大。
+
+**工作区回滚补足了一个长期缺位**。Claude Code 和 Codex 都没有，遇到 Agent 写错了一片文件的时候，靠 `git checkout .` 经常救不回新增文件。side-git 快照像一个独立的事务日志，让"撤销最后一次 Agent 行为"变成一个原子操作。
+
+**多 provider 是供应链层面的优势**。Claude Code 锁 Anthropic，Codex 锁 OpenAI；DeepSeek-TUI 同时支持 DeepSeek 官方、NVIDIA NIM、Fireworks、SGLang、DeepseekCN。这意味着同一个 TUI 可以连私有部署的 SGLang，也能在 NVIDIA NIM 上跑——对企业内部署场景是一个有用的属性。
+
+## 真实成本估算的几个细节
+
+V4 的 Cache Hit/Miss 双轨计费在 DeepSeek-TUI 里是自动处理的：API 返回的 `prompt_cache_hit_tokens` 和 `prompt_cache_miss_tokens` 字段会被识别，分别按 cache hit 价（\$0.0028/MTok for Flash）和 cache miss 价（\$0.14/MTok）计入会话累计。底栏会实时显示当前会话的总成本，每一轮也有单轮成本。
+
+V4 Pro 当前的 75% 限时折扣截至 2026-05-31 15:59 UTC。DeepSeek-TUI 的成本估算器在折扣到期后会自动回退到 Pro 的基础费率，不会留着旧价格继续算。这点对长期使用者很关键——别拿打折期的成本数字去做生产容量规划。
+
+如果你已经在用 Claude Code 或 Codex 跑长循环，可以做一个简单的成本对照：把同样一段任务（比如一次仓库 review）分别跑一次，对比累计 token 与成本。我自己粗略测过一个不到万行代码的小项目 review，DeepSeek V4 Pro 折扣价跑下来大概是 Claude Sonnet 4.6 的 1/8 到 1/12，看 cache hit 比例和思考链长度浮动。
+
+需要诚实说明：这是单点测试，不是大规模基准，仅供数量级参考。能力上的差距（V4 通用知识、长上下文召回、多模态缺位）也要纳入评估。我自己的做法是把 DeepSeek-TUI 用在批量数据处理和高吞吐 review 上，把 Claude Code 留给需要多模态或最高知识准确性的场景。
+
+## 谁不适合用它
+
+有几类场景我不会推 DeepSeek-TUI：
+
+**多模态需求**。V4 系列目前只有文本，DeepSeek-TUI 自然也没有图像/音频/视频处理能力。要在前端工作流里 review 截图、要做语音转录的，直接选 Claude 或 GPT-5.5。
+
+**对知识准确性极敏感**。DeepSeek 官方承认 V4 在知识测试上落后前沿模型 3-6 个月。法律、医学、最新政策这类对事实精度要求高的领域，不要把 V4 作为权威来源。
+
+**对供应链合规要求严格**。OpenAI 与 Anthropic 此前都指控过 DeepSeek 蒸馏其模型，DeepSeek 官方否认；同时美方对中国 AI 实验室的知识产权审查持续中。涉及政府客户、需要严格 IP 溯源的企业，采用 V4 之前要先做合规评估，不能只看价格。
+
+**重度依赖官方背书**。DeepSeek-TUI 是个人维护项目，不是 DeepSeek 官方产品。如果你的团队要求"工具厂商必须有 SLA"，这个项目当前不满足条件。
+
+## 一句话判断
+
+DeepSeek-TUI 把 DeepSeek V4 这套"低价 + 1M 上下文 + 思考流"的组合，按工程化标准包成了一个能进入生产工作流的终端 Agent。它真正提供的，是把模型层成本优势落到长循环工程实践里的可用能力。
+
+如果你已经在跑长循环 Agent、对 token 账单敏感、又能接受纯文本的能力边界，把它装一份做次级工具是合理的——尤其当你的工作量里有"批量分类"或"扇形子任务"这种 RLM 适用场景。
+
+如果你的主线是 Claude Code 或 Codex，不需要立刻替换。但 v0.8.x 的迭代节奏（一周内连发 8 个补丁版本）说明项目在快速稳定，值得放进观察清单。我自己的下一步是把它接到一个夜间跑的批量代码 review 任务上，跑两周看实际成本和回滚体验，再决定要不要写第二篇做实战记录。
+
+参考链接：[GitHub: Hmbown/DeepSeek-TUI](https://github.com/Hmbown/DeepSeek-TUI)、[DeepSeek API 文档](https://api-docs.deepseek.com/)。
