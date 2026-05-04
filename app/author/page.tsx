@@ -16,11 +16,11 @@ const RESUME_DESCRIPTION =
 export const metadata: Metadata = generateListPageSEO(
   "简历",
   RESUME_DESCRIPTION,
-  `${config.site.url}/resume`,
+  `${config.site.url}/author`,
 );
 
 export default function ResumePage() {
-  const resumeUrl = `${config.site.url}/resume`;
+  const resumeUrl = `${config.site.url}/author`;
 
   return (
     <main className="min-h-screen">

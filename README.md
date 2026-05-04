@@ -414,6 +414,8 @@ npm run deploy
 
 - `docs/guides/ai-worker-config-guide.md`
 
+如果你关心“新增文章 / 新增专栏后，AI 推荐何时能自动看到新内容”，也看这份指南里的对应章节。
+
 如果你要修改 Turnstile 允许域名、前端 action、每日总预算或紧急停用开关，优先改这份配置指南，再单独部署 Worker。
 
 > 重要：根目录的 GitHub Pages workflow **不会自动部署** `blog-ai-worker/`。

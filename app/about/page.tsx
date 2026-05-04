@@ -18,7 +18,7 @@ export default function AboutPage() {
           更详细的信息请查看我的简历页面
         </p>
         <Link
-          href="/resume"
+          href="/author"
           className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
         >
           查看完整简历

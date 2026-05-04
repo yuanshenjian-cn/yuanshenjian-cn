@@ -463,7 +463,134 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 ---
 
-## 9. 相关文档
+## 9. 新增文章 / 新增专栏后，AI 推荐如何自动感知内容
+
+当前首页 AI 推荐不是直接读 Markdown，而是依赖构建时生成的静态索引：
+
+```text
+public/ai-data/index.json
+```
+
+这个文件由下面的脚本生成：
+
+```text
+scripts/build-ai-data.js
+```
+
+构建命令已经自动包含这一步：
+
+```json
+"build": "npm run build:ai-data && next build"
+```
+
+### 9.1 新增文章时会发生什么
+
+只要你的文章满足以下条件：
+
+1. 位于 `content/blog/` 目录下
+2. 是 `.md` 或 `.mdx`
+3. frontmatter 至少包含：
+   - `title`
+   - `date`
+4. 没有写成：
+
+```yaml
+published: false
+```
+
+那么在下一次构建时，它就会自动进入：
+
+```text
+public/ai-data/index.json
+```
+
+Worker 下次请求 AI 推荐时，会重新读取线上站点的：
+
+```text
+https://yuanshenjian.cn/ai-data/index.json
+```
+
+因此新文章会自动进入推荐候选集。
+
+### 9.2 新增专栏时会发生什么
+
+对 **AI 推荐** 来说，专栏不是必须条件。
+
+也就是说：
+
+- 即使你只是新增了一篇普通文章
+- 只要它进入了 `ai-data/index.json`
+- AI 推荐就可能推荐到它
+
+但如果你想让站点里的“专栏导航 / 专栏页 / 专栏图标 / 上下篇上下文”也一起正常工作，还需要同步更新：
+
+- `lib/columns.ts`
+- `components/column-icons.tsx`
+
+### 9.3 什么时候需要重新部署 Worker
+
+分清两类改动：
+
+#### 只新增文章 / 只新增专栏内容
+
+通常只需要重新部署静态站点（GitHub Pages）。
+
+因为：
+
+- `ai-data/index.json` 属于静态站点构建产物
+- Worker 读取的是线上静态索引地址
+
+也就是说：
+
+> **新增文章本身不需要单独部署 Worker。**
+
+#### 改了 Worker 行为或 Worker 配置
+
+例如你改了：
+
+- Provider
+- Base URL
+- 限流
+- Turnstile hostname/action
+- 每日预算
+- 推荐算法
+
+这时才需要：
+
+```bash
+cd blog-ai-worker
+npm run deploy
+```
+
+### 9.4 如何本地确认新文章已经进入 AI 推荐索引
+
+运行：
+
+```bash
+npm run build:ai-data
+```
+
+然后检查：
+
+```text
+public/ai-data/index.json
+```
+
+如果能看到你的新文章 `slug` / `title`，说明 AI 推荐已经能“看到”它了。
+
+### 9.5 常见原因：为什么 AI 推荐还没看到新文章
+
+优先检查：
+
+1. 文章是否位于 `content/blog/` 下
+2. frontmatter 是否缺少 `title` 或 `date`
+3. 是否写了 `published: false`
+4. 是否还没重新构建 / 重新部署静态站点
+5. 本地看的是旧的 `public/ai-data/index.json`
+
+---
+
+## 10. 相关文档
 
 - `README.md`
 - `docs/troubleshoots.md`

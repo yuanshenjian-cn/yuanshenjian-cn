@@ -31,9 +31,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         
         {/* Content */}
-        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center w-full py-16">
+        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center w-full py-12">
           {/* 主标题 */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-6 text-foreground">
+          <h1 className="text-4xl md:text-5xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
             记录思考，分享成长
           </h1>
 
@@ -41,16 +41,15 @@ export default function Home() {
           <p className="text-lg md:text-xl text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
             技术实践 · 敏捷方法 · 生活随笔
           </p>
+        </div>
 
-          {/* AI 推荐 */}
-          <div className="mt-10 mb-8 max-w-lg mx-auto w-full">
-            <AiRecommendWidget
-              enabled={config.ai.enabled}
-              workerUrl={config.ai.workerUrl}
-              turnstileSiteKey={config.ai.turnstileSiteKey}
-            />
-          </div>
-
+        {/* AI 推荐 */}
+        <div className="relative z-10 max-w-2xl mx-auto px-6 w-full mb-8">
+          <AiRecommendWidget
+            enabled={config.ai.enabled}
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+          />
         </div>
 
         {/* 底部渐变过渡 */}
