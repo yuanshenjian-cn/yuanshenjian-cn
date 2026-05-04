@@ -52,7 +52,7 @@ function loadTurnstileScript(): Promise<void> {
   return turnstileScriptPromise;
 }
 
-const QUICK_TOPICS = ["Claude Code", "AI 编程", "TDD", "敏捷方法"];
+const QUICK_TOPICS = ["Claude Code", "AI 编程", "简单设计", "敏捷方法"];
 
 interface AiRecommendWidgetProps {
   enabled: boolean;
@@ -236,6 +236,28 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
             {topic}
           </button>
         ))}
+      </div>
+
+      {/* 专栏快捷链接 */}
+      <div className="flex flex-wrap gap-3 mt-3">
+        <Link
+          href="/ai/ai-frontier"
+          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          AI前言
+        </Link>
+        <Link
+          href="/ai/opencode"
+          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          OpenAI
+        </Link>
+        <Link
+          href="/ai/deepseek"
+          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          DeepSeek
+        </Link>
       </div>
 
       {error ? (
