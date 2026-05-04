@@ -6,7 +6,7 @@
  * 3. 简单的缓存策略
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `ysj-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `ysj-runtime-${CACHE_VERSION}`;
 const MAX_RUNTIME_ENTRIES = 80;
@@ -70,6 +70,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // 跳过 AI 静态索引等数据文件，避免请求失败时被错误回退为首页
+  if (url.pathname.startsWith('/ai-data/')) {
+    return;
+  }
   
   // 跳过非 GET 请求
   if (request.method !== 'GET') return;
@@ -121,7 +126,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // 网络失败，尝试返回离线页面
+            // 网络失败，仅对页面导航请求返回首页兜底
             if (request.mode === 'navigate') {
               return caches.match('/');
             }
