@@ -604,7 +604,7 @@ const article = await articleResp.json();
 - 当前交互：
   - 单行输入框
   - 右侧 `问 AI` 按钮
-  - `Claude Code` / `AI 编程` / `TDD` / `敏捷方法` 四个快捷主题
+  - 一组可配置快捷主题（当前默认包括 `AI 前沿`、`AI 编程`、`OpenAI`、`DeepSeek`、`Claude Code`、`简单设计`、`敏捷方法`）
   - 错误红框
   - `AI 回答` + `推荐文章` 卡片列表
 - 上下文：Worker 先从全局 `index.json` 中按 query 做预筛，只把更相关的少量文章送给模型

@@ -2,12 +2,24 @@ import type { AIQuickTopic } from "@/types/ai";
 
 const aiQuickTopics: AIQuickTopic[] = [
   {
-    label: "Claude Code",
-    prompt: "请推荐我博客里和 Claude Code、AI 编程实践相关的文章，并说明各自适合什么场景。",
+    label: "AI 前沿",
+    prompt: "请推荐我博客里和 AI 前沿、模型发布动态、厂商更新相关的文章，并说明各自最值得关注的点。",
   },
   {
     label: "AI 编程",
     prompt: "请推荐我博客里和 AI 编程、AI 辅助开发相关的文章，并按入门到进阶排序。",
+  },
+  {
+    label: "OpenAI",
+    prompt: "请推荐我博客里和 OpenAI、模型发布、产品能力演进相关的文章，并说明各自关注点。",
+  },
+  {
+    label: "DeepSeek",
+    prompt: "请推荐我博客里和 DeepSeek 相关的文章，并说明每篇文章分别适合关注什么问题。",
+  },
+  {
+    label: "Claude Code",
+    prompt: "请推荐我博客里和 Claude Code、AI 编程实践相关的文章，并说明各自适合什么场景。",
   },
   {
     label: "简单设计",
