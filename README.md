@@ -21,7 +21,7 @@
 - **静态导出**: 构建时生成静态 HTML，部署到 GitHub Pages
 - **PWA 支持**: 支持离线访问，可安装为桌面/移动应用
 - **测试覆盖**: 使用 Vitest + Testing Library 进行单元测试
-- **首页 AI 推荐**: 首页支持基于站内已发布文章的主题推荐，由 Cloudflare Worker 承接请求并做人机校验、限流与推荐兜底
+- **首页 AI 推荐**: 首页 Hero 内嵌 AI 输入框，支持快捷主题、站内文章推荐、错误提示与推荐结果卡片，由 Cloudflare Worker 承接请求并做人机校验、限流与推荐兜底
 
 ## 技术栈
 
@@ -165,6 +165,8 @@ personal-blog/
 │   ├── error.tsx            # 错误页面
 │   └── not-found.tsx        # 404 页面
 ├── components/              # React 组件
+│   ├── ai/                  # AI 推荐相关组件
+│   │   └── ai-recommend-widget.tsx
 │   ├── header.tsx           # 站点导航
 │   ├── footer.tsx           # 页脚
 │   ├── articles-content.tsx # 文章列表
@@ -178,6 +180,7 @@ personal-blog/
 │   ├── post-navigation.tsx  # 文章上下篇导航
 │   └── resume/              # 简历相关组件
 ├── lib/                     # 工具库
+│   ├── ai-client.ts        # 前端 AI 请求封装
 │   ├── blog.ts             # 博客数据逻辑
 │   ├── columns.ts          # 专栏注册与文章关联
 │   ├── mdx.tsx             # MDX 渲染
@@ -189,6 +192,7 @@ personal-blog/
 │   │   ├── ai-coding/       # AI 编程（专栏）
 │   │   │   ├── ai-frontier/ # AI 前沿
 │   │   │   ├── claudecode/  # Claude Code
+│   │   │   ├── deepseek/    # DeepSeek
 │   │   │   ├── opencode/    # OpenCode
 │   │   │   └── codex/       # Codex
 │   │   ├── oo/              # 面向对象
@@ -214,7 +218,9 @@ personal-blog/
 │   ├── sw.js                # Service Worker
 │   └── manifest.json        # PWA 配置
 ├── types/                   # TypeScript 类型定义
+│   └── ai.ts               # AI 请求/响应与 Turnstile 类型
 ├── scripts/                 # 工具脚本
+│   ├── build-ai-data.js     # 生成首页 AI 推荐静态索引
 │   ├── optimize-images.js   # 图片优化
 │   ├── check-images.js      # 图片检查
 │   └── pwa/                 # PWA 相关脚本
@@ -443,7 +449,7 @@ npm run deploy
 | 变量名 | 说明 |
 |--------|------|
 | `NEXT_PUBLIC_SITE_URL` | 站点 URL，如 `https://yuanshenjian.cn` |
-| `NEXT_PUBLIC_AI_ENABLED` | 是否启用首页 AI 推荐 |
+| `NEXT_PUBLIC_AI_ENABLED` | 是否允许首页 AI 推荐发起有效提交（当前不会强制隐藏组件） |
 | `NEXT_PUBLIC_AI_WORKER_URL` | AI Worker 地址，如 `https://yuanshenjian.cn/api/ai` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile Site Key |
 | `NEXT_PUBLIC_GISCUS_REPO` | GitHub 仓库，格式 `username/repo` |
@@ -480,6 +486,25 @@ Cloudflare Worker 侧还需要额外配置：
 - `TURNSTILE_EXPECTED_ACTION` 默认是 `homepage_recommend`，需与前端 Turnstile render 的 action 保持一致
 - `AI_EMERGENCY_DISABLE=true` 时，Worker 会直接拒绝 AI 请求
 - `AI_DAILY_REQUEST_LIMIT` 控制每天最多允许多少次会触发 LLM 的请求，按 UTC 日期统计
+
+### 当前首页 AI 推荐现状
+
+Phase 1 当前已经落地为 **Hero 区域内嵌输入式推荐组件**，不是独立弹窗或浮动按钮：
+
+- 输入框右侧按钮为 `问 AI`
+- 提交中按钮文案为 `思考中...`
+- 下方提供四个快捷主题：`Claude Code`、`AI 编程`、`TDD`、`敏捷方法`
+- 成功后展示：
+  - `AI 回答`
+  - `推荐文章` 卡片列表（标题 / 日期 / excerpt / 跳转链接）
+
+Worker 当前除了基础 `origin + Turnstile + per-IP rate limit` 外，还额外包含：
+
+- Turnstile `hostname / action` 校验
+- 全局日预算止损
+- 紧急关闭开关
+- 基于 query 的文章预筛（只选更相关的少量文章喂给模型）
+- 上游 provider 不稳定时的站内确定性推荐兜底
 
 设置示例：
 

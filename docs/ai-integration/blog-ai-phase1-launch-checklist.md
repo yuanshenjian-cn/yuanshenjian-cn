@@ -65,9 +65,13 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 ```toml
 [vars]
-ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
+ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 RATE_LIMIT_WINDOW_SECONDS = "3600"
 RATE_LIMIT_MAX_REQUESTS = "10"
+AI_EMERGENCY_DISABLE = "false"
+AI_DAILY_REQUEST_LIMIT = "100"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```
 
@@ -75,6 +79,10 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 - [ ] `ALLOWED_ORIGINS` 包含线上域名
 - [ ] `ALLOWED_ORIGINS` 包含本地开发域名（如果需要本地联调）
+- [ ] `TURNSTILE_ALLOWED_HOSTNAMES` 至少包含 `yuanshenjian.cn` 与 `localhost`
+- [ ] `TURNSTILE_EXPECTED_ACTION` 与前端固定 action 一致（当前为 `homepage_recommend`）
+- [ ] `AI_EMERGENCY_DISABLE=false`
+- [ ] `AI_DAILY_REQUEST_LIMIT` 符合当前成本承受范围
 - [ ] `AI_DATA_BASE_URL` 指向最终线上博客地址
 
 > 注意：如果将来域名变更，这里也要同步修改。
@@ -231,9 +239,10 @@ npx wrangler deploy
 
 打开首页，确认：
 
-- [ ] 首页出现 AI 推荐模块
+- [ ] Hero 区域出现 AI 输入框
 - [ ] 输入框可输入内容
-- [ ] 提交按钮可点击
+- [ ] 按钮文案为 `问 AI`
+- [ ] 下方可见快捷主题标签（如 `Claude Code`、`AI 编程`）
 - [ ] 页面无明显报错
 
 ### 6.2 网络验收
@@ -256,12 +265,13 @@ npx wrangler deploy
 - [ ] 返回 AI 文本回答
 - [ ] 返回推荐文章列表
 - [ ] 点击推荐文章能跳到 `/articles/${slug}`
+- [ ] 即使上游 provider 偶发失败，页面仍能返回站内推荐结果（不直接暴露 502）
 
 ---
 
 ## 7. 常见问题快速排查
 
-### 7.1 首页没有 AI 模块
+### 7.1 首页 AI 组件未出现，或组件出现但无法提交
 
 优先检查：
 
@@ -270,23 +280,35 @@ npx wrangler deploy
 - [ ] GitHub Actions Variables 是否已配置
 - [ ] 博客是否已经重新部署
 
+> 注意：当前实现里，即使配置不完整，组件也可能仍然渲染，但会表现为无法正常提交或点击快捷主题后提示“AI 推荐功能尚未配置完成”。
+
 ### 7.2 点击提交后报 403
 
 大概率是 Turnstile 问题，检查：
 
 - [ ] Turnstile widget hostname 是否包含 `yuanshenjian.cn`
+- [ ] `TURNSTILE_ALLOWED_HOSTNAMES` 是否与 Turnstile 控制台 hostname allowlist 一致
+- [ ] `TURNSTILE_EXPECTED_ACTION` 是否与前端固定 action `homepage_recommend` 一致
 - [ ] `TURNSTILE_SECRET_KEY` 是否正确
 - [ ] 前端 Site Key / 后端 Secret Key 是否是一对
 - [ ] Worker 路由是否就是当前博客域名
 
 ### 7.3 点击提交后报 429
 
-说明限流生效，检查：
+说明限流或日预算止损生效，检查：
 
 - [ ] 是否短时间内触发过多请求
 - [ ] 当前默认限制是每小时 10 次 / IP
+- [ ] `AI_DAILY_REQUEST_LIMIT` 是否已经打满
 
-### 7.4 点击提交后报 500
+### 7.4 点击提交后报 503
+
+优先检查：
+
+- [ ] `AI_EMERGENCY_DISABLE` 是否被改成了 `true`
+- [ ] Turnstile `siteverify` 是否暂时不可用
+
+### 7.5 点击提交后报 500 / 502
 
 优先检查 Worker 配置：
 
@@ -296,13 +318,14 @@ npx wrangler deploy
 - [ ] `AI_DATA_BASE_URL`
 - [ ] KV namespace id 是否已替换
 
-### 7.5 Worker 成功了，但推荐为空
+### 7.6 Worker 成功了，但推荐为空或相关推荐明显不对
 
 检查：
 
 - [ ] `https://yuanshenjian.cn/ai-data/index.json` 是否可访问
 - [ ] `build:ai-data` 是否已生成最新索引
 - [ ] 博客是否已重新部署
+- [ ] 新文章是否满足 `content/blog/**/*.md(x)`、`title`、`date`、非 `published: false` 这些条件
 
 ---
 

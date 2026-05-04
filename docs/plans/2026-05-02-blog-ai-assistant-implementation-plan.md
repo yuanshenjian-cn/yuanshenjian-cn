@@ -4,7 +4,7 @@
 
 **Goal:** 在当前 GitHub Pages 静态博客中，以最小改动上线 Phase 1 AI 能力（首页 AI 推荐），并为 Phase 2/3 保留可持续扩展的 Worker、静态索引和模型路由基础。
 
-**Architecture:** 保持现有 Next.js 静态导出不变，在同一仓库下新增 `blog-ai-worker/` 子项目作为独立 package，通过 Cloudflare Worker 承接 AI 请求。Phase 1 只实现 `recommend` 场景、`index.json` 静态索引、TokenHub provider、Turnstile 校验与 KV 固定窗口限流；Phase 2/3 所需的文章问答、专栏导读、场景路由、多 provider 配置只在计划中预留，不提前实现。
+**Architecture:** 保持现有 Next.js 静态导出不变，在同一仓库下新增 `blog-ai-worker/` 子项目作为独立 package，通过 Cloudflare Worker 承接 AI 请求。当前已落地的 Phase 1 不再只是最初最小稿，而是包含 `origin + Turnstile hostname/action + per-IP limit + daily budget + emergency disable + query 预筛 + 站内 fallback` 的生产化最小闭环；Phase 2/3 必须继承这套安全与成本控制基线，而不是回退到早期 happy path 设计。
 
 **Tech Stack:** Next.js 15、React 19、TypeScript、Cloudflare Workers、Workers KV、Cloudflare Turnstile、GitHub Pages、TokenHub OpenAI-compatible API。
 
@@ -18,6 +18,8 @@
 - [x] Phase 1 代码实现完成
 - [x] Phase 1 审核完成并修复所有关键问题
 - [x] 用户侧配置说明整理完成
+
+> 注：本文件下方 Task 1 ~ Task 8 主要保留 Phase 1 的原始实现轨迹。继续推进 Phase 2/3 时，请以本文件顶部 `Architecture`、`Phase Boundaries` 与后文 `Notes for Future Continuation` 的更新基线为准。
 
 ---
 
@@ -67,22 +69,42 @@
 - [x] MiMo 仅保留文档扩展位，不进入 Phase 1 运行时实现
 - [x] Turnstile 校验接入
 - [x] Workers KV 固定窗口限流接入
+- [x] Turnstile `hostname / action` 校验接入
+- [x] 全局日预算止损与紧急关闭开关接入
 - [x] `public/ai-data/index.json` 构建生成
 - [x] 首页 `AiRecommendWidget` 可用
 - [x] 前端与 Worker 使用统一 JSON 契约：`{ answer, references, usage? }`
+- [x] 推荐场景 query 预筛与上下文限制落地
+- [x] Provider 失败时站内确定性 fallback 落地
 
 ### Phase 2（仅计划，不实现）
 
 - [ ] 文章页 `article` 场景
 - [ ] 专栏页 `column` 场景
 - [ ] `articles/{slug}.json` 与 `columns/{column}.json`
-- [ ] `SCENE_ROUTING_CONFIG` 外置到 Worker vars
+- [ ] `SCENE_ROUTING_CONFIG` 外置到 Worker vars，并显式包含 `turnstileAction`、`contextLimit`、`fallbackPolicy`
+- [ ] article / column 场景继承 Phase 1 的安全、预算与 fallback 机制
 
 ### Phase 3（仅计划，不实现）
 
-- [ ] 搜索增强
 - [ ] 用量日志与运营指标
+- [ ] 搜索增强（在预算与观测语义稳定后推进）
 - [ ] 多 provider 灰度与 MiMo 深度接入
+
+### Phase 2/3 Planning Adjustments（2026-05-04）
+
+后续继续扩展前，先接受三个现实约束：
+
+1. **Phase 1 已经不是“最小可演示稿”**，而是带安全兜底和成本约束的生产基线。
+2. **新 scene 不能只复制 `recommend` 的接口表面**，必须补齐自己的 `turnstileAction`、上下文裁剪、fallback 和预算语义。
+3. **搜索增强不应早于观测与预算治理**。否则搜索入口一旦 AI 化，会比首页推荐更容易放大流量与成本风险。
+
+因此推荐顺序调整为：
+
+1. 先做 `article` / `column` 的索引与 scene 契约设计
+2. 再补 scene 级 routing / fallback / 预算配置
+3. 然后做基础用量日志与运营指标
+4. 最后再推进搜索增强与多 provider 灰度
 
 ---
 
@@ -608,7 +630,7 @@ Define the complete frontend flow:
 
 ```text
 1. 仅在用户打开或提交 widget 时加载 Turnstile SDK
-2. 使用 invisible/managed widget 获取 token
+2. 使用显式渲染 + execute 模式获取 token
 3. token 获取失败时展示可读错误
 4. token 过期后重新获取
 5. 若 turnstile site key 缺失，则组件不渲染提交能力
@@ -628,14 +650,14 @@ await aiChat({
 
 - [ ] **Step 4: Gate by config**
 
-If `config.ai.enabled === false` or `config.ai.turnstileSiteKey` is empty, the widget should render a disabled/hidden state instead of making broken requests.
+If `config.ai.enabled === false` or `config.ai.turnstileSiteKey` is empty, the widget should still avoid making broken requests. 当前已落地实现是：组件仍渲染，但提交链路不可用，并会给出可读错误提示。
 
 - [ ] **Step 5: Insert into homepage**
 
 Placement target:
 
 ```text
-Hero section 之后，Latest Posts 之前
+Hero 区域内嵌输入式推荐组件，不再是 Hero 之后的独立模块
 ```
 
 Expected:
@@ -729,4 +751,6 @@ Expected:
 
 - 执行 Phase 2 时，先更新本文件 `Phase Boundaries` 与 `Progress Summary`
 - 新增 article/column 功能前，先确认 `articles/{slug}.json` 和 `columns/{column}.json` 结构
+- article / column / search 任一新 scene，都必须单独定义自己的 `turnstileAction`、上下文裁剪规则、fallback 策略与预算语义
+- 搜索增强应排在用量日志与预算治理之后，不建议直接跳过观测层
 - MiMo 接入前，必须先补齐官方文档，再更新设计文档第 13 节的 TBD 状态

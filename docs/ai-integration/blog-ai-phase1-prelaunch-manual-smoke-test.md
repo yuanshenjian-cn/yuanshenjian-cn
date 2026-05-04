@@ -40,12 +40,13 @@ https://yuanshenjian.cn/ai-data/index.json
 
 回到首页，确认：
 
-- [ ] 能看到 “AI 推荐” 模块
+- [ ] Hero 区域里能看到 AI 输入框
 - [ ] 能看到输入框
-- [ ] 能看到提交按钮
+- [ ] 能看到 `问 AI` 按钮
+- [ ] 下方有快捷主题标签（如 `Claude Code`、`AI 编程`）
 - [ ] 页面没有明显红字报错
 
-如果首页没有 AI 模块：
+如果首页没有 AI 组件，或组件出现但无法正常提交：
 
 优先检查：
 
@@ -65,7 +66,7 @@ https://yuanshenjian.cn/ai-data/index.json
 
 点击提交，观察：
 
-- [ ] 按钮进入 loading 状态
+- [ ] 按钮进入 loading 状态（文案变为 `思考中...`）
 - [ ] 页面没有立即报错
 - [ ] Network 面板中出现 `POST /api/ai/chat`
 
@@ -83,13 +84,19 @@ https://yuanshenjian.cn/ai-data/index.json
 如果这里失败：
 
 ### 返回 403
-- [ ] 优先排查 Turnstile 配置
+- [ ] 优先排查 Turnstile 配置、hostname allowlist、Worker `TURNSTILE_ALLOWED_HOSTNAMES`
+- [ ] 检查前端 action 与 `TURNSTILE_EXPECTED_ACTION` 是否一致（当前为 `homepage_recommend`）
 
 ### 返回 429
-- [ ] 说明限流已触发，等待后重试
+- [ ] 说明 per-IP 限流或 daily budget 已触发，先确认最近是否有高频请求
 
-### 返回 500
+### 返回 503
+- [ ] 优先检查 `AI_EMERGENCY_DISABLE` 是否被打开
+- [ ] 或 Turnstile `siteverify` 是否暂时不可用
+
+### 返回 500 / 502
 - [ ] 优先排查 Worker secrets / vars / KV / 腾讯 TokenHub base URL
+- [ ] 同时检查 `https://yuanshenjian.cn/ai-data/index.json` 是否可访问
 
 ---
 
@@ -102,6 +109,7 @@ https://yuanshenjian.cn/ai-data/index.json
 - [ ] 每条推荐都有标题
 - [ ] 每条推荐都有摘要
 - [ ] 每条推荐都有日期
+- [ ] 即使上游 provider 偶发不稳定，页面仍尽量给出站内推荐结果，而不是直接空白
 
 视觉检查：
 
@@ -132,7 +140,7 @@ https://yuanshenjian.cn/ai-data/index.json
 如果以下项目全部为真，可以判定本次 Phase 1 已可上线：
 
 - [ ] `ai-data/index.json` 可访问
-- [ ] 首页 AI 模块可见
+- [ ] 首页 Hero AI 输入框可见
 - [ ] `POST /api/ai/chat` 返回 200
 - [ ] 页面能展示推荐结果
 - [ ] 推荐链接能跳转到正确文章页

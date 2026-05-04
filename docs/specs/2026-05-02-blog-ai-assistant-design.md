@@ -1,8 +1,8 @@
 # 博客 AI 助手设计方案
 
-**版本**：v1.1  
-**日期**：2026-05-02  
-**状态**：草稿，待评审  
+**版本**：v1.2  
+**日期**：2026-05-04  
+**状态**：已落地（持续回填实现细节）  
 **作者**：袁慎建
 
 ---
@@ -568,7 +568,7 @@ public/
   "scripts": {
     "build:ai-data": "node scripts/build-ai-data.js",
     "build": "npm run build:ai-data && next build",
-    "build:prod": "npm run optimize-images && npm run build:ai-data && next build"
+    "build:prod": "npm run optimize-images && npm run build"
   }
 }
 ```
@@ -597,13 +597,19 @@ const article = await articleResp.json();
 
 ### 9.1 主页（`app/page.tsx`）
 
-**Phase 1 入口：** 在 Hero Section 下方或最新文章区域附近，新增一个小型"问博主"对话框或浮动按钮。
+**Phase 1 当前入口：** 在 Hero 区域内嵌一个输入式 AI 推荐组件，不是浮动按钮或单独弹窗。
 
 - 场景：`recommend`
-- 用途：用户可以输入"有没有关于 TDD 的文章"，AI 返回相关文章推荐（带链接）
-- 上下文：全局 `index.json` 中的 title + excerpt 列表（token 友好）
+- 用途：用户输入主题后，AI 返回站内相关文章推荐（带链接）
+- 当前交互：
+  - 单行输入框
+  - 右侧 `问 AI` 按钮
+  - `Claude Code` / `AI 编程` / `TDD` / `敏捷方法` 四个快捷主题
+  - 错误红框
+  - `AI 回答` + `推荐文章` 卡片列表
+- 上下文：Worker 先从全局 `index.json` 中按 query 做预筛，只把更相关的少量文章送给模型
 
-**组件：** 新增 `components/ai-recommend-widget.tsx`（客户端组件）
+**组件：** `components/ai/ai-recommend-widget.tsx`（客户端组件）
 
 ### 9.2 文章页（`components/article-content.tsx` 附近）
 
@@ -644,14 +650,13 @@ const article = await articleResp.json();
 const AI_WORKER_BASE = process.env.NEXT_PUBLIC_AI_WORKER_URL ?? "/api/ai";
 
 interface AIChatOptions {
-  scene: "article" | "column" | "recommend";
+  scene: "recommend";
   message: string;
   context?: Record<string, unknown>;
   turnstileToken: string;
-  onChunk?: (chunk: string) => void;
 }
 
-export async function aiChat(options: AIChatOptions): Promise<void> {
+export async function aiChat(options: AIChatOptions): Promise<AIChatResponse> {
   const response = await fetch(`${AI_WORKER_BASE}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -668,7 +673,7 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
     throw new Error(err.error ?? `HTTP ${response.status}`);
   }
 
-  // Phase 1 先处理非流式 JSON 响应
+  return (await response.json()) as AIChatResponse;
 }
 ```
 
@@ -686,9 +691,10 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 
 #### 范围
 
-- Cloudflare Worker 基础设施（Turnstile 验证 + KV 限流 + TokenHub 接入）
+- Cloudflare Worker 基础设施（origin 校验 + Turnstile 验证 + hostname/action 校验 + per-IP 限流 + 日预算止损 + 紧急关闭）
 - 构建期 `index.json` 生成
-- 主页"文章推荐"AI 对话框
+- Hero 区域内嵌输入式 AI 推荐组件
+- 推荐 query 预筛 + 站内确定性 fallback
 
 #### 架构变化
 
@@ -700,24 +706,26 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 
 #### 前端入口
 
-- `app/page.tsx`：引入 `components/ai-recommend-widget.tsx`
+- `app/page.tsx`：引入 `components/ai/ai-recommend-widget.tsx`
 - 用户输入问题 → 展示相关文章列表（带链接、标题、excerpt）
 - UI 轻量，不干扰主页现有布局
 
 #### Worker 能力
 
-- `POST /api/ai/chat`：接受 `scene=recommend`，从 CDN 取 `index.json`，调 TokenHub，返回非流式 JSON 响应
-- Turnstile 验证（必须通过才处理）
-- KV 固定窗口限流（每 IP 每小时 10 次）
+- `POST /api/ai/chat`：接受 `scene=recommend`，从 CDN 取 `index.json`，调 Tencent TokenHub，返回非流式 JSON 响应
+- `origin -> Turnstile -> hostname/action -> per-IP rate limit -> daily budget` 全部通过后才会触发 LLM
+- 推荐前先按 query 对 tags / title / excerpt 做预筛，只选少量高相关文章作为模型上下文
+- 上游 provider 5xx 或空内容时，回退为站内确定性推荐，而不是直接把 502 暴露给用户
 - 生产同域 `/api/ai/*`；开发环境允许 `localhost`
 
 #### 风险与取舍
 
 | 风险 | 取舍 |
 |------|------|
-| `index.json` 包含所有文章摘要，单次 token 可能较多 | 限制传给 LLM 的 excerpt 总长度（如前 50 篇） |
+| `index.json` 包含全站文章摘要，直接全量送模会推高 token 成本 | 先按 query 预筛，再限制送模文章数（当前为 top 8） |
 | Turnstile 首次加载可能有 100-200ms 延迟 | 用户打开对话框时再初始化，不影响主页首屏 |
-| MiMo 尚未可用 | Phase 1 全部使用 TokenHub，MiMo 适配器在代码中保留占位 |
+| 上游 provider 偶发不返回最终内容 | Worker 侧保留站内推荐 fallback，优先保证首页可用性 |
+| MiMo 尚未可用 | Phase 1 全部使用 Tencent TokenHub，MiMo 适配器在代码中保留占位 |
 | 本地联调路径与生产不同 | 文档中同时给出生产同域与开发 `localhost` 放行策略 |
 
 #### 验收标准
@@ -743,12 +751,15 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 - AI 专栏页"问问专栏"交互区
 - 补充 `articles/{slug}.json` 与 `columns/{column-slug}.json` 生成逻辑
 - 场景路由配置完善（article/column 场景独立配置）
+- 每个 scene 显式定义自己的 `turnstileAction`、`contextLimit`、`fallbackPolicy` 与预算策略
 
 #### 架构变化
 
 - Worker 新增对 `article` 和 `column` 场景的处理逻辑
 - Worker 运行时按需 fetch `articles/{slug}.json` 或 `columns/{column-slug}.json`
 - 前端需要在请求中传递 `context.slug` 或 `context.columnSlug`，供 Worker 取索引
+- article / column 不应直接全量送正文或整专栏摘要，必须沿用“先筛选、再限制上下文长度”的 Phase 1 经验
+- article / column 也应继承 Phase 1 已落地的安全基线，而不是只复用最初的 `recommend` happy path
 
 #### 前端入口
 
@@ -765,8 +776,9 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 
 | 风险 | 取舍 |
 |------|------|
-| 单篇文章正文可能过长 | contentChunks 按标题/段落提取纯文本，并限制总长度 |
+| 单篇文章正文可能过长 | contentChunks 按标题/段落提取纯文本，并限制总长度；必要时先按 query 选 chunk |
 | 读者可能问文章以外的问题 | 系统提示明确限定"请基于以下文章内容回答" |
+| 新 scene 如果没有 fallback，体验会退回纯 happy path | 将 fallback 从 recommend 特例升级为 scene 级契约 |
 | 如果 MiMo 文档到位，Phase 2 可以接入 MiMo | MiMo 适配器在 Phase 1 代码中已有占位，完成 `[MiMo-TBD]` 部分即可 |
 
 #### 验收标准
@@ -879,7 +891,6 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 blog-ai-worker/
   src/
     index.ts              # Worker 入口，路由分发
-    router.ts             # handleAIRequest，串联各模块
     providers/
       types.ts            # LLMProvider 接口定义
       tencent-tokenhub.ts # 腾讯 TokenHub 适配器
@@ -887,15 +898,11 @@ blog-ai-worker/
       index.ts            # createProvider 工厂函数
     middleware/
       turnstile.ts        # verifyTurnstile
-      rate-limit.ts       # checkRateLimit（KV 滑动窗口）
-      cors.ts             # CORS 检查
+      rate-limit.ts       # per-IP 限流 + daily budget + emergency disable
+      origin.ts           # origin 检查
     scenes/
-      article.ts          # article 场景：fetch 文章索引，构建 messages
-      column.ts           # column 场景：fetch 专栏索引，构建 messages
       recommend.ts        # recommend 场景：fetch index.json，构建 messages
     prompts/
-      article_qa.ts       # article 场景系统提示模板
-      column_intro.ts     # column 场景系统提示模板
       recommend.ts        # recommend 场景系统提示模板
     types.ts              # Env 接口定义（绑定的 KV、secrets、vars）
   wrangler.toml           # Worker 配置（路由、KV 绑定等）
@@ -909,14 +916,14 @@ blog-ai-worker/
 ```toml
 name = "blog-ai-worker"
 main = "src/index.ts"
-compatibility_date = "2025-01-01"
+compatibility_date = "2026-05-02"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
 id = "<kv-namespace-id>"
 
 [vars]
-ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
+ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 RATE_LIMIT_WINDOW_SECONDS = "3600"
@@ -935,10 +942,10 @@ zone_name = "yuanshenjian.cn"
 
 | 文件路径 | 说明 |
 |---------|------|
-| `scripts/build-ai-data.ts` | 构建期生成 `public/ai-data/` 的脚本 |
+| `scripts/build-ai-data.js` | 构建期生成 `public/ai-data/` 的脚本 |
 | `public/ai-data/.gitkeep` | 占位，确保目录存在（实际 JSON 由构建生成，不提交）|
 | `lib/ai-client.ts` | 前端统一 AI 请求封装 |
-| `components/ai-recommend-widget.tsx` | 主页推荐 AI 对话框（Phase 1）|
+| `components/ai/ai-recommend-widget.tsx` | Hero 区域内嵌输入式 AI 推荐组件（Phase 1）|
 | `components/ai-article-chat.tsx` | 文章页问答对话框（Phase 2）|
 | `components/ai-column-chat.tsx` | 专栏页问答对话框（Phase 2）|
 | `.env.example` 更新 | 新增 `NEXT_PUBLIC_AI_WORKER_URL`、`NEXT_PUBLIC_TURNSTILE_SITE_KEY` |
