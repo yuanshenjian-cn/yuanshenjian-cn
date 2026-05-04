@@ -14,6 +14,18 @@ function assertConfiguredEnv(env: Env): void {
     throw new HttpError(500, "Worker misconfigured: TURNSTILE_SECRET_KEY is missing");
   }
 
+  if (!env.LLM_ACTIVE_PROFILE?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: LLM_ACTIVE_PROFILE is missing");
+  }
+
+  if (!env.LLM_PROVIDER_NAME?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: LLM_PROVIDER_NAME is missing");
+  }
+
+  if (!env.LLM_MODEL_ID?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: LLM_MODEL_ID is missing");
+  }
+
   if (!env.LLM_PROVIDER_API_KEY?.trim()) {
     throw new HttpError(500, "Worker misconfigured: LLM_PROVIDER_API_KEY is missing");
   }

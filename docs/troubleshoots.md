@@ -4,6 +4,46 @@
 
 ---
 
+## 2026-05-04 Worker LLM profile 已切到本地 active，但线上模型仍未变化
+
+### 现象
+
+- 本地执行过 `npm run llm:use -- provider/modelKey`
+- `blog-ai-worker/.llm-active-profile` 已经变成新值
+- 但线上 `/api/ai/chat` 仍然表现得像旧模型 / 旧 provider
+
+### 根因
+
+新方案里：
+
+- `llm:use` 只负责写本地 `.llm-active-profile`
+- `llm:deploy` 才会把当前 active profile 通过 `wrangler secret bulk` 写入 Cloudflare Worker，并执行 `wrangler deploy`
+
+如果只执行了 `llm:use`，线上不会发生任何变化。
+
+### 正确修复
+
+在 `blog-ai-worker/` 下执行：
+
+```bash
+npm run llm:deploy
+```
+
+如果你想在部署时顺便切换目标 profile，也可以直接：
+
+```bash
+npm run llm:deploy -- tencent-tokenhub/glm-5.1
+```
+
+### 如何确认修复生效
+
+1. 检查本地 `.llm-active-profile` 是否是预期的 `provider/modelKey`
+2. 执行 `npm run llm:deploy`
+3. 确认命令输出里展示的 `profile / provider / modelId / baseUrl origin` 都符合预期
+4. 再做一次首页 AI 推荐冒烟验证，确认线上行为已切到新配置
+
+---
+
 ## 2026-05-04 首页 AI 推荐偶发泄漏原始 JSON，且“敏捷方法”主题检索退化成兜底排序
 
 ### 现象

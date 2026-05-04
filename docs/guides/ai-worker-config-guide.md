@@ -9,8 +9,8 @@
 当前首页 AI 推荐分成三层配置：
 
 1. **前端公开变量**：控制首页是否展示 AI 推荐入口
-2. **Worker secrets**：保存 LLM API Key、LLM Base URL、Turnstile Secret
-3. **Worker vars / 代码常量**：控制限流、允许来源、推荐上下文规模等
+2. **Worker LLM profile 本地文件**：保存多套 provider / model 组合，并记录当前本地激活项
+3. **Worker vars / secrets / 代码常量**：控制 Turnstile、限流、允许来源、推荐上下文规模等
 
 ### 1.1 前端公开变量
 
@@ -24,26 +24,74 @@
 
 > 注意：把 `NEXT_PUBLIC_AI_ENABLED=false` 只能隐藏前端入口，**不能替代 Worker 侧限流和 Turnstile 防护**。
 
-### 1.2 Worker secrets
+### 1.2 Worker LLM profile 文件
 
-这些值不能进入前端，也不应该写死在仓库里：
+LLM 不再通过手工修改代码常量或逐项 `wrangler secret put` 切换，而是统一走本地 profile 文件：
 
-| 变量名 | 用途 | 修改方式 |
+| 文件名 | 用途 | 是否入库 |
 | --- | --- | --- |
-| `LLM_PROVIDER_API_KEY` | 当前激活的 LLM Provider API Key | `wrangler secret put` |
-| `LLM_PROVIDER_BASE_URL` | 当前激活的 LLM Provider Base URL | `wrangler secret put` |
-| `TURNSTILE_SECRET_KEY` | Turnstile 后端 Secret Key | `wrangler secret put` |
+| `blog-ai-worker/llm-profiles.example.jsonc` | 模板文件，不放真实密钥 | 是 |
+| `blog-ai-worker/llm-profiles.local.jsonc` | 本地真实 provider / model 配置 | 否 |
+| `blog-ai-worker/.llm-active-profile` | 本地当前激活项，内容为单行 `provider/modelKey` | 否 |
 
-设置示例：
+> 提示：`baseUrl` 只填到 `/v1` 这一层，不要包含 `/chat/completions`；provider 会在运行时自行拼接该路径。
+
+`llm-profiles.local.jsonc` 结构示例：
+
+```jsonc
+{
+  "version": 1,
+  "providers": {
+    "tencent-tokenhub": {
+      "label": "Tencent TokenHub",
+      "baseUrl": "https://tokenhub.tencentmaas.com/v1",
+      "apiKey": "replace-with-your-real-api-key",
+      "models": {
+        "glm-5.1": {
+          "modelId": "glm-5.1"
+        },
+        "kimi-k2.6": {
+          "modelId": "kimi-k2.6"
+        }
+      }
+    }
+  }
+}
+```
+
+当前命令约定：
 
 ```bash
 cd blog-ai-worker
-npx wrangler secret put LLM_PROVIDER_API_KEY
-npx wrangler secret put LLM_PROVIDER_BASE_URL
-npx wrangler secret put TURNSTILE_SECRET_KEY
+
+npm run llm:list
+npm run llm:use -- tencent-tokenhub/glm-5.1
+npm run llm:deploy -- tencent-tokenhub/kimi-k2.6
+npm run llm:deploy
 ```
 
-### 1.3 Worker vars
+语义说明：
+
+- `llm:list`：列出本地所有可用 profile
+- `llm:use`：只更新本地 `.llm-active-profile`，不改线上
+- `llm:deploy -- provider/modelKey`：先更新 active profile，再把当前配置写入 Worker 并执行 `wrangler deploy`
+- `llm:deploy`：读取当前 `.llm-active-profile`，把当前配置写入 Worker 并执行 `wrangler deploy`
+
+`llm:deploy` 会通过 `wrangler secret bulk` 一次写入以下 5 个 Worker 字段：
+
+- `LLM_ACTIVE_PROFILE`
+- `LLM_PROVIDER_NAME`
+- `LLM_MODEL_ID`
+- `LLM_PROVIDER_BASE_URL`
+- `LLM_PROVIDER_API_KEY`
+
+注意：
+
+- 当前只支持默认 Worker 环境，不支持 `--env`
+- selector 只支持 `provider/modelKey`
+- 当前运行时至少支持 `tencent-tokenhub`
+
+### 1.3 Worker vars / secrets
 
 这些值目前定义在 `blog-ai-worker/wrangler.toml`：
 
@@ -60,6 +108,13 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 | `AI_REQUEST_MAX_BODY_BYTES` | 请求体最大字节数 | 提前拦住异常或滥用的大请求体，减少无意义解析开销 |
 | `AI_REQUEST_MAX_MESSAGE_CHARS` | `message.trim()` 后的最大字符数 | 限制单次提问长度，控制 prompt 体积与异常输入 |
 
+另外，`TURNSTILE_SECRET_KEY` 仍需单独使用 `wrangler secret put` 维护：
+
+```bash
+cd blog-ai-worker
+npx wrangler secret put TURNSTILE_SECRET_KEY
+```
+
 改完 `wrangler.toml` 后，需要重新部署：
 
 ```bash
@@ -69,43 +124,54 @@ npm run deploy
 
 ---
 
-## 2. 如何修改 LLM Provider / Base URL
+## 2. 如何修改 LLM Provider / Base URL / 模型
 
 ### 场景 A：只换 Key，不换 Provider
 
-例如只是重新生成了腾讯 TokenHub Key：
+例如只是轮换腾讯 TokenHub Key：
+
+1. 编辑 `blog-ai-worker/llm-profiles.local.jsonc` 中当前 provider 的 `apiKey`
+2. 执行：
 
 ```bash
 cd blog-ai-worker
-npx wrangler secret put LLM_PROVIDER_API_KEY
-npm run deploy
+npm run llm:deploy
 ```
 
-这种情况通常**不需要改代码**。
-
-### 场景 B：换成另一个 OpenAI-compatible Provider
-
-如果新的 Provider 仍兼容 `/chat/completions` 协议，通常只要改三处：
-
-1. 更新 `LLM_PROVIDER_API_KEY`
-2. 更新 `LLM_PROVIDER_BASE_URL`
-3. 根据新 Provider 支持的模型，修改：
-
-```ts
-// blog-ai-worker/src/scenes/recommend.ts
-const RECOMMEND_MODEL = "glm-5.1";
-```
-
-改完后部署：
+如果你还没有激活本地 profile，也可以显式带 selector：
 
 ```bash
 cd blog-ai-worker
-npm run deploy
+npm run llm:deploy -- tencent-tokenhub/glm-5.1
 ```
 
-### 场景 C：换成**不兼容** OpenAI API 的 Provider
+### 场景 B：同一 Provider 下切换模型
 
-这时不能只改 Base URL，需要新增一个适配器。
+例如要从 `glm-5.1` 切到 `kimi-k2.6`：
+
+1. 确认 `llm-profiles.local.jsonc` 里已经存在目标 modelKey
+2. 执行：
+
+```bash
+cd blog-ai-worker
+npm run llm:list
+npm run llm:use -- tencent-tokenhub/kimi-k2.6
+npm run llm:deploy
+```
+
+如果你只是临时切一次，也可以直接：
+
+```bash
+cd blog-ai-worker
+npm run llm:deploy -- tencent-tokenhub/kimi-k2.6
+```
+
+### 场景 C：新增一个新的兼容 Provider
+
+如果新的 Provider 仍兼容 `/chat/completions` 协议，仍然需要两层变更：
+
+1. 在 `llm-profiles.local.jsonc` 中新增 provider / model 配置
+2. 在运行时代码中新增 provider 路由
 
 当前实现参考文件：
 
@@ -116,28 +182,32 @@ npm run deploy
 
 1. 复制 `tencent-tokenhub.ts` 为新的 provider 文件
 2. 按新厂商的请求/响应格式修改 `chat()` 逻辑
-3. 在 `providers/index.ts` 中切到新 provider
-4. **保留通用环境变量命名**：
-   - `LLM_PROVIDER_API_KEY`
-   - `LLM_PROVIDER_BASE_URL`
+3. 在 `providers/index.ts` 中按 `env.LLM_PROVIDER_NAME` 增加分支
+4. 再把对应 provider 写入 `llm-profiles.local.jsonc`
 
-这样以后继续切换厂商时，不需要重命名整套环境变量。
+如果 `providers/index.ts` 里没有新增分支，CLI 会在 `llm:use / llm:deploy` 阶段直接拒绝该 profile，避免把不支持的 provider 配置部署到线上
 
 ---
 
 ## 3. 如何调整模型、上下文和 token 开销
 
-除了 Provider 本身，真正影响成本的还有以下代码常量：
+除了 Provider 本身，真正影响成本的还有以下配置：
 
 ### 3.1 模型名
 
-文件：`blog-ai-worker/src/scenes/recommend.ts`
+模型不再写死在 `recommend.ts`，而是来自：
 
-```ts
-const RECOMMEND_MODEL = "glm-5.1";
+```text
+blog-ai-worker/llm-profiles.local.jsonc -> providers.<provider>.models.<modelKey>.modelId
 ```
 
-如果要切到更便宜或更稳定的模型，优先改这里。
+切换方式：
+
+```bash
+cd blog-ai-worker
+npm run llm:use -- provider/modelKey
+npm run llm:deploy
+```
 
 ### 3.2 推荐上下文规模
 
@@ -356,8 +426,8 @@ npm run deploy
 
 ```bash
 cd blog-ai-worker
-npx wrangler secret put LLM_PROVIDER_API_KEY
-npm run deploy
+# 先更新 llm-profiles.local.jsonc 中对应 provider 的 apiKey
+npm run llm:deploy
 ```
 
 ### 第五步：临时关闭首页入口
@@ -384,21 +454,30 @@ NEXT_PUBLIC_AI_ENABLED=false
 
 ## 8. 每次改配置后的标准操作
 
-### 7.1 改 secrets 后
+### 8.1 改 LLM profile 后
+
+```bash
+cd blog-ai-worker
+npm run llm:list
+npm run llm:deploy
+```
+
+### 8.2 改 Turnstile secret 后
+
+```bash
+cd blog-ai-worker
+npx wrangler secret put TURNSTILE_SECRET_KEY
+npm run deploy
+```
+
+### 8.3 改 `wrangler.toml` 后
 
 ```bash
 cd blog-ai-worker
 npm run deploy
 ```
 
-### 7.2 改 `wrangler.toml` 后
-
-```bash
-cd blog-ai-worker
-npm run deploy
-```
-
-### 7.3 改 Worker 代码后
+### 8.4 改 Worker 代码后
 
 ```bash
 npm --prefix blog-ai-worker run typecheck
@@ -406,7 +485,7 @@ cd blog-ai-worker
 npm run deploy
 ```
 
-### 8.4 推荐的安全配置基线
+### 8.5 推荐的安全配置基线
 
 ```toml
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
@@ -493,6 +572,12 @@ AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 - `MAX_CONTEXT_POSTS = 8`
 - 推荐场景只保留必要的 `maxTokens`
 - Provider 5xx 时保留站内推荐兜底，不把上游异常直接暴露给用户
+
+### Worker LLM profile 建议
+
+- `llm-profiles.local.jsonc` 里只放真实可用的候选模型，不要堆无效历史项
+- `.llm-active-profile` 只是本地状态文件，切完 `llm:use` 后还要执行 `llm:deploy` 才会改线上
+- `llm-profiles.example.jsonc` 只保留模板，不放真实 key
 
 ---
 

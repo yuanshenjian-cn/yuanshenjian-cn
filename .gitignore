@@ -61,4 +61,6 @@ tmp/
 blog-ai-worker/node_modules/
 blog-ai-worker/.wrangler/
 blog-ai-worker/.dev.vars
+blog-ai-worker/llm-profiles.local.jsonc
+blog-ai-worker/.llm-active-profile
 public/ai-data/*.json

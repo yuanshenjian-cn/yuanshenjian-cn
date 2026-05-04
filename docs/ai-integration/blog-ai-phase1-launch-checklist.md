@@ -92,41 +92,35 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 > 注意：如果将来域名变更，这里也要同步修改。
 
-### 2.2 配置 Worker secrets
+### 2.2 配置 Worker LLM profile 与 secret
 
 在 `blog-ai-worker/` 目录下执行：
 
 ```bash
-npx wrangler secret put LLM_PROVIDER_API_KEY
-npx wrangler secret put LLM_PROVIDER_BASE_URL
+cp llm-profiles.example.jsonc llm-profiles.local.jsonc
+npm run llm:list
+npm run llm:use -- tencent-tokenhub/glm-5.1
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
 填写要求：
 
-#### `LLM_PROVIDER_API_KEY`
+#### `llm-profiles.local.jsonc`
 
-- [ ] 填你腾讯 TokenHub 的真实 API Key
-
-#### `LLM_PROVIDER_BASE_URL`
-
-- [ ] 填：
-
-```text
-https://tokenhub.tencentmaas.com/v1
-```
-
-> 不要填成：
->
-> ```text
-> https://tokenhub.tencentmaas.com/v1/chat/completions
-> ```
->
-> 因为代码会再拼接 `/chat/completions`。
+- [ ] 已从 `llm-profiles.example.jsonc` 复制生成 `llm-profiles.local.jsonc`
+- [ ] `tencent-tokenhub.baseUrl` 填：`https://tokenhub.tencentmaas.com/v1`
+- [ ] `tencent-tokenhub.baseUrl` 不要包含 `/chat/completions`
+- [ ] `tencent-tokenhub.apiKey` 填你腾讯 TokenHub 的真实 API Key
+- [ ] `models.glm-5.1.modelId` 填真实模型 ID，例如 `glm-5.1`
+- [ ] `blog-ai-worker/llm-profiles.local.jsonc` 不会提交到 git
+- [ ] `blog-ai-worker/.llm-active-profile` 已由 `npm run llm:use -- tencent-tokenhub/glm-5.1` 正确写入
 
 #### `TURNSTILE_SECRET_KEY`
 
 - [ ] 填 Turnstile 的 Secret Key
+- [ ] 已通过 `wrangler secret put TURNSTILE_SECRET_KEY` 写入 Cloudflare
+
+> 注意：`llm:use` 只改本地 active profile，不会修改线上 Worker。真正写入线上 LLM 配置并部署的是 `npm run llm:deploy`。
 
 ---
 
@@ -228,13 +222,14 @@ https://yuanshenjian.cn/ai-data/index.json
 在 `blog-ai-worker/` 下执行：
 
 ```bash
-npx wrangler deploy
+npm run llm:deploy
 ```
 
 检查项：
 
 - [ ] Worker 部署成功
 - [ ] Worker 已接管 `/api/ai/chat`
+- [ ] 当前线上激活 profile 与本地 `.llm-active-profile` 一致
 
 ---
 
@@ -317,6 +312,12 @@ npx wrangler deploy
 
 优先检查 Worker 配置：
 
+- [ ] `blog-ai-worker/llm-profiles.local.jsonc` 中当前 active profile 是否存在
+- [ ] `blog-ai-worker/.llm-active-profile` 是否指向了正确的 `provider/modelKey`
+- [ ] 是否在改完 profile 后执行过 `npm run llm:deploy`
+- [ ] `LLM_ACTIVE_PROFILE`
+- [ ] `LLM_PROVIDER_NAME`
+- [ ] `LLM_MODEL_ID`
 - [ ] `LLM_PROVIDER_API_KEY`
 - [ ] `LLM_PROVIDER_BASE_URL`
 - [ ] `TURNSTILE_SECRET_KEY`

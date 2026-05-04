@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "llm:list": "node scripts/llm-profile-cli.mjs list",
+    "llm:use": "node scripts/llm-profile-cli.mjs use",
+    "llm:deploy": "node scripts/llm-profile-cli.mjs deploy",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "engines": {

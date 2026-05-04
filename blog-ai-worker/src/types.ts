@@ -10,6 +10,9 @@ export interface ExecutionContext {
 
 export interface Env {
   RATE_LIMIT_KV: KVNamespace;
+  LLM_ACTIVE_PROFILE: string;
+  LLM_PROVIDER_NAME: string;
+  LLM_MODEL_ID: string;
   LLM_PROVIDER_API_KEY: string;
   LLM_PROVIDER_BASE_URL: string;
   TURNSTILE_SECRET_KEY: string;

@@ -1,0 +1,23 @@
+{
+  // Copy this file to llm-profiles.local.jsonc and fill in your real API key.
+  // baseUrl should stop at /v1 and must not include /chat/completions.
+  "version": 1,
+  "providers": {
+    "tencent-tokenhub": {
+      "label": "Tencent TokenHub",
+      "baseUrl": "https://tokenhub.tencentmaas.com/v1",
+      "apiKey": "replace-with-your-real-api-key",
+      "models": {
+        "glm-5.1": {
+          "modelId": "glm-5.1"
+        },
+        "kimi-k2.6": {
+          "modelId": "kimi-k2.6"
+        },
+        "deepseek-v4-pro": {
+          "modelId": "deepseek-v4-pro"
+        }
+      }
+    }
+  }
+}

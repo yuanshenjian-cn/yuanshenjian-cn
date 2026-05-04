@@ -4,7 +4,6 @@ import type { ChatResponse } from "../providers/types";
 import type { AIChatResponse, AIReference, Env } from "../types";
 import { HttpError } from "../types";
 
-const RECOMMEND_MODEL = "glm-5.1";
 const MAX_CONTEXT_POSTS = 8;
 const MAX_REFERENCES = 3;
 const DEFAULT_ANSWER = "我暂时没整理出明确推荐，你可以换个更具体的话题再试一次。";
@@ -345,7 +344,7 @@ export async function handleRecommendScene(message: string, env: Env): Promise<A
   const index = await fetchIndex(env);
   const selection = selectContextPosts(index.posts, message);
   const posts = selection.posts;
-  const provider = createProvider(env, RECOMMEND_MODEL);
+  const provider = createProvider(env, env.LLM_MODEL_ID);
   let llmResponse: ChatResponse;
 
   try {
