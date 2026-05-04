@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Sparkles } from "lucide-react";
 import { aiChat } from "@/lib/ai-client";
-import type { AIChatResponse, AIQuickTopic } from "@/types/ai";
+import type { AIQuickTopic, RecommendResponse } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_TIMEOUT_MS = 15000;
@@ -62,7 +62,7 @@ interface AiRecommendWidgetProps {
 
 export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInputChars, quickTopics }: AiRecommendWidgetProps) {
   const [message, setMessage] = useState("");
-  const [response, setResponse] = useState<AIChatResponse | null>(null);
+  const [response, setResponse] = useState<RecommendResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

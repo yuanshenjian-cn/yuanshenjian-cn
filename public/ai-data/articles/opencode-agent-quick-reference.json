@@ -1,0 +1,237 @@
+{
+  "slug": "opencode-agent-quick-reference",
+  "title": "OpenCode Agent 速查手册",
+  "date": "2026-02-09T00:00:00.000Z",
+  "excerpt": "OpenCode 的 Sub Agent 功能让 AI 编程助手从单一对话模式升级为多代理协作系统。本文详细介绍 Primary Agent 与 Sub Agent 的区别、内置代理类型、配置方法以及实战使用技巧，帮助你构建更高效的 AI 辅助开发工作流。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "OpenCode"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "OpenCode Sub Agent 让 AI 助手实现\"分工协作\"，复杂任务并行处理，效率倍增。",
+      "excerpt": "OpenCode Sub Agent 让 AI 助手实现\"分工协作\"，复杂任务并行处理，效率倍增。"
+    },
+    {
+      "id": "为什么需要-sub-agent",
+      "anchorId": "为什么需要-sub-agent",
+      "heading": "为什么需要 Sub Agent",
+      "content": "使用传统 AI 编程助手时，所有任务都在同一个对话中完成。分析代码、修改文件、搜索文档——这些操作串行执行，效率受限。 OpenCode 的 Sub Agent 解决了这个问题： 并行处理：多个任务同时执行 专业化分工：不同代理负责不同领域 上下文隔离：子任务不污染主对话 权限管控：精细化控制每个代理的能力",
+      "excerpt": "使用传统 AI 编程助手时，所有任务都在同一个对话中完成。分析代码、修改文件、搜索文档——这些操作串行执行，效率受限。 OpenCode 的 Sub Agent 解决了这个问题： 并行处理：多个任务同时执行 专业化分工：不同代理负责不同领域 上下文隔离：子任务不污染主对话 权限管控：精细化控制每个代理的能力"
+    },
+    {
+      "id": "agent-类型详解",
+      "anchorId": "agent-类型详解",
+      "heading": "Agent 类型详解",
+      "content": "OpenCode 有两种 Agent 类型：Primary（主代理）和 Sub（子代理）。",
+      "excerpt": "OpenCode 有两种 Agent 类型：Primary（主代理）和 Sub（子代理）。"
+    },
+    {
+      "id": "primary-agent主代理",
+      "anchorId": "primary-agent主代理",
+      "heading": "Primary Agent（主代理）",
+      "content": "直接与用户交互，处理主要对话。 代理 模式 特点 ------ ------ ------ Build Primary 默认代理，拥有全部工具权限 Plan Primary 受限代理，仅分析和规划，不修改代码 切换方式：按 Tab 键循环切换。",
+      "excerpt": "直接与用户交互，处理主要对话。 代理 模式 特点 ------ ------ ------ Build Primary 默认代理，拥有全部工具权限 Plan Primary 受限代理，仅分析和规划，不修改代码 切换方式：按 Tab 键循环切换。"
+    },
+    {
+      "id": "sub-agent子代理",
+      "anchorId": "sub-agent子代理",
+      "heading": "Sub Agent（子代理）",
+      "content": "由主代理调用，处理特定任务。 代理 用途 ------ ------ General 通用任务，支持文件修改 Explore 代码库探索，只读模式 调用方式：@agent-name 手动调用，或由主代理自动调用。",
+      "excerpt": "由主代理调用，处理特定任务。 代理 用途 ------ ------ General 通用任务，支持文件修改 Explore 代码库探索，只读模式 调用方式：@agent-name 手动调用，或由主代理自动调用。"
+    },
+    {
+      "id": "系统代理",
+      "anchorId": "系统代理",
+      "heading": "系统代理",
+      "content": "代理 模式 状态 功能 ------ ------ ------ ------ Compaction primary 隐藏 自动压缩长上下文 Title primary 隐藏 自动生成会话标题 Summary primary 隐藏 自动创建会话摘要",
+      "excerpt": "代理 模式 状态 功能 ------ ------ ------ ------ Compaction primary 隐藏 自动压缩长上下文 Title primary 隐藏 自动生成会话标题 Summary primary 隐藏 自动创建会话摘要"
+    },
+    {
+      "id": "build-代理",
+      "anchorId": "build-代理",
+      "heading": "Build 代理",
+      "content": "全能型代理，适合日常开发。 适用场景： 编写和修改代码 执行系统命令 完整的开发任务 特点：所有工具默认启用。",
+      "excerpt": "全能型代理，适合日常开发。 适用场景： 编写和修改代码 执行系统命令 完整的开发任务 特点：所有工具默认启用。"
+    },
+    {
+      "id": "plan-代理",
+      "anchorId": "plan-代理",
+      "heading": "Plan 代理",
+      "content": "安全分析型代理，适合代码审查。 默认权限： 文件编辑：需要确认（ask） Bash 命令：需要确认（ask） 适用场景： 代码审查 架构规划 方案设计",
+      "excerpt": "安全分析型代理，适合代码审查。 默认权限： 文件编辑：需要确认（ask） Bash 命令：需要确认（ask） 适用场景： 代码审查 架构规划 方案设计"
+    },
+    {
+      "id": "general-子代理",
+      "anchorId": "general-子代理",
+      "heading": "General 子代理",
+      "content": "通用任务处理专家。 特点： 完整工具访问（除 todo 外） 可修改文件 适合多任务并行",
+      "excerpt": "通用任务处理专家。 特点： 完整工具访问（除 todo 外） 可修改文件 适合多任务并行"
+    },
+    {
+      "id": "explore-子代理",
+      "anchorId": "explore-子代理",
+      "heading": "Explore 子代理",
+      "content": "代码库探索专家。 特点： 只读模式，不会修改文件 快速搜索和定位 安全探索代码库",
+      "excerpt": "代码库探索专家。 特点： 只读模式，不会修改文件 快速搜索和定位 安全探索代码库"
+    },
+    {
+      "id": "json-配置",
+      "anchorId": "json-配置",
+      "heading": "JSON 配置",
+      "content": "在项目根目录创建 opencode.json：",
+      "excerpt": "在项目根目录创建 opencode.json："
+    },
+    {
+      "id": "markdown-配置",
+      "anchorId": "markdown-配置",
+      "heading": "Markdown 配置",
+      "content": "将代理配置文件保存为 .md 格式，支持两种保存位置： 全局配置：~/.config/opencode/agents/（所有项目可用） 项目配置：.opencode/agents/（当前项目专用） 例如，在全局目录创建 review.md：",
+      "excerpt": "将代理配置文件保存为 .md 格式，支持两种保存位置： 全局配置：~/.config/opencode/agents/（所有项目可用） 项目配置：.opencode/agents/（当前项目专用） 例如，在全局目录创建 review.md："
+    },
+    {
+      "id": "temperature温度",
+      "anchorId": "temperature温度",
+      "heading": "Temperature（温度）",
+      "content": "控制输出的创造性和随机性。 范围 适用场景 ------ ---------- 0.0-0.2 代码分析、规划（确定性高） 0.3-0.5 一般开发任务（平衡） 0.6-1.0 头脑风暴、探索（创造性高） 默认值：如果未指定温度，OpenCode 使用模型默认值（大多数模型为 0，Qwen 模型为 0.55）。",
+      "excerpt": "控制输出的创造性和随机性。 范围 适用场景 ------ ---------- 0.0-0.2 代码分析、规划（确定性高） 0.3-0.5 一般开发任务（平衡） 0.6-1.0 头脑风暴、探索（创造性高） 默认值：如果未指定温度，OpenCode 使用模型默认值（大多数模型为 0，Qwen 模型为 0.55）。"
+    },
+    {
+      "id": "steps步数上限",
+      "anchorId": "steps步数上限",
+      "heading": "Steps（步数上限）",
+      "content": "限制代理的迭代次数，控制成本。现在应使用 steps，旧的 maxSteps 已经废弃。",
+      "excerpt": "限制代理的迭代次数，控制成本。现在应使用 steps，旧的 maxSteps 已经废弃。"
+    },
+    {
+      "id": "permissions权限",
+      "anchorId": "permissions权限",
+      "heading": "Permissions（权限）",
+      "content": "精细控制工具权限。 权限级别： ask：执行前询问 allow：允许执行 deny：禁止执行",
+      "excerpt": "精细控制工具权限。 权限级别： ask：执行前询问 allow：允许执行 deny：禁止执行"
+    },
+    {
+      "id": "hidden隐藏",
+      "anchorId": "hidden隐藏",
+      "heading": "Hidden（隐藏）",
+      "content": "隐藏子代理，不让其在 @ 菜单中显示。",
+      "excerpt": "隐藏子代理，不让其在 @ 菜单中显示。"
+    },
+    {
+      "id": "top-p采样控制",
+      "anchorId": "top-p采样控制",
+      "heading": "Top P（采样控制）",
+      "content": "控制响应多样性的温度替代方案。 值范围 0.0-1.0：低值更聚焦，高值更多样。",
+      "excerpt": "控制响应多样性的温度替代方案。 值范围 0.0-1.0：低值更聚焦，高值更多样。"
+    },
+    {
+      "id": "color颜色",
+      "anchorId": "color颜色",
+      "heading": "Color（颜色）",
+      "content": "自定义代理在 UI 中的显示颜色。 支持十六进制颜色（如 #FF5733）或主题色：primary、secondary、accent、success、warning、error、info。",
+      "excerpt": "自定义代理在 UI 中的显示颜色。 支持十六进制颜色（如 #FF5733）或主题色：primary、secondary、accent、success、warning、error、info。"
+    },
+    {
+      "id": "disable禁用",
+      "anchorId": "disable禁用",
+      "heading": "Disable（禁用）",
+      "content": "设置为 true 禁用代理。",
+      "excerpt": "设置为 true 禁用代理。"
+    },
+    {
+      "id": "task-permission代理调用权限",
+      "anchorId": "task-permission代理调用权限",
+      "heading": "Task Permission（代理调用权限）",
+      "content": "控制代理可以调用哪些子代理，使用 glob 模式匹配。",
+      "excerpt": "控制代理可以调用哪些子代理，使用 glob 模式匹配。"
+    },
+    {
+      "id": "prompt自定义提示",
+      "anchorId": "prompt自定义提示",
+      "heading": "Prompt（自定义提示）",
+      "content": "指定自定义系统提示文件。 路径相对于配置文件所在位置。",
+      "excerpt": "指定自定义系统提示文件。 路径相对于配置文件所在位置。"
+    },
+    {
+      "id": "model模型选择",
+      "anchorId": "model模型选择",
+      "heading": "Model（模型选择）",
+      "content": "为不同代理使用不同模型。 模型 ID 格式：provider/model-id。",
+      "excerpt": "为不同代理使用不同模型。 模型 ID 格式：provider/model-id。"
+    },
+    {
+      "id": "other传递给模型的参数",
+      "anchorId": "other传递给模型的参数",
+      "heading": "Other（传递给模型的参数）",
+      "content": "其他选项会直接传递给模型提供商。",
+      "excerpt": "其他选项会直接传递给模型提供商。"
+    },
+    {
+      "id": "会话导航",
+      "anchorId": "会话导航",
+      "heading": "会话导航",
+      "content": "当子代理创建子会话时： \\ +Down：进入第一个子 agent 会话 →：子会话循环 ←：子会话反向循环 ↑：返回父会话",
+      "excerpt": "当子代理创建子会话时： \\ +Down：进入第一个子 agent 会话 →：子会话循环 ←：子会话反向循环 ↑：返回父会话"
+    },
+    {
+      "id": "并行任务",
+      "anchorId": "并行任务",
+      "heading": "并行任务",
+      "content": "让 General 子代理并行处理多个独立任务：",
+      "excerpt": "让 General 子代理并行处理多个独立任务："
+    },
+    {
+      "id": "自定义代理创建",
+      "anchorId": "自定义代理创建",
+      "heading": "自定义代理创建",
+      "content": "使用命令行快速创建： 交互式流程： 选择保存位置（全局/项目） 描述代理用途 生成系统提示词 选择可用工具 创建 Markdown 配置文件",
+      "excerpt": "使用命令行快速创建： 交互式流程： 选择保存位置（全局/项目） 描述代理用途 生成系统提示词 选择可用工具 创建 Markdown 配置文件"
+    },
+    {
+      "id": "典型使用场景",
+      "anchorId": "典型使用场景",
+      "heading": "典型使用场景",
+      "content": "场景 推荐代理 配置要点 ------ ---------- ---------- 日常开发 Build 全工具开启 代码审查 Plan / 自定义 Review 只读，温度 0.1-0.2 代码探索 Explore 只读 安全审计 Security Auditor 禁止写操作，温度 0.1 文档编写 Docs Writer 禁用 bash 多任务并行 General 全工具 调试问题 Debug 禁止写操作，温度 0.2 创意探索 Creative 高温度 0.8，high top_p 快速规划 Plan (Haiku) 使用 Haiku 模型节省成本",
+      "excerpt": "场景 推荐代理 配置要点 ------ ---------- ---------- 日常开发 Build 全工具开启 代码审查 Plan / 自定义 Review 只读，温度 0.1-0.2 代码探索 Explore 只读 安全审计 Security Auditor 禁止写操作，温度 0.1 文档编写 Docs Wri..."
+    },
+    {
+      "id": "使用通配符控制工具",
+      "anchorId": "使用通配符控制工具",
+      "heading": "使用通配符控制工具",
+      "content": "禁用整个 MCP 服务器的工具：",
+      "excerpt": "禁用整个 MCP 服务器的工具："
+    },
+    {
+      "id": "精细化-bash-命令权限",
+      "anchorId": "精细化-bash-命令权限",
+      "heading": "精细化 Bash 命令权限",
+      "content": "允许特定命令，其他都需要确认：",
+      "excerpt": "允许特定命令，其他都需要确认："
+    },
+    {
+      "id": "多代理协作配置",
+      "anchorId": "多代理协作配置",
+      "heading": "多代理协作配置",
+      "content": "配置一个编排器代理控制子代理调用：",
+      "excerpt": "配置一个编排器代理控制子代理调用："
+    },
+    {
+      "id": "总结",
+      "anchorId": "总结",
+      "heading": "总结",
+      "content": "OpenCode Agent 的核心价值： 专业化分工：不同任务交给不同专家 并行处理：多任务同时执行，节省时间 权限隔离：精细化控制，安全可控 上下文管理：主对话保持清晰",
+      "excerpt": "OpenCode Agent 的核心价值： 专业化分工：不同任务交给不同专家 并行处理：多任务同时执行，节省时间 权限隔离：精细化控制，安全可控 上下文管理：主对话保持清晰"
+    },
+    {
+      "id": "参考",
+      "anchorId": "参考",
+      "heading": "参考",
+      "content": "官方文档 - 代理 官方文档 - 介绍 GitHub 社区",
+      "excerpt": "官方文档 - 代理 官方文档 - 介绍 GitHub 社区"
+    }
+  ]
+}

@@ -67,6 +67,28 @@ describe("createProvider", () => {
     });
   });
 
+  it("openai-compatible provider 暴露 streamChat 能力", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(new ReadableStream(), {
+        status: 200,
+        headers: {
+          "Content-Type": "text/event-stream",
+        },
+      }),
+    );
+
+    const provider = createProvider(env, env.LLM_MODEL_ID);
+    const stream = await provider.streamChat?.({
+      messages: [{ role: "user", content: "hello" }],
+      maxTokens: 100,
+      temperature: 0.4,
+      stream: true,
+    });
+
+    expect(stream).toBeInstanceOf(ReadableStream);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("导出的支持列表与 provider 判断函数一致", () => {
     expect(SUPPORTED_LLM_PROVIDERS).toEqual(["tencent-tokenhub", "deepseek", "moonshot-cn"]);
     expect(isSupportedLLMProvider("tencent-tokenhub")).toBe(true);

@@ -1,4 +1,4 @@
-import type { AIReference } from "../types";
+import type { RecommendReference } from "../types";
 
 const MAX_PROMPT_POSTS = 50;
 const MAX_EXCERPT_LENGTH = 160;
@@ -7,7 +7,7 @@ function truncate(text: string): string {
   return text.length > MAX_EXCERPT_LENGTH ? `${text.slice(0, MAX_EXCERPT_LENGTH)}...` : text;
 }
 
-function formatPost(post: AIReference): string {
+function formatPost(post: RecommendReference): string {
   const tags = post.tags.length > 0 ? post.tags.join(", ") : "无";
   return [
     `slug: ${post.slug}`,
@@ -18,7 +18,7 @@ function formatPost(post: AIReference): string {
   ].join("\n");
 }
 
-export function buildRecommendSystemPrompt(posts: AIReference[]): string {
+export function buildRecommendSystemPrompt(posts: RecommendReference[]): string {
   const postList = posts.slice(0, MAX_PROMPT_POSTS).map(formatPost).join("\n\n");
 
   return [

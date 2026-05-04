@@ -4,6 +4,8 @@ import { getColumnContextByPost } from "@/lib/columns";
 import { extractHeadings } from "@/lib/mdx";
 import { config } from "@/lib/config";
 import Script from "next/script";
+import { ArticleAiAssistant } from "@/components/ai/article-ai-assistant";
+import { PageAIAssistantProvider } from "@/components/ai/page-ai-assistant-provider";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
 import { TableOfContents } from "@/components/table-of-contents";
@@ -86,6 +88,49 @@ export default async function PostPage({ params }: Props) {
   const breadcrumbStructuredData = generateBreadcrumbStructuredData(breadcrumbs);
 
   const allStructuredData = [articleStructuredData, breadcrumbStructuredData];
+  const pageAssistantEnabled = config.ai.pageAssistantEnabled;
+
+  const articleBody = (
+    <>
+      <ArticleHeader post={post} />
+
+      {pageAssistantEnabled ? <ArticleAiAssistant variant="primary" /> : null}
+
+      {headings.length > 0 ? (
+        <div className="my-8 lg:hidden">
+          <div className="bg-card rounded-lg p-4 border">
+            <TableOfContents headings={headings} />
+          </div>
+        </div>
+      ) : null}
+
+      <ArticleContent
+        post={post}
+        prev={prev}
+        next={next}
+        slug={slug}
+        showHeader={false}
+        url={postUrl}
+        columnContext={columnContext}
+        footerAssistant={pageAssistantEnabled ? <ArticleAiAssistant variant="footer" /> : undefined}
+      />
+    </>
+  );
+
+  const articleContent = pageAssistantEnabled ? (
+    <PageAIAssistantProvider
+      scene="article"
+      context={{ slug }}
+      workerUrl={config.ai.workerUrl}
+      turnstileSiteKey={config.ai.turnstileSiteKey}
+      streamEnabled={config.ai.pageAssistantStreamEnabled}
+      maxInputChars={config.ai.maxInputChars}
+    >
+      {articleBody}
+    </PageAIAssistantProvider>
+  ) : (
+    articleBody
+  );
 
   return (
     <>
@@ -100,22 +145,8 @@ export default async function PostPage({ params }: Props) {
       <article className="py-12 px-6">
         {headings.length > 0 ? (
           <div className="max-w-6xl mx-auto lg:flex lg:justify-center lg:gap-8">
-            <div className="lg:hidden max-w-2xl mx-auto mb-8">
-              <ArticleHeader post={post} />
-              <div className="my-8">
-                <div className="bg-card rounded-lg p-4 border">
-                  <TableOfContents headings={headings} />
-                </div>
-              </div>
-            </div>
-
             <div className="w-full max-w-2xl mx-auto lg:mx-0 overflow-hidden">
-              <div className="hidden lg:block">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} columnContext={columnContext} />
-              </div>
-              <div className="lg:hidden">
-                <ArticleContent post={post} prev={prev} next={next} slug={slug} showHeader={false} url={postUrl} columnContext={columnContext} />
-              </div>
+              {articleContent}
             </div>
 
             <aside className="hidden lg:block w-60 flex-shrink-0">
@@ -128,7 +159,7 @@ export default async function PostPage({ params }: Props) {
           </div>
         ) : (
           <div className="max-w-2xl mx-auto overflow-hidden">
-            <ArticleContent post={post} prev={prev} next={next} slug={slug} url={postUrl} columnContext={columnContext} />
+            {articleContent}
           </div>
         )}
       </article>

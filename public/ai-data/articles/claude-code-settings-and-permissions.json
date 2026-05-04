@@ -1,0 +1,307 @@
+{
+  "slug": "claude-code-settings-and-permissions",
+  "title": "Claude Code 第六篇：设置、权限与 Auto Mode",
+  "date": "2026-04-06T00:00:00.000Z",
+  "excerpt": "深入 Claude Code 的四层设置体系、细粒度权限规则语法、Auto Mode 分类器配置与沙箱化纵深防御，帮你在安全与效率之间找到最佳平衡点。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "ClaudeCode"
+  ],
+  "sections": [
+    {
+      "id": "引言安全与效率的永恒博弈",
+      "anchorId": "引言安全与效率的永恒博弈",
+      "heading": "引言：安全与效率的永恒博弈",
+      "content": "前五篇我们已经能用 Claude Code 完成日常开发任务。但随着使用深入，你会遇到这样的场景： 团队成员 A 希望 Claude 自动运行 npm test，成员 B 担心误执行 rm -rf 你想让 Claude 推送到公司 GitLab，但 Auto Mode 把它当成\"数据泄露\"拦截了 CI/CD 环境里需要完全无人值守，开发机上却想保留确认提示 新来的实习生需要限制 Claude 只能读不能写 Claude Code 提供了一套四层设置 + 细粒度权限 + Auto Mode 分类器 + OS 级沙箱的完整安全体系来应对这些挑战。本篇将系统拆解每一层。 前置阅读：本篇假设你已熟悉第四篇中介绍的六种权限模式（Default / AcceptEdits / Plan / Auto / DontAsk / BypassPermissions），这里将深入权限规则层面而非模式层面。 ---",
+      "excerpt": "前五篇我们已经能用 Claude Code 完成日常开发任务。但随着使用深入，你会遇到这样的场景： 团队成员 A 希望 Claude 自动运行 npm test，成员 B 担心误执行 rm -rf 你想让 Claude 推送到公司 GitLab，但 Auto Mode 把它当成\"数据泄露\"拦截了 CI/CD 环境里需要..."
+    },
+    {
+      "id": "配置作用域一览",
+      "anchorId": "配置作用域一览",
+      "heading": "配置作用域一览",
+      "content": "Claude Code 采用分层配置，每一层有明确的定位： 作用域 文件位置 影响范围 是否共享 典型用途 -------- --------- --------- --------- --------- Managed 服务器 / MDM / plist / 系统级 managed-settings.json 机器上所有用户 由 IT 部署 组织安全策略、合规要求 User ~/.claude/settings.json 你的所有项目 否 个人偏好（主题、语言、模型） Project .claude/settings.json 项目所有协作者 提交到 git 团队权限、Hooks、MCP Local .claude/settings.local.json 仅你在此项目 否（gitignored） 个人覆盖、测试配置",
+      "excerpt": "Claude Code 采用分层配置，每一层有明确的定位： 作用域 文件位置 影响范围 是否共享 典型用途 -------- --------- --------- --------- --------- Managed 服务器 / MDM / plist / 系统级 managed-settings.json 机器上..."
+    },
+    {
+      "id": "优先级规则",
+      "anchorId": "优先级规则",
+      "heading": "优先级规则",
+      "content": "当同一设置在多层出现时，更具体的层级获胜： 关键规则： Managed 不可覆盖：即使用 --allowedTools 也无法绕过 Managed 的 deny 规则 deny 优先于 allow：若 User 层 allow，但 Project 层 deny，则被阻止 数组类设置合并：permissions.deny、sandbox.filesystem.allowWrite 等数组类设置在各层之间是合并而非替换",
+      "excerpt": "当同一设置在多层出现时，更具体的层级获胜： 关键规则： Managed 不可覆盖：即使用 --allowedTools 也无法绕过 Managed 的 deny 规则 deny 优先于 allow：若 User 层 allow，但 Project 层 deny，则被阻止 数组类设置合并：permissions.deny..."
+    },
+    {
+      "id": "各功能的配置位置",
+      "anchorId": "各功能的配置位置",
+      "heading": "各功能的配置位置",
+      "content": "不同功能在各作用域的文件位置不同： 功能 User 位置 Project 位置 Local 位置 ------ ---------- ------------- ----------- Settings ~/.claude/settings.json .claude/settings.json .claude/settings.local.json Subagents ~/.claude/agents/ .claude/agents/ — MCP Servers ~/.claude.json .mcp.json ~/.claude.json（每项目段） Plugins ~/.claude/settings.json .claude/settings.json .claude/settings.local.json CLAUDE.md ~/.claude/CLAUDE.md CLAUDE.md 或 .claude/CLAUDE.md CLAUDE.local.md 或 .claude/CLAUDE.local.md Rules ~/.claude/rules/ .claude/rules/ —",
+      "excerpt": "不同功能在各作用域的文件位置不同： 功能 User 位置 Project 位置 Local 位置 ------ ---------- ------------- ----------- Settings ~/.claude/settings.json .claude/settings.json .claude/sett..."
+    },
+    {
+      "id": "config-命令与-json-schema",
+      "anchorId": "config-命令与-json-schema",
+      "heading": "/config 命令与 JSON Schema",
+      "content": "交互式配置入口： 在 settings.json 顶部添加 $schema 可获得编辑器自动补全： ---",
+      "excerpt": "交互式配置入口： 在 settings.json 顶部添加 $schema 可获得编辑器自动补全： ---"
+    },
+    {
+      "id": "权限模型",
+      "anchorId": "权限模型",
+      "heading": "权限模型",
+      "content": "Claude Code 的权限模型分三层： 工具类型 示例 默认需要批准？ \"是，不再询问\" 的作用范围 --------- ------ ------------ ----------------- 只读 文件读取、Grep 否 不适用 Bash 命令 Shell 执行 是 每项目目录 + 命令，永久有效 文件修改 Edit / Write 是 仅当前会话 规则按 deny → ask → allow 顺序评估，第一个匹配的规则生效。这意味着 deny 永远优先。",
+      "excerpt": "Claude Code 的权限模型分三层： 工具类型 示例 默认需要批准？ \"是，不再询问\" 的作用范围 --------- ------ ------------ ----------------- 只读 文件读取、Grep 否 不适用 Bash 命令 Shell 执行 是 每项目目录 + 命令，永久有效 文件修改 ..."
+    },
+    {
+      "id": "匹配所有使用",
+      "anchorId": "匹配所有使用",
+      "heading": "匹配所有使用",
+      "content": "Bash(*) 等同于 Bash，匹配所有命令。",
+      "excerpt": "Bash(*) 等同于 Bash，匹配所有命令。"
+    },
+    {
+      "id": "bash-通配符",
+      "anchorId": "bash-通配符",
+      "heading": "Bash 通配符",
+      "content": "Bash 规则支持 通配符，可出现在任意位置： 规则 匹配 不匹配 ------ ------ -------- Bash(npm run build) 精确匹配 npm run build npm run test Bash(npm run ) npm run test、npm run lint npm install Bash( --version) node --version、python --version node --help Bash(git main) git checkout main、git merge main git push origin dev 空格敏感：Bash(ls ) 匹配 ls -la 但不匹配 lsof；Bash(ls) 两者都匹配。因为空格前缀的 强制单词边界。 复合命令自动拆分：批准 git status && npm test 时，Claude Code 会为 npm test 单独保存规则，未来 npm test 无论前面连什么都会被识别。单个复合命令最多保存 5 条规则。 Shell 运算符感知：Bash(safe-cmd ) 不会让 safe-cmd && other-cmd 获得权限，Claude Code 理解 &&、 、; 等运算符。 安全警告：试图用 Bash 模式约束命令参数是脆弱的。例如 Bash(curl http://github.com/ *) 无法匹配 URL 前加选项、不同协议、重定向等变体。对于 URL 过滤，更推荐用 WebFetch(domain:...) 权限 + 沙箱网络隔离。",
+      "excerpt": "Bash 规则支持 通配符，可出现在任意位置： 规则 匹配 不匹配 ------ ------ -------- Bash(npm run build) 精确匹配 npm run build npm run test Bash(npm run ) npm run test、npm run lint npm instal..."
+    },
+    {
+      "id": "read--edit-路径规则",
+      "anchorId": "read--edit-路径规则",
+      "heading": "Read / Edit 路径规则",
+      "content": "Read 和 Edit 规则遵循 gitignore 规范，有四种路径前缀： 前缀 含义 示例 ------ ------ ------ //path 文件系统绝对路径 Read(//Users/alice/secrets/) ~/path 相对主目录* Read(~/Documents/.pdf) /path 相对项目根目录 Edit(/src/*/.ts) path 或 ./path 相对当前目录 Read(.env) 易错点：/Users/alice/file 不是绝对路径！它相对于项目根目录。绝对路径必须用 //。 通配符区别： 匹配单个目录中的文件， 递归匹配目录。 重要限制：Read/Edit 的 deny 规则仅适用于 Claude 的内置文件工具**，不阻止 Bash 中的 cat .env。要实现 OS 级阻止，需启用沙箱。",
+      "excerpt": "Read 和 Edit 规则遵循 gitignore 规范，有四种路径前缀： 前缀 含义 示例 ------ ------ ------ //path 文件系统绝对路径 Read(//Users/alice/secrets/) ~/path 相对主目录* Read(~/Documents/.pdf) /path 相对项..."
+    },
+    {
+      "id": "mcp-工具权限",
+      "anchorId": "mcp-工具权限",
+      "heading": "MCP 工具权限",
+      "content": "格式：mcp ，用 mcp 或 mcp __* 匹配服务器所有工具。",
+      "excerpt": "格式：mcp ，用 mcp 或 mcp __* 匹配服务器所有工具。"
+    },
+    {
+      "id": "agentsubagent权限",
+      "anchorId": "agentsubagent权限",
+      "heading": "Agent（Subagent）权限",
+      "content": "也可通过 CLI 标志：--disallowedTools 'Agent(Explore)'。",
+      "excerpt": "也可通过 CLI 标志：--disallowedTools 'Agent(Explore)'。"
+    },
+    {
+      "id": "实用配置示例",
+      "anchorId": "实用配置示例",
+      "heading": "实用配置示例",
+      "content": "前端项目——允许常用命令，阻止敏感文件和危险操作： 只读审查模式——仅允许读取和分析，禁止一切修改：",
+      "excerpt": "前端项目——允许常用命令，阻止敏感文件和危险操作： 只读审查模式——仅允许读取和分析，禁止一切修改："
+    },
+    {
+      "id": "工作目录",
+      "anchorId": "工作目录",
+      "heading": "工作目录",
+      "content": "默认情况下，Claude 只能访问启动它的目录。扩展方式： 方式 用法 持久性 ------ ------ -------- CLI 参数 --add-dir ../docs 仅当前会话 交互命令 /add-dir ../docs 仅当前会话 设置文件 additionalDirectories: [\"../docs\"] 持久 注意：额外目录仅授予文件访问权限，不会成为完整的配置根目录。大多数 .claude/ 配置不会从额外目录加载，但 Skills 和部分插件设置例外。 ---",
+      "excerpt": "默认情况下，Claude 只能访问启动它的目录。扩展方式： 方式 用法 持久性 ------ ------ -------- CLI 参数 --add-dir ../docs 仅当前会话 交互命令 /add-dir ../docs 仅当前会话 设置文件 additionalDirectories: [\"../docs\"..."
+    },
+    {
+      "id": "auto-mode-深入",
+      "anchorId": "auto-mode-深入",
+      "heading": "Auto Mode 深入",
+      "content": "第四篇介绍了 Auto Mode 是六种权限模式之一——它使用后台分类器自动批准或拒绝操作。本节深入其配置机制。",
+      "excerpt": "第四篇介绍了 Auto Mode 是六种权限模式之一——它使用后台分类器自动批准或拒绝操作。本节深入其配置机制。"
+    },
+    {
+      "id": "分类器的工作方式",
+      "anchorId": "分类器的工作方式",
+      "heading": "分类器的工作方式",
+      "content": "Auto Mode 的分类器模型会对每个工具调用进行评估： 分类器内部的优先级： softdeny 规则先阻止（如强制推送、数据泄露、curl bash） allow 规则作为例外覆盖 softdeny 显式用户意图可覆盖两者——但必须是直接且具体的指令（\"强制推送此分支\"有效，\"清理存储库\"无效）",
+      "excerpt": "Auto Mode 的分类器模型会对每个工具调用进行评估： 分类器内部的优先级： softdeny 规则先阻止（如强制推送、数据泄露、curl bash） allow 规则作为例外覆盖 softdeny 显式用户意图可覆盖两者——但必须是直接且具体的指令（\"强制推送此分支\"有效，\"清理存储库\"无效）"
+    },
+    {
+      "id": "配置源限制",
+      "anchorId": "配置源限制",
+      "heading": "配置源限制",
+      "content": "分类器不从共享项目设置（.claude/settings.json）读取 autoMode，防止恶意仓库注入自己的 allow 规则。只从以下来源读取： 配置源 文件 用途 -------- ------ ------ 个人设置 ~/.claude/settings.json 个人信任的基础设施 项目本地设置 .claude/settings.local.json 每项目信任的存储桶/服务（gitignored） 托管设置 managed-settings.json 等 组织级强制信任基础设施 各来源的条目被合并。开发者可以用个人条目扩展 environment、allow、soft_deny，但不能删除托管设置提供的条目。",
+      "excerpt": "分类器不从共享项目设置（.claude/settings.json）读取 autoMode，防止恶意仓库注入自己的 allow 规则。只从以下来源读取： 配置源 文件 用途 -------- ------ ------ 个人设置 ~/.claude/settings.json 个人信任的基础设施 项目本地设置 .cla..."
+    },
+    {
+      "id": "配置信任基础设施environment",
+      "anchorId": "配置信任基础设施environment",
+      "heading": "配置信任基础设施（environment）",
+      "content": "对大多数组织，autoMode.environment 是唯一需要设置的字段。它用自然语言告诉分类器哪些是你的内部资源： 条目是散文描述（不是正则表达式或工具模式），分类器将它们作为自然语言规则读取。按你向新工程师描述基础设施的方式编写即可。 推荐渐进式配置： 先用默认值运行 添加源代码控制组织和关键内部服务（解决最常见误报，如推送到自己的仓库被拦截） 添加信任域和云存储桶 其余在遇到阻止时按需填写",
+      "excerpt": "对大多数组织，autoMode.environment 是唯一需要设置的字段。它用自然语言告诉分类器哪些是你的内部资源： 条目是散文描述（不是正则表达式或工具模式），分类器将它们作为自然语言规则读取。按你向新工程师描述基础设施的方式编写即可。 推荐渐进式配置： 先用默认值运行 添加源代码控制组织和关键内部服务（解决最常..."
+    },
+    {
+      "id": "覆盖-allow-和-soft_deny",
+      "anchorId": "覆盖-allow-和-soft_deny",
+      "heading": "覆盖 allow 和 soft_deny",
+      "content": "危险操作：设置 allow 或 softdeny 会替换该部分的整个默认列表！如果你只设置一条 softdeny，所有内置阻止规则（强制推送、数据泄露、curl bash、生产部署等）都会消失。 安全操作流程： 示例——在默认规则基础上放宽 staging 部署：",
+      "excerpt": "危险操作：设置 allow 或 softdeny 会替换该部分的整个默认列表！如果你只设置一条 softdeny，所有内置阻止规则（强制推送、数据泄露、curl bash、生产部署等）都会消失。 安全操作流程： 示例——在默认规则基础上放宽 staging 部署："
+    },
+    {
+      "id": "审查-auto-mode-拒绝",
+      "anchorId": "审查-auto-mode-拒绝",
+      "heading": "审查 Auto Mode 拒绝",
+      "content": "当 Auto Mode 拒绝某个操作时： 屏幕出现通知 被拒绝的操作记录在 /permissions → \"最近拒绝\" 选项卡 在被拒绝的操作上按 r，将其标记为\"重试\" 退出对话框后，Claude Code 发消息告诉模型可以重试该操作 要以编程方式响应拒绝，可使用 PermissionDenied Hook。",
+      "excerpt": "当 Auto Mode 拒绝某个操作时： 屏幕出现通知 被拒绝的操作记录在 /permissions → \"最近拒绝\" 选项卡 在被拒绝的操作上按 r，将其标记为\"重试\" 退出对话框后，Claude Code 发消息告诉模型可以重试该操作 要以编程方式响应拒绝，可使用 PermissionDenied Hook。"
+    },
+    {
+      "id": "禁用-auto-mode",
+      "anchorId": "禁用-auto-mode",
+      "heading": "禁用 Auto Mode",
+      "content": "在任何 settings.json 中设置： 效果：从 Shift+Tab 循环中移除 auto，启动时拒绝 --permission-mode auto。在托管设置中设置最有效，因为用户无法覆盖。 ---",
+      "excerpt": "在任何 settings.json 中设置： 效果：从 Shift+Tab 循环中移除 auto，启动时拒绝 --permission-mode auto。在托管设置中设置最有效，因为用户无法覆盖。 ---"
+    },
+    {
+      "id": "为什么需要沙箱",
+      "anchorId": "为什么需要沙箱",
+      "heading": "为什么需要沙箱",
+      "content": "权限系统控制 Claude 的内置工具可以做什么，但 Bash 子进程可以绕过——cat .env 不受 Read(./.env) deny 规则限制。沙箱提供 OS 级强制执行，限制所有 Bash 命令及其子进程的文件系统和网络访问。 安全层 作用对象 强制级别 覆盖范围 -------- --------- --------- --------- 权限系统 Claude 内置工具（Bash、Read、Edit、WebFetch、MCP） 应用级 所有工具 沙箱 Bash 命令及其子进程 OS 级 仅 Bash 两者是互补关系，推荐同时使用实现纵深防御。",
+      "excerpt": "权限系统控制 Claude 的内置工具可以做什么，但 Bash 子进程可以绕过——cat .env 不受 Read(./.env) deny 规则限制。沙箱提供 OS 级强制执行，限制所有 Bash 命令及其子进程的文件系统和网络访问。 安全层 作用对象 强制级别 覆盖范围 -------- --------- ---..."
+    },
+    {
+      "id": "沙箱的两大隔离",
+      "anchorId": "沙箱的两大隔离",
+      "heading": "沙箱的两大隔离",
+      "content": "文件系统隔离： 默认写入：仅当前工作目录及子目录 默认读取：整个机器（除某些被拒绝目录） OS 级强制：macOS 用 Seatbelt，Linux 用 bubblewrap，所有子进程继承限制 网络隔离： 通过沙箱外的代理服务器控制 仅允许访问批准的域名 新域名请求触发权限提示 适用于所有子进程",
+      "excerpt": "文件系统隔离： 默认写入：仅当前工作目录及子目录 默认读取：整个机器（除某些被拒绝目录） OS 级强制：macOS 用 Seatbelt，Linux 用 bubblewrap，所有子进程继承限制 网络隔离： 通过沙箱外的代理服务器控制 仅允许访问批准的域名 新域名请求触发权限提示 适用于所有子进程"
+    },
+    {
+      "id": "启用与配置",
+      "anchorId": "启用与配置",
+      "heading": "启用与配置",
+      "content": "Linux 前置依赖（macOS 开箱即用）： 两种沙箱模式： 模式 行为 适用场景 ------ ------ --------- Auto Allow 沙箱内命令自动批准，无法沙箱化的命令回退到权限流程 日常开发，追求效率 Regular Permissions 所有命令都走权限流程，沙箱仅提供 OS 级保护 高安全要求 Auto Allow 模式独立于权限模式运行——即使你不在 AcceptEdits 模式，沙箱化的 bash 命令也会自动执行。",
+      "excerpt": "Linux 前置依赖（macOS 开箱即用）： 两种沙箱模式： 模式 行为 适用场景 ------ ------ --------- Auto Allow 沙箱内命令自动批准，无法沙箱化的命令回退到权限流程 日常开发，追求效率 Regular Permissions 所有命令都走权限流程，沙箱仅提供 OS 级保护 高安..."
+    },
+    {
+      "id": "沙箱设置速查",
+      "anchorId": "沙箱设置速查",
+      "heading": "沙箱设置速查",
+      "content": "路径前缀规则（注意与 Read/Edit 权限规则不同）： 前缀 沙箱中的含义 Read/Edit 权限中的含义 ------ ----------- ----------------- /path 绝对路径 项目根相对路径 ~/path 主目录相对 主目录相对 ./path 项目根相对 当前目录相对 逃生舱机制：当命令因沙箱限制失败时，Claude 可能使用 dangerouslyDisableSandbox 参数在沙箱外重试，此时走常规权限流程。设置 \"allowUnsandboxedCommands\": false 可完全禁用此逃生舱。",
+      "excerpt": "路径前缀规则（注意与 Read/Edit 权限规则不同）： 前缀 沙箱中的含义 Read/Edit 权限中的含义 ------ ----------- ----------------- /path 绝对路径 项目根相对路径 ~/path 主目录相对 主目录相对 ./path 项目根相对 当前目录相对 逃生舱机制：当命..."
+    },
+    {
+      "id": "沙箱不覆盖的内容",
+      "anchorId": "沙箱不覆盖的内容",
+      "heading": "沙箱不覆盖的内容",
+      "content": "内置文件工具（Read、Edit、Write）：由权限系统控制，不走沙箱 Computer Use：在真实桌面运行，不在隔离环境 WebFetch：有自己的域名权限控制 ---",
+      "excerpt": "内置文件工具（Read、Edit、Write）：由权限系统控制，不走沙箱 Computer Use：在真实桌面运行，不在隔离环境 WebFetch：有自己的域名权限控制 ---"
+    },
+    {
+      "id": "hooks-扩展权限评估",
+      "anchorId": "hooks-扩展权限评估",
+      "heading": "Hooks 扩展权限评估",
+      "content": "Hooks 是第七篇的重点，这里仅介绍其与权限系统的交互。 PreToolUse Hook 可在权限提示前运行自定义脚本来动态评估： Hook 返回值的效果： Hook 返回 效果 与权限规则的关系 ---------- ------ ------------- \"allow\" 跳过提示 deny/ask 规则仍然生效（deny 优先） 退出码 2 阻止调用 优先于 allow 规则 其他 不影响 正常走权限流程 典型用途：允许所有 Bash 但用 Hook 阻止特定危险命令： ---",
+      "excerpt": "Hooks 是第七篇的重点，这里仅介绍其与权限系统的交互。 PreToolUse Hook 可在权限提示前运行自定义脚本来动态评估： Hook 返回值的效果： Hook 返回 效果 与权限规则的关系 ---------- ------ ------------- \"allow\" 跳过提示 deny/ask 规则仍然生效..."
+    },
+    {
+      "id": "仅-managed-生效的设置",
+      "anchorId": "仅-managed-生效的设置",
+      "heading": "仅 Managed 生效的设置",
+      "content": "以下设置只在 Managed 层有效，放在用户或项目设置中无效： 设置 用途 ------ ------ allowedChannelPlugins 频道插件白名单 allowManagedHooksOnly 仅允许 Managed Hooks allowManagedMcpServersOnly 仅允许 Managed MCP allowManagedPermissionRulesOnly 仅允许 Managed 权限规则 blockedMarketplaces 插件市场黑名单 channelsEnabled 启用频道功能 pluginTrustMessage 自定义插件信任警告 sandbox.filesystem.allowManagedReadPathsOnly 仅 Managed 读取路径 sandbox.network.allowManagedDomainsOnly 仅 Managed 网络域名 strictKnownMarketplaces 限制插件市场来源",
+      "excerpt": "以下设置只在 Managed 层有效，放在用户或项目设置中无效： 设置 用途 ------ ------ allowedChannelPlugins 频道插件白名单 allowManagedHooksOnly 仅允许 Managed Hooks allowManagedMcpServersOnly 仅允许 Manage..."
+    },
+    {
+      "id": "部署方式",
+      "anchorId": "部署方式",
+      "heading": "部署方式",
+      "content": "方式 平台 位置 ------ ------ ------ 服务器托管 通用 Claude.ai 管理员控制台 MDM macOS com.anthropic.claudecode preferences 域 注册表 Windows HKLM\\SOFTWARE\\Policies\\ClaudeCode 基于文件 macOS /Library/Application Support/ClaudeCode/ 基于文件 Linux /etc/claude-code/ 基于文件 Windows C:\\Program Files\\ClaudeCode\\ Drop-in 目录：managed-settings.d/ 目录中的 *.json 文件按字母顺序合并，方便不同团队独立部署策略片段。使用数字前缀控制顺序（如 10-telemetry.json、20-security.json）。 ---",
+      "excerpt": "方式 平台 位置 ------ ------ ------ 服务器托管 通用 Claude.ai 管理员控制台 MDM macOS com.anthropic.claudecode preferences 域 注册表 Windows HKLM\\SOFTWARE\\Policies\\ClaudeCode 基于文件 macO..."
+    },
+    {
+      "id": "个人开发者",
+      "anchorId": "个人开发者",
+      "heading": "个人开发者",
+      "content": "场景：个人项目，追求效率，适度安全。",
+      "excerpt": "场景：个人项目，追求效率，适度安全。"
+    },
+    {
+      "id": "团队项目",
+      "anchorId": "团队项目",
+      "heading": "团队项目",
+      "content": "场景：多人协作，需要统一标准，允许合理自由度。",
+      "excerpt": "场景：多人协作，需要统一标准，允许合理自由度。"
+    },
+    {
+      "id": "企业-cicd",
+      "anchorId": "企业-cicd",
+      "heading": "企业 CI/CD",
+      "content": "场景：无人值守，需要最大自动化 + 最严格安全。 ---",
+      "excerpt": "场景：无人值守，需要最大自动化 + 最严格安全。 ---"
+    },
+    {
+      "id": "高频设置速查表",
+      "anchorId": "高频设置速查表",
+      "heading": "高频设置速查表",
+      "content": "以下精选日常最常调整的设置项（完整列表见官方文档）：",
+      "excerpt": "以下精选日常最常调整的设置项（完整列表见官方文档）："
+    },
+    {
+      "id": "行为与偏好",
+      "anchorId": "行为与偏好",
+      "heading": "行为与偏好",
+      "content": "设置键 类型 说明 示例 -------- ------ ------ ------ model string 覆盖默认模型 \"claude-sonnet-4-6\" effortLevel string 努力级别 \"low\" / \"medium\" / \"high\" language string 响应语言 \"chinese\" outputStyle string 输出风格 \"Explanatory\" alwaysThinkingEnabled bool 默认启用扩展思考 true",
+      "excerpt": "设置键 类型 说明 示例 -------- ------ ------ ------ model string 覆盖默认模型 \"claude-sonnet-4-6\" effortLevel string 努力级别 \"low\" / \"medium\" / \"high\" language string 响应语言 \"chine..."
+    },
+    {
+      "id": "安全与权限",
+      "anchorId": "安全与权限",
+      "heading": "安全与权限",
+      "content": "设置键 类型 说明 示例 -------- ------ ------ ------ permissions.defaultMode string 默认权限模式 \"acceptEdits\" permissions.allow array 允许规则列表 [\"Bash(npm *)\"] permissions.deny array 拒绝规则列表 [\"Read(./.env)\"] disableAutoMode string 禁用 Auto Mode \"disable\" disableBypassPermissionsMode string 禁用 Bypass 模式 \"disable\"",
+      "excerpt": "设置键 类型 说明 示例 -------- ------ ------ ------ permissions.defaultMode string 默认权限模式 \"acceptEdits\" permissions.allow array 允许规则列表 [\"Bash(npm *)\"] permissions.deny a..."
+    },
+    {
+      "id": "沙箱",
+      "anchorId": "沙箱",
+      "heading": "沙箱",
+      "content": "设置键 类型 说明 示例 -------- ------ ------ ------ sandbox.enabled bool 启用沙箱 true sandbox.autoAllowBashIfSandboxed bool 沙箱内自动批准 true sandbox.failIfUnavailable bool 不可用时硬失败 true sandbox.excludedCommands array 沙箱外运行的命令 [\"docker\"] sandbox.filesystem.allowWrite array 额外写入路径 [\"~/.kube\"]",
+      "excerpt": "设置键 类型 说明 示例 -------- ------ ------ ------ sandbox.enabled bool 启用沙箱 true sandbox.autoAllowBashIfSandboxed bool 沙箱内自动批准 true sandbox.failIfUnavailable bool 不可用时..."
+    },
+    {
+      "id": "会话与清理",
+      "anchorId": "会话与清理",
+      "heading": "会话与清理",
+      "content": "设置键 类型 说明 示例 -------- ------ ------ ------ cleanupPeriodDays number 非活跃会话清理周期 20 autoUpdatesChannel string 更新渠道 \"stable\" / \"latest\" includeGitInstructions bool 系统提示含 Git 说明 true ---",
+      "excerpt": "设置键 类型 说明 示例 -------- ------ ------ ------ cleanupPeriodDays number 非活跃会话清理周期 20 autoUpdatesChannel string 更新渠道 \"stable\" / \"latest\" includeGitInstructions bool ..."
+    },
+    {
+      "id": "安全最佳实践清单",
+      "anchorId": "安全最佳实践清单",
+      "heading": "安全最佳实践清单",
+      "content": "基于官方安全指南，按场景整理：",
+      "excerpt": "基于官方安全指南，按场景整理："
+    },
+    {
+      "id": "处理敏感代码",
+      "anchorId": "处理敏感代码",
+      "heading": "处理敏感代码",
+      "content": "✅ 批准前审查所有建议的更改 ✅ 为敏感仓库使用项目级权限设置 ✅ 启用沙箱并配置 denyRead 阻止敏感路径 ✅ 使用 /permissions 定期审计权限设置 ✅ 考虑使用 Devcontainer 获得额外隔离",
+      "excerpt": "✅ 批准前审查所有建议的更改 ✅ 为敏感仓库使用项目级权限设置 ✅ 启用沙箱并配置 denyRead 阻止敏感路径 ✅ 使用 /permissions 定期审计权限设置 ✅ 考虑使用 Devcontainer 获得额外隔离"
+    },
+    {
+      "id": "防止提示注入",
+      "anchorId": "防止提示注入",
+      "heading": "防止提示注入",
+      "content": "✅ 权限系统在任何操作前要求批准 ✅ 不要直接将不受信任内容管道传给 Claude ✅ 验证对关键文件的修改建议 ✅ 沙箱确保即使注入成功，也无法修改系统文件或泄露数据 ✅ Web Fetch 使用独立上下文窗口，避免注入恶意提示",
+      "excerpt": "✅ 权限系统在任何操作前要求批准 ✅ 不要直接将不受信任内容管道传给 Claude ✅ 验证对关键文件的修改建议 ✅ 沙箱确保即使注入成功，也无法修改系统文件或泄露数据 ✅ Web Fetch 使用独立上下文窗口，避免注入恶意提示"
+    },
+    {
+      "id": "团队协作",
+      "anchorId": "团队协作",
+      "heading": "团队协作",
+      "content": "✅ 用 Managed 设置强制执行组织标准 ✅ 通过 .claude/settings.json 共享权限配置 ✅ 用 OpenTelemetry 监控 Claude Code 使用情况 ✅ 用 ConfigChange Hook 审计设置变更 ✅ 用 /bug 报告可疑行为 ---",
+      "excerpt": "✅ 用 Managed 设置强制执行组织标准 ✅ 通过 .claude/settings.json 共享权限配置 ✅ 用 OpenTelemetry 监控 Claude Code 使用情况 ✅ 用 ConfigChange Hook 审计设置变更 ✅ 用 /bug 报告可疑行为 ---"
+    },
+    {
+      "id": "常见问题",
+      "anchorId": "常见问题",
+      "heading": "常见问题",
+      "content": "问题 答案 ------ ------ 如何查看当前生效的所有权限？ /permissions 命令，列出所有规则及来源 allow 和 deny 冲突时谁赢？ deny 永远赢，评估顺序 deny → ask → allow Auto Mode 把正常操作拦截了怎么办？ 在 /permissions \"最近拒绝\"选项卡按 r 重试，或配置 autoMode.environment 沙箱和权限需要同时开吗？ 推荐同时开，权限控制工具级，沙箱控制 OS 级，互补 项目设置会覆盖我的个人设置吗？ 是的，Project 优先于 User（但 Local 优先于 Project） bypassPermissions 真的跳过一切吗？ 不，.git、.claude、.vscode、.idea、.husky 目录的写入仍需确认 如何在 CI 中完全无人值守？ 用 --permission-mode dontAsk + 预配置 allow 规则 沙箱在 Docker 中能用吗？ Linux 上需要 enableWeakerNestedSandbox，安全性会削弱 settings.json 改了不生效？ 检查优先级——更高层级可能覆盖了。用 /config 或 claude auto-mode config 查看实际生效值 如何阻止 Claude 读取 .env？ 权限 deny: [\"Read(./.env)\"] + 沙箱 denyRead: [\"./.env\"]，双保险 ---",
+      "excerpt": "问题 答案 ------ ------ 如何查看当前生效的所有权限？ /permissions 命令，列出所有规则及来源 allow 和 deny 冲突时谁赢？ deny 永远赢，评估顺序 deny → ask → allow Auto Mode 把正常操作拦截了怎么办？ 在 /permissions \"最近拒绝\"选项..."
+    },
+    {
+      "id": "小结",
+      "anchorId": "小结",
+      "heading": "小结",
+      "content": "本篇系统梳理了 Claude Code 的安全与配置体系： 层级 机制 作用 ------ ------ ------ 设置系统 四层作用域 + 优先级 统一配置管理 权限规则 deny → ask → allow + 工具特定语法 细粒度工具控制 Auto Mode 分类器 + 自然语言策略 智能自动批准 沙箱 OS 级文件/网络隔离 纵深防御 Hooks PreToolUse 运行时评估 动态权限扩展 托管设置 不可覆盖的组织策略 企业级管控 安全配置的核心原则：从最小权限开始，按需放宽，定期审计。下一篇我们将进入 Claude Code 的扩展架构——Skills、Sub-agents、Agent Teams、Hooks、MCP 与 Plugins 的全景图。",
+      "excerpt": "本篇系统梳理了 Claude Code 的安全与配置体系： 层级 机制 作用 ------ ------ ------ 设置系统 四层作用域 + 优先级 统一配置管理 权限规则 deny → ask → allow + 工具特定语法 细粒度工具控制 Auto Mode 分类器 + 自然语言策略 智能自动批准 沙箱 OS..."
+    }
+  ]
+}

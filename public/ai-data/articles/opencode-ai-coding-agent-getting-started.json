@@ -1,0 +1,125 @@
+{
+  "slug": "opencode-ai-coding-agent-getting-started",
+  "title": "OpenCode 新手入门：从零开始使用",
+  "date": "2026-02-06T00:00:00.000Z",
+  "excerpt": "OpenCode 是一款开源的 AI Coding Agent，支持终端、桌面应用和主流 IDE。本文从零开始，带你完成 OpenCode 的安装配置和初次使用，快速上手这款提升编程效率的神器。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "OpenCode"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "一款开源、免费、支持 75+ 模型提供商的 AI 编程代理，拥有近 100K GitHub stars，让你的终端变成智能编程助手。",
+      "excerpt": "一款开源、免费、支持 75+ 模型提供商的 AI 编程代理，拥有近 100K GitHub stars，让你的终端变成智能编程助手。"
+    },
+    {
+      "id": "引言为什么需要-opencode",
+      "anchorId": "引言为什么需要-opencode",
+      "heading": "引言：为什么需要 OpenCode",
+      "content": "每天面对重复性编码任务、繁琐的代码审查、复杂的重构工作，你是否想过有一个智能助手能分担这些工作？传统的 AI 编程工具要么价格昂贵，要么隐私堪忧。 OpenCode 的出现改变了这一局面。它是一款完全开源的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，你既可以直接连接自己的 provider，也可以先从 /models 里挑当前可用的体验模型开始上手。 这篇文章带你全面了解 OpenCode，从安装配置到核心功能，帮助你快速上手这款效率工具。",
+      "excerpt": "每天面对重复性编码任务、繁琐的代码审查、复杂的重构工作，你是否想过有一个智能助手能分担这些工作？传统的 AI 编程工具要么价格昂贵，要么隐私堪忧。 OpenCode 的出现改变了这一局面。它是一款完全开源的 AI 编程代理，支持在终端、桌面应用和主流 IDE 中使用。最吸引人的是：它支持 75+ 家模型提供商，你既可以..."
+    },
+    {
+      "id": "什么是-opencode",
+      "anchorId": "什么是-opencode",
+      "heading": "什么是 OpenCode",
+      "content": "OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 anomalyco 开发并在 GitHub 开源。它允许开发者通过自然语言与 AI 交互，完成代码编写、重构、调试、审查等任务。 核心定位： 开源免费，代码透明 隐私优先，数据可控 终端原生，高效便捷 模型灵活，支持多提供商",
+      "excerpt": "OpenCode 是一个开源的 AI 编程代理（AI Coding Agent），由 anomalyco 开发并在 GitHub 开源。它允许开发者通过自然语言与 AI 交互，完成代码编写、重构、调试、审查等任务。 核心定位： 开源免费，代码透明 隐私优先，数据可控 终端原生，高效便捷 模型灵活，支持多提供商"
+    },
+    {
+      "id": "主要特性",
+      "anchorId": "主要特性",
+      "heading": "主要特性",
+      "content": "特性 说明 ------ ------ 双模式工作 Build 模式（全权限编辑）+ Plan 模式（只读规划） 多平台支持 macOS、Windows（WSL）、Linux 模型丰富 支持 75+ 提供商，可直接连接自己的 provider，也可以先从 /models 中当前可用的体验模型开始 工具集 bash 执行、文件读写、grep 搜索等 上下文感知 自动生成 AGENTS.md，理解项目结构 分享协作 一键生成会话分享链接",
+      "excerpt": "特性 说明 ------ ------ 双模式工作 Build 模式（全权限编辑）+ Plan 模式（只读规划） 多平台支持 macOS、Windows（WSL）、Linux 模型丰富 支持 75+ 提供商，可直接连接自己的 provider，也可以先从 /models 中当前可用的体验模型开始 工具集 bash 执行..."
+    },
+    {
+      "id": "适用场景",
+      "anchorId": "适用场景",
+      "heading": "适用场景",
+      "content": "快速原型开发：通过自然语言描述生成代码 代码审查与重构：自动化代码改进建议 Bug 修复：定位问题并提供修复方案 技术学习：解释复杂代码逻辑 文档编写：自动生成代码注释和文档",
+      "excerpt": "快速原型开发：通过自然语言描述生成代码 代码审查与重构：自动化代码改进建议 Bug 修复：定位问题并提供修复方案 技术学习：解释复杂代码逻辑 文档编写：自动生成代码注释和文档"
+    },
+    {
+      "id": "macos-安装",
+      "anchorId": "macos-安装",
+      "heading": "macOS 安装",
+      "content": "方式一：一键安装脚本（推荐） 方式二：Homebrew 安装 方式三：npm 安装 *验证安装成功：",
+      "excerpt": "方式一：一键安装脚本（推荐） 方式二：Homebrew 安装 方式三：npm 安装 *验证安装成功："
+    },
+    {
+      "id": "windows-安装",
+      "anchorId": "windows-安装",
+      "heading": "Windows 安装",
+      "content": "推荐：使用 WSL（Windows Subsystem for Linux） WSL（Windows Subsystem for Linux）是 Windows 10/11 的可选功能，需要手动开启，不是系统默认自带的。 第一步：安装 WSL 以管理员身份打开 PowerShell，执行： 这会安装默认的 Ubuntu 发行版。安装完成后重启电脑，按提示设置 Ubuntu 用户名和密码。 如果已经安装了 WSL，可以跳过此步骤。 第二步：在 WSL 中安装 OpenCode 打开 WSL 终端（在开始菜单搜索 \"Ubuntu\" 或 \"WSL\"），然后执行： WSL 目录关联说明 在 WSL 中，Windows 磁盘被挂载到 /mnt 目录下。了解路径对应关系有助于在 WSL 中访问 Windows 文件： Windows 路径 WSL 路径 ----------------------- --------------------------- C:\\Users\\Name\\project /mnt/c/Users/Name/project D:\\workspace /mnt/d/workspace E:\\data /mnt/e/data 例如，要在 WSL 中打开 Windows 的 D 盘工作目录： 方式二：npm 安装",
+      "excerpt": "推荐：使用 WSL（Windows Subsystem for Linux） WSL（Windows Subsystem for Linux）是 Windows 10/11 的可选功能，需要手动开启，不是系统默认自带的。 第一步：安装 WSL 以管理员身份打开 PowerShell，执行： 这会安装默认的 Ubuntu..."
+    },
+    {
+      "id": "桌面应用安装beta",
+      "anchorId": "桌面应用安装beta",
+      "heading": "桌面应用安装（BETA）",
+      "content": "桌面版直接以官方下载页当前提供的安装方式为准： 下载页：https://opencode.ai/download GitHub Releases：https://github.com/anomalyco/opencode/releases 如果你在 macOS 上，也可以直接用 Homebrew 安装： ⚠️ 注意：桌面应用目前处于 BETA 阶段，功能可能不如终端版本稳定。",
+      "excerpt": "桌面版直接以官方下载页当前提供的安装方式为准： 下载页：https://opencode.ai/download GitHub Releases：https://github.com/anomalyco/opencode/releases 如果你在 macOS 上，也可以直接用 Homebrew 安装： ⚠️ 注意：桌..."
+    },
+    {
+      "id": "启动与初次使用",
+      "anchorId": "启动与初次使用",
+      "heading": "启动与初次使用",
+      "content": "安装完成后，在终端输入以下命令启动 OpenCode： 首次启动流程： 欢迎界面：看到 OpenCode 的 TUI（终端用户界面） 模型选择：首次启动会提示选择 AI 模型 - 可以先从 /models 里当前标注 Free 或可直接使用的体验模型开始 - 或选择 /connect 配置自己的 API Key 或登录已有账户 开始使用：进入主界面后，输入 /help 查看帮助 验证安装成功： 快速测试： 如果看到 AI 回复，说明安装成功。",
+      "excerpt": "安装完成后，在终端输入以下命令启动 OpenCode： 首次启动流程： 欢迎界面：看到 OpenCode 的 TUI（终端用户界面） 模型选择：首次启动会提示选择 AI 模型 - 可以先从 /models 里当前标注 Free 或可直接使用的体验模型开始 - 或选择 /connect 配置自己的 API Key 或登录..."
+    },
+    {
+      "id": "配置模型",
+      "anchorId": "配置模型",
+      "heading": "配置模型",
+      "content": "使用免费体验模型（限时，无需 API Key）： 启动后输入 /models 查看可用模型，优先选择当前标注 Free 或可直接使用的体验模型。体验期间通常不需要额外连接供应商或配置 API Key，即可先把工作流跑起来。 ⚠️ 注意：免费体验模型可能有使用限制或时限，建议长期使用前配置自己的 API Key 或考虑 OpenCode Zen 服务。 连接商业模型： 按提示选择提供商（OpenAI、Anthropic、Google 等）并粘贴 API Key。 使用已有账号登录： OpenCode 支持直接登录你已经付费的 AI 服务账号： Claude：输入 /connect，选择 Anthropic，粘贴 API Key ChatGPT Plus/Pro：输入 /connect，选择 OpenAI，登录你的 ChatGPT 账户 这样可以复用你已经订阅的服务，无需额外付费。 💡 提示：新手可以先使用免费模型体验，需要更好性能时再考虑使用 Zen。",
+      "excerpt": "使用免费体验模型（限时，无需 API Key）： 启动后输入 /models 查看可用模型，优先选择当前标注 Free 或可直接使用的体验模型。体验期间通常不需要额外连接供应商或配置 API Key，即可先把工作流跑起来。 ⚠️ 注意：免费体验模型可能有使用限制或时限，建议长期使用前配置自己的 API Key 或考虑 ..."
+    },
+    {
+      "id": "双模式工作流",
+      "anchorId": "双模式工作流",
+      "heading": "双模式工作流",
+      "content": "OpenCode 提供两种工作模式，通过 Tab 键 切换： Build 模式（默认） AI 拥有完整编辑权限 可直接修改文件、执行命令 适合直接编码任务 Plan 模式 AI 只读，不修改文件 提供实施方案和步骤 适合规划和审查 使用建议：复杂任务先 Plan 后 Build，简单任务直接 Build，关键代码人工确认后再执行。",
+      "excerpt": "OpenCode 提供两种工作模式，通过 Tab 键 切换： Build 模式（默认） AI 拥有完整编辑权限 可直接修改文件、执行命令 适合直接编码任务 Plan 模式 AI 只读，不修改文件 提供实施方案和步骤 适合规划和审查 使用建议：复杂任务先 Plan 后 Build，简单任务直接 Build，关键代码人工确..."
+    },
+    {
+      "id": "项目初始化",
+      "anchorId": "项目初始化",
+      "heading": "项目初始化",
+      "content": "进入项目目录后执行： 在 TUI 中输入： init命令会做如下事情： 扫描整个项目 - 分析项目结构和所有内容 理解项目类型 - 识别项目使用的技术栈、框架和架构 生成 AGENTS.md - 创建一个包含项目特定规则和指南的 AGENTS.md 文件 AGENTS.md会帮助 opencode 更好地导航和理解项目，在后续任务中更懂你。一定要将 AGENTS.md 提交到 Git，便于团队协作。",
+      "excerpt": "进入项目目录后执行： 在 TUI 中输入： init命令会做如下事情： 扫描整个项目 - 分析项目结构和所有内容 理解项目类型 - 识别项目使用的技术栈、框架和架构 生成 AGENTS.md - 创建一个包含项目特定规则和指南的 AGENTS.md 文件 AGENTS.md会帮助 opencode 更好地导航和理解项目..."
+    },
+    {
+      "id": "内置工具集",
+      "anchorId": "内置工具集",
+      "heading": "内置工具集",
+      "content": "OpenCode 通过工具操作代码库，可在 opencode.json 中配置权限： 工具 功能 权限选项 ------ ------ ---------- bash 执行 shell 命令 allow/deny/ask read 读取文件内容 allow write 创建新文件 跟随 edit 权限 edit 修改文件内容；applypatch / multiedit 也归这一类 allow/deny/ask grep 搜索文件内容 allow glob 列出匹配文件 allow lsp 语言服务分析（实验性） allow（需 OPENCODEEXPERIMENTALLSPTOOL=true） webfetch 抓取网页内容 allow websearch 网络搜索 allow（需 OpenCode provider 或 OPENCODEENABLEEXA=1） skill 加载 SKILL.md 技能文件 allow todowrite 创建/更新任务清单 allow question 向用户提问 allow 其中 write、apply_patch 和 multiedit 虽然是不同的写入能力，但都统一受 edit permission 控制。",
+      "excerpt": "OpenCode 通过工具操作代码库，可在 opencode.json 中配置权限： 工具 功能 权限选项 ------ ------ ---------- bash 执行 shell 命令 allow/deny/ask read 读取文件内容 allow write 创建新文件 跟随 edit 权限 edit 修改文..."
+    },
+    {
+      "id": "常用-slash-命令",
+      "anchorId": "常用-slash-命令",
+      "heading": "常用 Slash 命令",
+      "content": "在 TUI 中输入 / 查看所有命令： 核心命令： 命令 功能 快捷键 ------ ------ -------- /connect 配置模型提供商 - /init 初始化项目 Ctrl+X I /models 切换模型 Ctrl+X M /new 新会话 Ctrl+X N /compact 压缩当前会话（总结上下文） Ctrl+X C /sessions 列出并切换会话 Ctrl+X L /export 导出对话为 Markdown Ctrl+X X /undo 撤销更改 Ctrl+X U /share 分享会话 Ctrl+X S /exit 退出 Ctrl+X Q",
+      "excerpt": "在 TUI 中输入 / 查看所有命令： 核心命令： 命令 功能 快捷键 ------ ------ -------- /connect 配置模型提供商 - /init 初始化项目 Ctrl+X I /models 切换模型 Ctrl+X M /new 新会话 Ctrl+X N /compact 压缩当前会话（总结上下文..."
+    },
+    {
+      "id": "文件引用语法",
+      "anchorId": "文件引用语法",
+      "heading": "文件引用语法",
+      "content": "使用 @ 快速引用项目文件： 支持模糊搜索，输入 @ 后按文件名自动补全。",
+      "excerpt": "使用 @ 快速引用项目文件： 支持模糊搜索，输入 @ 后按文件名自动补全。"
+    },
+    {
+      "id": "参考链接",
+      "anchorId": "参考链接",
+      "heading": "参考链接",
+      "content": "官网：https://opencode.ai GitHub：https://github.com/anomalyco/opencode 文档：https://opencode.ai/docs 下载页面：https://opencode.ai/download",
+      "excerpt": "官网：https://opencode.ai GitHub：https://github.com/anomalyco/opencode 文档：https://opencode.ai/docs 下载页面：https://opencode.ai/download"
+    }
+  ]
+}

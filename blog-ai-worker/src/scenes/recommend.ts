@@ -1,7 +1,7 @@
 import { buildRecommendSystemPrompt } from "../prompts/recommend";
 import { createProvider } from "../providers";
 import type { ChatResponse } from "../providers/types";
-import type { AIChatResponse, AIReference, Env } from "../types";
+import type { Env, RecommendReference, RecommendResponse } from "../types";
 import { HttpError } from "../types";
 
 const MAX_CONTEXT_POSTS = 8;
@@ -11,7 +11,7 @@ const QUERY_STOPWORDS = ["推荐", "几篇", "关于", "文章", "博客", "一�
 
 interface AIIndexPayload {
   generated: string;
-  posts: AIReference[];
+  posts: RecommendReference[];
 }
 
 interface RecommendModelPayload {
@@ -20,7 +20,7 @@ interface RecommendModelPayload {
 }
 
 interface SelectedPostsResult {
-  posts: AIReference[];
+  posts: RecommendReference[];
   hasMatch: boolean;
 }
 
@@ -28,7 +28,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isReference(value: unknown): value is AIReference {
+function isReference(value: unknown): value is RecommendReference {
   return (
     isRecord(value) &&
     typeof value.slug === "string" &&
@@ -116,12 +116,12 @@ function parseModelResponse(content: string): RecommendModelPayload {
   };
 }
 
-function mapReferences(posts: AIReference[], slugs: string[]): AIReference[] {
+function mapReferences(posts: RecommendReference[], slugs: string[]): RecommendReference[] {
   const postMap = new Map(posts.map((post) => [post.slug, post]));
 
   return slugs
     .map((slug) => postMap.get(slug))
-    .filter((post): post is AIReference => post !== undefined)
+    .filter((post): post is RecommendReference => post !== undefined)
     .slice(0, MAX_REFERENCES);
 }
 
@@ -192,23 +192,23 @@ function buildQueryKeywords(message: string): string[] {
   });
 }
 
-function scorePost(post: AIReference, keywords: string[]): number {
+function scorePost(post: RecommendReference, keywords: string[]): number {
   if (keywords.length === 0) {
     return 0;
   }
 
   const title = normalizeText(post.title);
   const excerpt = normalizeText(post.excerpt);
-  const tags = post.tags.map((tag) => normalizeText(tag));
+  const tags = post.tags.map((tag: string) => normalizeText(tag));
 
   return keywords.reduce((score, keyword) => {
     let nextScore = score;
 
-    if (tags.some((tag) => tag === keyword)) {
+    if (tags.some((tag: string) => tag === keyword)) {
       nextScore += 10;
     }
 
-    if (tags.some((tag) => tag.includes(keyword) || keyword.includes(tag))) {
+    if (tags.some((tag: string) => tag.includes(keyword) || keyword.includes(tag))) {
       nextScore += 4;
     }
 
@@ -224,7 +224,7 @@ function scorePost(post: AIReference, keywords: string[]): number {
   }, 0);
 }
 
-function selectContextPosts(posts: AIReference[], message: string): SelectedPostsResult {
+function selectContextPosts(posts: RecommendReference[], message: string): SelectedPostsResult {
   const keywords = buildQueryKeywords(message);
 
   const rankedPosts = posts
@@ -255,8 +255,8 @@ function selectContextPosts(posts: AIReference[], message: string): SelectedPost
   };
 }
 
-function buildFallbackReason(post: AIReference): string {
-  const normalizedTags = new Set(post.tags.map((tag) => normalizeText(tag)));
+function buildFallbackReason(post: RecommendReference): string {
+  const normalizedTags = new Set(post.tags.map((tag: string) => normalizeText(tag)));
 
   if (normalizedTags.has(normalizeText("选型指南"))) {
     return "适合先快速建立整体选型视角。";
@@ -285,7 +285,7 @@ function buildFallbackReason(post: AIReference): string {
   return "和你这次想读的主题比较接近。";
 }
 
-function buildFallbackResponse(message: string, posts: AIReference[], hasMatch: boolean): AIChatResponse {
+function buildFallbackResponse(message: string, posts: RecommendReference[], hasMatch: boolean): RecommendResponse {
   const references = posts.slice(0, MAX_REFERENCES);
 
   if (references.length === 0) {
@@ -307,7 +307,7 @@ function buildFallbackResponse(message: string, posts: AIReference[], hasMatch: 
   };
 }
 
-async function getRecommendResponse(message: string, provider: ReturnType<typeof createProvider>, posts: AIReference[]): Promise<ChatResponse> {
+async function getRecommendResponse(message: string, provider: ReturnType<typeof createProvider>, posts: RecommendReference[]): Promise<ChatResponse> {
   return provider.chat({
     messages: [
       {
@@ -340,7 +340,7 @@ async function fetchIndex(env: Env): Promise<AIIndexPayload> {
   return payload;
 }
 
-export async function handleRecommendScene(message: string, env: Env): Promise<AIChatResponse> {
+export async function handleRecommendScene(message: string, env: Env): Promise<RecommendResponse> {
   const index = await fetchIndex(env);
   const selection = selectContextPosts(index.posts, message);
   const posts = selection.posts;

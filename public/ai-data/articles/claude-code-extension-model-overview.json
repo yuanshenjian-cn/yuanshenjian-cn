@@ -1,0 +1,237 @@
+{
+  "slug": "claude-code-extension-model-overview",
+  "title": "Claude Code 第七篇：扩展架构全景——Skills、Sub-agents、Hooks、MCP、Plugins 与 Agent Teams",
+  "date": "2026-04-07T00:00:00.000Z",
+  "excerpt": "系统拆解 Claude Code 的六大扩展机制——Skills、Sub-agents、Hooks、MCP、Plugins、Agent Teams，理解它们的定位、协作关系与选型决策，帮你从「会用工具」迈向「设计工具链」。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "ClaudeCode"
+  ],
+  "sections": [
+    {
+      "id": "引言从使用者到架构师",
+      "anchorId": "引言从使用者到架构师",
+      "heading": "引言：从使用者到架构师",
+      "content": "前六篇我们已经能高效使用 Claude Code 完成日常开发。但随着任务复杂度上升，你会发现单靠内置能力远远不够： 想让 Claude 每次提交前自动跑 lint + test，怎么做？ 想让 Claude 访问公司内部的 API 文档服务器，怎么接入？ 想把一套\"创建 React 组件\"的流程固化成可复用的模板，怎么封装？ 想让多个 Claude 实例并行处理不同模块，怎么协调？ Claude Code 为此提供了六大扩展机制，从轻量脚本到分布式协作，覆盖了几乎所有定制化场景。本篇将系统拆解每一种机制的设计意图、核心配置与适用边界。 阅读建议：本篇是\"架构认知\"篇，侧重是什么、为什么、怎么选。具体的端到端实战配置将在第八篇中展开。 ---",
+      "excerpt": "前六篇我们已经能高效使用 Claude Code 完成日常开发。但随着任务复杂度上升，你会发现单靠内置能力远远不够： 想让 Claude 每次提交前自动跑 lint + test，怎么做？ 想让 Claude 访问公司内部的 API 文档服务器，怎么接入？ 想把一套\"创建 React 组件\"的流程固化成可复用的模板，怎..."
+    },
+    {
+      "id": "六大机制全景图",
+      "anchorId": "六大机制全景图",
+      "heading": "六大机制全景图",
+      "content": "先建立宏观视角——六大机制各自解决什么问题： 机制 核心定位 触发方式 典型场景 ------ --------- --------- --------- Skills 可复用的指令模板 /skill-name 命令 封装工作流（批量处理、调试循环） Sub-agents 专职的子 Claude 实例 自动或手动调度 代码探索、方案规划、专领域代理 Hooks 生命周期事件回调 25+ 事件自动触发 提交前检查、文件变更通知、权限拦截 MCP 外部工具/数据连接协议 Claude 按需调用 数据库查询、API 网关、文件系统扩展 Plugins 多机制打包分发单元 安装后自动生效 第三方工具集成（如 Sentry、Linear） Agent Teams 多 Claude 并行协作 团队任务分发 大规模重构、多模块并行开发 它们之间不是互斥关系，而是分层互补： ---",
+      "excerpt": "先建立宏观视角——六大机制各自解决什么问题： 机制 核心定位 触发方式 典型场景 ------ --------- --------- --------- Skills 可复用的指令模板 /skill-name 命令 封装工作流（批量处理、调试循环） Sub-agents 专职的子 Claude 实例 自动或手动调度 ..."
+    },
+    {
+      "id": "什么是-skill",
+      "anchorId": "什么是-skill",
+      "heading": "什么是 Skill",
+      "content": "Skill 是一个 Markdown 文件（SKILL.md），包含 YAML frontmatter 元数据和正文指令。你可以把它理解为\"可参数化的 CLAUDE.md 片段\"——当用户输入 /skill-name 时，Claude 会加载该 Skill 的指令并按照其中的步骤执行。",
+      "excerpt": "Skill 是一个 Markdown 文件（SKILL.md），包含 YAML frontmatter 元数据和正文指令。你可以把它理解为\"可参数化的 CLAUDE.md 片段\"——当用户输入 /skill-name 时，Claude 会加载该 Skill 的指令并按照其中的步骤执行。"
+    },
+    {
+      "id": "skill-的存放位置与优先级",
+      "anchorId": "skill-的存放位置与优先级",
+      "heading": "Skill 的存放位置与优先级",
+      "content": "Skill 可存放在四个位置，优先级从高到低： 位置 路径 影响范围 是否共享 ------ ------ --------- --------- Enterprise 由管理策略注入 组织所有成员 由 IT 管控 Personal ~/.claude/skills/skill-name/SKILL.md 你的所有项目 否 Project .claude/skills/skill-name/SKILL.md 项目所有协作者 提交到 git Plugin 通过 Plugin 安装 取决于 Plugin 作用域 取决于 Plugin 同名 Skill 高优先级覆盖低优先级。",
+      "excerpt": "Skill 可存放在四个位置，优先级从高到低： 位置 路径 影响范围 是否共享 ------ ------ --------- --------- Enterprise 由管理策略注入 组织所有成员 由 IT 管控 Personal ~/.claude/skills/skill-name/SKILL.md 你的所有项目..."
+    },
+    {
+      "id": "skillmd-结构详解",
+      "anchorId": "skillmd-结构详解",
+      "heading": "SKILL.md 结构详解",
+      "content": "一个完整的 Skill 文件：",
+      "excerpt": "一个完整的 Skill 文件："
+    },
+    {
+      "id": "frontmatter-字段速查",
+      "anchorId": "frontmatter-字段速查",
+      "heading": "Frontmatter 字段速查",
+      "content": "字段 类型 说明 ------ ------ ------ name string Skill 名称，决定 /name 命令 description string 描述，用于 AI 自动选择 argument-hint string 参数提示，显示在帮助中 user-invocable boolean 是否可通过 / 命令手动调用 disable-model-invocation boolean 禁止 AI 自动调用此 Skill allowed-tools string[] 允许使用的工具白名单 model string 运行此 Skill 的模型 effort string 推理强度（low / medium / high） context string fork 则在子代理中运行，隔离上下文 agent string 指定运行此 Skill 的子代理 hooks object 绑定到此 Skill 的 Hooks paths string[] 限制 Skill 自动激活的范围（匹配工作目录下的路径） shell string 指定 Bash 命令使用的 Shell",
+      "excerpt": "字段 类型 说明 ------ ------ ------ name string Skill 名称，决定 /name 命令 description string 描述，用于 AI 自动选择 argument-hint string 参数提示，显示在帮助中 user-invocable boolean 是否可通过 / ..."
+    },
+    {
+      "id": "参数替换机制",
+      "anchorId": "参数替换机制",
+      "heading": "参数替换机制",
+      "content": "Skill 正文中可使用以下占位符： 占位符 说明 示例 -------- ------ ------ $ARGUMENTS 完整参数字符串 /deploy staging → staging $ARGUMENTS[0] 第 N 个参数（空格分隔） /deploy staging eu → staging $1, $2, ... 同 $ARGUMENTS[0]、$ARGUMENTS[1] 简写形式 ${CLAUDESESSIONID} 当前会话 ID 用于日志关联 ${CLAUDESKILLDIR} Skill 文件所在目录 引用同目录下的资源文件",
+      "excerpt": "Skill 正文中可使用以下占位符： 占位符 说明 示例 -------- ------ ------ $ARGUMENTS 完整参数字符串 /deploy staging → staging $ARGUMENTS[0] 第 N 个参数（空格分隔） /deploy staging eu → staging $1, $2..."
+    },
+    {
+      "id": "动态上下文注入",
+      "anchorId": "动态上下文注入",
+      "heading": "动态上下文注入",
+      "content": "Skill 正文中可使用 ` !command ` 语法动态注入命令输出： 当 Skill 被加载时，这些命令会立即执行，输出替换到对应位置，为 Claude 提供实时上下文。",
+      "excerpt": "Skill 正文中可使用 ` !command ` 语法动态注入命令输出： 当 Skill 被加载时，这些命令会立即执行，输出替换到对应位置，为 Claude 提供实时上下文。"
+    },
+    {
+      "id": "内置-skills",
+      "anchorId": "内置-skills",
+      "heading": "内置 Skills",
+      "content": "Claude Code 自带以下 Skills： Skill 用途 ------- ------ /batch 批量处理多个文件或任务 /claude-api 加载 Claude API 参考资料到上下文 /debug 进入调试循环（运行→失败→修复→重试） /loop 循环执行直到条件满足 /simplify 简化复杂代码",
+      "excerpt": "Claude Code 自带以下 Skills： Skill 用途 ------- ------ /batch 批量处理多个文件或任务 /claude-api 加载 Claude API 参考资料到上下文 /debug 进入调试循环（运行→失败→修复→重试） /loop 循环执行直到条件满足 /simplify 简化复..."
+    },
+    {
+      "id": "context-fork-与隔离运行",
+      "anchorId": "context-fork-与隔离运行",
+      "heading": "context: fork 与隔离运行",
+      "content": "当 context: fork 时，Skill 会在一个独立的子代理会话中运行： 独立上下文：不会污染主会话的对话历史 结果回传：子代理完成后，结果摘要返回主会话 适用场景：探索性任务、可能产生大量中间输出的操作 ---",
+      "excerpt": "当 context: fork 时，Skill 会在一个独立的子代理会话中运行： 独立上下文：不会污染主会话的对话历史 结果回传：子代理完成后，结果摘要返回主会话 适用场景：探索性任务、可能产生大量中间输出的操作 ---"
+    },
+    {
+      "id": "内置-sub-agents",
+      "anchorId": "内置-sub-agents",
+      "heading": "内置 Sub-agents",
+      "content": "Claude Code 内置了五个专职子代理，各有明确分工： 子代理 模型 权限 用途 -------- ------ ------ ------ Explore Haiku 只读 快速搜索代码、阅读文件 Plan 继承主模型 只读 制定实施方案，不做修改 通用子代理 继承主模型 全工具 委派完整子任务 StatusLine Setup Sonnet — 配置终端状态栏 Claude Code Guide Haiku — 回答关于 Claude Code 本身的问题 当 Claude 自行判断某个子任务适合委派时，会自动选择合适的内置子代理。例如，当它需要了解一个大型代码库的结构时，往往会先派出 Explore 子代理进行快速扫描。",
+      "excerpt": "Claude Code 内置了五个专职子代理，各有明确分工： 子代理 模型 权限 用途 -------- ------ ------ ------ Explore Haiku 只读 快速搜索代码、阅读文件 Plan 继承主模型 只读 制定实施方案，不做修改 通用子代理 继承主模型 全工具 委派完整子任务 StatusL..."
+    },
+    {
+      "id": "自定义-sub-agents",
+      "anchorId": "自定义-sub-agents",
+      "heading": "自定义 Sub-agents",
+      "content": "你可以在以下位置创建自定义子代理： 项目级：.claude/agents/agent-name.md 用户级：~/.claude/agents/agent-name.md 文件格式与 Skill 类似——YAML frontmatter + Markdown 正文指令：",
+      "excerpt": "你可以在以下位置创建自定义子代理： 项目级：.claude/agents/agent-name.md 用户级：~/.claude/agents/agent-name.md 文件格式与 Skill 类似——YAML frontmatter + Markdown 正文指令："
+    },
+    {
+      "id": "agent-frontmatter-字段速查",
+      "anchorId": "agent-frontmatter-字段速查",
+      "heading": "Agent Frontmatter 字段速查",
+      "content": "字段 类型 说明 ------ ------ ------ name string 代理名称 description string 描述，用于 AI 自动选择 tools string[] 允许使用的工具白名单 disallowedTools string[] 禁止使用的工具黑名单 model string 使用的模型（haiku / sonnet / opus） permissionMode string 权限模式（default / plan / auto / bypassPermissions 等） maxTurns number 最大对话轮数 skills string[] 此代理可使用的 Skills mcpServers string[] 此代理可使用的 MCP 服务器名称列表 hooks object 绑定到此代理的 Hooks memory string 持久记忆级别（user / project / local） background boolean 后台运行模式 effort string 推理强度 isolation string worktree 使用 git worktree 隔离 color string 终端状态栏颜色标识 initialPrompt string 代理启动时的初始提示",
+      "excerpt": "字段 类型 说明 ------ ------ ------ name string 代理名称 description string 描述，用于 AI 自动选择 tools string[] 允许使用的工具白名单 disallowedTools string[] 禁止使用的工具黑名单 model string 使用的模型..."
+    },
+    {
+      "id": "工具控制策略",
+      "anchorId": "工具控制策略",
+      "heading": "工具控制策略",
+      "content": "tools 和 disallowedTools 支持精细的工具控制： 工具名称遵循 Claude Code 的权限规则语法——ToolName(pattern) 形式可限制工具的参数范围。",
+      "excerpt": "tools 和 disallowedTools 支持精细的工具控制： 工具名称遵循 Claude Code 的权限规则语法——ToolName(pattern) 形式可限制工具的参数范围。"
+    },
+    {
+      "id": "后台子代理",
+      "anchorId": "后台子代理",
+      "heading": "后台子代理",
+      "content": "当 background: true 时，子代理在后台运行： 不阻塞主会话：你可以继续与主 Claude 交互 权限预审批：后台代理的工具权限在启动时确定，运行中不再弹出权限确认 适用场景：长时间运行的任务（如大规模代码分析、持续监控）",
+      "excerpt": "当 background: true 时，子代理在后台运行： 不阻塞主会话：你可以继续与主 Claude 交互 权限预审批：后台代理的工具权限在启动时确定，运行中不再弹出权限确认 适用场景：长时间运行的任务（如大规模代码分析、持续监控）"
+    },
+    {
+      "id": "隔离运行git-worktree",
+      "anchorId": "隔离运行git-worktree",
+      "heading": "隔离运行：git worktree",
+      "content": "当 isolation: worktree 时，子代理会在一个独立的 git worktree 中工作： 效果： 子代理的文件修改不会影响主工作目录 完成后可选择性地将更改合并回来 适合需要大量试错的重构任务",
+      "excerpt": "当 isolation: worktree 时，子代理会在一个独立的 git worktree 中工作： 效果： 子代理的文件修改不会影响主工作目录 完成后可选择性地将更改合并回来 适合需要大量试错的重构任务"
+    },
+    {
+      "id": "持久记忆",
+      "anchorId": "持久记忆",
+      "heading": "持久记忆",
+      "content": "当 memory: true 时，子代理会在会话间保留记忆： 项目级记忆：.claude/agent-memory/agent-name/ 用户级记忆：~/.claude/agent-memory/agent-name/ 每次调用该代理时，之前积累的记忆会自动加载，使代理能\"记住\"项目的历史上下文。 ---",
+      "excerpt": "当 memory: true 时，子代理会在会话间保留记忆： 项目级记忆：.claude/agent-memory/agent-name/ 用户级记忆：~/.claude/agent-memory/agent-name/ 每次调用该代理时，之前积累的记忆会自动加载，使代理能\"记住\"项目的历史上下文。 ---"
+    },
+    {
+      "id": "设计理念",
+      "anchorId": "设计理念",
+      "heading": "设计理念",
+      "content": "Hooks 是 Claude Code 的事件系统——在特定生命周期节点自动触发外部脚本。与传统 Git hooks 类似，但覆盖面更广：不仅限于 Git 操作，还包括工具调用、权限决策、会话管理等 25+ 个事件。",
+      "excerpt": "Hooks 是 Claude Code 的事件系统——在特定生命周期节点自动触发外部脚本。与传统 Git hooks 类似，但覆盖面更广：不仅限于 Git 操作，还包括工具调用、权限决策、会话管理等 25+ 个事件。"
+    },
+    {
+      "id": "事件一览",
+      "anchorId": "事件一览",
+      "heading": "事件一览",
+      "content": "Claude Code 支持的 Hook 事件按生命周期阶段分组： 会话生命周期 事件 触发时机 ------ --------- SessionStart 会话开始 SessionEnd 会话结束 InstructionsLoaded CLAUDE.md / Rules 加载完成 ConfigChange 配置发生变更 CwdChanged 工作目录切换 用户交互 事件 触发时机 ------ --------- UserPromptSubmit 用户提交 prompt（可修改 prompt 内容） Notification Claude 发出通知 Elicitation MCP 服务器请求用户输入 ElicitationResult 用户对 Elicitation 的回复 工具调用 事件 触发时机 ------ --------- PreToolUse 工具调用前（可拦截、修改或放行） PostToolUse 工具调用后（可审计结果） PostToolUseFailure 工具调用失败后 权限决策 事件 触发时机 ------ --------- PermissionRequest 权限请求弹出时（可自动决策） PermissionDenied 权限被拒绝后（可重试） 子代理 / 团队 事件 触发时机 ------ --------- SubagentStart 子代理启动 SubagentStop 子代理停止 TeammateIdle 团队成员空闲 TaskCreated 任务创建 TaskCompleted 任务完成 文件 / 工作区 事件 触发时机 ------ --------- FileChanged 文件发生变更 WorktreeCreate git worktree 创建 WorktreeRemove git worktree 移除 上下文管理 事件 触发时机 ------ --------- PreCompact 上下文压缩前 PostCompact 上下文压缩后 终止 事件 触发时机 ------ --------- Stop Claude 正常停止 StopFailure Claude 异常停止",
+      "excerpt": "Claude Code 支持的 Hook 事件按生命周期阶段分组： 会话生命周期 事件 触发时机 ------ --------- SessionStart 会话开始 SessionEnd 会话结束 InstructionsLoaded CLAUDE.md / Rules 加载完成 ConfigChange 配置发生变..."
+    },
+    {
+      "id": "hook-类型",
+      "anchorId": "hook-类型",
+      "heading": "Hook 类型",
+      "content": "Hook 支持四种执行方式： 类型 说明 示例 ------ ------ ------ command 执行本地命令 \"command\": \"npm test\" http 发送 HTTP 请求 \"url\": \"https://api.example.com/hook\" prompt 注入额外 prompt 给 Claude \"prompt\": \"记得检查类型安全\" agent 启动一个子代理处理 \"agent\": \"security-checker\"",
+      "excerpt": "Hook 支持四种执行方式： 类型 说明 示例 ------ ------ ------ command 执行本地命令 \"command\": \"npm test\" http 发送 HTTP 请求 \"url\": \"https://api.example.com/hook\" prompt 注入额外 prompt 给 Cla..."
+    },
+    {
+      "id": "配置格式",
+      "anchorId": "配置格式",
+      "heading": "配置格式",
+      "content": "Hooks 配置在 settings.json 中，采用嵌套结构——每个事件下是一组匹配规则，每条规则包含一个 matcher（可选）和对应的 hooks 数组： 注意结构层次：hooks → 事件名 → [ { matcher?, hooks: [...] } ]。matcher 不填则匹配该事件的所有触发。 { \"permissionDecision\": \"allow\" } { \"decision\": { \"behavior\": \"allow\" } } { \"retry\": true } { \"mcpServers\": { \"my-db\": { \"type\": \"stdio\", \"command\": \"npx\", \"args\": [\"@modelcontextprotocol/server-postgres\"], \"env\": { \"DATABASE_URL\": \"postgresql://localhost:5432/mydb\" } } } } { \"mcpServers\": { \"remote-api\": { \"type\": \"http\", \"url\": \"https://mcp.example.com/api\" } } }",
+      "excerpt": "Hooks 配置在 settings.json 中，采用嵌套结构——每个事件下是一组匹配规则，每条规则包含一个 matcher（可选）和对应的 hooks 数组： 注意结构层次：hooks → 事件名 → [ { matcher?, hooks: [...] } ]。matcher 不填则匹配该事件的所有触发。 { \"..."
+    },
+    {
+      "id": "添加-stdio-服务器",
+      "anchorId": "添加-stdio-服务器",
+      "heading": "添加 stdio 服务器",
+      "content": "claude mcp add my-db -- npx @modelcontextprotocol/server-postgres",
+      "excerpt": "claude mcp add my-db -- npx @modelcontextprotocol/server-postgres"
+    },
+    {
+      "id": "添加-http-服务器",
+      "anchorId": "添加-http-服务器",
+      "heading": "添加 HTTP 服务器",
+      "content": "claude mcp add --transport http remote-api https://mcp.example.com/api",
+      "excerpt": "claude mcp add --transport http remote-api https://mcp.example.com/api"
+    },
+    {
+      "id": "指定作用域",
+      "anchorId": "指定作用域",
+      "heading": "指定作用域",
+      "content": "claude mcp add my-tool --scope project -- npx my-tool-server",
+      "excerpt": "claude mcp add my-tool --scope project -- npx my-tool-server"
+    },
+    {
+      "id": "列出已配置的服务器",
+      "anchorId": "列出已配置的服务器",
+      "heading": "列出已配置的服务器",
+      "content": "claude mcp list",
+      "excerpt": "claude mcp list"
+    },
+    {
+      "id": "移除服务器",
+      "anchorId": "移除服务器",
+      "heading": "移除服务器",
+      "content": "claude mcp remove my-db @server-name:protocol://resource/path 请参考 @docs:file:///api-reference.md 来实现这个接口",
+      "excerpt": "claude mcp remove my-db @server-name:protocol://resource/path 请参考 @docs:file:///api-reference.md 来实现这个接口"
+    },
+    {
+      "id": "格式mcp__servername__promptname",
+      "anchorId": "格式mcp__servername__promptname",
+      "heading": "格式：/mcp__servername__promptname",
+      "content": "/mcpdocssearch-api claude mcp serve my-plugin/ ├── .claude-plugin/ │ └── plugin.json 清单文件（可选，用于元数据声明） ├── commands/ 额外命令 ├── agents/ 子代理定义 ├── skills/ Skill 定义 ├── hooks/ │ └── hooks.json Hook 配置 ├── .mcp.json MCP 服务器配置 ├── .lsp.json LSP 配置 └── settings.json 设置覆盖（仅支持 agent 相关配置） { \"name\": \"my-plugin\", \"version\": \"1.0.0\", \"description\": \"我的自定义插件\", \"author\": { \"name\": \"your-name\" } }",
+      "excerpt": "/mcpdocssearch-api claude mcp serve my-plugin/ ├── .claude-plugin/ │ └── plugin.json 清单文件（可选，用于元数据声明） ├── commands/ 额外命令 ├── agents/ 子代理定义 ├── skills/ Skill 定义 ..."
+    },
+    {
+      "id": "格式plugin-nameskill-name",
+      "anchorId": "格式plugin-nameskill-name",
+      "heading": "格式：/plugin-name:skill-name",
+      "content": "/my-plugin:create-component /sentry:analyze-error",
+      "excerpt": "/my-plugin:create-component /sentry:analyze-error"
+    },
+    {
+      "id": "测试本地-plugin",
+      "anchorId": "测试本地-plugin",
+      "heading": "测试本地 Plugin",
+      "content": "claude --plugin-dir ./my-plugin",
+      "excerpt": "claude --plugin-dir ./my-plugin"
+    },
+    {
+      "id": "重新加载-plugins开发时",
+      "anchorId": "重新加载-plugins开发时",
+      "heading": "重新加载 Plugins（开发时）",
+      "content": "/reload-plugins",
+      "excerpt": "/reload-plugins"
+    },
+    {
+      "id": "从-marketplace-安装",
+      "anchorId": "从-marketplace-安装",
+      "heading": "从 marketplace 安装",
+      "content": "/plugin install plugin-name",
+      "excerpt": "/plugin install plugin-name"
+    },
+    {
+      "id": "从-url-安装",
+      "anchorId": "从-url-安装",
+      "heading": "从 URL 安装",
+      "content": "/plugin install https://github.com/org/plugin-repo export CLAUDECODEEXPERIMENTALAGENTTEAMS=1 ┌──────────────┐ │ Team Lead │ │ (协调者/你) │ └──────┬───────┘ │ 分发任务 ┌──────────┼──────────┐ ▼ ▼ ▼ ┌─────────┐ ┌─────────┐ ┌─────────┐ │Teammate │ │Teammate │ │Teammate │ │ A │ │ B │ │ C │ └────┬────┘ └────┬────┘ └────┬────┘ │ │ │ └───────────┼───────────┘ ▼ Shared Task List + Mailbox 你想做什么？ │ ├─ 连接外部工具/数据 ──────────→ MCP │ ├─ 在特定事件自动执行 ──────────→ Hooks │ （提交前检查、文件变更通知） │ ├─ 封装可复用的工作流 ──────────→ Skills │ （模板化、参数化） │ ├─ 委派独立子任务 ──────────────→ Sub-agents │ （代码探索、安全审查） │ ├─ 多人/多模块并行 ──────────────→ Agent Teams │ （大规模重构） │ └─ 打包分发给团队/社区 ─────────→ Plugins /create-component Button ↓ Skill 执行写入 ↓ PostToolUse Hook 触发 ↓ 自动运行 prettier + eslint --fix 主 Claude → 委派 security-reviewer 子代理 ↓ 子代理通过 MCP 查询 CVE 数据库 ↓ 子代理通过 MCP 查询内部安全规则 ↓ 返回结构化审查报告",
+      "excerpt": "/plugin install https://github.com/org/plugin-repo export CLAUDECODEEXPERIMENTALAGENTTEAMS=1 ┌──────────────┐ │ Team Lead │ │ (协调者/你) │ └──────┬───────┘ │ 分发任务 ..."
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+import { AuthorAiAssistant } from "@/components/ai/author-ai-assistant";
+import { PageAIAssistantProvider } from "@/components/ai/page-ai-assistant-provider";
 import { ResumeHero } from "@/components/resume/resume-hero";
 import { ResumeSkills } from "@/components/resume/resume-skills";
 import { ResumeEducation } from "@/components/resume/resume-education";
@@ -6,6 +8,7 @@ import { ResumeExperience } from "@/components/resume/resume-experience";
 import { ResumeProjects } from "@/components/resume/resume-projects";
 import { ResumeExtras } from "@/components/resume/resume-extras";
 import { ShareButtons } from "@/components/share-buttons";
+import { authorProfile, getAuthorSummary } from "@/lib/author-profile";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 import { Download } from "lucide-react";
@@ -21,10 +24,27 @@ export const metadata: Metadata = generateListPageSEO(
 
 export default function ResumePage() {
   const resumeUrl = `${config.site.url}/author`;
+  const authorSummary = getAuthorSummary(authorProfile);
 
   return (
     <main className="min-h-screen">
       <ResumeHero />
+      {config.ai.pageAssistantEnabled ? (
+        <section className="py-8 px-6">
+          <div className="max-w-2xl mx-auto">
+            <PageAIAssistantProvider
+              scene="author"
+              context={{ page: "author" }}
+              workerUrl={config.ai.workerUrl}
+              turnstileSiteKey={config.ai.turnstileSiteKey}
+              streamEnabled={config.ai.pageAssistantStreamEnabled}
+              maxInputChars={config.ai.maxInputChars}
+            >
+              <AuthorAiAssistant />
+            </PageAIAssistantProvider>
+          </div>
+        </section>
+      ) : null}
       <ResumeSkills />
       <ResumeEducation />
       <ResumeExperience />
@@ -37,7 +57,7 @@ export default function ResumePage() {
           <ShareButtons
             url={resumeUrl}
             title="袁慎建的简历"
-            description="AI 软件工程师 | 研发效能专家 | 敏捷开发教练"
+            description={authorSummary}
           />
           <a
             href="/docs/resume.pdf"

@@ -1,93 +1,18 @@
 import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
-
-interface Skill {
-  level: "master" | "proficient" | "familiar";
-  icon: string;
-  title: string;
-  description: string;
-}
-
-const skills: Skill[] = [
-  {
-    level: "master",
-    icon: "敏",
-    title: "敏捷开发",
-    description:
-      "精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计",
-  },
-  {
-    level: "master",
-    icon: "软",
-    title: "软件设计",
-    description: "精通面向对象、设计模式、整洁软件设计",
-  },
-  {
-    level: "master",
-    icon: "测",
-    title: "测试策略",
-    description:
-      "精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建",
-  },
-  {
-    level: "proficient",
-    icon: "J",
-    title: "Java技术栈",
-    description:
-      "熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术",
-  },
-  {
-    level: "proficient",
-    icon: "AI",
-    title: "AI Agent",
-    description:
-      "熟练使用Spring AI、LangGraph开发AI Agent应用，熟悉提示词工程、MCP、RAG",
-  },
-  {
-    level: "proficient",
-    icon: "AI",
-    title: "AI软开工程",
-    description:
-      "熟练使用AI提效工具，如：Claude code、Cursor、OpenCode、Agent Skills、SDD框架",
-  },
-  {
-    level: "proficient",
-    icon: "架",
-    title: "架构设计",
-    description: "熟练掌握高可用架构设计，以及DDD实践、微服务设计、分层架构",
-  },
-  {
-    level: "familiar",
-    icon: "业",
-    title: "业务分析",
-    description:
-      "熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
-  },
-  {
-    level: "familiar",
-    icon: "P",
-    title: "Python",
-    description: "熟悉Python、FastAPI、LangChain",
-  },
-
-];
-
-const certificates = [
-  "CSM（2020年）",
-  "CAC敏捷教练（2021年）",
-  "ATD培训师（2023年）",
-  "CBBA高级健身教练（2025年）",
-];
+import { authorProfile } from "@/lib/author-profile";
 
 export function ResumeSkills() {
+  const { skills } = authorProfile;
+
   return (
-    <section id="skills" className="py-16 max-w-2xl mx-auto">
-      <SectionTitle title="技能证书" />
+    <section id={skills.id} className="py-16 max-w-2xl mx-auto">
+      <SectionTitle title={skills.heading} />
 
       <ScrollAnimation>
         <div className="bg-card rounded-2xl p-8 shadow-sm border">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {skills.map((skill, index) => (
+            {skills.items.map((skill, index) => (
               <div
                 key={index}
                 className={`p-5 rounded-xl border-l-4 ${
@@ -124,7 +49,7 @@ export function ResumeSkills() {
                 专业认证
               </h3>
               <div className="flex flex-wrap gap-2">
-                {certificates.map((cert, index) => (
+                {skills.certificates.map((cert, index) => (
                   <span
                     key={index}
                     className="px-3 py-1.5 bg-background rounded-full text-sm text-muted-foreground border"

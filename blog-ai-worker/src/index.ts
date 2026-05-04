@@ -1,6 +1,8 @@
 import { validateOrigin } from "./middleware/origin";
 import { assertAIEnabled, checkDailyAIBudget, checkRateLimit } from "./middleware/rate-limit";
 import { verifyTurnstile } from "./middleware/turnstile";
+import { handleArticleScene, streamArticleScene } from "./scenes/article";
+import { handleAuthorScene, streamAuthorScene } from "./scenes/author";
 import { handleRecommendScene } from "./scenes/recommend";
 import type { ChatRequestBody, Env, ExecutionContext } from "./types";
 import { HttpError } from "./types";
@@ -47,8 +49,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isChatPath(pathname: string): boolean {
-  return pathname === "/chat" || pathname === "/api/ai/chat";
+function getRouteType(pathname: string): "chat" | "stream" | null {
+  if (pathname === "/chat" || pathname === "/api/ai/chat") {
+    return "chat";
+  }
+
+  if (pathname === "/chat/stream" || pathname === "/api/ai/chat/stream") {
+    return "stream";
+  }
+
+  return null;
 }
 
 function parsePositiveInteger(value: string | undefined, fallback: number): number {
@@ -83,7 +93,7 @@ async function parseBody(request: Request, env: Env): Promise<ChatRequestBody> {
 
   if (
     !isRecord(payload) ||
-    payload.scene !== "recommend" ||
+    (payload.scene !== "recommend" && payload.scene !== "article" && payload.scene !== "author") ||
     typeof payload.message !== "string" ||
     typeof payload.cf_turnstile_response !== "string"
   ) {
@@ -99,10 +109,43 @@ async function parseBody(request: Request, env: Env): Promise<ChatRequestBody> {
     throw new HttpError(413, "Message is too long. Please shorten it and try again.");
   }
 
+  if (payload.scene === "recommend") {
+    return {
+      scene: "recommend",
+      message,
+      cf_turnstile_response: payload.cf_turnstile_response,
+    };
+  }
+
+  if (!isRecord(payload.context)) {
+    throw new HttpError(400, "Invalid request payload");
+  }
+
+  if (payload.scene === "article") {
+    if (typeof payload.context.slug !== "string" || !payload.context.slug.trim()) {
+      throw new HttpError(400, "Invalid request payload");
+    }
+
+    return {
+      scene: "article",
+      message,
+      context: {
+        slug: payload.context.slug.trim(),
+      },
+      cf_turnstile_response: payload.cf_turnstile_response,
+    };
+  }
+
+  if (payload.context.page !== "author") {
+    throw new HttpError(400, "Invalid request payload");
+  }
+
   return {
-    scene: "recommend",
+    scene: "author",
     message,
-    context: isRecord(payload.context) ? payload.context : undefined,
+    context: {
+      page: "author",
+    },
     cf_turnstile_response: payload.cf_turnstile_response,
   };
 }
@@ -113,7 +156,9 @@ export default {
 
     try {
       const url = new URL(request.url);
-      if (!isChatPath(url.pathname)) {
+      const routeType = getRouteType(url.pathname);
+
+      if (!routeType) {
         return jsonResponse({ error: "Not found" }, { status: 404 });
       }
 
@@ -140,12 +185,35 @@ export default {
       assertAIEnabled(env);
       const body = await parseBody(request, env);
 
-      await verifyTurnstile(body.cf_turnstile_response, request, env);
+      if (routeType === "stream" && body.scene === "recommend") {
+        throw new HttpError(400, "Streaming is only supported for article and author scenes");
+      }
+
+      await verifyTurnstile(body.cf_turnstile_response, request, env, body.scene);
       await checkRateLimit(request, env);
       await checkDailyAIBudget(env);
 
-      const result = await handleRecommendScene(body.message, env);
-      return jsonResponse(result, { origin });
+      if (routeType === "stream") {
+        if (body.scene === "article") {
+          return streamArticleScene(body, env, origin);
+        }
+
+        if (body.scene === "author") {
+          return streamAuthorScene(body, env, origin);
+        }
+
+        throw new HttpError(400, "Streaming is only supported for article and author scenes");
+      }
+
+      if (body.scene === "recommend") {
+        return jsonResponse(await handleRecommendScene(body.message, env), { origin });
+      }
+
+      if (body.scene === "article") {
+        return jsonResponse(await handleArticleScene(body, env), { origin });
+      }
+
+      return jsonResponse(await handleAuthorScene(body, env), { origin });
     } catch (error) {
       return errorResponse(error instanceof Error ? error : new Error("Internal server error"), origin);
     }

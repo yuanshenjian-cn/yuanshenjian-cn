@@ -659,3 +659,72 @@ AI_EMERGENCY_DISABLE = "true"
 - 改 `wrangler.toml` 后，必须单独部署 Worker
 - 保留 `localhost` 是为了本地调试，不应被误删
 - `AI_DAILY_REQUEST_LIMIT` 是总量止损，不是单 IP 限流的替代品
+
+---
+
+## 2026-05-05 页面级 AI 流式回答偶发丢空格/换行，正文被拼成一整段
+
+### 现象
+
+- 页面级 AI 在文章页 / 作者页流式输出时，偶发出现词与词之间空格消失
+- 某些本应换行的回答被直接拼接成一整段
+- 引用区正常，但正文阅读体验明显变差
+
+### 根因
+
+问题不在前端 SSE 解析，而在 Worker 对上游 delta 的文本抽取逻辑：
+
+1. `blog-ai-worker/src/scenes/page.ts` 中的 `extractTextParts()` 会对字符串执行 `trim()`
+2. `normalizeTextParts()` 在拼接后又再次 `trim()`
+3. 对流式 delta 来说，前导空格和换行本来就是合法正文的一部分
+4. 一旦被 Worker 侧 trim 掉，前端即使按原样追加，也无法恢复这些空白
+
+### 修复
+
+将页面级流式 delta 的处理收紧为：
+
+1. `extractTextParts()` 只过滤空字符串，不再 `trim()` 有效内容
+2. `normalizeTextParts()` 只做 `join("")`，不再额外裁剪首尾空白
+3. 保证 Worker 向浏览器转发的是模型原始正文片段，而不是“清洗过”的片段
+
+### 如何确认修复生效
+
+1. 在文章页或作者页触发一次流式回答
+2. 观察正文中原本应保留的空格、中文句间停顿和换行是否正常显示
+3. 若需要回归验证，可运行：
+   - `npm run test -- tests/lib/ai-client.test.ts tests/blog-ai-worker/article-scene.test.ts tests/blog-ai-worker/author-scene.test.ts`
+   - `npm --prefix blog-ai-worker run typecheck`
+
+---
+
+## 2026-05-05 页面级 AI 流式 fallback 引用 Turnstile token 时因作用域错误直接报错
+
+### 现象
+
+- 页面级 AI 在流式模式下，如果上游返回“当前 provider 不支持 streaming”
+- 前端本应自动回退到非流式 `/chat`
+- 但实际没有回退成功，而是停留在加载态，测试里还能看到未处理异常：`ReferenceError: turnstileToken is not defined`
+
+### 根因
+
+`components/ai/page-ai-assistant-provider.tsx` 的 `submitMessage()` 中：
+
+1. `turnstileToken` 是在 `try` 块里用 `const` 声明的
+2. `catch` 分支里又要在 `AIStreamUnsupportedError` 场景下调用 `runNonStreamFallback(requestId, nextMessage, turnstileToken)`
+3. 由于块级作用域限制，`catch` 里实际上拿不到这个变量
+4. 于是流式 fallback 不是正常降级，而是被新的 `ReferenceError` 打断
+
+### 修复
+
+将 `turnstileToken` 提前到 `try/catch` 外层声明：
+
+1. 在 `submitMessage()` 进入 `try` 前先定义 `let turnstileToken = ""`
+2. `try` 中只做 `turnstileToken = await getTurnstileToken()`
+3. 这样 `catch` 中的流式 fallback 可以复用同一个 token，正常回退到非流式请求
+
+### 如何确认修复生效
+
+1. 让 `aiChatStream()` 抛出 `AIStreamUnsupportedError`
+2. 确认页面最终展示非流式回答，而不是停在 `AI 正在整理当前页面内容...`
+3. 回归运行：
+   - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/lib/ai-client.test.ts tests/blog-ai-worker/article-scene.test.ts`

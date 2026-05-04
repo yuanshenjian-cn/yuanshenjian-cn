@@ -28,21 +28,49 @@ export interface Env {
   AI_DATA_BASE_URL: string;
 }
 
-export type ChatScene = "recommend";
+export type ChatScene = "recommend" | "article" | "author";
+export type PageScene = "article" | "author";
 
-export interface ChatRequestBody {
-  scene: ChatScene;
+export interface RecommendRequestBody {
+  scene: "recommend";
   message: string;
-  context?: Record<string, unknown>;
   cf_turnstile_response: string;
 }
 
-export interface AIReference {
+export interface ArticleRequestBody {
+  scene: "article";
+  message: string;
+  context: {
+    slug: string;
+  };
+  cf_turnstile_response: string;
+}
+
+export interface AuthorRequestBody {
+  scene: "author";
+  message: string;
+  context: {
+    page: "author";
+  };
+  cf_turnstile_response: string;
+}
+
+export type ChatRequestBody = RecommendRequestBody | ArticleRequestBody | AuthorRequestBody;
+
+export interface RecommendReference {
   slug: string;
   title: string;
   excerpt: string;
   tags: string[];
   date: string;
+}
+
+export interface PageReference {
+  id: string;
+  title: string;
+  excerpt: string;
+  sourceType: "article-section" | "author-section";
+  anchorId?: string;
 }
 
 export interface AIUsage {
@@ -51,11 +79,43 @@ export interface AIUsage {
   totalTokens?: number;
 }
 
-export interface AIChatResponse {
+export interface RecommendResponse {
   answer: string;
-  references: AIReference[];
+  references: RecommendReference[];
   usage?: AIUsage;
 }
+
+export interface PageResponse {
+  answer: string;
+  references: PageReference[];
+  usage?: AIUsage;
+}
+
+export interface PageSection {
+  id: string;
+  heading: string;
+  content: string;
+  excerpt: string;
+  anchorId?: string;
+}
+
+export interface ArticlePageData {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  tags: string[];
+  sections: PageSection[];
+}
+
+export interface AuthorPageData {
+  slug: "author";
+  title: string;
+  summary: string;
+  sections: PageSection[];
+}
+
+export type PageData = ArticlePageData | AuthorPageData;
 
 export class HttpError extends Error {
   status: number;

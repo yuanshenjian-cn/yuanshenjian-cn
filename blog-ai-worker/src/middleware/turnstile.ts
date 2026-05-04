@@ -1,5 +1,11 @@
-import type { Env } from "../types";
+import type { ChatScene, Env } from "../types";
 import { HttpError } from "../types";
+
+export const TURNSTILE_ACTIONS: Record<ChatScene, string> = {
+  recommend: "homepage_recommend",
+  article: "article_page_ai",
+  author: "author_page_ai",
+};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -31,7 +37,11 @@ function getRemoteIp(request: Request): string | null {
   return forwardedFor.split(",")[0]?.trim() || null;
 }
 
-export async function verifyTurnstile(token: string, request: Request, env: Env): Promise<void> {
+export function getExpectedTurnstileAction(scene: ChatScene): string {
+  return TURNSTILE_ACTIONS[scene];
+}
+
+export async function verifyTurnstile(token: string, request: Request, env: Env, scene: ChatScene): Promise<void> {
   if (!token.trim()) {
     throw new HttpError(403, "Turnstile token is required");
   }
@@ -68,7 +78,7 @@ export async function verifyTurnstile(token: string, request: Request, env: Env)
     throw new HttpError(403, "Turnstile verification failed");
   }
 
-  const expectedAction = env.TURNSTILE_EXPECTED_ACTION?.trim();
+  const expectedAction = getExpectedTurnstileAction(scene);
   if (expectedAction) {
     const action = readStringField(payload, "action");
     if (action !== expectedAction) {

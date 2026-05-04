@@ -127,6 +127,24 @@ function getUsage(payload: unknown): ChatResponse["usage"] {
   };
 }
 
+function createRequestInit(apiKey: string, baseUrl: string, model: string, request: ChatRequest): RequestInit {
+  return {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: request.messages,
+      max_tokens: request.maxTokens,
+      temperature: request.temperature,
+      stream: request.stream,
+      stream_options: request.stream ? { include_usage: true } : undefined,
+    }),
+  };
+}
+
 export class OpenAICompatibleProvider implements LLMProvider {
   constructor(
     public readonly name: string,
@@ -137,20 +155,10 @@ export class OpenAICompatibleProvider implements LLMProvider {
   ) {}
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
-    const response = await fetch(`${this.baseUrl.replace(/\/$/, "")}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: this.model,
-        messages: request.messages,
-        max_tokens: request.maxTokens,
-        temperature: request.temperature,
-        stream: request.stream,
-      }),
-    });
+    const response = await fetch(
+      `${this.baseUrl.replace(/\/$/, "")}/chat/completions`,
+      createRequestInit(this.apiKey, this.baseUrl, this.model, request),
+    );
 
     const payload: unknown = await response.json().catch(() => null);
     if (!response.ok) {
@@ -166,5 +174,26 @@ export class OpenAICompatibleProvider implements LLMProvider {
       content,
       usage: getUsage(payload),
     };
+  }
+
+  async streamChat(request: ChatRequest): Promise<ReadableStream<Uint8Array>> {
+    const response = await fetch(
+      `${this.baseUrl.replace(/\/$/, "")}/chat/completions`,
+      createRequestInit(this.apiKey, this.baseUrl, this.model, {
+        ...request,
+        stream: true,
+      }),
+    );
+
+    if (!response.ok) {
+      const payload: unknown = await response.json().catch(() => null);
+      throw new HttpError(502, getProviderErrorMessage(payload) ?? `${this.displayName} request failed`);
+    }
+
+    if (!response.body) {
+      throw new HttpError(502, `${this.displayName} returned no stream body`);
+    }
+
+    return response.body;
   }
 }

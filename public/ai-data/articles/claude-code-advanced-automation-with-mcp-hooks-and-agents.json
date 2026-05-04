@@ -1,0 +1,195 @@
+{
+  "slug": "claude-code-advanced-automation-with-mcp-hooks-and-agents",
+  "title": "Claude Code 第八篇：高阶自动化实战——Chrome、Channels、CI/CD 与跨端协作",
+  "date": "2026-04-08T00:00:00.000Z",
+  "excerpt": "三个端到端蓝图串联 Claude Code 全部扩展机制——本地 Chrome 自动化调试、GitHub CI/CD 无人值守流水线、跨端 Channels 协作，带你从理论走向实战。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "ClaudeCode"
+  ],
+  "sections": [
+    {
+      "id": "引言把所有积木拼起来",
+      "anchorId": "引言把所有积木拼起来",
+      "heading": "引言：把所有积木拼起来",
+      "content": "前七篇我们逐层拆解了 Claude Code 的能力体系：从基础操作到日常工作流，从内置命令到扩展架构。现在是把这些积木拼成完整作品的时候了。 本篇将通过三个端到端蓝图，展示如何在真实场景中组合使用 Skills、Sub-agents、Hooks、MCP 和 Agent Teams： 蓝图 场景 涉及机制 ------ ------ --------- 蓝图一 本地 Chrome 自动化调试 MCP + Hooks + Sub-agents 蓝图二 GitHub CI/CD 无人值守流水线 Hooks + 程序化运行 + GitHub Actions 蓝图三 跨端 Channels 协作 Channels + MCP + Agent Teams 前置阅读：本篇假设你已阅读第七篇，熟悉六大扩展机制的基本概念。 ---",
+      "excerpt": "前七篇我们逐层拆解了 Claude Code 的能力体系：从基础操作到日常工作流，从内置命令到扩展架构。现在是把这些积木拼成完整作品的时候了。 本篇将通过三个端到端蓝图，展示如何在真实场景中组合使用 Skills、Sub-agents、Hooks、MCP 和 Agent Teams： 蓝图 场景 涉及机制 ------..."
+    },
+    {
+      "id": "场景描述",
+      "anchorId": "场景描述",
+      "heading": "场景描述",
+      "content": "你正在开发一个 Web 应用，遇到了一个棘手的前端 Bug——某个按钮在特定条件下无响应。你希望 Claude 能： 启动 Chrome 并导航到问题页面 检查 DOM 结构和 console 错误 定位问题根因并修复代码 验证修复后按钮恢复正常",
+      "excerpt": "你正在开发一个 Web 应用，遇到了一个棘手的前端 Bug——某个按钮在特定条件下无响应。你希望 Claude 能： 启动 Chrome 并导航到问题页面 检查 DOM 结构和 console 错误 定位问题根因并修复代码 验证修复后按钮恢复正常"
+    },
+    {
+      "id": "第一步配置-chrome-mcp-服务器",
+      "anchorId": "第一步配置-chrome-mcp-服务器",
+      "heading": "第一步：配置 Chrome MCP 服务器",
+      "content": "在项目根目录创建 .mcp.json： 提示：浏览器 MCP 服务器的包名可能随版本更新变化，请以 Claude Code 官方文档 或 claude mcp add 命令的推荐为准。社区常用的方案还包括 @anthropic-ai/mcp-server-puppeteer 和 Playwright MCP 等。 添加完成后，Claude 会获得一组浏览器操作工具： 工具 功能 ------ ------ mcpbrowsernavigate 导航到 URL mcpbrowserscreenshot 截图 mcpbrowserclick 点击元素 mcpbrowsertype 输入文本 mcpbrowserevaluate 执行 JavaScript mcpbrowsersnapshot 获取页面可访问性快照",
+      "excerpt": "在项目根目录创建 .mcp.json： 提示：浏览器 MCP 服务器的包名可能随版本更新变化，请以 Claude Code 官方文档 或 claude mcp add 命令的推荐为准。社区常用的方案还包括 @anthropic-ai/mcp-server-puppeteer 和 Playwright MCP 等。 添加..."
+    },
+    {
+      "id": "第二步创建调试-skill",
+      "anchorId": "第二步创建调试-skill",
+      "heading": "第二步：创建调试 Skill",
+      "content": "创建 .claude/skills/debug-frontend/SKILL.md：",
+      "excerpt": "创建 .claude/skills/debug-frontend/SKILL.md："
+    },
+    {
+      "id": "第三步配置自动格式化-hook",
+      "anchorId": "第三步配置自动格式化-hook",
+      "heading": "第三步：配置自动格式化 Hook",
+      "content": "在 .claude/settings.json 中添加： 这样，每当 Claude 通过 Write 工具修改文件后，Prettier 会自动格式化。注意 timeout 单位是秒。",
+      "excerpt": "在 .claude/settings.json 中添加： 这样，每当 Claude 通过 Write 工具修改文件后，Prettier 会自动格式化。注意 timeout 单位是秒。"
+    },
+    {
+      "id": "第四步实际使用",
+      "anchorId": "第四步实际使用",
+      "heading": "第四步：实际使用",
+      "content": "Claude 会执行完整的调试循环：",
+      "excerpt": "Claude 会执行完整的调试循环："
+    },
+    {
+      "id": "进阶多页面自动化测试",
+      "anchorId": "进阶多页面自动化测试",
+      "heading": "进阶：多页面自动化测试",
+      "content": "将调试 Skill 扩展为自动化测试代理： ---",
+      "excerpt": "将调试 Skill 扩展为自动化测试代理： ---"
+    },
+    {
+      "id": "场景描述-1",
+      "anchorId": "场景描述-1",
+      "heading": "场景描述",
+      "content": "你希望在 GitHub Pull Request 流程中自动化以下环节： PR 创建时，Claude 自动进行代码审查 审查发现问题时，自动创建修复提交 修复后自动触发测试，确认绿灯 全程无需人工介入",
+      "excerpt": "你希望在 GitHub Pull Request 流程中自动化以下环节： PR 创建时，Claude 自动进行代码审查 审查发现问题时，自动创建修复提交 修复后自动触发测试，确认绿灯 全程无需人工介入"
+    },
+    {
+      "id": "程序化运行programmatic-usage",
+      "anchorId": "程序化运行programmatic-usage",
+      "heading": "程序化运行（Programmatic Usage）",
+      "content": "Claude Code 支持完全无人值守的程序化运行模式，适合 CI/CD 环境： 关键参数： 参数 说明 ------ ------ -p \"prompt\" 非交互式执行 --output-format json JSON 格式输出（含 cost、duration 等元数据） --output-format stream-json 流式 JSON（实时输出） --allowedTools 白名单工具（CI 中必须显式授权） --max-turns N 最大对话轮数 --permission-mode 权限模式（CI 中通常用 auto） --continue 恢复上一次会话 --bare 最小化输出，不显示进度和装饰信息 --json-schema 指定 JSON Schema，约束输出格式 --include-hook-events 在流式输出中包含 Hook 事件 --no-session-persistence 不持久化会话记录（适合短期 CI 任务）",
+      "excerpt": "Claude Code 支持完全无人值守的程序化运行模式，适合 CI/CD 环境： 关键参数： 参数 说明 ------ ------ -p \"prompt\" 非交互式执行 --output-format json JSON 格式输出（含 cost、duration 等元数据） --output-format stre..."
+    },
+    {
+      "id": "github-actions-配置",
+      "anchorId": "github-actions-配置",
+      "heading": "GitHub Actions 配置",
+      "content": "创建 .github/workflows/claude-review.yml：",
+      "excerpt": "创建 .github/workflows/claude-review.yml："
+    },
+    {
+      "id": "自动修复流水线",
+      "anchorId": "自动修复流水线",
+      "heading": "自动修复流水线",
+      "content": "在审查基础上增加自动修复步骤：",
+      "excerpt": "在审查基础上增加自动修复步骤："
+    },
+    {
+      "id": "配合-hooks-实现质量门禁",
+      "anchorId": "配合-hooks-实现质量门禁",
+      "heading": "配合 Hooks 实现质量门禁",
+      "content": "在项目 .claude/settings.json 中配置 CI 专用 Hooks： 其中 check-dangerous-cmd.js 脚本检查命令内容，对 rm -rf、git push --force 等危险命令返回 {\"permissionDecision\": \"deny\"}。这确保了即使在 auto 权限模式下，危险命令也会被拦截。",
+      "excerpt": "在项目 .claude/settings.json 中配置 CI 专用 Hooks： 其中 check-dangerous-cmd.js 脚本检查命令内容，对 rm -rf、git push --force 等危险命令返回 {\"permissionDecision\": \"deny\"}。这确保了即使在 auto 权限模式..."
+    },
+    {
+      "id": "多会话编排",
+      "anchorId": "多会话编排",
+      "heading": "多会话编排",
+      "content": "复杂的 CI 流程可以编排多个 Claude 会话： ---",
+      "excerpt": "复杂的 CI 流程可以编排多个 Claude 会话： ---"
+    },
+    {
+      "id": "场景描述-2",
+      "anchorId": "场景描述-2",
+      "heading": "场景描述",
+      "content": "你是一个团队的 Tech Lead，希望： 在手机 Telegram 上随时给 Claude 发送任务 Claude 在开发机上执行任务并通过 Telegram 回报进度 多个 Claude 实例协作处理大规模重构 全程通过移动端监控和指挥",
+      "excerpt": "你是一个团队的 Tech Lead，希望： 在手机 Telegram 上随时给 Claude 发送任务 Claude 在开发机上执行任务并通过 Telegram 回报进度 多个 Claude 实例协作处理大规模重构 全程通过移动端监控和指挥"
+    },
+    {
+      "id": "channels-基础配置",
+      "anchorId": "channels-基础配置",
+      "heading": "Channels 基础配置",
+      "content": "前提条件：Channels 功能需要 Claude Code v2.1.80+ 且使用 claude.ai 账号登录（非 API Key），同时需要安装 Bun 运行时。 Channels 通过安装对应的 Plugin 来启用。以 Telegram 为例： 首次启动时，Claude 会引导你完成频道配对：",
+      "excerpt": "前提条件：Channels 功能需要 Claude Code v2.1.80+ 且使用 claude.ai 账号登录（非 API Key），同时需要安装 Bun 运行时。 Channels 通过安装对应的 Plugin 来启用。以 Telegram 为例： 首次启动时，Claude 会引导你完成频道配对："
+    },
+    {
+      "id": "telegram-工作流",
+      "anchorId": "telegram-工作流",
+      "heading": "Telegram 工作流",
+      "content": "配对完成后，你可以在 Telegram 中：",
+      "excerpt": "配对完成后，你可以在 Telegram 中："
+    },
+    {
+      "id": "安全机制",
+      "anchorId": "安全机制",
+      "heading": "安全机制",
+      "content": "Channels 内置了多层安全保护： 机制 说明 ------ ------ 配对码验证 首次连接需输入一次性配对码 发送者允许列表 只接受已认证的发送者消息 权限继承 遵循当前会话的权限模式 审计日志 所有 Channel 交互记录在会话日志中",
+      "excerpt": "Channels 内置了多层安全保护： 机制 说明 ------ ------ 配对码验证 首次连接需输入一次性配对码 发送者允许列表 只接受已认证的发送者消息 权限继承 遵循当前会话的权限模式 审计日志 所有 Channel 交互记录在会话日志中"
+    },
+    {
+      "id": "配合-agent-teams-实现分布式协作",
+      "anchorId": "配合-agent-teams-实现分布式协作",
+      "heading": "配合 Agent Teams 实现分布式协作",
+      "content": "在大规模重构场景中，结合 Agent Teams 和 Channels： 工作流： 在 Telegram 中发起任务：",
+      "excerpt": "在大规模重构场景中，结合 Agent Teams 和 Channels： 工作流： 在 Telegram 中发起任务："
+    },
+    {
+      "id": "频道配置进阶",
+      "anchorId": "频道配置进阶",
+      "heading": "频道配置进阶",
+      "content": "Channels 的频道连接通过插件或 MCP 服务器实现。由于 Channels 仍处于研究预览阶段，具体的包名和配置方式可能变化，请以 Claude Code 官方 Channels 文档 为准。 配置思路示例（概念性，非直接可运行）： 注意：上述包名为占位符。实际使用时需查阅 Claude Code 官方文档或 Plugin marketplace 获取最新可用的 Channels 插件。 ---",
+      "excerpt": "Channels 的频道连接通过插件或 MCP 服务器实现。由于 Channels 仍处于研究预览阶段，具体的包名和配置方式可能变化，请以 Claude Code 官方 Channels 文档 为准。 配置思路示例（概念性，非直接可运行）： 注意：上述包名为占位符。实际使用时需查阅 Claude Code 官方文档或 ..."
+    },
+    {
+      "id": "适用场景矩阵",
+      "anchorId": "适用场景矩阵",
+      "heading": "适用场景矩阵",
+      "content": "维度 蓝图一：Chrome 调试 蓝图二：CI/CD 蓝图三：Channels ------ ------------------- ------------- ----------------- 环境 本地开发机 远程 CI 服务器 跨设备 交互 实时交互 完全无人值守 异步远程 核心机制 MCP + Skill 程序化运行 + Hook Channels + Teams 复杂度 中等 中高 高 投入 半小时配置 数小时配置 依赖实验功能 收益 单次调试效率提升 持续集成全自动化 团队协作范式转变",
+      "excerpt": "维度 蓝图一：Chrome 调试 蓝图二：CI/CD 蓝图三：Channels ------ ------------------- ------------- ----------------- 环境 本地开发机 远程 CI 服务器 跨设备 交互 实时交互 完全无人值守 异步远程 核心机制 MCP + Skill 程..."
+    },
+    {
+      "id": "渐进式采用路径",
+      "anchorId": "渐进式采用路径",
+      "heading": "渐进式采用路径",
+      "content": "建议按以下顺序逐步引入： ---",
+      "excerpt": "建议按以下顺序逐步引入： ---"
+    },
+    {
+      "id": "成本控制",
+      "anchorId": "成本控制",
+      "heading": "成本控制",
+      "content": "策略 说明 ------ ------ --max-turns CI 中务必设置上限，防止无限循环 模型选择 探索用 Haiku，审查用 Sonnet，复杂推理用 Opus effort 参数 简单任务用 low，复杂任务用 high 工具白名单 只授权必要工具，减少不必要的工具调用",
+      "excerpt": "策略 说明 ------ ------ --max-turns CI 中务必设置上限，防止无限循环 模型选择 探索用 Haiku，审查用 Sonnet，复杂推理用 Opus effort 参数 简单任务用 low，复杂任务用 high 工具白名单 只授权必要工具，减少不必要的工具调用"
+    },
+    {
+      "id": "安全清单",
+      "anchorId": "安全清单",
+      "heading": "安全清单",
+      "content": "在生产环境使用 Claude Code 自动化之前，确认以下项： [ ] CI 环境的 API Key 使用独立的、有限额的 Key [ ] --allowedTools 严格限制，不包含 Bash 的通配权限 [ ] Hooks 中拦截危险命令（rm -rf、git push --force、DROP TABLE） [ ] 敏感文件在 .claude/settings.json 中通过 permissions.deny 保护 [ ] Git 操作限制在特定分支，禁止直接推送 main [ ] 自动提交使用 bot 账号，便于审计追踪 [ ] 定期审查 Claude 的操作日志",
+      "excerpt": "在生产环境使用 Claude Code 自动化之前，确认以下项： [ ] CI 环境的 API Key 使用独立的、有限额的 Key [ ] --allowedTools 严格限制，不包含 Bash 的通配权限 [ ] Hooks 中拦截危险命令（rm -rf、git push --force、DROP TABLE） ..."
+    },
+    {
+      "id": "故障恢复",
+      "anchorId": "故障恢复",
+      "heading": "故障恢复",
+      "content": "场景 处理方式 ------ --------- CI 中 Claude 超时 设置 --max-turns + GitHub Actions timeout-minutes 自动修复引入新 Bug Hook 在 Stop 事件运行全量测试 Agent Team 成员崩溃 当前无法自动恢复，需重新启动 MCP 服务器断连 Claude 会自动尝试重连，超时后跳过该工具 Channels 消息丢失 通过配对码重新建立连接 ---",
+      "excerpt": "场景 处理方式 ------ --------- CI 中 Claude 超时 设置 --max-turns + GitHub Actions timeout-minutes 自动修复引入新 Bug Hook 在 Stop 事件运行全量测试 Agent Team 成员崩溃 当前无法自动恢复，需重新启动 MCP 服务器断..."
+    },
+    {
+      "id": "全系列回顾从新手到架构师",
+      "anchorId": "全系列回顾从新手到架构师",
+      "heading": "全系列回顾：从新手到架构师",
+      "content": "八篇文章，一条完整的学习路径： 篇号 主题 你获得了 ------ ------ --------- 第一篇 心智模型与迁移 从 OpenCode 视角理解 Claude Code 的差异与优势 第二篇 快速上手 安装、登录、三种入口、跑通第一个任务 第三篇 日常工作流 探索代码、修 Bug、重构、测试、Git 全流程 第四篇 交互模式与命令 六种权限模式、内置命令、上下文管理 第五篇 CLAUDE.md 与记忆 指令层级、规则系统、Auto Memory 机制 第六篇 设置与权限 四层设置、权限规则语法、沙箱防御 第七篇 扩展架构全景 六大机制的定位、配置与选型 第八篇 高阶自动化实战 三个端到端蓝图的完整配置 核心认知跃迁： ---",
+      "excerpt": "八篇文章，一条完整的学习路径： 篇号 主题 你获得了 ------ ------ --------- 第一篇 心智模型与迁移 从 OpenCode 视角理解 Claude Code 的差异与优势 第二篇 快速上手 安装、登录、三种入口、跑通第一个任务 第三篇 日常工作流 探索代码、修 Bug、重构、测试、Git 全流程..."
+    },
+    {
+      "id": "结语",
+      "anchorId": "结语",
+      "heading": "结语",
+      "content": "Claude Code 不只是一个 AI 编程助手，它是一个可编程的开发平台。Skills 让你封装经验，Sub-agents 让你委派任务，Hooks 让你编织自动化，MCP 让你连接万物，Plugins 让你分享能力，Agent Teams 让你突破单人瓶颈。 这些机制的组合空间是指数级的。本系列只是起点——真正的价值，在于你根据自己团队的实际痛点，设计出独一无二的自动化工作流。 祝你构建愉快。",
+      "excerpt": "Claude Code 不只是一个 AI 编程助手，它是一个可编程的开发平台。Skills 让你封装经验，Sub-agents 让你委派任务，Hooks 让你编织自动化，MCP 让你连接万物，Plugins 让你分享能力，Agent Teams 让你突破单人瓶颈。 这些机制的组合空间是指数级的。本系列只是起点——真正的..."
+    }
+  ]
+}

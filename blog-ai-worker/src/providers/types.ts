@@ -9,7 +9,7 @@ export interface ChatRequest {
   messages: ChatMessage[];
   maxTokens: number;
   temperature: number;
-  stream: false;
+  stream: boolean;
 }
 
 export interface ChatResponse {
@@ -20,4 +20,5 @@ export interface ChatResponse {
 export interface LLMProvider {
   name: string;
   chat(request: ChatRequest): Promise<ChatResponse>;
+  streamChat?(request: ChatRequest): Promise<ReadableStream<Uint8Array>>;
 }

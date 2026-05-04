@@ -1,9 +1,12 @@
 import Image from "next/image";
 import { Phone, Mail, Download } from "lucide-react";
+import { authorProfile } from "@/lib/author-profile";
 
 export function ResumeHero() {
+  const { hero } = authorProfile;
+
   return (
-    <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+    <section id={hero.id} className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -43,37 +46,35 @@ export function ResumeHero() {
 
         {/* 主标题 - 更有质感的排版 */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4 text-foreground">
-          袁慎建
+          {hero.name}
         </h1>
 
         {/* 三个角色 - 小屏幕三行显示 */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-base md:text-lg text-foreground/90 mb-8 font">
-          <span>AI 软件工程师</span>
-          <span className="hidden sm:inline text-foreground/40">·</span>
-          <span>研发效能专家</span>
-          <span className="hidden sm:inline text-foreground/40">·</span>
-          <span>敏捷开发教练</span>
+          {hero.roles.map((role, index) => (
+            <span key={role} className="contents">
+              {index > 0 ? <span className="hidden sm:inline text-foreground/40">·</span> : null}
+              <span>{role}</span>
+            </span>
+          ))}
         </div>
 
         <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-6 mb-8 text-foreground/70">
           <div className="flex items-center justify-center gap-2 text-sm">
             <Phone className="w-4 h-4" />
-            <span>18192235667</span>
+            <span>{hero.phone}</span>
           </div>
           <div className="flex items-center justify-center gap-2 text-sm">
             <Mail className="w-4 h-4" />
-            <span>yuanshenjian@foxmail.com</span>
+            <span>{hero.email}</span>
           </div>
         </div>
 
         {/* 个人简介 - 分成两段 */}
         <div className="space-y-4 text-base text-foreground/75 leading-relaxed max-w-2xl mx-auto">
-          <p>
-            在Thoughtworks 10年多年，经历多个国内外交付、咨询和技术人员培养项目，精通敏捷软件工程实践和研发效能提升，擅长软件架构设计和服务器端应用开发
-          </p>
-          <p>
-            有代码洁癖和优秀的业务Sense，具备良好的快速学习、解决问题和团队协作能力，热爱技术写作和分享
-          </p>
+          {hero.summary.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
         </div>
       </div>
 

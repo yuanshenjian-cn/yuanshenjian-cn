@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { MDXContent as MDXRemoteContent } from "@/lib/mdx";
 import { PostNavigation } from "@/components/post-navigation";
 import { ColumnNavigation } from "@/components/column-navigation";
@@ -16,9 +16,10 @@ interface ArticleContentProps {
   showHeader?: boolean;
   url?: string;
   columnContext?: ColumnContext | null;
+  footerAssistant?: ReactNode;
 }
 
-export function ArticleContent({ post, prev, next, slug, showHeader = true, url, columnContext }: ArticleContentProps) {
+export function ArticleContent({ post, prev, next, slug, showHeader = true, url, columnContext, footerAssistant }: ArticleContentProps) {
   // URL 由父组件（服务端）传入，确保 SSR 和客户端一致
   const shareUrl = url || `/articles/${slug}`;
 
@@ -27,6 +28,7 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
       {showHeader && <ArticleHeader post={post} />}
 
       <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <div id="intro" />
         <Suspense fallback={<div className="text-muted-foreground">加载中...</div>}>
           <MDXRemoteContent source={post.content} />
         </Suspense>
@@ -51,6 +53,8 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
           <PostNavigation prev={prev} next={next} />
         </div>
       )}
+
+      {footerAssistant ? footerAssistant : null}
 
       <GiscusCommentsContainer path={`/articles/${slug}`} />
     </>

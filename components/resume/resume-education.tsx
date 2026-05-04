@@ -1,11 +1,14 @@
 import Image from "next/image";
+import { authorProfile } from "@/lib/author-profile";
 import { SectionTitle } from "./section-title";
 import { ScrollAnimation } from "./scroll-animation";
 
 export function ResumeEducation() {
+  const { education } = authorProfile;
+
   return (
-    <section id="education" className="py-16 max-w-2xl mx-auto">
-      <SectionTitle title="教育背景" />
+    <section id={education.id} className="py-16 max-w-2xl mx-auto">
+      <SectionTitle title={education.heading} />
 
       <ScrollAnimation>
         <div className="bg-card rounded-2xl p-8 shadow-sm border">
@@ -22,17 +25,17 @@ export function ResumeEducation() {
             <div>
               <h3 className="text-foreground text-lg font-medium mb-1">
                 <a
-                  href="https://www.chd.edu.cn/"
+                  href={education.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  长安大学（统招本科 211）
+                  {education.school}
                 </a>
               </h3>
-              <p className="text-muted-foreground text-sm">软件工程（转）</p>
+              <p className="text-muted-foreground text-sm">{education.major}</p>
               <p className="text-primary font-medium mt-1 text-sm">
-                2009.09 ~ 2013.07
+                {education.period}
               </p>
             </div>
           </div>
