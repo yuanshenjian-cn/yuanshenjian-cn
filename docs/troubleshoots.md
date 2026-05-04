@@ -181,3 +181,28 @@ size: "invisible"
 ```
 
 否则即使请求体中可能最终带上 `cf_turnstile_response`，页面端也会出现大量 Turnstile 异常，导致提交流程卡住或表现不稳定。
+
+### 本次衍生问题：Worker 返回 `TokenHub returned empty content`
+
+如果 Turnstile 已通过，但 `/api/ai/chat` 返回：
+
+```json
+{"error":"TokenHub returned empty content"}
+```
+
+说明问题已经从前端验证码阶段进入到了 provider 解析阶段。
+
+根因通常是：
+
+- 上游模型返回的 `message.content` 不是简单字符串
+- 而是数组/分片结构（例如文本段数组）
+- 当前 provider 只按字符串解析，结果把有效内容误判为空
+
+修复方式：
+
+- 在 `blog-ai-worker/src/providers/tokenhub.ts` 中同时兼容：
+  - `message.content: string`
+  - `message.content: Array<{ text?: string }>`
+  - `message.content: Array<{ type: "text", content: string }>`
+
+原则：优先把 provider 的差异吸收在 Provider 层，不把这种解析差异泄漏到场景层或前端。

@@ -5,6 +5,34 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function extractTextFromContentParts(content: unknown): string | null {
+  if (!Array.isArray(content)) {
+    return null;
+  }
+
+  const textParts = content
+    .map((part) => {
+      if (!isRecord(part)) {
+        return null;
+      }
+
+      if (typeof part.text === "string") {
+        return part.text;
+      }
+
+      if (part.type === "text" && typeof part.content === "string") {
+        return part.content;
+      }
+
+      return null;
+    })
+    .filter((part): part is string => Boolean(part))
+    .join("\n")
+    .trim();
+
+  return textParts || null;
+}
+
 function getProviderErrorMessage(payload: unknown): string | null {
   if (!isRecord(payload)) {
     return null;
@@ -27,7 +55,11 @@ function getContent(payload: unknown): string | null {
     return null;
   }
 
-  return typeof firstChoice.message.content === "string" ? firstChoice.message.content : null;
+  if (typeof firstChoice.message.content === "string") {
+    return firstChoice.message.content;
+  }
+
+  return extractTextFromContentParts(firstChoice.message.content);
 }
 
 function getUsage(payload: unknown): ChatResponse["usage"] {
