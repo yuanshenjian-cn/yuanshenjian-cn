@@ -31,19 +31,21 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         
         {/* Content */}
-        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center w-full py-12">
-          {/* 主标题 */}
-          <h1 className="text-4xl md:text-5xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
-            记录思考，分享成长
-          </h1>
+        <div className="relative z-10 w-full py-12 px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            {/* 主标题 */}
+            <h1 className="text-4xl md:text-5xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
+              记录思考，分享成长
+            </h1>
 
-          {/* 副标题 */}
-          <p className="text-lg md:text-xl text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
-            技术实践 · 敏捷方法 · 生活随笔
-          </p>
+            {/* 副标题 */}
+            <p className="text-lg md:text-xl text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
+              AI 实践 · 敏捷方法 · 生活随笔
+            </p>
+          </div>
 
           {/* AI 推荐 */}
-          <div className="mt-10 mb-8 w-full -mx-6">
+          <div className="max-w-2xl mx-auto mt-10 mb-8">
             <AiRecommendWidget
               enabled={config.ai.enabled}
               workerUrl={config.ai.workerUrl}
