@@ -66,28 +66,53 @@ function extractJson(content: string): string {
   return content;
 }
 
+function looksLikeStructuredPayload(content: string): boolean {
+  const trimmed = content.trim();
+  return trimmed.startsWith("{") || trimmed.startsWith("```json");
+}
+
+function extractAnswerField(content: string): string | null {
+  const match = content.match(/"answer"\s*:\s*"((?:\\.|[^"\\])*)"/s);
+  if (!match?.[1]) {
+    return null;
+  }
+
+  try {
+    const answer = JSON.parse(`"${match[1]}"`);
+    return typeof answer === "string" && answer.trim() ? answer.trim() : null;
+  } catch {
+    return match[1].trim() || null;
+  }
+}
+
 function parseModelResponse(content: string): RecommendModelPayload {
   const rawJson = extractJson(content);
 
   try {
     const payload: unknown = JSON.parse(rawJson);
-    if (
-      isRecord(payload) &&
-      typeof payload.answer === "string" &&
-      Array.isArray(payload.slugs) &&
-      payload.slugs.every((slug) => typeof slug === "string")
-    ) {
+    if (isRecord(payload) && typeof payload.answer === "string") {
       return {
         answer: payload.answer.trim() || DEFAULT_ANSWER,
-        slugs: payload.slugs,
+        slugs:
+          Array.isArray(payload.slugs) && payload.slugs.every((slug) => typeof slug === "string")
+            ? payload.slugs
+            : [],
       };
     }
   } catch {
     // 让下方回退到纯文本 answer，避免把偶发的模型格式问题暴露为 500。
   }
 
+  const extractedAnswer = extractAnswerField(rawJson) ?? extractAnswerField(content);
+  if (extractedAnswer) {
+    return {
+      answer: extractedAnswer,
+      slugs: [],
+    };
+  }
+
   return {
-    answer: content.trim() || DEFAULT_ANSWER,
+    answer: looksLikeStructuredPayload(content) ? DEFAULT_ANSWER : content.trim() || DEFAULT_ANSWER,
     slugs: [],
   };
 }
@@ -115,9 +140,41 @@ function stripStopwords(input: string, stopwords: string[]): string {
   return result;
 }
 
+function extractTopicKeywords(message: string, stopwords: string[]): string[] {
+  const topicMatch =
+    message.match(/关于(.+?)(?:相关的)?文章/u) ??
+    message.match(/和(.+?)(?:相关的)?文章/u) ??
+    message.match(/推荐几篇(.+?)文章/u);
+
+  if (!topicMatch?.[1]) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      topicMatch[1]
+        .split(/[、，,\/\s]+/u)
+        .flatMap((segment) => {
+          const keyword = stripStopwords(normalizeText(segment), stopwords);
+          if (keyword.length < 2) {
+            return [];
+          }
+
+          const keywords = [keyword];
+          if (/^\p{Script=Han}+$/u.test(keyword) && keyword.length >= 4) {
+            keywords.push(keyword.slice(0, 2));
+          }
+
+          return keywords;
+        }),
+    ),
+  );
+}
+
 function buildQueryKeywords(message: string): string[] {
   const compactStopwords = QUERY_STOPWORDS.map(normalizeText).filter(Boolean);
   const compact = stripStopwords(normalizeText(message), compactStopwords);
+  const topicKeywords = extractTopicKeywords(message, compactStopwords);
 
   const spacedTokens = message
     .toLowerCase()
@@ -125,7 +182,7 @@ function buildQueryKeywords(message: string): string[] {
     .map((token) => stripStopwords(normalizeText(token), compactStopwords))
     .filter((token) => token.length >= 2);
 
-  const rawKeywords = Array.from(new Set([compact, ...spacedTokens].filter((token) => token.length >= 2)));
+  const rawKeywords = Array.from(new Set([compact, ...topicKeywords, ...spacedTokens].filter((token) => token.length >= 2)));
 
   return rawKeywords.filter((keyword) => {
     if (keyword.length > 2) {
