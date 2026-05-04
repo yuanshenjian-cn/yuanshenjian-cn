@@ -728,3 +728,46 @@ AI_EMERGENCY_DISABLE = "true"
 2. 确认页面最终展示非流式回答，而不是停在 `AI 正在整理当前页面内容...`
 3. 回归运行：
    - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/lib/ai-client.test.ts tests/blog-ai-worker/article-scene.test.ts`
+
+---
+
+## 2026-05-05 页面级 AI 流式接口线上返回 Cloudflare 1101 HTML
+
+### 现象
+
+- 浏览器请求 `POST /api/ai/chat/stream` 时返回 `500 Internal Server Error`
+- 响应体不是 Worker 约定的 JSON / SSE，而是 Cloudflare 错误页
+- 页面标题类似：`Worker threw exception | yuanshenjian.cn | Cloudflare`
+- Cloudflare 错误码：`1101`
+
+### 根因
+
+`blog-ai-worker/src/index.ts` 的流式分支里直接返回了异步函数：
+
+1. `return streamArticleScene(body, env, origin)`
+2. `return streamAuthorScene(body, env, origin)`
+
+这两个函数是 `async`。如果它们在真正创建 `Response` 前发生 reject，例如：
+
+- 拉取页面 AI 数据失败
+- 上游 provider 创建流失败
+- provider 返回非 2xx 并抛出 `HttpError`
+
+异常会绕过 `index.ts` 外层 `try/catch`，直接冒泡成 Cloudflare Worker 未捕获异常，于是线上返回 1101 HTML。
+
+### 修复
+
+在流式分支中显式 `await`：
+
+1. `return await streamArticleScene(body, env, origin)`
+2. `return await streamAuthorScene(body, env, origin)`
+
+这样 Response 创建前的异步异常会进入统一 `catch`，返回受控 JSON 错误，而不是 Cloudflare HTML 错误页。
+
+### 如何确认修复生效
+
+1. 模拟上游 provider 在流式 Response 创建前返回 500
+2. 断言 `worker.fetch()` 返回 `502` JSON：`{ "error": "..." }`
+3. 回归运行：
+   - `npm run test -- tests/blog-ai-worker/index-runtime-config.test.ts tests/blog-ai-worker/article-scene.test.ts tests/lib/ai-client.test.ts`
+   - `npm --prefix blog-ai-worker run typecheck`

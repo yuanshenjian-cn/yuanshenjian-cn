@@ -195,11 +195,11 @@ export default {
 
       if (routeType === "stream") {
         if (body.scene === "article") {
-          return streamArticleScene(body, env, origin);
+          return await streamArticleScene(body, env, origin);
         }
 
         if (body.scene === "author") {
-          return streamAuthorScene(body, env, origin);
+          return await streamAuthorScene(body, env, origin);
         }
 
         throw new HttpError(400, "Streaming is only supported for article and author scenes");

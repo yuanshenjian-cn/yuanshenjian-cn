@@ -154,4 +154,56 @@ describe("Worker runtime env validation", () => {
     expect(body).toContain("event: references");
     expect(body).toContain("event: done");
   });
+
+  it("/chat/stream 在流式响应创建前失败时返回受控 JSON 错误", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({
+          success: true,
+          hostname: "localhost",
+          action: "article_page_ai",
+        }), { headers: { "Content-Type": "application/json" } }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({
+          slug: "demo",
+          title: "示例文章",
+          date: "2026-05-05T00:00:00.000Z",
+          excerpt: "摘要",
+          tags: ["AI"],
+          sections: [
+            { id: "intro", heading: "前言", content: "前言内容", excerpt: "前言摘录", anchorId: "intro" },
+          ],
+        }), { headers: { "Content-Type": "application/json" } }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: { message: "provider stream failed" } }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+    const response = await worker.fetch(
+      new Request("https://example.com/api/ai/chat/stream", {
+        method: "POST",
+        headers: {
+          Origin: "http://localhost:3000",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scene: "article",
+          message: "3 行总结这篇文章",
+          context: { slug: "demo" },
+          cf_turnstile_response: "token",
+        }),
+      }),
+      env,
+      executionContext,
+    );
+
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({
+      error: "provider stream failed",
+    });
+  });
 });
