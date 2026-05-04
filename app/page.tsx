@@ -40,7 +40,7 @@ export default function Home() {
 
             {/* 副标题 */}
             <p className="text-lg md:text-xl text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
-              AI 实践 · 敏捷方法 · 生活随笔
+              AI 效能 · 敏捷方法 · 生活随笔
             </p>
           </div>
 
