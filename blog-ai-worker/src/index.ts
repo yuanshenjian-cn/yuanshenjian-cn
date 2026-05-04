@@ -11,12 +11,12 @@ function assertConfiguredEnv(env: Env): void {
     throw new HttpError(500, "Worker misconfigured: TURNSTILE_SECRET_KEY is missing");
   }
 
-  if (!env.TOKENHUB_API_KEY?.trim()) {
-    throw new HttpError(500, "Worker misconfigured: TOKENHUB_API_KEY is missing");
+  if (!env.LLM_PROVIDER_API_KEY?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: LLM_PROVIDER_API_KEY is missing");
   }
 
-  if (!env.TOKENHUB_BASE_URL?.trim()) {
-    throw new HttpError(500, "Worker misconfigured: TOKENHUB_BASE_URL is missing");
+  if (!env.LLM_PROVIDER_BASE_URL?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: LLM_PROVIDER_BASE_URL is missing");
   }
 
   if (!env.AI_DATA_BASE_URL?.trim()) {

@@ -366,8 +366,8 @@ Decide explicitly that `blog-ai-worker/package-lock.json` is committed, because 
 ```ts
 export interface Env {
   RATE_LIMIT_KV: KVNamespace;
-  TOKENHUB_API_KEY: string;
-  TOKENHUB_BASE_URL: string;
+  LLM_PROVIDER_API_KEY: string;
+  LLM_PROVIDER_BASE_URL: string;
   TURNSTILE_SECRET_KEY: string;
   ALLOWED_ORIGINS: string;
   RATE_LIMIT_WINDOW_SECONDS: string;

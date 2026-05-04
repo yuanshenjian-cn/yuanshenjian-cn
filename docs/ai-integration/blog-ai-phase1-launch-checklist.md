@@ -84,18 +84,18 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 在 `blog-ai-worker/` 目录下执行：
 
 ```bash
-npx wrangler secret put TOKENHUB_API_KEY
-npx wrangler secret put TOKENHUB_BASE_URL
+npx wrangler secret put LLM_PROVIDER_API_KEY
+npx wrangler secret put LLM_PROVIDER_BASE_URL
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
 填写要求：
 
-#### `TOKENHUB_API_KEY`
+#### `LLM_PROVIDER_API_KEY`
 
 - [ ] 填你腾讯 TokenHub 的真实 API Key
 
-#### `TOKENHUB_BASE_URL`
+#### `LLM_PROVIDER_BASE_URL`
 
 - [ ] 填：
 
@@ -290,8 +290,8 @@ npx wrangler deploy
 
 优先检查 Worker 配置：
 
-- [ ] `TOKENHUB_API_KEY`
-- [ ] `TOKENHUB_BASE_URL`
+- [ ] `LLM_PROVIDER_API_KEY`
+- [ ] `LLM_PROVIDER_BASE_URL`
 - [ ] `TURNSTILE_SECRET_KEY`
 - [ ] `AI_DATA_BASE_URL`
 - [ ] KV namespace id 是否已替换

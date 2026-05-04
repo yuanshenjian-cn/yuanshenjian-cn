@@ -359,7 +359,7 @@ class MiMoProvider implements LLMProvider {
 function createProvider(env: Env, providerName: string, model: string): LLMProvider {
   switch (providerName) {
     case "tokenhub":
-      return new TokenHubProvider(env.TOKENHUB_API_KEY, env.TOKENHUB_BASE_URL, model);
+      return new TokenHubProvider(env.LLM_PROVIDER_API_KEY, env.LLM_PROVIDER_BASE_URL, model);
     case "mimo":
       return new MiMoProvider(env.MIMO_API_KEY, env.MIMO_BASE_URL, model); // [MiMo-TBD]
     default:
@@ -822,12 +822,12 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 
 | 变量名 | 说明 |
 |--------|------|
-| `TOKENHUB_API_KEY` | 腾讯 TokenHub API Key |
-| `TOKENHUB_BASE_URL` | TokenHub Endpoint 基础 URL（如含账号信息则视为 secret）|
+| `LLM_PROVIDER_API_KEY` | 当前激活 LLM provider 的 API Key（Phase 1 对应 TokenHub） |
+| `LLM_PROVIDER_BASE_URL` | 当前激活 LLM provider 的基础 URL（Phase 1 对应 TokenHub） |
 | `MIMO_API_KEY` | Xiaomi MiMo API Key **[MiMo-TBD]** |
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile 后端 Secret Key |
 
-> 注意：`TOKENHUB_BASE_URL` 如果仅是通用域名（不含账号信息），可以降级为 vars。
+> 注意：`LLM_PROVIDER_BASE_URL` 如果仅是通用域名（不含账号信息），可以降级为 vars。
 
 ### 11.3 Worker Vars（明文，Cloudflare dashboard 可见）
 
