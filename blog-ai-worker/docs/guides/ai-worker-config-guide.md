@@ -310,81 +310,36 @@ AI_IP_RATE_LIMIT_MAX_REQUESTS = "2"
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
 ```
 
-建议原则：
+建议：
 
-1. 线上只保留你自己的正式域名
-2. 本地开发时再额外保留 localhost
-3. 不要随手加入测试域名、临时预览域名，除非你明确需要
-
-如果后面要新增域名，比如 `https://www.yuanshenjian.cn`，再显式加进去。
+- 允许正式域名
+- 本地调试时保留 `localhost`
+- 不要为了“看起来更干净”而删除本地地址，否则会影响联调
 
 ---
 
-## 6. 如何配置 Turnstile 的 hostname / action 校验
+## 6. Turnstile 的 hostname / action 校验
 
 当前 Worker 会在 `siteverify` 成功后继续检查两个字段：
 
-1. `hostname`
-2. `action`（仅当你配置了期望值时）
+- `hostname`
+- `action`
 
-### 6.1 `TURNSTILE_ALLOWED_HOSTNAMES`
-
-文件：`blog-ai-worker/wrangler.toml`
+相关配置：
 
 ```toml
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
-```
-
-规则：
-
-- 这是 **hostname 列表**，不是完整 URL
-- `https://yuanshenjian.cn` 要写成 `yuanshenjian.cn`
-- 本地调试要保留 `localhost`
-- 如果你本地固定用 `127.0.0.1` 调试，需要显式再加上 `127.0.0.1`
-
-推荐做法：
-
-- 线上：至少保留正式域名
-- 本地联调：额外保留 `localhost`
-- 新增域名时，同时更新这里和 Turnstile 控制台里的 hostname allowlist
-
-### 6.2 `TURNSTILE_EXPECTED_ACTION`
-
-文件：`blog-ai-worker/wrangler.toml`
-
-```toml
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 ```
 
-前端当前固定 action 在：
-
-- `components/ai/ai-recommend-widget.tsx`
-
-当前值：
-
-```ts
-const TURNSTILE_ACTION = "homepage_recommend";
-```
-
-规则：
+注意：
 
 - Worker 端配置为空字符串时，不校验 action
 - Worker 端配置了值时，必须与前端 render 的 action 完全一致
-- 改任意一侧后，都要同步另一侧并重新部署对应产物
-
-### 6.3 什么时候需要重新 deploy
-
-- 改 `TURNSTILE_ALLOWED_HOSTNAMES` 或 `TURNSTILE_EXPECTED_ACTION`：`npm run deploy`
-- 改前端 `TURNSTILE_ACTION`：重新部署主站静态页面
-- 改 Turnstile 控制台 hostname allowlist：不改代码，但建议立刻做一次线上冒烟验证
 
 ---
 
-## 7. 紧急止损手册（强烈建议收藏）
-
-如果你怀疑有人在刷接口，优先按下面顺序止损：
-
-### 第一步：直接打开紧急关闭
+## 7. 紧急关闭与日预算止损
 
 改 `blog-ai-worker/wrangler.toml`：
 
@@ -392,63 +347,15 @@ const TURNSTILE_ACTION = "homepage_recommend";
 AI_EMERGENCY_DISABLE = "true"
 ```
 
-然后部署：
-
-```bash
-cd blog-ai-worker
-npm run deploy
-```
-
 这会让 Worker 直接拒绝新的 AI 请求，不再继续做人机校验和模型调用。
-
-### 第二步：立即收紧限流和总量预算
 
 改 `blog-ai-worker/wrangler.toml`：
 
 ```toml
-AI_IP_RATE_LIMIT_WINDOW_SECONDS = "86400"
-AI_IP_RATE_LIMIT_MAX_REQUESTS = "1"
-AI_DAILY_REQUEST_LIMIT = "20"
+AI_DAILY_REQUEST_LIMIT = "100"
 ```
 
-然后部署：
-
-```bash
-cd blog-ai-worker
-npm run deploy
-```
-
-### 第三步：确认 `ALLOWED_ORIGINS` 和 `TURNSTILE_ALLOWED_HOSTNAMES` 只剩必要值
-
-去掉不需要的测试来源，但如果你还要本地调试，就保留 `localhost`。
-
-### 第四步：必要时轮换 LLM Key
-
-```bash
-cd blog-ai-worker
-# 先更新 llm-profiles.local.jsonc 中对应 provider 的 apiKey
-npm run llm:deploy
-```
-
-### 第五步：临时关闭首页入口
-
-把前端变量改成：
-
-```env
-NEXT_PUBLIC_AI_ENABLED=false
-```
-
-然后重新部署 GitHub Pages。
-
-> 这一步只能隐藏首页入口，真正的后端止损仍然依赖：
->
-> - Turnstile
-> - Turnstile hostname / action 校验
-> - `ALLOWED_ORIGINS`
-> - Rate Limit
-> - 全局日预算
-> - `AI_EMERGENCY_DISABLE`
-> - Key 轮换
+表示每天最多允许的 AI 请求数。
 
 ---
 
@@ -492,84 +399,15 @@ ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhos
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
-AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "50"
 AI_EMERGENCY_DISABLE = "false"
 AI_DAILY_REQUEST_LIMIT = "100"
 AI_REQUEST_MAX_BODY_BYTES = "8192"
 AI_REQUEST_MAX_MESSAGE_CHARS = "500"
-AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```
-
-含义：
-
-- 允许正式域名和本地页面访问 Worker
-- 只接受来自 `yuanshenjian.cn` 或 `localhost` 的 Turnstile 校验结果
-- 只接受首页推荐这个 action 的 token
-- 正常状态下每天最多放行 100 次会触发 LLM 的请求
-- 请求体超过 `8192` 字节时直接返回 `413 Payload Too Large`
-- `message.trim()` 超过 `500` 个字符时直接返回 `413 Payload Too Large`
-- 出问题时把 `AI_EMERGENCY_DISABLE` 改成 `true` 后立即部署
-
-> 注意：根目录的 GitHub Pages workflow **不会自动部署 `blog-ai-worker/`**。
->
-> 所以：
->
-> - 改前端 → 走 Pages 部署
-> - 改 Worker / Worker 配置 → **必须单独 `npm run deploy`**
-
----
-
-## 8. 推荐的日常安全基线
-
-如果你想要一个成本更可控、又不至于太难用的默认组合，我建议：
-
-### 前端
-
-```env
-NEXT_PUBLIC_AI_ENABLED=true
-NEXT_PUBLIC_AI_WORKER_URL=https://yuanshenjian.cn/api/ai
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=你的真实 site key
-```
-
-### Worker vars
-
-```toml
-ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
-AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
-AI_IP_RATE_LIMIT_MAX_REQUESTS = "5"
-AI_REQUEST_MAX_BODY_BYTES = "8192"
-AI_REQUEST_MAX_MESSAGE_CHARS = "500"
-AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
-```
-
-### 8.1 请求体与消息长度保护
-
-当前 Worker 在请求解析阶段有两层限制：
-
-1. `AI_REQUEST_MAX_BODY_BYTES`
-2. `AI_REQUEST_MAX_MESSAGE_CHARS`
-
-默认值：
-
-```toml
-AI_REQUEST_MAX_BODY_BYTES = "8192"
-AI_REQUEST_MAX_MESSAGE_CHARS = "500"
-```
-
-行为说明：
-
-- Worker 会优先读取 `Content-Length`；如果声明值已经超限，会直接返回 `413`
-- 即使没有 `Content-Length`，或者 header 值不可信，Worker 在实际读取请求体后仍会按真实字节数再校验一次
-- `message` 长度按 `trim()` 之后的字符数计算，避免纯空白字符绕过
-- 返回信息保持用户可读，但不会暴露内部阈值判断细节
-
-### 8.2 per-IP 限流变量迁移说明
-
-- 当前统一使用 `AI_IP_RATE_LIMIT_WINDOW_SECONDS` 和 `AI_IP_RATE_LIMIT_MAX_REQUESTS`
 
 ### Worker 代码建议
 
-- `MAX_CONTEXT_POSTS = 8`
 - 推荐场景只保留必要的 `maxTokens`
 - Provider 5xx 时保留站内推荐兜底，不把上游异常直接暴露给用户
 
@@ -583,44 +421,7 @@ AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 
 ## 9. 新增文章 / 新增专栏后，AI 推荐如何自动感知内容
 
-当前首页 AI 推荐不是直接读 Markdown，而是依赖构建时生成的静态索引：
-
-```text
-public/ai-data/index.json
-```
-
-这个文件由下面的脚本生成：
-
-```text
-scripts/build-ai-data.js
-```
-
-构建命令已经自动包含这一步：
-
-```json
-"build": "npm run build:ai-data && next build"
-```
-
-### 9.1 新增文章时会发生什么
-
-只要你的文章满足以下条件：
-
-1. 位于 `content/blog/` 目录下
-2. 是 `.md` 或 `.mdx`
-3. frontmatter 至少包含：
-   - `title`
-   - `date`
-4. 没有写成：
-
-```yaml
-published: false
-```
-
-那么在下一次构建时，它就会自动进入：
-
-```text
-public/ai-data/index.json
-```
+新增文章本身不需要单独部署 Worker。
 
 Worker 下次请求 AI 推荐时，会重新读取线上站点的：
 
@@ -628,97 +429,32 @@ Worker 下次请求 AI 推荐时，会重新读取线上站点的：
 https://yuanshenjian.cn/ai-data/index.json
 ```
 
-因此新文章会自动进入推荐候选集。
+因此：
 
-### 9.2 新增专栏时会发生什么
+- 新增文章 / 专栏 → 重新构建并发布主站即可
+- 改 Worker 行为 / Worker 配置 → 必须单独重新部署 Worker
 
-对 **AI 推荐** 来说，专栏不是必须条件。
+---
 
-也就是说：
+## 10. 常见配置后问题
 
-- 即使你只是新增了一篇普通文章
-- 只要它进入了 `ai-data/index.json`
-- AI 推荐就可能推荐到它
+### 改了 profile 但线上没生效
 
-但如果你想让站点里的“专栏导航 / 专栏页 / 专栏图标 / 上下篇上下文”也一起正常工作，还需要同步更新：
+- 先确认是否只执行了 `llm:use`
+- 如果是，还需要执行：
 
-- `lib/columns.ts`
-- `components/column-icons.tsx`
+```bash
+cd blog-ai-worker
+npm run llm:deploy
+```
 
-### 9.3 什么时候需要重新部署 Worker
+### 改了 Worker 代码但线上没生效
 
-分清两类改动：
+主站 GitHub Pages workflow 不会自动部署 `blog-ai-worker/`。
 
-#### 只新增文章 / 只新增专栏内容
-
-通常只需要重新部署静态站点（GitHub Pages）。
-
-因为：
-
-- `ai-data/index.json` 属于静态站点构建产物
-- Worker 读取的是线上静态索引地址
-
-也就是说：
-
-> **新增文章本身不需要单独部署 Worker。**
-
-#### 改了 Worker 行为或 Worker 配置
-
-例如你改了：
-
-- Provider
-- Base URL
-- 限流
-- Turnstile hostname/action
-- 每日预算
-- 推荐算法
-
-这时才需要：
+必须单独执行：
 
 ```bash
 cd blog-ai-worker
 npm run deploy
 ```
-
-### 9.4 如何本地确认新文章已经进入 AI 推荐索引
-
-运行：
-
-```bash
-npm run build:ai-data
-```
-
-然后检查：
-
-```text
-public/ai-data/index.json
-```
-
-如果能看到你的新文章 `slug` / `title`，说明 AI 推荐已经能“看到”它了。
-
-### 9.5 常见原因：为什么 AI 推荐还没看到新文章
-
-优先检查：
-
-1. 文章是否位于 `content/blog/` 下
-2. frontmatter 是否缺少 `title` 或 `date`
-3. 是否写了 `published: false`
-4. 是否还没重新构建 / 重新部署静态站点
-5. 本地看的是旧的 `public/ai-data/index.json`
-
----
-
-## 10. 相关文档
-
-- `README.md`
-- `docs/troubleshoots.md`
-- `docs/ai-integration/blog-ai-phase1-launch-checklist.md`
-- `docs/ai-integration/blog-ai-phase1-prelaunch-manual-smoke-test.md`
-
-如果后续你又遇到：
-
-- 改了 Worker 代码但线上没生效
-- `Tencent TokenHub returned empty content`
-- 首页 AI 推荐偶发 502
-
-优先回看 `docs/troubleshoots.md`。

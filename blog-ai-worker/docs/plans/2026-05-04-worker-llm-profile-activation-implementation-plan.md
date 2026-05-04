@@ -27,11 +27,11 @@
 
 - Modify: `.gitignore` — 忽略 `blog-ai-worker/llm-profiles.local.jsonc` 与 `blog-ai-worker/.llm-active-profile`
 - Modify: `README.md` — 更新 AI Worker 的 LLM 配置方式与命令示例
-- Modify: `docs/guides/ai-worker-config-guide.md` — 以 profile 文件 + CLI 替换旧的手工 secret put / 硬编码模型说明
+- Modify: `blog-ai-worker/docs/guides/ai-worker-config-guide.md` — 以 profile 文件 + CLI 替换旧的手工 secret put / 硬编码模型说明
 - Modify: `docs/ai-integration/blog-ai-phase1-launch-checklist.md` — 替换旧的 Worker LLM 配置步骤，避免继续引用 `wrangler secret put` 旧路径
 - Modify: `docs/troubleshoots.md` — 如果实现或验证过程中暴露出值得复用的坑，补充排障记录
-- Create: `docs/specs/2026-05-04-worker-llm-profile-activation-design.md` — 新设计文档
-- Create: `docs/plans/2026-05-04-worker-llm-profile-activation-implementation-plan.md` — 当前执行计划
+- Create: `blog-ai-worker/docs/specs/2026-05-04-worker-llm-profile-activation-design.md` — 新设计文档
+- Create: `blog-ai-worker/docs/plans/2026-05-04-worker-llm-profile-activation-implementation-plan.md` — 当前执行计划
 
 ### Worker subpackage
 
@@ -51,8 +51,8 @@
 ## Task 1: Align docs and plan baseline
 
 **Files:**
-- Modify: `docs/specs/2026-05-04-worker-llm-profile-activation-design.md`
-- Modify: `docs/plans/2026-05-04-worker-llm-profile-activation-implementation-plan.md`
+- Modify: `blog-ai-worker/docs/specs/2026-05-04-worker-llm-profile-activation-design.md`
+- Modify: `blog-ai-worker/docs/plans/2026-05-04-worker-llm-profile-activation-implementation-plan.md`
 
 - [ ] **Step 1: Keep plan baseline consistent with approved design**
 
@@ -353,7 +353,7 @@ Expected:
 
 **Files:**
 - Modify: `README.md`
-- Modify: `docs/guides/ai-worker-config-guide.md`
+- Modify: `blog-ai-worker/docs/guides/ai-worker-config-guide.md`
 - Modify: `docs/ai-integration/blog-ai-phase1-launch-checklist.md`
 - Modify: `docs/troubleshoots.md`（如需要）
 

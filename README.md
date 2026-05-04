@@ -430,7 +430,7 @@ npm run llm:deploy -- tencent-tokenhub/kimi-k2.6
 
 更详细的配置项说明、限流调优和防滥用止损建议见：
 
-- `docs/guides/ai-worker-config-guide.md`
+- `blog-ai-worker/docs/guides/ai-worker-config-guide.md`
 
 如果你关心“新增文章 / 新增专栏后，AI 推荐何时能自动看到新内容”，也看这份指南里的对应章节。
 
