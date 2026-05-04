@@ -50,6 +50,7 @@ export default function Home() {
               enabled={config.ai.enabled}
               workerUrl={config.ai.workerUrl}
               turnstileSiteKey={config.ai.turnstileSiteKey}
+              quickTopics={config.ai.quickTopics}
             />
           </div>
         </div>

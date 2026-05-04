@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Sparkles } from "lucide-react";
 import { aiChat } from "@/lib/ai-client";
-import type { AIChatResponse } from "@/types/ai";
+import type { AIChatResponse, AIQuickTopic } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_TIMEOUT_MS = 15000;
@@ -52,15 +52,14 @@ function loadTurnstileScript(): Promise<void> {
   return turnstileScriptPromise;
 }
 
-const QUICK_TOPICS = ["Claude Code", "AI 编程", "简单设计", "敏捷方法"];
-
 interface AiRecommendWidgetProps {
   enabled: boolean;
   workerUrl: string;
   turnstileSiteKey: string;
+  quickTopics: AIQuickTopic[];
 }
 
-export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRecommendWidgetProps) {
+export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, quickTopics }: AiRecommendWidgetProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<AIChatResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -192,11 +191,11 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
     await doSubmit(message.trim());
   }
 
-  function handleQuickTopic(topic: string) {
-    setMessage(topic);
+  function handleQuickTopic(topic: AIQuickTopic) {
+    setMessage(topic.label);
     // 让输入框先更新，再提交
     setTimeout(() => {
-      doSubmit(topic.trim());
+      doSubmit(topic.prompt.trim());
     }, 50);
   }
 
@@ -223,46 +222,21 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
         </div>
       </form>
 
-      {/* 快捷主题 + 专栏链接 */}
-      <div className="flex flex-wrap justify-center gap-2 mt-3">
-        <Link
-          href="/ai/ai-frontier"
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
-        >
-          AI 前沿
-        </Link>
-        <button
-          type="button"
-          onClick={() => handleQuickTopic("AI 编程")}
-          disabled={isSubmitting}
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-        >
-          AI 编程
-        </button>
-        <Link
-          href="/ai/ai-frontier"
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
-        >
-          OpenAI
-        </Link>
-        <Link
-          href="/ai/deepseek"
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
-        >
-          DeepSeek
-        </Link>
-        {QUICK_TOPICS.filter((t) => t !== "AI 编程").map((topic) => (
-          <button
-            key={topic}
-            type="button"
-            onClick={() => handleQuickTopic(topic)}
-            disabled={isSubmitting}
-            className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-          >
-            {topic}
-          </button>
-        ))}
-      </div>
+      {quickTopics.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-2 mt-3">
+          {quickTopics.map((topic) => (
+            <button
+              key={topic.label}
+              type="button"
+              onClick={() => handleQuickTopic(topic)}
+              disabled={isSubmitting}
+              className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              {topic.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {error ? (
         <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive text-left">

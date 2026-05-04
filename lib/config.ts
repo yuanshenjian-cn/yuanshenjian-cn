@@ -1,3 +1,24 @@
+import type { AIQuickTopic } from "@/types/ai";
+
+const aiQuickTopics: AIQuickTopic[] = [
+  {
+    label: "Claude Code",
+    prompt: "请推荐我博客里和 Claude Code、AI 编程实践相关的文章，并说明各自适合什么场景。",
+  },
+  {
+    label: "AI 编程",
+    prompt: "请推荐我博客里和 AI 编程、AI 辅助开发相关的文章，并按入门到进阶排序。",
+  },
+  {
+    label: "简单设计",
+    prompt: "请推荐我博客里和简单设计相关的文章，并总结每篇文章最值得先看的一个要点。",
+  },
+  {
+    label: "敏捷方法",
+    prompt: "请推荐我博客里和敏捷方法相关的文章，并说明分别适合团队实践中的哪些问题。",
+  },
+];
+
 export const config = {
   posts: {
     perPage: 12,
@@ -32,6 +53,7 @@ export const config = {
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
     workerUrl: process.env.NEXT_PUBLIC_AI_WORKER_URL || "/api/ai",
     turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+    quickTopics: aiQuickTopics,
   },
 } as const;
 

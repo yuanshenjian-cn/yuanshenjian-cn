@@ -26,6 +26,11 @@ export interface AIChatOptions {
   context?: Record<string, unknown>;
 }
 
+export interface AIQuickTopic {
+  label: string;
+  prompt: string;
+}
+
 export interface TurnstileRenderOptions {
   sitekey: string;
   action?: string;
