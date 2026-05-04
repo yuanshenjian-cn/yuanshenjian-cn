@@ -68,9 +68,81 @@ describe("createProvider", () => {
   });
 
   it("导出的支持列表与 provider 判断函数一致", () => {
-    expect(SUPPORTED_LLM_PROVIDERS).toContain("tencent-tokenhub");
+    expect(SUPPORTED_LLM_PROVIDERS).toEqual(["tencent-tokenhub", "deepseek", "moonshot-cn"]);
     expect(isSupportedLLMProvider("tencent-tokenhub")).toBe(true);
+    expect(isSupportedLLMProvider("deepseek")).toBe(true);
+    expect(isSupportedLLMProvider("moonshot-cn")).toBe(true);
     expect(isSupportedLLMProvider("unknown-provider")).toBe(false);
+  });
+
+  it("deepseek provider 可正常路由", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: "ok" } }],
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    const provider = createProvider(
+      {
+        ...env,
+        LLM_PROVIDER_NAME: "deepseek",
+        LLM_PROVIDER_BASE_URL: "https://api.deepseek.com/v1",
+        LLM_MODEL_ID: "deepseek-v4-flash",
+      },
+      "deepseek-v4-flash",
+    );
+
+    await provider.chat({
+      messages: [{ role: "user", content: "hello" }],
+      maxTokens: 100,
+      temperature: 0.4,
+      stream: false,
+    });
+
+    expect(provider.name).toBe("deepseek");
+    const [url, init] = fetchMock.mock.calls.at(-1) ?? [];
+    expect(url).toBe("https://api.deepseek.com/v1/chat/completions");
+    expect(JSON.parse(String(init?.body))).toMatchObject({ model: "deepseek-v4-flash" });
+  });
+
+  it("moonshot-cn provider 可正常路由", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: "ok" } }],
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    const provider = createProvider(
+      {
+        ...env,
+        LLM_PROVIDER_NAME: "moonshot-cn",
+        LLM_PROVIDER_BASE_URL: "https://api.moonshot.cn/v1",
+        LLM_MODEL_ID: "moonshot-v1-8k",
+      },
+      "moonshot-v1-8k",
+    );
+
+    await provider.chat({
+      messages: [{ role: "user", content: "hello" }],
+      maxTokens: 100,
+      temperature: 0.4,
+      stream: false,
+    });
+
+    expect(provider.name).toBe("moonshot-cn");
+    const [url, init] = fetchMock.mock.calls.at(-1) ?? [];
+    expect(url).toBe("https://api.moonshot.cn/v1/chat/completions");
+    expect(JSON.parse(String(init?.body))).toMatchObject({ model: "moonshot-v1-8k" });
   });
 
   it("未知 provider 直接抛出清晰错误", () => {

@@ -89,7 +89,7 @@ npm run llm:deploy
 
 - 当前只支持默认 Worker 环境，不支持 `--env`
 - selector 只支持 `provider/modelKey`
-- 当前运行时至少支持 `tencent-tokenhub`
+- 当前运行时支持 `tencent-tokenhub`、`deepseek`、`moonshot-cn`
 
 ### 1.3 Worker vars / secrets
 

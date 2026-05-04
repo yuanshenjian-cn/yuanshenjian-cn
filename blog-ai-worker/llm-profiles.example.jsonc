@@ -18,6 +18,29 @@
           "modelId": "deepseek-v4-pro"
         }
       }
+    },
+    "deepseek": {
+      "label": "DeepSeek Official",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "apiKey": "replace-with-your-real-api-key",
+      "models": {
+        "deepseek-v4-pro": {
+          "modelId": "deepseek-v4-pro"
+        },
+        "deepseek-v4-flash": {
+          "modelId": "deepseek-v4-flash"
+        }
+      }
+    },
+    "moonshot-cn": {
+      "label": "Moonshot CN Official",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "apiKey": "replace-with-your-real-api-key",
+      "models": {
+        "kimi-k2.6": {
+          "modelId": "kimi-k2.6"
+        }
+      }
     }
   }
 }

@@ -29,12 +29,12 @@ const VALID_PROFILES_JSONC = `{
 const UNSUPPORTED_PROVIDER_JSONC = `{
   "version": 1,
   "providers": {
-    "deepseek": {
-      "baseUrl": "https://api.deepseek.com/v1",
+    "unknown-provider": {
+      "baseUrl": "https://example.com/v1",
       "apiKey": "test-key",
       "models": {
         "v4-pro": {
-          "modelId": "deepseek-chat"
+          "modelId": "example-model"
         }
       }
     }
@@ -115,8 +115,8 @@ describe("llm-profile-cli", () => {
   it("不支持的 provider 在 CLI 阶段就失败", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), UNSUPPORTED_PROVIDER_JSONC, "utf8");
 
-    await expect(useProfile("deepseek/v4-pro", { workerDir })).rejects.toThrow(
-      "Unsupported provider in profile deepseek/v4-pro: deepseek. Implement it in blog-ai-worker/src/providers/index.ts first.",
+    await expect(useProfile("unknown-provider/v4-pro", { workerDir })).rejects.toThrow(
+      "Unsupported provider in profile unknown-provider/v4-pro: unknown-provider. Implement it in blog-ai-worker/src/providers/index.ts first.",
     );
   });
 

@@ -492,7 +492,7 @@ Turnstile secret 仍需单独设置：
 
 - `TURNSTILE_SECRET_KEY`
 
-LLM 相关字段不再手工逐项 `wrangler secret put`，而是由 `blog-ai-worker/llm-profiles.local.jsonc` + `npm run llm:deploy` 统一写入 Worker：
+LLM 相关字段不再手工逐项 `wrangler secret put`，而是由 `blog-ai-worker/llm-profiles.local.jsonc` + `npm run llm:deploy` 统一写入 Worker。当前运行时支持的 provider 包括 `tencent-tokenhub`、`deepseek`、`moonshot-cn`：
 
 - `LLM_ACTIVE_PROFILE`
 - `LLM_PROVIDER_NAME`
