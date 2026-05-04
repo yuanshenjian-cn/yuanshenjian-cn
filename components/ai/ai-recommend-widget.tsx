@@ -122,9 +122,9 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
     if (!turnstileWidgetIdRef.current) {
       turnstileWidgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
         sitekey: turnstileSiteKey,
-        size: "invisible",
+        size: "flexible",
         execution: "execute",
-        appearance: "execute",
+        appearance: "interaction-only",
         callback: (token) => resolveTurnstileRequest(token),
         "error-callback": () => rejectTurnstileRequest("Turnstile 校验失败，请稍后重试。"),
         "expired-callback": () => rejectTurnstileRequest("Turnstile 已过期，请重新提交。", false),

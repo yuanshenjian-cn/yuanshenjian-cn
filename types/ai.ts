@@ -28,7 +28,7 @@ export interface AIChatOptions {
 
 export interface TurnstileRenderOptions {
   sitekey: string;
-  size?: "invisible";
+  size?: "normal" | "flexible" | "compact";
   execution?: "execute" | "render";
   appearance?: "execute" | "always" | "interaction-only";
   callback?: (token: string) => void;

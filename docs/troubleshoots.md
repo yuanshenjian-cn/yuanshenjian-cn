@@ -155,3 +155,29 @@ https://yuanshenjian.cn/ai-data/index.json
 - 站点离线兜底逻辑把失败请求回退成首页
 
 而不是优先怀疑 GitHub Pages 部署目录错误。
+
+### 本次衍生问题：Turnstile `size` 参数配置错误会导致前端卡死在“推荐中...”
+
+如果页面已经显示出 AI 推荐组件，但点击提交后长期停留在“推荐中...”，浏览器 console 中出现类似报错：
+
+```text
+Invalid value for parameter "size", expected "compact", "flexible", or "normal", got "invisible"
+```
+
+说明 Turnstile 前端参数配置不合法。
+
+当前项目中，稳定可用的组合应优先使用：
+
+```ts
+size: "flexible"
+execution: "execute"
+appearance: "interaction-only"
+```
+
+不要使用：
+
+```ts
+size: "invisible"
+```
+
+否则即使请求体中可能最终带上 `cf_turnstile_response`，页面端也会出现大量 Turnstile 异常，导致提交流程卡住或表现不稳定。
