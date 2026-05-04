@@ -7,6 +7,7 @@ import type { AIChatResponse } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_TIMEOUT_MS = 15000;
+const TURNSTILE_ACTION = "homepage_recommend";
 
 let turnstileScriptPromise: Promise<void> | null = null;
 
@@ -122,6 +123,7 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
     if (!turnstileWidgetIdRef.current) {
       turnstileWidgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
         sitekey: turnstileSiteKey,
+        action: TURNSTILE_ACTION,
         size: "flexible",
         execution: "execute",
         appearance: "interaction-only",

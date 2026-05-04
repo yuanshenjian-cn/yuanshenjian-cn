@@ -354,3 +354,114 @@ const nonColumnPost = allPosts.find((p) => !p.relativePath.startsWith("swd/ai-co
 3. 同步检查测试是否仍依赖旧的目录白名单或固定专栏数量假设
 
 原则：**测试应验证“分类规则”，不要验证一组容易过期的目录枚举。**
+
+---
+
+## 2026-05-04 AI Worker 新增 Turnstile hostname/action 校验与日预算止损后，因配置未同步导致 403 / 429 / 503
+
+### 现象
+
+上线新版本后，首页 AI 推荐可能出现以下几类报错：
+
+- `Turnstile verification failed`
+- `今日 AI 请求额度已用完，请明天再试。`
+- `AI 功能当前暂时不可用，请稍后再试。`
+
+常见外在表现：
+
+- 本地开发原来可用，现在 localhost 提交直接失败
+- 线上页面明明能拿到 Turnstile token，但 Worker 仍返回 403
+- 线上请求突然全部 503
+- 流量稍大后开始稳定返回 429
+
+### 根因
+
+这类问题通常不是前端组件坏了，而是 **Worker / Turnstile 控制台 / 前端 action 三边配置没有同步**。
+
+重点检查这几项：
+
+1. `TURNSTILE_ALLOWED_HOSTNAMES`
+2. `TURNSTILE_EXPECTED_ACTION`
+3. 前端 `components/ai/ai-recommend-widget.tsx` 中的 `TURNSTILE_ACTION`
+4. Turnstile 控制台中的 hostname allowlist
+5. `AI_DAILY_REQUEST_LIMIT`
+6. `AI_EMERGENCY_DISABLE`
+
+### 排查方式
+
+#### 情况 A：`Turnstile verification failed`
+
+优先检查：
+
+1. `blog-ai-worker/wrangler.toml` 中的 hostname 列表是否写成了完整 URL
+
+错误示例：
+
+```toml
+TURNSTILE_ALLOWED_HOSTNAMES = "https://yuanshenjian.cn,http://localhost:3000"
+```
+
+正确示例：
+
+```toml
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+```
+
+2. 本地调试是否遗漏了 `localhost`
+3. 如果你本地用的是 `127.0.0.1`，是否显式加入了 `127.0.0.1`
+4. `TURNSTILE_EXPECTED_ACTION` 是否与前端固定 action 一致
+
+当前前端默认值是：
+
+```ts
+const TURNSTILE_ACTION = "homepage_recommend";
+```
+
+5. Turnstile 控制台里是否也允许了对应域名
+
+#### 情况 B：`今日 AI 请求额度已用完，请明天再试。`
+
+说明请求已经通过了：
+
+- origin 校验
+- Turnstile 校验
+- 单 IP 限流
+
+但全局日预算已经打满。
+
+处理方式：
+
+1. 确认是否是正常流量增长
+2. 按需调大 `AI_DAILY_REQUEST_LIMIT`
+3. 修改后执行 `cd blog-ai-worker && npm run deploy`
+4. 如果是恶意流量，优先不要盲目放大预算，而是先打开紧急关闭或收紧来源名单
+
+#### 情况 C：`AI 功能当前暂时不可用，请稍后再试。`
+
+这通常表示：
+
+```toml
+AI_EMERGENCY_DISABLE = "true"
+```
+
+这是主动熔断，不是故障。
+
+恢复方式：
+
+1. 把值改回 `"false"`
+2. 重新部署 Worker
+
+### 如何避免再次踩坑
+
+以后只要改下面任意一项，都要同步检查另外几处：
+
+- 改前端 Turnstile action
+- 改 Worker 的 `TURNSTILE_EXPECTED_ACTION`
+- 改 Turnstile 控制台的 hostname allowlist
+- 改 Worker 的 `TURNSTILE_ALLOWED_HOSTNAMES`
+
+并且记住：
+
+- 改 `wrangler.toml` 后，必须单独部署 Worker
+- 保留 `localhost` 是为了本地调试，不应被误删
+- `AI_DAILY_REQUEST_LIMIT` 是总量止损，不是单 IP 限流的替代品

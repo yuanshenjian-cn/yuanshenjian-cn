@@ -51,8 +51,12 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 | --- | --- | --- |
 | `AI_DATA_BASE_URL` | AI 推荐索引地址 | 确保 Worker 只读取本站静态索引 |
 | `ALLOWED_ORIGINS` | 允许访问 Worker 的来源列表 | 防止任意站点直接复用你的 Worker |
+| `TURNSTILE_ALLOWED_HOSTNAMES` | Turnstile siteverify 返回的允许 hostname 列表 | 防止别的站点拿你的 Site Key / token 复用 Worker |
+| `TURNSTILE_EXPECTED_ACTION` | 期望的 Turnstile action，可留空 | 防止别的页面或别的交互复用同一 token |
 | `RATE_LIMIT_WINDOW_SECONDS` | 限流窗口长度 | 控制统计周期 |
 | `RATE_LIMIT_MAX_REQUESTS` | 窗口内最大请求数 | 限制单 IP 可消耗的请求量 |
+| `AI_EMERGENCY_DISABLE` | 紧急关闭 AI 能力 | 遇到异常流量或上游故障时可立即止损 |
+| `AI_DAILY_REQUEST_LIMIT` | 每天最多允许的 AI 请求数 | 控制全局每日最大 token 风险敞口 |
 
 改完 `wrangler.toml` 后，需要重新部署：
 
@@ -244,17 +248,76 @@ ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhos
 
 ---
 
-## 6. 紧急止损手册（强烈建议收藏）
+## 6. 如何配置 Turnstile 的 hostname / action 校验
+
+当前 Worker 会在 `siteverify` 成功后继续检查两个字段：
+
+1. `hostname`
+2. `action`（仅当你配置了期望值时）
+
+### 6.1 `TURNSTILE_ALLOWED_HOSTNAMES`
+
+文件：`blog-ai-worker/wrangler.toml`
+
+```toml
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+```
+
+规则：
+
+- 这是 **hostname 列表**，不是完整 URL
+- `https://yuanshenjian.cn` 要写成 `yuanshenjian.cn`
+- 本地调试要保留 `localhost`
+- 如果你本地固定用 `127.0.0.1` 调试，需要显式再加上 `127.0.0.1`
+
+推荐做法：
+
+- 线上：至少保留正式域名
+- 本地联调：额外保留 `localhost`
+- 新增域名时，同时更新这里和 Turnstile 控制台里的 hostname allowlist
+
+### 6.2 `TURNSTILE_EXPECTED_ACTION`
+
+文件：`blog-ai-worker/wrangler.toml`
+
+```toml
+TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
+```
+
+前端当前固定 action 在：
+
+- `components/ai/ai-recommend-widget.tsx`
+
+当前值：
+
+```ts
+const TURNSTILE_ACTION = "homepage_recommend";
+```
+
+规则：
+
+- Worker 端配置为空字符串时，不校验 action
+- Worker 端配置了值时，必须与前端 render 的 action 完全一致
+- 改任意一侧后，都要同步另一侧并重新部署对应产物
+
+### 6.3 什么时候需要重新 deploy
+
+- 改 `TURNSTILE_ALLOWED_HOSTNAMES` 或 `TURNSTILE_EXPECTED_ACTION`：`npm run deploy`
+- 改前端 `TURNSTILE_ACTION`：重新部署主站静态页面
+- 改 Turnstile 控制台 hostname allowlist：不改代码，但建议立刻做一次线上冒烟验证
+
+---
+
+## 7. 紧急止损手册（强烈建议收藏）
 
 如果你怀疑有人在刷接口，优先按下面顺序止损：
 
-### 第一步：立即收紧限流
+### 第一步：直接打开紧急关闭
 
 改 `blog-ai-worker/wrangler.toml`：
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "86400"
-RATE_LIMIT_MAX_REQUESTS = "1"
+AI_EMERGENCY_DISABLE = "true"
 ```
 
 然后部署：
@@ -264,11 +327,30 @@ cd blog-ai-worker
 npm run deploy
 ```
 
-### 第二步：确认 `ALLOWED_ORIGINS` 只剩正式域名
+这会让 Worker 直接拒绝新的 AI 请求，不再继续做人机校验和模型调用。
 
-去掉不需要的测试来源。
+### 第二步：立即收紧限流和总量预算
 
-### 第三步：必要时轮换 LLM Key
+改 `blog-ai-worker/wrangler.toml`：
+
+```toml
+RATE_LIMIT_WINDOW_SECONDS = "86400"
+RATE_LIMIT_MAX_REQUESTS = "1"
+AI_DAILY_REQUEST_LIMIT = "20"
+```
+
+然后部署：
+
+```bash
+cd blog-ai-worker
+npm run deploy
+```
+
+### 第三步：确认 `ALLOWED_ORIGINS` 和 `TURNSTILE_ALLOWED_HOSTNAMES` 只剩必要值
+
+去掉不需要的测试来源，但如果你还要本地调试，就保留 `localhost`。
+
+### 第四步：必要时轮换 LLM Key
 
 ```bash
 cd blog-ai-worker
@@ -276,7 +358,7 @@ npx wrangler secret put LLM_PROVIDER_API_KEY
 npm run deploy
 ```
 
-### 第四步：临时关闭首页入口
+### 第五步：临时关闭首页入口
 
 把前端变量改成：
 
@@ -289,13 +371,16 @@ NEXT_PUBLIC_AI_ENABLED=false
 > 这一步只能隐藏首页入口，真正的后端止损仍然依赖：
 >
 > - Turnstile
+> - Turnstile hostname / action 校验
 > - `ALLOWED_ORIGINS`
 > - Rate Limit
+> - 全局日预算
+> - `AI_EMERGENCY_DISABLE`
 > - Key 轮换
 
 ---
 
-## 7. 每次改配置后的标准操作
+## 8. 每次改配置后的标准操作
 
 ### 7.1 改 secrets 后
 
@@ -318,6 +403,27 @@ npm --prefix blog-ai-worker run typecheck
 cd blog-ai-worker
 npm run deploy
 ```
+
+### 8.4 推荐的安全配置基线
+
+```toml
+ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
+RATE_LIMIT_WINDOW_SECONDS = "3600"
+RATE_LIMIT_MAX_REQUESTS = "10"
+AI_EMERGENCY_DISABLE = "false"
+AI_DAILY_REQUEST_LIMIT = "100"
+AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
+```
+
+含义：
+
+- 允许正式域名和本地页面访问 Worker
+- 只接受来自 `yuanshenjian.cn` 或 `localhost` 的 Turnstile 校验结果
+- 只接受首页推荐这个 action 的 token
+- 正常状态下每天最多放行 100 次会触发 LLM 的请求
+- 出问题时把 `AI_EMERGENCY_DISABLE` 改成 `true` 后立即部署
 
 > 注意：根目录的 GitHub Pages workflow **不会自动部署 `blog-ai-worker/`**。
 >

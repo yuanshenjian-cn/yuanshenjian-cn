@@ -8,8 +8,12 @@ id = "2f2d97e777a748cb8e60d2dabd74b2dd"
 
 [vars]
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 RATE_LIMIT_WINDOW_SECONDS = "3600"
 RATE_LIMIT_MAX_REQUESTS = "10"
+AI_EMERGENCY_DISABLE = "false"
+AI_DAILY_REQUEST_LIMIT = "100"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 [[routes]]

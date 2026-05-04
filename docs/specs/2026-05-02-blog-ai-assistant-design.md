@@ -183,6 +183,9 @@ Turnstile 在用户打开 AI 功能对话框时静默触发（无感模式），
   POST https://challenges.cloudflare.com/turnstile/v0/siteverify
   Body: secret=<TURNSTILE_SECRET_KEY>&response=<token>&remoteip=<ip>
   ```
+- siteverify 成功后还要继续校验：
+  - `hostname` 必须命中 Worker vars 中的允许名单
+  - `action` 在配置了期望值时必须精确匹配，例如 `homepage_recommend`
 - 验证失败 → 返回 `403`，不发出 LLM 请求
 - Turnstile token 一次性有效，不可重用
 
@@ -226,6 +229,18 @@ TTL:   略大于窗口大小（如 3700 秒）
 ```
 
 这不是强一致安全边界，而是首发阶段足够实用、实现最简单、成本最低的“提高滥用门槛”方案。
+
+### 5.3.1 总量止损 / 熔断补充
+
+在固定窗口 IP 限流之外，再补一层全局止损：
+
+- 使用同一个 `RATE_LIMIT_KV` 记录按 UTC 日期聚合的全局计数
+- 计数 key 形如 `ai-daily-budget:2026-05-04`
+- 只有请求已经通过 `origin -> Turnstile -> per-IP rate limit` 后，才会消耗这一天的全局预算
+- 超出 `AI_DAILY_REQUEST_LIMIT` 后直接返回用户可读错误，不再继续触发 LLM 调用
+- `AI_EMERGENCY_DISABLE=true` 时，直接拒绝新的 AI 请求，用于异常流量或上游故障时的紧急停机
+
+这层保护的目标不是精确计费，而是把“每日最大风险敞口”限制在一个明确范围内。
 
 ### 5.4 首发阶段配置建议
 
@@ -834,8 +849,12 @@ export async function aiChat(options: AIChatOptions): Promise<void> {
 | 变量名 | 类型 | 说明 |
 |--------|------|------|
 | `ALLOWED_ORIGINS` | string | 允许的 origin 列表，如 `https://yuanshenjian.cn,http://localhost:3000` |
+| `TURNSTILE_ALLOWED_HOSTNAMES` | string | Turnstile siteverify 返回允许的 hostname 列表，如 `yuanshenjian.cn,localhost` |
+| `TURNSTILE_EXPECTED_ACTION` | string | 期望的 Turnstile action，如 `homepage_recommend`；为空则不校验 |
 | `RATE_LIMIT_WINDOW_SECONDS` | string | 滑动窗口大小，单位秒，如 `"3600"` |
 | `RATE_LIMIT_MAX_REQUESTS` | string | 窗口内最大请求数，如 `"10"` |
+| `AI_EMERGENCY_DISABLE` | string | 是否紧急关闭 AI，`"true"` 表示直接拒绝请求 |
+| `AI_DAILY_REQUEST_LIMIT` | string | 每日最多允许的 AI 请求数，如 `"100"` |
 | `SCENE_ROUTING_CONFIG` | JSON string | 场景路由配置（参见第 7 节） |
 | `AI_DATA_BASE_URL` | string | ai-data JSON 的 CDN 基础 URL，如 `https://yuanshenjian.cn/ai-data` |
 | `MIMO_BASE_URL` | string | MiMo API 基础 URL **[MiMo-TBD]**，如确认无敏感信息则放 vars |
@@ -898,8 +917,12 @@ id = "<kv-namespace-id>"
 
 [vars]
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
+TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
+TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
 RATE_LIMIT_WINDOW_SECONDS = "3600"
 RATE_LIMIT_MAX_REQUESTS = "10"
+AI_EMERGENCY_DISABLE = "false"
+AI_DAILY_REQUEST_LIMIT = "100"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 # routes 通过 Cloudflare dashboard 配置，或：

@@ -389,7 +389,9 @@ brief: 文章摘要，用于列表展示和 SEO
 首页 AI 推荐不是直接在前端请求模型，而是通过 `blog-ai-worker/` 目录下的 Cloudflare Worker 统一处理：
 
 - Turnstile 校验
+- Turnstile hostname / action 校验
 - 请求限流
+- 全局日预算止损与紧急关闭
 - 读取 `public/ai-data/index.json`
 - 调用 LLM provider
 - 在上游模型不稳定时回退为站内确定性推荐
@@ -411,6 +413,8 @@ npm run deploy
 更详细的配置项说明、限流调优和防滥用止损建议见：
 
 - `docs/guides/ai-worker-config-guide.md`
+
+如果你要修改 Turnstile 允许域名、前端 action、每日总预算或紧急停用开关，优先改这份配置指南，再单独部署 Worker。
 
 > 重要：根目录的 GitHub Pages workflow **不会自动部署** `blog-ai-worker/`。
 >
@@ -455,14 +459,25 @@ Cloudflare Worker 侧还需要额外配置：
 
 - `AI_DATA_BASE_URL`
 - `ALLOWED_ORIGINS`
+- `TURNSTILE_ALLOWED_HOSTNAMES`
+- `TURNSTILE_EXPECTED_ACTION`
 - `RATE_LIMIT_WINDOW_SECONDS`
 - `RATE_LIMIT_MAX_REQUESTS`
+- `AI_EMERGENCY_DISABLE`
+- `AI_DAILY_REQUEST_LIMIT`
 
 同时需要在 Worker secrets 中设置：
 
 - `LLM_PROVIDER_API_KEY`
 - `LLM_PROVIDER_BASE_URL`
 - `TURNSTILE_SECRET_KEY`
+
+默认安全基线见 `blog-ai-worker/wrangler.toml`。其中：
+
+- `TURNSTILE_ALLOWED_HOSTNAMES` 默认保留 `yuanshenjian.cn,localhost`，保证本地调试仍可用
+- `TURNSTILE_EXPECTED_ACTION` 默认是 `homepage_recommend`，需与前端 Turnstile render 的 action 保持一致
+- `AI_EMERGENCY_DISABLE=true` 时，Worker 会直接拒绝 AI 请求
+- `AI_DAILY_REQUEST_LIMIT` 控制每天最多允许多少次会触发 LLM 的请求，按 UTC 日期统计
 
 设置示例：
 

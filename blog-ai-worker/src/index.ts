@@ -1,5 +1,5 @@
 import { validateOrigin } from "./middleware/origin";
-import { checkRateLimit } from "./middleware/rate-limit";
+import { assertAIEnabled, checkDailyAIBudget, checkRateLimit } from "./middleware/rate-limit";
 import { verifyTurnstile } from "./middleware/turnstile";
 import { handleRecommendScene } from "./scenes/recommend";
 import type { ChatRequestBody, Env, ExecutionContext } from "./types";
@@ -21,6 +21,10 @@ function assertConfiguredEnv(env: Env): void {
 
   if (!env.AI_DATA_BASE_URL?.trim()) {
     throw new HttpError(500, "Worker misconfigured: AI_DATA_BASE_URL is missing");
+  }
+
+  if (!env.TURNSTILE_ALLOWED_HOSTNAMES?.trim()) {
+    throw new HttpError(500, "Worker misconfigured: TURNSTILE_ALLOWED_HOSTNAMES is missing");
   }
 }
 
@@ -87,10 +91,12 @@ export default {
       }
 
       assertConfiguredEnv(env);
+      assertAIEnabled(env);
       const body = await parseBody(request);
 
       await verifyTurnstile(body.cf_turnstile_response, request, env);
       await checkRateLimit(request, env);
+      await checkDailyAIBudget(env);
 
       const result = await handleRecommendScene(body.message, env);
       return jsonResponse(result, { origin });

@@ -5,6 +5,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function parseCsvList(value: string | undefined): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function readStringField(payload: Record<string, unknown>, key: string): string | null {
+  const value = payload[key];
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
 function getRemoteIp(request: Request): string | null {
   const cfIp = request.headers.get("CF-Connecting-IP");
   if (cfIp) {
@@ -48,5 +60,19 @@ export async function verifyTurnstile(token: string, request: Request, env: Env)
   const payload: unknown = await response.json().catch(() => null);
   if (!isRecord(payload) || payload.success !== true) {
     throw new HttpError(403, "Turnstile verification failed");
+  }
+
+  const allowedHostnames = parseCsvList(env.TURNSTILE_ALLOWED_HOSTNAMES);
+  const hostname = readStringField(payload, "hostname");
+  if (allowedHostnames.length === 0 || !hostname || !allowedHostnames.includes(hostname)) {
+    throw new HttpError(403, "Turnstile verification failed");
+  }
+
+  const expectedAction = env.TURNSTILE_EXPECTED_ACTION?.trim();
+  if (expectedAction) {
+    const action = readStringField(payload, "action");
+    if (action !== expectedAction) {
+      throw new HttpError(403, "Turnstile verification failed");
+    }
   }
 }
