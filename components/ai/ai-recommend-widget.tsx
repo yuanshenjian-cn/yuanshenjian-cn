@@ -229,8 +229,16 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
           href="/ai/ai-frontier"
           className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
         >
-          AI前沿
+          AI 前沿
         </Link>
+        <button
+          type="button"
+          onClick={() => handleQuickTopic("AI 编程")}
+          disabled={isSubmitting}
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          AI 编程
+        </button>
         <Link
           href="/ai/ai-frontier"
           className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
@@ -243,7 +251,7 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
         >
           DeepSeek
         </Link>
-        {QUICK_TOPICS.map((topic) => (
+        {QUICK_TOPICS.filter((t) => t !== "AI 编程").map((topic) => (
           <button
             key={topic}
             type="button"
