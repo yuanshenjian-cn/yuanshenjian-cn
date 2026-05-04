@@ -392,8 +392,8 @@ export interface Env {
   LLM_PROVIDER_BASE_URL: string;
   TURNSTILE_SECRET_KEY: string;
   ALLOWED_ORIGINS: string;
-  RATE_LIMIT_WINDOW_SECONDS: string;
-  RATE_LIMIT_MAX_REQUESTS: string;
+  AI_IP_RATE_LIMIT_WINDOW_SECONDS: string;
+  AI_IP_RATE_LIMIT_MAX_REQUESTS: string;
   AI_DATA_BASE_URL: string;
   MIMO_API_KEY?: string;
   MIMO_BASE_URL?: string;
@@ -415,8 +415,8 @@ id = "<kv-namespace-id>"
 
 [vars]
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 [[routes]]

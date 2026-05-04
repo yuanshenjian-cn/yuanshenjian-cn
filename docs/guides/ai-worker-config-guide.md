@@ -53,10 +53,12 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 | `ALLOWED_ORIGINS` | 允许访问 Worker 的来源列表 | 防止任意站点直接复用你的 Worker |
 | `TURNSTILE_ALLOWED_HOSTNAMES` | Turnstile siteverify 返回的允许 hostname 列表 | 防止别的站点拿你的 Site Key / token 复用 Worker |
 | `TURNSTILE_EXPECTED_ACTION` | 期望的 Turnstile action，可留空 | 防止别的页面或别的交互复用同一 token |
-| `RATE_LIMIT_WINDOW_SECONDS` | 限流窗口长度 | 控制统计周期 |
-| `RATE_LIMIT_MAX_REQUESTS` | 窗口内最大请求数 | 限制单 IP 可消耗的请求量 |
+| `AI_IP_RATE_LIMIT_WINDOW_SECONDS` | 按 IP 限流窗口长度 | 控制统计周期 |
+| `AI_IP_RATE_LIMIT_MAX_REQUESTS` | 按 IP 窗口内最大请求数 | 限制单 IP 可消耗的请求量 |
 | `AI_EMERGENCY_DISABLE` | 紧急关闭 AI 能力 | 遇到异常流量或上游故障时可立即止损 |
 | `AI_DAILY_REQUEST_LIMIT` | 每天最多允许的 AI 请求数 | 控制全局每日最大 token 风险敞口 |
+| `AI_REQUEST_MAX_BODY_BYTES` | 请求体最大字节数 | 提前拦住异常或滥用的大请求体，减少无意义解析开销 |
+| `AI_REQUEST_MAX_MESSAGE_CHARS` | `message.trim()` 后的最大字符数 | 限制单次提问长度，控制 prompt 体积与异常输入 |
 
 改完 `wrangler.toml` 后，需要重新部署：
 
@@ -179,8 +181,8 @@ maxTokens: 800,
 文件：`blog-ai-worker/wrangler.toml`
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 ```
 
 这表示：
@@ -193,8 +195,8 @@ RATE_LIMIT_MAX_REQUESTS = "10"
 #### 保守默认值（推荐线上长期使用）
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "5"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "5"
 ```
 
 适合：
@@ -205,8 +207,8 @@ RATE_LIMIT_MAX_REQUESTS = "5"
 #### 平衡模式
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 ```
 
 适合：
@@ -217,8 +219,8 @@ RATE_LIMIT_MAX_REQUESTS = "10"
 #### 遭受攻击时的应急模式
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "86400"
-RATE_LIMIT_MAX_REQUESTS = "2"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "86400"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "2"
 ```
 
 适合：
@@ -334,8 +336,8 @@ npm run deploy
 改 `blog-ai-worker/wrangler.toml`：
 
 ```toml
-RATE_LIMIT_WINDOW_SECONDS = "86400"
-RATE_LIMIT_MAX_REQUESTS = "1"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "86400"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "1"
 AI_DAILY_REQUEST_LIMIT = "20"
 ```
 
@@ -410,10 +412,12 @@ npm run deploy
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 AI_EMERGENCY_DISABLE = "false"
 AI_DAILY_REQUEST_LIMIT = "100"
+AI_REQUEST_MAX_BODY_BYTES = "8192"
+AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```
 
@@ -423,6 +427,8 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 - 只接受来自 `yuanshenjian.cn` 或 `localhost` 的 Turnstile 校验结果
 - 只接受首页推荐这个 action 的 token
 - 正常状态下每天最多放行 100 次会触发 LLM 的请求
+- 请求体超过 `8192` 字节时直接返回 `413 Payload Too Large`
+- `message.trim()` 超过 `500` 个字符时直接返回 `413 Payload Too Large`
 - 出问题时把 `AI_EMERGENCY_DISABLE` 改成 `true` 后立即部署
 
 > 注意：根目录的 GitHub Pages workflow **不会自动部署 `blog-ai-worker/`**。
@@ -450,10 +456,37 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=你的真实 site key
 
 ```toml
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000"
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "5"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "5"
+AI_REQUEST_MAX_BODY_BYTES = "8192"
+AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```
+
+### 8.1 请求体与消息长度保护
+
+当前 Worker 在请求解析阶段有两层限制：
+
+1. `AI_REQUEST_MAX_BODY_BYTES`
+2. `AI_REQUEST_MAX_MESSAGE_CHARS`
+
+默认值：
+
+```toml
+AI_REQUEST_MAX_BODY_BYTES = "8192"
+AI_REQUEST_MAX_MESSAGE_CHARS = "500"
+```
+
+行为说明：
+
+- Worker 会优先读取 `Content-Length`；如果声明值已经超限，会直接返回 `413`
+- 即使没有 `Content-Length`，或者 header 值不可信，Worker 在实际读取请求体后仍会按真实字节数再校验一次
+- `message` 长度按 `trim()` 之后的字符数计算，避免纯空白字符绕过
+- 返回信息保持用户可读，但不会暴露内部阈值判断细节
+
+### 8.2 per-IP 限流变量迁移说明
+
+- 当前统一使用 `AI_IP_RATE_LIMIT_WINDOW_SECONDS` 和 `AI_IP_RATE_LIMIT_MAX_REQUESTS`
 
 ### Worker 代码建议
 

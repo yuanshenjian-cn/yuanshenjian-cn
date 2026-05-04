@@ -469,10 +469,12 @@ Cloudflare Worker 侧还需要额外配置：
 - `ALLOWED_ORIGINS`
 - `TURNSTILE_ALLOWED_HOSTNAMES`
 - `TURNSTILE_EXPECTED_ACTION`
-- `RATE_LIMIT_WINDOW_SECONDS`
-- `RATE_LIMIT_MAX_REQUESTS`
+- `AI_IP_RATE_LIMIT_WINDOW_SECONDS`
+- `AI_IP_RATE_LIMIT_MAX_REQUESTS`
 - `AI_EMERGENCY_DISABLE`
 - `AI_DAILY_REQUEST_LIMIT`
+- `AI_REQUEST_MAX_BODY_BYTES`
+- `AI_REQUEST_MAX_MESSAGE_CHARS`
 
 同时需要在 Worker secrets 中设置：
 
@@ -484,8 +486,11 @@ Cloudflare Worker 侧还需要额外配置：
 
 - `TURNSTILE_ALLOWED_HOSTNAMES` 默认保留 `yuanshenjian.cn,localhost`，保证本地调试仍可用
 - `TURNSTILE_EXPECTED_ACTION` 默认是 `homepage_recommend`，需与前端 Turnstile render 的 action 保持一致
+- `AI_IP_RATE_LIMIT_WINDOW_SECONDS` 和 `AI_IP_RATE_LIMIT_MAX_REQUESTS` 控制按 IP 的限流窗口与阈值
 - `AI_EMERGENCY_DISABLE=true` 时，Worker 会直接拒绝 AI 请求
 - `AI_DAILY_REQUEST_LIMIT` 控制每天最多允许多少次会触发 LLM 的请求，按 UTC 日期统计
+- `AI_REQUEST_MAX_BODY_BYTES` 默认是 `8192`，优先用 `Content-Length` 预判请求体大小，并在实际解析时再做一次字节数兜底校验，超限返回 `413`
+- `AI_REQUEST_MAX_MESSAGE_CHARS` 默认是 `500`，按 `message.trim()` 后的字符数判断，超限返回 `413`
 
 ### 当前首页 AI 推荐现状
 
@@ -505,6 +510,7 @@ ai: {
   enabled: true,
   workerUrl: "/api/ai",
   turnstileSiteKey: "",
+  maxInputChars: 200,
   quickTopics: [
     {
       label: "AI 编程",

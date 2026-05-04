@@ -68,10 +68,12 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 AI_EMERGENCY_DISABLE = "false"
 AI_DAILY_REQUEST_LIMIT = "100"
+AI_REQUEST_MAX_BODY_BYTES = "8192"
+AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 ```
 
@@ -81,8 +83,11 @@ AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 - [ ] `ALLOWED_ORIGINS` 包含本地开发域名（如果需要本地联调）
 - [ ] `TURNSTILE_ALLOWED_HOSTNAMES` 至少包含 `yuanshenjian.cn` 与 `localhost`
 - [ ] `TURNSTILE_EXPECTED_ACTION` 与前端固定 action 一致（当前为 `homepage_recommend`）
+- [ ] `AI_IP_RATE_LIMIT_WINDOW_SECONDS` / `AI_IP_RATE_LIMIT_MAX_REQUESTS` 符合当前流量与成本预期
 - [ ] `AI_EMERGENCY_DISABLE=false`
 - [ ] `AI_DAILY_REQUEST_LIMIT` 符合当前成本承受范围
+- [ ] `AI_REQUEST_MAX_BODY_BYTES=8192`（或你确认过的值）
+- [ ] `AI_REQUEST_MAX_MESSAGE_CHARS=500`（或你确认过的值）
 - [ ] `AI_DATA_BASE_URL` 指向最终线上博客地址
 
 > 注意：如果将来域名变更，这里也要同步修改。
@@ -318,7 +323,16 @@ npx wrangler deploy
 - [ ] `AI_DATA_BASE_URL`
 - [ ] KV namespace id 是否已替换
 
-### 7.6 Worker 成功了，但推荐为空或相关推荐明显不对
+### 7.6 点击提交后报 413
+
+优先检查：
+
+- [ ] 请求体是否明显过大（例如前端误塞入了多余上下文字段）
+- [ ] `Content-Length` 是否已经超过 `AI_REQUEST_MAX_BODY_BYTES`
+- [ ] `message.trim()` 是否超过 `AI_REQUEST_MAX_MESSAGE_CHARS`
+- [ ] `blog-ai-worker/wrangler.toml` 中这两个上限是否符合当前页面真实请求规模
+
+### 7.7 Worker 成功了，但推荐为空或相关推荐明显不对
 
 检查：
 

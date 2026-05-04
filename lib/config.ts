@@ -65,6 +65,7 @@ export const config = {
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
     workerUrl: process.env.NEXT_PUBLIC_AI_WORKER_URL || "/api/ai",
     turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+    maxInputChars: 200,
     quickTopics: aiQuickTopics,
   },
 } as const;

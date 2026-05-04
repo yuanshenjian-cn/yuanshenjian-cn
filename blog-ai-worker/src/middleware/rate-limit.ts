@@ -4,8 +4,8 @@ import { HttpError } from "../types";
 const WINDOW_TTL_BUFFER_SECONDS = 60;
 const DAILY_BUDGET_TTL_BUFFER_SECONDS = 86400;
 
-function parsePositiveInteger(value: string, fallback: number): number {
-  const parsedValue = Number.parseInt(value, 10);
+function parsePositiveInteger(value: string | undefined, fallback: number): number {
+  const parsedValue = Number.parseInt(value ?? "", 10);
   return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : fallback;
 }
 
@@ -32,8 +32,8 @@ function getUtcDayKey(now = new Date()): string {
 }
 
 export async function checkRateLimit(request: Request, env: Env): Promise<void> {
-  const windowSeconds = parsePositiveInteger(env.RATE_LIMIT_WINDOW_SECONDS, 3600);
-  const maxRequests = parsePositiveInteger(env.RATE_LIMIT_MAX_REQUESTS, 10);
+  const windowSeconds = parsePositiveInteger(env.AI_IP_RATE_LIMIT_WINDOW_SECONDS, 3600);
+  const maxRequests = parsePositiveInteger(env.AI_IP_RATE_LIMIT_MAX_REQUESTS, 10);
   const now = Math.floor(Date.now() / 1000);
   const windowBucket = Math.floor(now / windowSeconds);
   const retryAfter = Math.max((windowBucket + 1) * windowSeconds - now, 1);

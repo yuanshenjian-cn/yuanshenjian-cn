@@ -56,10 +56,11 @@ interface AiRecommendWidgetProps {
   enabled: boolean;
   workerUrl: string;
   turnstileSiteKey: string;
+  maxInputChars: number;
   quickTopics: AIQuickTopic[];
 }
 
-export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, quickTopics }: AiRecommendWidgetProps) {
+export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInputChars, quickTopics }: AiRecommendWidgetProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<AIChatResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -158,6 +159,11 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, quickT
       return;
     }
 
+    if (nextMessage.length > maxInputChars) {
+      setError(`输入内容不能超过 ${maxInputChars} 个字符，请精简后再试。`);
+      return;
+    }
+
     if (!isConfigured) {
       setError("AI 推荐功能尚未配置完成，暂时无法发起请求。");
       return;
@@ -209,6 +215,7 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, quickT
             id="ai-recommend-message"
             value={message}
             onChange={(event) => setMessage(event.target.value)}
+            maxLength={maxInputChars}
             placeholder="想找什么主题的文章？直接告诉我"
             className="w-full rounded-2xl bg-background/90 backdrop-blur-md border border-border pl-11 pr-24 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/70 shadow-lg shadow-foreground/5 focus:outline-none focus:border-primary/50 focus:bg-background focus:ring-2 focus:ring-primary/15 transition-all"
           />

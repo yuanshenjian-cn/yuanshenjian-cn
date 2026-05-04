@@ -4,6 +4,69 @@
 
 ---
 
+## 2026-05-04 首页 AI 输入缺少前端长度上限，且 per-IP 限流变量名不够直观
+
+### 现象
+
+- 首页 AI 输入框过去只依赖 Worker 侧 `AI_REQUEST_MAX_MESSAGE_CHARS` 做安全边界
+- 前端没有静态长度上限，超长内容会一直留在输入框里，提交时才由后端拒绝
+- Worker 的 per-IP 限流变量名 `RATE_LIMIT_WINDOW_SECONDS`、`RATE_LIMIT_MAX_REQUESTS` 语义偏泛，不利于和其他限流配置区分
+
+### 修复
+
+1. 在 `lib/config.ts` 中新增 `config.ai.maxInputChars = 200`
+2. 在 `components/ai/ai-recommend-widget.tsx` 中：
+   - 给输入框加 `maxLength`
+   - 提交前再做一次长度兜底校验
+   - 超限时直接展示可读错误，不触发 Turnstile，也不发起 AI 请求
+3. 将 per-IP 限流默认变量名升级为：
+   - `AI_IP_RATE_LIMIT_WINDOW_SECONDS`
+   - `AI_IP_RATE_LIMIT_MAX_REQUESTS`
+4. Worker 代码和默认配置统一切到新名字，不再继续保留旧变量名兼容
+
+### 如何确认修复生效
+
+1. 在首页输入超过 200 个字符，确认输入框不会继续接收更多字符
+2. 通过程序方式或快捷提交路径传入超过 200 个字符，确认前端直接显示错误，且不会触发 Turnstile / AI 请求
+3. `wrangler.toml` 与 Cloudflare dashboard 中只使用 `AI_IP_RATE_LIMIT_WINDOW_SECONDS`、`AI_IP_RATE_LIMIT_MAX_REQUESTS`
+4. 触发限流时，确认行为仍与改名前一致
+
+---
+
+## 2026-05-04 AI Worker 缺少请求体大小与消息长度保护，异常长输入会直接进入解析链路
+
+### 现象
+
+首页 AI 推荐过去只校验 JSON 结构与空字符串，缺少：
+
+- 请求体总字节数上限
+- `message.trim()` 后的字符数上限
+
+这会让异常长输入先进入 JSON 解析链路，增加无意义开销。
+
+### 修复
+
+在 `blog-ai-worker/src/index.ts` 的请求解析阶段增加两层 `413 Payload Too Large` 防护：
+
+1. 优先读取 `Content-Length`，声明值超限时立即拒绝
+2. 实际读取请求体后按真实字节数再校验一次，避免没有 header 或 header 不可信时失效
+
+同时新增两个 Worker vars：
+
+- `AI_REQUEST_MAX_BODY_BYTES="8192"`
+- `AI_REQUEST_MAX_MESSAGE_CHARS="500"`
+
+其中 `message` 长度按 `trim()` 后计算，超限时返回用户可读错误，但不暴露内部细节。
+
+### 如何确认修复生效
+
+1. 构造一个 `Content-Length` 明显大于 `8192` 的请求，确认 Worker 返回 `413`
+2. 构造一个没有 `Content-Length`、但实际 body 超过 `8192` 字节的请求，确认仍返回 `413`
+3. 构造一个 `message.trim().length > 500` 的请求，确认返回 `413`
+4. 正常长度请求仍可继续走后续 Turnstile / 限流 / 推荐逻辑
+
+---
+
 ## 2026-05-04 GitHub Pages 误走 legacy/Jekyll 构建，导致 README.md 中 `{{ }}` 被 Liquid 解析报错
 
 ### 现象

@@ -78,7 +78,7 @@ Cloudflare Worker  (yuanshenjian.cn/api/*)
   │
   ├── Turnstile 验证（siteverify API）
   ├── 限流检查（Workers KV，Phase 1 为固定窗口计数）
-  ├── 请求解析（scene + context + message）
+  ├── 请求解析（scene + context + message，并校验请求体字节数与消息长度）
   ├── 场景路由 → 选择 provider/model/params
   ├── 提取 ai-data 静态索引（可选，限定问答范围）
   │
@@ -863,10 +863,12 @@ export async function aiChat(options: AIChatOptions): Promise<AIChatResponse> {
 | `ALLOWED_ORIGINS` | string | 允许的 origin 列表，如 `https://yuanshenjian.cn,http://localhost:3000` |
 | `TURNSTILE_ALLOWED_HOSTNAMES` | string | Turnstile siteverify 返回允许的 hostname 列表，如 `yuanshenjian.cn,localhost` |
 | `TURNSTILE_EXPECTED_ACTION` | string | 期望的 Turnstile action，如 `homepage_recommend`；为空则不校验 |
-| `RATE_LIMIT_WINDOW_SECONDS` | string | 滑动窗口大小，单位秒，如 `"3600"` |
-| `RATE_LIMIT_MAX_REQUESTS` | string | 窗口内最大请求数，如 `"10"` |
+| `AI_IP_RATE_LIMIT_WINDOW_SECONDS` | string | 按 IP 的限流窗口大小，单位秒，如 `"3600"` |
+| `AI_IP_RATE_LIMIT_MAX_REQUESTS` | string | 按 IP 的窗口内最大请求数，如 `"10"` |
 | `AI_EMERGENCY_DISABLE` | string | 是否紧急关闭 AI，`"true"` 表示直接拒绝请求 |
 | `AI_DAILY_REQUEST_LIMIT` | string | 每日最多允许的 AI 请求数，如 `"100"` |
+| `AI_REQUEST_MAX_BODY_BYTES` | string | 请求体最大字节数，如 `"8192"`；超限返回 `413 Payload Too Large` |
+| `AI_REQUEST_MAX_MESSAGE_CHARS` | string | `message.trim()` 后允许的最大字符数，如 `"500"`；超限返回 `413 Payload Too Large` |
 | `SCENE_ROUTING_CONFIG` | JSON string | 场景路由配置（参见第 7 节） |
 | `AI_DATA_BASE_URL` | string | ai-data JSON 的 CDN 基础 URL，如 `https://yuanshenjian.cn/ai-data` |
 | `MIMO_BASE_URL` | string | MiMo API 基础 URL **[MiMo-TBD]**，如确认无敏感信息则放 vars |
@@ -926,10 +928,12 @@ id = "<kv-namespace-id>"
 ALLOWED_ORIGINS = "https://yuanshenjian.cn,http://localhost:3000,http://localhost:3001"
 TURNSTILE_ALLOWED_HOSTNAMES = "yuanshenjian.cn,localhost"
 TURNSTILE_EXPECTED_ACTION = "homepage_recommend"
-RATE_LIMIT_WINDOW_SECONDS = "3600"
-RATE_LIMIT_MAX_REQUESTS = "10"
+AI_IP_RATE_LIMIT_WINDOW_SECONDS = "3600"
+AI_IP_RATE_LIMIT_MAX_REQUESTS = "10"
 AI_EMERGENCY_DISABLE = "false"
 AI_DAILY_REQUEST_LIMIT = "100"
+AI_REQUEST_MAX_BODY_BYTES = "8192"
+AI_REQUEST_MAX_MESSAGE_CHARS = "500"
 AI_DATA_BASE_URL = "https://yuanshenjian.cn/ai-data"
 
 # routes 通过 Cloudflare dashboard 配置，或：

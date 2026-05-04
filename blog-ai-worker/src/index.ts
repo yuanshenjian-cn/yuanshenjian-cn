@@ -6,6 +6,9 @@ import type { ChatRequestBody, Env, ExecutionContext } from "./types";
 import { HttpError } from "./types";
 import { errorResponse, jsonResponse, noContentResponse } from "./utils/response";
 
+const DEFAULT_REQUEST_MAX_BODY_BYTES = 8192;
+const DEFAULT_REQUEST_MAX_MESSAGE_CHARS = 500;
+
 function assertConfiguredEnv(env: Env): void {
   if (!env.TURNSTILE_SECRET_KEY?.trim()) {
     throw new HttpError(500, "Worker misconfigured: TURNSTILE_SECRET_KEY is missing");
@@ -36,8 +39,35 @@ function isChatPath(pathname: string): boolean {
   return pathname === "/chat" || pathname === "/api/ai/chat";
 }
 
-async function parseBody(request: Request): Promise<ChatRequestBody> {
-  const payload: unknown = await request.json().catch(() => null);
+function parsePositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number.parseInt(value ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+async function parseBody(request: Request, env: Env): Promise<ChatRequestBody> {
+  const maxBodyBytes = parsePositiveInteger(env.AI_REQUEST_MAX_BODY_BYTES, DEFAULT_REQUEST_MAX_BODY_BYTES);
+  const maxMessageChars = parsePositiveInteger(
+    env.AI_REQUEST_MAX_MESSAGE_CHARS,
+    DEFAULT_REQUEST_MAX_MESSAGE_CHARS,
+  );
+  const declaredContentLength = Number.parseInt(request.headers.get("Content-Length") ?? "", 10);
+
+  if (Number.isFinite(declaredContentLength) && declaredContentLength > maxBodyBytes) {
+    throw new HttpError(413, "Request payload too large");
+  }
+
+  const rawBody = await request.arrayBuffer().catch(() => null);
+  if (rawBody === null) {
+    throw new HttpError(400, "Invalid request payload");
+  }
+
+  if (rawBody.byteLength > maxBodyBytes) {
+    throw new HttpError(413, "Request payload too large");
+  }
+
+  const payload: unknown = await Promise.resolve()
+    .then(() => JSON.parse(new TextDecoder().decode(rawBody)))
+    .catch(() => null);
 
   if (
     !isRecord(payload) ||
@@ -51,6 +81,10 @@ async function parseBody(request: Request): Promise<ChatRequestBody> {
   const message = payload.message.trim();
   if (!message) {
     throw new HttpError(400, "Message is required");
+  }
+
+  if (message.length > maxMessageChars) {
+    throw new HttpError(413, "Message is too long. Please shorten it and try again.");
   }
 
   return {
@@ -92,7 +126,7 @@ export default {
 
       assertConfiguredEnv(env);
       assertAIEnabled(env);
-      const body = await parseBody(request);
+      const body = await parseBody(request, env);
 
       await verifyTurnstile(body.cf_turnstile_response, request, env);
       await checkRateLimit(request, env);
