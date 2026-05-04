@@ -223,7 +223,7 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
         </div>
       </form>
 
-      {/* 快捷主题标签 */}
+      {/* 快捷主题 + 专栏链接 */}
       <div className="flex flex-wrap justify-center gap-2 mt-3">
         {QUICK_TOPICS.map((topic) => (
           <button
@@ -236,25 +236,18 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
             {topic}
           </button>
         ))}
-      </div>
-
-      {/* 专栏快捷链接 */}
-      <div className="flex flex-wrap gap-3 mt-3">
         <Link
           href="/ai/ai-frontier"
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
         >
           AI前言
         </Link>
-        <Link
-          href="/ai/opencode"
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
-        >
+        <span className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground/50 cursor-not-allowed">
           OpenAI
-        </Link>
+        </span>
         <Link
           href="/ai/deepseek"
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
         >
           DeepSeek
         </Link>
