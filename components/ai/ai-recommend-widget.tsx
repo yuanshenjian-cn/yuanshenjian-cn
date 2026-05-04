@@ -225,6 +225,24 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
 
       {/* 快捷主题 + 专栏链接 */}
       <div className="flex flex-wrap justify-center gap-2 mt-3">
+        <Link
+          href="/ai/ai-frontier"
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
+        >
+          AI前沿
+        </Link>
+        <Link
+          href="/ai/ai-frontier"
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
+        >
+          OpenAI
+        </Link>
+        <Link
+          href="/ai/deepseek"
+          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
+        >
+          DeepSeek
+        </Link>
         {QUICK_TOPICS.map((topic) => (
           <button
             key={topic}
@@ -236,21 +254,6 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey }: AiRe
             {topic}
           </button>
         ))}
-        <Link
-          href="/ai/ai-frontier"
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
-        >
-          AI前言
-        </Link>
-        <span className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground/50 cursor-not-allowed">
-          OpenAI
-        </span>
-        <Link
-          href="/ai/deepseek"
-          className="px-3 py-1 rounded-full text-xs bg-background/70 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-background hover:border-border transition-all"
-        >
-          DeepSeek
-        </Link>
       </div>
 
       {error ? (
