@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
 import { getAllPosts } from "@/lib/blog";
 import { config } from "@/lib/config";
@@ -31,46 +31,33 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
         
         {/* Content */}
-        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-          {/* 主标题 - 更有质感的排版 */}
+        <div className="relative z-10 max-w-2xl mx-auto px-6 text-center w-full py-16">
+          {/* 主标题 */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-6 text-foreground">
             记录思考，分享成长
           </h1>
-          
-          {/* 副标题 - 更简洁的描述 */}
-          <p className="text-base md:text-lg text-foreground/80 mb-12 max-w-lg mx-auto leading-relaxed font-light">
+
+          {/* 副标题 */}
+          <p className="text-base md:text-lg text-foreground/80 max-w-lg mx-auto leading-relaxed font-light">
             技术实践 · 敏捷方法 · 生活随笔
           </p>
-          
-          {/* 按钮组 - 更简约的设计 */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link
-              href="/articles"
-              className="group inline-flex items-center gap-2 px-5 py-2.5 text-sm bg-foreground text-background rounded-full hover:bg-foreground/90 transition-all duration-300"
-            >
-              探索文章
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
-              href="/resume"
-              className="inline-flex items-center px-5 py-2.5 text-sm text-foreground border border-foreground/30 rounded-full hover:border-foreground/60 hover:bg-foreground/5 transition-all duration-300"
-            >
-              了解作者
-            </Link>
+
+          {/* AI 推荐 */}
+          <div className="mt-10 mb-8 max-w-lg mx-auto w-full">
+            <AiRecommendWidget
+              enabled={config.ai.enabled}
+              workerUrl={config.ai.workerUrl}
+              turnstileSiteKey={config.ai.turnstileSiteKey}
+            />
           </div>
+
         </div>
-        
+
         {/* 底部渐变过渡 */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      <AiRecommendWidget
-        enabled={config.ai.enabled}
-        workerUrl={config.ai.workerUrl}
-        turnstileSiteKey={config.ai.turnstileSiteKey}
-      />
-
-      {/* Latest Posts */}
+    {/* Latest Posts */}
       {recentPosts.length > 0 && (
         <section className="py-16 px-6">
           <div className="max-w-2xl mx-auto">

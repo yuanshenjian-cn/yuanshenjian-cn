@@ -5,7 +5,7 @@ import { getPostsForSearch } from "@/lib/blog";
 const navItems = [
   { href: "/ai", label: "AI", icon: "sparkles" },
   { href: "/articles", label: "文章" },
-  { href: "/resume", label: "简历" },
+  { href: "/resume", label: "作者" },
 ];
 
 export async function Header() {
