@@ -357,7 +357,9 @@ export function AiRecommendWidget({
     <div className="w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative group">
-          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50 group-focus-within:text-primary transition-colors" />
+          <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2 transition-colors">
+            <Sparkles className="h-4 w-4 text-muted-foreground/70 transition-colors group-focus-within:text-primary" />
+          </div>
           <input
             type="text"
             id="ai-recommend-message"

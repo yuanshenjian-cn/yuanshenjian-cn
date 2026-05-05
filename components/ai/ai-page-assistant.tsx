@@ -138,14 +138,16 @@ export function AiPageAssistant({
 
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="relative group">
-          <Sparkles className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/50 transition-colors group-focus-within:text-primary" />
+          <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2 transition-colors">
+            <Sparkles className="h-4 w-4 text-muted-foreground/70 transition-colors group-focus-within:text-primary" />
+          </div>
           <input
             type="text"
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             maxLength={maxInputChars}
             placeholder={placeholder}
-            className="w-full rounded-2xl border border-border bg-background pl-11 pr-24 py-3 text-sm text-foreground shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/15"
+            className="w-full rounded-2xl border border-border bg-background pl-11 pr-24 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/15"
           />
           <button
             type="submit"
