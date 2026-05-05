@@ -345,12 +345,17 @@ export async function writeActiveProfile(selector, options = {}) {
   return normalized;
 }
 
-function buildSecretPayload(profile) {
+function buildVariablePayload(profile) {
   return {
     LLM_ACTIVE_PROFILE: profile.selector,
     LLM_PROVIDER_NAME: profile.providerName,
     LLM_MODEL_ID: profile.modelId,
     LLM_PROVIDER_BASE_URL: profile.baseUrl,
+  };
+}
+
+function buildSecretPayload(profile) {
+  return {
     LLM_PROVIDER_API_KEY: profile.apiKey,
   };
 }
@@ -400,6 +405,28 @@ async function runCommand(command, args, options = {}) {
   });
 }
 
+async function listSecretNames(execute, workerDir) {
+  const result = await execute("wrangler", ["secret", "list", "--format", "json"], {
+    cwd: workerDir,
+  });
+
+  let payload;
+
+  try {
+    payload = JSON.parse(result.stdout || "[]");
+  } catch {
+    throw new Error("wrangler secret list returned invalid JSON");
+  }
+
+  if (!Array.isArray(payload)) {
+    throw new Error("wrangler secret list returned an unexpected payload");
+  }
+
+  return payload
+    .filter((item) => isRecord(item) && typeof item.name === "string")
+    .map((item) => item.name);
+}
+
 export async function listProfiles(options = {}) {
   const config = await loadProfilesConfig(options);
   const activeProfile = await readActiveProfile({ ...options, allowMissing: true });
@@ -433,27 +460,57 @@ export async function deployProfile(selector, options = {}) {
   }
 
   const profile = assertSupportedProfile(resolveProfile(config, activeSelector));
-  const payload = JSON.stringify(buildSecretPayload(profile), null, 2);
+  const variablePayload = buildVariablePayload(profile);
+  const secretPayload = JSON.stringify(buildSecretPayload(profile), null, 2);
+  const deployArgs = ["deploy", "--keep-vars"];
+
+  for (const [key, value] of Object.entries(variablePayload)) {
+    deployArgs.push("--var", `${key}:${value}`);
+  }
 
   try {
     await execute("wrangler", ["secret", "bulk"], {
       cwd: paths.workerDir,
-      input: payload,
+      input: secretPayload,
     });
   } catch (error) {
     throw new Error(
-      `Failed to upload LLM secrets with wrangler secret bulk after local active profile was set to ${profile.selector}: ${getErrorMessage(error)}`,
+      `Failed to upload LLM API key secret after local active profile was set to ${profile.selector}: ${getErrorMessage(error)}`,
     );
   }
 
   try {
-    await execute("wrangler", ["deploy"], {
+    await execute("wrangler", deployArgs, {
       cwd: paths.workerDir,
     });
   } catch (error) {
     throw new Error(
       `Failed to run wrangler deploy after local active profile was set to ${profile.selector}: ${getErrorMessage(error)}`,
     );
+  }
+
+  let existingSecrets;
+
+  try {
+    existingSecrets = await listSecretNames(execute, paths.workerDir);
+  } catch (error) {
+    throw new Error(
+      `Failed to inspect existing Worker secrets after deploying profile ${profile.selector}: ${getErrorMessage(error)}`,
+    );
+  }
+
+  const legacySecretKeys = Object.keys(variablePayload).filter((key) => existingSecrets.includes(key));
+
+  for (const key of legacySecretKeys) {
+    try {
+      await execute("wrangler", ["secret", "delete", key], {
+        cwd: paths.workerDir,
+      });
+    } catch (error) {
+      throw new Error(
+        `Failed to delete legacy LLM secret ${key} after deploying profile ${profile.selector}: ${getErrorMessage(error)}`,
+      );
+    }
   }
 
   return profile;

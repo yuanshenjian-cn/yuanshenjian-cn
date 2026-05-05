@@ -10,20 +10,27 @@ const VALID_PROFILES_JSONC = `{
   // local profiles
   "version": 1,
   "providers": {
-    "tencent-tokenhub": {
-      "label": "Tencent TokenHub",
-      "baseUrl": "https://tokenhub.tencentmaas.com/v1/private-path",
+    "deepseek": {
+      "label": "DeepSeek",
+      "baseUrl": "https://api.deepseek.com/v1/private-path",
       "apiKey": "test-key",
       "models": {
-        "glm-5.1": {
-          "modelId": "glm-5.1",
-        },
-        "kimi-k2.6": {
-          "modelId": "moonshot-v1-8k",
-        },
-      },
+        "deepseek-v4-flash": {
+          "modelId": "deepseek-v4-flash",
+        }
+      }
     },
-  },
+    "moonshot-cn": {
+      "label": "Moonshot CN",
+      "baseUrl": "https://api.moonshot.cn/v1/private-path",
+      "apiKey": "moonshot-test-key",
+      "models": {
+        "kimi-k2.6": {
+          "modelId": "kimi-k2.6"
+        }
+      }
+    }
+  }
 }`;
 
 const UNSUPPORTED_PROVIDER_JSONC = `{
@@ -59,12 +66,12 @@ describe("llm-profile-cli", () => {
 
     expect(config.profiles).toEqual([
       expect.objectContaining({
-        selector: "tencent-tokenhub/glm-5.1",
-        modelId: "glm-5.1",
+        selector: "deepseek/deepseek-v4-flash",
+        modelId: "deepseek-v4-flash",
       }),
       expect.objectContaining({
-        selector: "tencent-tokenhub/kimi-k2.6",
-        modelId: "moonshot-v1-8k",
+        selector: "moonshot-cn/kimi-k2.6",
+        modelId: "kimi-k2.6",
       }),
     ]);
   });
@@ -87,11 +94,11 @@ describe("llm-profile-cli", () => {
       `{
         "version": 1,
         "providers": {
-          "tencent-tokenhub": {
-            "baseUrl": "https://tokenhub.tencentmaas.com/v1",
+          "deepseek": {
+            "baseUrl": "https://api.deepseek.com/v1",
             "apiKey": "test-key",
             "models": {
-              "glm-5.1": {}
+              "deepseek-v4-flash": {}
             }
           }
         }
@@ -100,15 +107,15 @@ describe("llm-profile-cli", () => {
     );
 
     await expect(loadProfilesConfig({ workerDir })).rejects.toThrow(
-      "providers.tencent-tokenhub.models.glm-5.1.modelId is required",
+      "providers.deepseek.models.deepseek-v4-flash.modelId is required",
     );
   });
 
   it("unknown selector 时直接失败", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
 
-    await expect(useProfile("tencent-tokenhub/unknown-model", { workerDir })).rejects.toThrow(
-      "Unknown profile: tencent-tokenhub/unknown-model",
+    await expect(useProfile("deepseek/unknown-model", { workerDir })).rejects.toThrow(
+      "Unknown profile: deepseek/unknown-model",
     );
   });
 
@@ -123,26 +130,40 @@ describe("llm-profile-cli", () => {
   it("llm:use 只写本地 active profile 文件", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
 
-    const profile = await useProfile("tencent-tokenhub/glm-5.1", { workerDir });
+    const profile = await useProfile("deepseek/deepseek-v4-flash", { workerDir });
     const activeProfile = await readFile(path.join(workerDir, ".llm-active-profile"), "utf8");
 
-    expect(profile.selector).toBe("tencent-tokenhub/glm-5.1");
-    expect(activeProfile.trim()).toBe("tencent-tokenhub/glm-5.1");
+    expect(profile.selector).toBe("deepseek/deepseek-v4-flash");
+    expect(activeProfile.trim()).toBe("deepseek/deepseek-v4-flash");
   });
 
-  it("llm:deploy 无显式参数时读取 active profile 并调用 wrangler secret bulk + deploy", async () => {
+  it("llm:deploy 无显式参数时读取 active profile，并以 4 个 vars + 1 个 secret 部署", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
-    await writeFile(path.join(workerDir, ".llm-active-profile"), "tencent-tokenhub/kimi-k2.6\n", "utf8");
+    await writeFile(path.join(workerDir, ".llm-active-profile"), "moonshot-cn/kimi-k2.6\n", "utf8");
 
-    const runCommand = vi.fn().mockResolvedValue({ stdout: "", stderr: "" });
+    const runCommand = vi
+      .fn()
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify([
+          { name: "LLM_ACTIVE_PROFILE", type: "secret_text" },
+          { name: "LLM_PROVIDER_NAME", type: "secret_text" },
+          { name: "LLM_MODEL_ID", type: "secret_text" },
+          { name: "LLM_PROVIDER_BASE_URL", type: "secret_text" },
+          { name: "LLM_PROVIDER_API_KEY", type: "secret_text" },
+        ]),
+        stderr: "",
+      })
+      .mockResolvedValue({ stdout: "", stderr: "" });
 
     const profile = await deployProfile(undefined, {
       workerDir,
       runCommand,
     });
 
-    expect(profile.selector).toBe("tencent-tokenhub/kimi-k2.6");
-    expect(runCommand).toHaveBeenCalledTimes(2);
+    expect(profile.selector).toBe("moonshot-cn/kimi-k2.6");
+    expect(runCommand).toHaveBeenCalledTimes(7);
     expect(runCommand).toHaveBeenNthCalledWith(
       1,
       "wrangler",
@@ -155,51 +176,127 @@ describe("llm-profile-cli", () => {
     expect(runCommand).toHaveBeenNthCalledWith(
       2,
       "wrangler",
-      ["deploy"],
+      [
+        "deploy",
+        "--keep-vars",
+        "--var",
+        "LLM_ACTIVE_PROFILE:moonshot-cn/kimi-k2.6",
+        "--var",
+        "LLM_PROVIDER_NAME:moonshot-cn",
+        "--var",
+        "LLM_MODEL_ID:kimi-k2.6",
+        "--var",
+        "LLM_PROVIDER_BASE_URL:https://api.moonshot.cn/v1/private-path",
+      ],
       expect.objectContaining({
         cwd: workerDir,
       }),
     );
     expect(JSON.parse(String(runCommand.mock.calls[0]?.[2]?.input))).toEqual({
-      LLM_ACTIVE_PROFILE: "tencent-tokenhub/kimi-k2.6",
-      LLM_PROVIDER_NAME: "tencent-tokenhub",
-      LLM_MODEL_ID: "moonshot-v1-8k",
-      LLM_PROVIDER_BASE_URL: "https://tokenhub.tencentmaas.com/v1/private-path",
-      LLM_PROVIDER_API_KEY: "test-key",
+      LLM_PROVIDER_API_KEY: "moonshot-test-key",
     });
+    expect(runCommand).toHaveBeenNthCalledWith(
+      3,
+      "wrangler",
+      ["secret", "list", "--format", "json"],
+      expect.objectContaining({ cwd: workerDir }),
+    );
+    expect(runCommand).toHaveBeenNthCalledWith(
+      4,
+      "wrangler",
+      ["secret", "delete", "LLM_ACTIVE_PROFILE"],
+      expect.objectContaining({ cwd: workerDir }),
+    );
+    expect(runCommand).toHaveBeenNthCalledWith(
+      5,
+      "wrangler",
+      ["secret", "delete", "LLM_PROVIDER_NAME"],
+      expect.objectContaining({ cwd: workerDir }),
+    );
+    expect(runCommand).toHaveBeenNthCalledWith(
+      6,
+      "wrangler",
+      ["secret", "delete", "LLM_MODEL_ID"],
+      expect.objectContaining({ cwd: workerDir }),
+    );
+    expect(runCommand).toHaveBeenNthCalledWith(
+      7,
+      "wrangler",
+      ["secret", "delete", "LLM_PROVIDER_BASE_URL"],
+      expect.objectContaining({ cwd: workerDir }),
+    );
   });
 
   it("llm:deploy 显式参数时先更新 active profile，再按该配置部署", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
 
-    const runCommand = vi.fn().mockResolvedValue({ stdout: "", stderr: "" });
+    const runCommand = vi
+      .fn()
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({ stdout: JSON.stringify([]), stderr: "" });
 
-    await deployProfile("tencent-tokenhub/glm-5.1", {
+    await deployProfile("deepseek/deepseek-v4-flash", {
       workerDir,
       runCommand,
     });
 
     const activeProfile = await readFile(path.join(workerDir, ".llm-active-profile"), "utf8");
 
-    expect(activeProfile.trim()).toBe("tencent-tokenhub/glm-5.1");
+    expect(activeProfile.trim()).toBe("deepseek/deepseek-v4-flash");
     expect(JSON.parse(String(runCommand.mock.calls[0]?.[2]?.input))).toMatchObject({
-      LLM_ACTIVE_PROFILE: "tencent-tokenhub/glm-5.1",
-      LLM_MODEL_ID: "glm-5.1",
+      LLM_PROVIDER_API_KEY: "test-key",
     });
+    expect(runCommand).toHaveBeenNthCalledWith(
+      2,
+      "wrangler",
+      expect.arrayContaining([
+        "deploy",
+        "--keep-vars",
+        "--var",
+        "LLM_ACTIVE_PROFILE:deepseek/deepseek-v4-flash",
+        "--var",
+        "LLM_MODEL_ID:deepseek-v4-flash",
+      ]),
+      expect.objectContaining({ cwd: workerDir }),
+    );
   });
 
-  it("wrangler secret bulk 失败时给出清晰错误并提示 active 已更新", async () => {
+  it("上传 LLM API key secret 失败时给出清晰错误并提示 active 已更新", async () => {
     await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
 
     const runCommand = vi.fn().mockRejectedValueOnce(new Error("bulk failed"));
 
     await expect(
-      deployProfile("tencent-tokenhub/glm-5.1", {
+      deployProfile("deepseek/deepseek-v4-flash", {
         workerDir,
         runCommand,
       }),
     ).rejects.toThrow(
-      "Failed to upload LLM secrets with wrangler secret bulk after local active profile was set to tencent-tokenhub/glm-5.1: bulk failed",
+      "Failed to upload LLM API key secret after local active profile was set to deepseek/deepseek-v4-flash: bulk failed",
+    );
+  });
+
+  it("删除旧的非敏感 LLM secrets 失败时给出清晰错误", async () => {
+    await writeFile(path.join(workerDir, "llm-profiles.local.jsonc"), VALID_PROFILES_JSONC, "utf8");
+
+    const runCommand = vi
+      .fn()
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({ stdout: "", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify([{ name: "LLM_ACTIVE_PROFILE", type: "secret_text" }]),
+        stderr: "",
+      })
+      .mockRejectedValueOnce(new Error("delete failed"));
+
+    await expect(
+      deployProfile("deepseek/deepseek-v4-flash", {
+        workerDir,
+        runCommand,
+      }),
+    ).rejects.toThrow(
+      "Failed to delete legacy LLM secret LLM_ACTIVE_PROFILE after deploying profile deepseek/deepseek-v4-flash: delete failed",
     );
   });
 
@@ -212,12 +309,12 @@ describe("llm-profile-cli", () => {
       .mockRejectedValueOnce(new Error("deploy failed"));
 
     await expect(
-      deployProfile("tencent-tokenhub/glm-5.1", {
+      deployProfile("deepseek/deepseek-v4-flash", {
         workerDir,
         runCommand,
       }),
     ).rejects.toThrow(
-      "Failed to run wrangler deploy after local active profile was set to tencent-tokenhub/glm-5.1: deploy failed",
+      "Failed to run wrangler deploy after local active profile was set to deepseek/deepseek-v4-flash: deploy failed",
     );
   });
 });

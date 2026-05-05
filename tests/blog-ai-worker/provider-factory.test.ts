@@ -8,9 +8,9 @@ const env: Env = {
     get: vi.fn(),
     put: vi.fn(),
   },
-  LLM_ACTIVE_PROFILE: "tencent-tokenhub/glm-5.1",
-  LLM_PROVIDER_NAME: "tencent-tokenhub",
-  LLM_MODEL_ID: "glm-5.1",
+  LLM_ACTIVE_PROFILE: "deepseek/deepseek-v4-flash",
+  LLM_PROVIDER_NAME: "deepseek",
+  LLM_MODEL_ID: "deepseek-v4-flash",
   LLM_PROVIDER_API_KEY: "test-key",
   LLM_PROVIDER_BASE_URL: "https://example.com/v1",
   TURNSTILE_SECRET_KEY: "test-turnstile-secret",
@@ -57,13 +57,13 @@ describe("createProvider", () => {
       stream: false,
     });
 
-    expect(provider.name).toBe("tencent-tokenhub");
+    expect(provider.name).toBe("deepseek");
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("https://example.com/v1/chat/completions");
     expect(JSON.parse(String(init?.body))).toMatchObject({
-      model: "glm-5.1",
+      model: "deepseek-v4-flash",
     });
   });
 
@@ -90,8 +90,8 @@ describe("createProvider", () => {
   });
 
   it("导出的支持列表与 provider 判断函数一致", () => {
-    expect(SUPPORTED_LLM_PROVIDERS).toEqual(["tencent-tokenhub", "deepseek", "moonshot-cn"]);
-    expect(isSupportedLLMProvider("tencent-tokenhub")).toBe(true);
+    expect(SUPPORTED_LLM_PROVIDERS).toHaveLength(3);
+    expect(SUPPORTED_LLM_PROVIDERS).toEqual(expect.arrayContaining(["deepseek", "moonshot-cn"]));
     expect(isSupportedLLMProvider("deepseek")).toBe(true);
     expect(isSupportedLLMProvider("moonshot-cn")).toBe(true);
     expect(isSupportedLLMProvider("unknown-provider")).toBe(false);

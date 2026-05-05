@@ -807,3 +807,53 @@ AI_EMERGENCY_DISABLE = "true"
 4. 回归运行：
    - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/lib/ai-client.test.ts`
    - `npm run typecheck`
+
+---
+
+## 2026-05-05 Worker LLM 非敏感配置继续以 secret 形式存在，排障不便
+
+### 现象
+
+- 在 Cloudflare Dashboard 里，以下键原本都显示为 secret：
+  - `LLM_ACTIVE_PROFILE`
+  - `LLM_PROVIDER_NAME`
+  - `LLM_MODEL_ID`
+  - `LLM_PROVIDER_BASE_URL`
+- 这些值并不敏感，但作为 secret 时不方便直接核对当前线上真实配置
+- 每次 `llm:deploy` 还会继续把它们重新写成 secret
+
+### 根因
+
+`blog-ai-worker/scripts/llm-profile-cli.mjs` 之前把 5 个 LLM 字段统一走了 `wrangler secret bulk`：
+
+1. 非敏感字段和 API key 没有区分
+2. 导致 Cloudflare 面板里无法直观看到当前生效的 provider / model / base URL
+3. 也会让线上残留一批其实不该保密的 legacy secrets
+
+### 修复
+
+将 LLM 配置拆成两类：
+
+1. 明文变量：
+   - `LLM_ACTIVE_PROFILE`
+   - `LLM_PROVIDER_NAME`
+   - `LLM_MODEL_ID`
+   - `LLM_PROVIDER_BASE_URL`
+2. secret：
+   - `LLM_PROVIDER_API_KEY`
+
+`llm:deploy` 新流程：
+
+1. 先用 `wrangler secret bulk` 只上传 `LLM_PROVIDER_API_KEY`
+2. 再用 `wrangler deploy --keep-vars --var ...` 写入 4 个非敏感字段
+3. 部署后检查现有 secrets，并删除同名 legacy secrets（如果存在）
+
+### 如何确认修复生效
+
+1. 执行 `npm run llm:deploy -- deepseek/deepseek-v4-flash`
+2. 在 Cloudflare Dashboard 中确认：
+   - `LLM_PROVIDER_API_KEY` 仍是 secret
+   - 另外 4 个字段出现在 Variables 中
+3. 回归运行：
+   - `npm run test -- tests/blog-ai-worker/llm-profile-cli.test.ts`
+   - `npm --prefix blog-ai-worker run typecheck`

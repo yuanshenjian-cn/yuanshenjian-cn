@@ -84,12 +84,17 @@ npm run llm:deploy
 - `llm:deploy -- provider/modelKey`：先更新 active profile，再把当前配置写入 Worker 并执行 `wrangler deploy`
 - `llm:deploy`：读取当前 `.llm-active-profile`，把当前配置写入 Worker 并执行 `wrangler deploy`
 
-`llm:deploy` 会通过 `wrangler secret bulk` 一次写入以下 5 个 Worker 字段：
+`llm:deploy` 会按“4 个明文变量 + 1 个 secret”写入 Worker：
+
+明文变量：
 
 - `LLM_ACTIVE_PROFILE`
 - `LLM_PROVIDER_NAME`
 - `LLM_MODEL_ID`
 - `LLM_PROVIDER_BASE_URL`
+
+secret：
+
 - `LLM_PROVIDER_API_KEY`
 
 注意：
@@ -97,6 +102,7 @@ npm run llm:deploy
 - 当前只支持默认 Worker 环境，不支持 `--env`
 - selector 只支持 `provider/modelKey`
 - 当前运行时支持 `tencent-tokenhub`、`deepseek`、`moonshot-cn`
+- `llm:deploy` 会在部署后尝试删除同名旧 secret（如果存在），避免非敏感字段继续以 secret 形式残留在 Cloudflare 上
 
 ### 1.3 Worker vars / secrets
 
