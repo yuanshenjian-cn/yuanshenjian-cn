@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
+import { HUMANIZED_TURNSTILE_MESSAGES } from "@/components/ai/user-facing-messages";
 import { aiRecommendStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 import type { AIQuickTopic, RecommendResponse, RecommendStreamEvent } from "@/types/ai";
 
@@ -66,7 +67,7 @@ const answerMarkdownComponents = {
 
 function loadTurnstileScript(): Promise<void> {
   if (typeof window === "undefined") {
-    return Promise.reject(new Error("Turnstile 只能在浏览器中使用。"));
+    return Promise.reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.notReady));
   }
 
   if (window.turnstile) {
@@ -84,7 +85,7 @@ function loadTurnstileScript(): Promise<void> {
       existingScript.addEventListener("load", () => resolve(), { once: true });
       existingScript.addEventListener("error", () => {
         turnstileScriptPromise = null;
-        reject(new Error("Turnstile 加载失败，请稍后重试。"));
+        reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
       }, { once: true });
       return;
     }
@@ -96,7 +97,7 @@ function loadTurnstileScript(): Promise<void> {
     script.addEventListener("load", () => resolve(), { once: true });
     script.addEventListener("error", () => {
       turnstileScriptPromise = null;
-      reject(new Error("Turnstile 加载失败，请稍后重试。"));
+      reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
     }, { once: true });
     document.head.appendChild(script);
   });
@@ -179,11 +180,11 @@ export function AiRecommendWidget({
     await loadTurnstileScript();
 
     if (!window.turnstile) {
-      throw new Error("Turnstile 尚未就绪，请稍后再试。");
+      throw new Error(HUMANIZED_TURNSTILE_MESSAGES.notReady);
     }
 
     if (!turnstileContainerRef.current) {
-      throw new Error("Turnstile 容器初始化失败，请刷新页面后重试。");
+      throw new Error(HUMANIZED_TURNSTILE_MESSAGES.initFailed);
     }
 
     if (!turnstileWidgetIdRef.current) {
@@ -194,9 +195,9 @@ export function AiRecommendWidget({
         execution: "execute",
         appearance: "interaction-only",
         callback: (token) => resolveTurnstileRequest(token),
-        "error-callback": () => rejectTurnstileRequest("Turnstile 校验失败，请稍后重试。"),
-        "expired-callback": () => rejectTurnstileRequest("Turnstile 已过期，请重新提交。", false),
-        "timeout-callback": () => rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。"),
+        "error-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.validationFailed),
+        "expired-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.expired, false),
+        "timeout-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.timeout),
       });
     }
 
@@ -210,7 +211,7 @@ export function AiRecommendWidget({
       turnstileResolveRef.current = resolve;
       turnstileRejectRef.current = reject;
       turnstileTimeoutRef.current = window.setTimeout(() => {
-        rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。");
+        rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.timeout);
       }, turnstileTimeoutMs);
 
       window.turnstile?.execute(widgetId);
@@ -228,7 +229,7 @@ export function AiRecommendWidget({
     }
 
     if (!isConfigured) {
-      setError("AI 推荐功能尚未配置完成，暂时无法发起请求。");
+      setError(HUMANIZED_TURNSTILE_MESSAGES.recommendNotConfigured);
       return;
     }
 

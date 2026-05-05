@@ -431,11 +431,11 @@ describe("PageAIAssistantProvider", () => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(4320);
     });
-    expect(screen.queryByText("Turnstile 响应超时，请稍后重试。")).not.toBeInTheDocument();
+    expect(screen.queryByText("现在有点忙，请稍后再试。")).not.toBeInTheDocument();
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(1);
     });
-    expect(screen.getByText("Turnstile 响应超时，请稍后重试。")).toBeInTheDocument();
+    expect(screen.getByText("现在有点忙，请稍后再试。")).toBeInTheDocument();
   });
 });

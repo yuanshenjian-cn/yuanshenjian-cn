@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { HUMANIZED_TURNSTILE_MESSAGES } from "@/components/ai/user-facing-messages";
 import { aiChatStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 import type { PageReference, PageStreamEvent } from "@/types/ai";
 
@@ -63,7 +64,7 @@ const PageAIAssistantContext = createContext<PageAIAssistantContextValue | null>
 
 function loadTurnstileScript(): Promise<void> {
   if (typeof window === "undefined") {
-    return Promise.reject(new Error("Turnstile 只能在浏览器中使用。"));
+    return Promise.reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.notReady));
   }
 
   if (window.turnstile) {
@@ -83,7 +84,7 @@ function loadTurnstileScript(): Promise<void> {
         "error",
         () => {
           turnstileScriptPromise = null;
-          reject(new Error("Turnstile 加载失败，请稍后重试。"));
+          reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
         },
         { once: true },
       );
@@ -99,7 +100,7 @@ function loadTurnstileScript(): Promise<void> {
       "error",
       () => {
         turnstileScriptPromise = null;
-        reject(new Error("Turnstile 加载失败，请稍后重试。"));
+        reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
       },
       { once: true },
     );
@@ -189,11 +190,11 @@ export function PageAIAssistantProvider({
     await loadTurnstileScript();
 
     if (!window.turnstile) {
-      throw new Error("Turnstile 尚未就绪，请稍后再试。");
+      throw new Error(HUMANIZED_TURNSTILE_MESSAGES.notReady);
     }
 
     if (!turnstileContainerRef.current) {
-      throw new Error("Turnstile 容器初始化失败，请刷新页面后重试。");
+      throw new Error(HUMANIZED_TURNSTILE_MESSAGES.initFailed);
     }
 
     if (!turnstileWidgetIdRef.current) {
@@ -204,9 +205,9 @@ export function PageAIAssistantProvider({
         execution: "execute",
         appearance: "interaction-only",
         callback: (token) => resolveTurnstileRequest(token),
-        "error-callback": () => rejectTurnstileRequest("Turnstile 校验失败，请稍后重试。"),
-        "expired-callback": () => rejectTurnstileRequest("Turnstile 已过期，请重新提交。", undefined, false),
-        "timeout-callback": () => rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。"),
+        "error-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.validationFailed),
+        "expired-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.expired, undefined, false),
+        "timeout-callback": () => rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.timeout),
       });
     }
 
@@ -222,7 +223,7 @@ export function PageAIAssistantProvider({
       turnstileResolveRef.current = resolve;
       turnstileRejectRef.current = reject;
       turnstileTimeoutRef.current = window.setTimeout(() => {
-        rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。", requestId);
+        rejectTurnstileRequest(HUMANIZED_TURNSTILE_MESSAGES.timeout, requestId);
       }, turnstileTimeoutMs);
 
       window.turnstile?.execute(widgetId);
