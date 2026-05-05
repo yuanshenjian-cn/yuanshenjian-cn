@@ -127,6 +127,36 @@ describe("PageAIAssistantProvider", () => {
     expect(screen.getByText("第一条").closest("li")).not.toBeNull();
   });
 
+  it("流式回答里的 Markdown 标题会渲染为带统一样式的 heading", async () => {
+    aiChatStreamMock.mockImplementation(async ({ onEvent }: { onEvent: (event: unknown) => void }) => {
+      onEvent({ type: "answer-delta", delta: "## 小标题\n\n正文内容" });
+      onEvent({ type: "done" });
+    });
+
+    render(
+      <PageAIAssistantProvider
+        scene="article"
+        context={{ slug: "tdd-introduction" }}
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
+        streamEnabled
+        maxInputChars={200}
+      >
+        <ArticleAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想快速了解这篇文章？直接问我"), {
+      target: { value: "给我一个分段说明" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    const heading = await screen.findByRole("heading", { level: 2, name: "小标题" });
+    expect(heading.className).toContain("tracking-tight");
+    expect(screen.getByText("正文内容")).toBeInTheDocument();
+  });
+
   it("第二次请求会中断第一次流式请求，并忽略旧流写入", async () => {
     let firstOnEvent: ((event: { type: string; delta?: string }) => void) | null = null;
 

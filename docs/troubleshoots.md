@@ -961,6 +961,40 @@ AI_EMERGENCY_DISABLE = "true"
 
 ---
 
+## 2026-05-05 页面级 AI 回答中的 Markdown 标题字号忽大忽小
+
+### 现象
+
+- 作者页和文章页的页面级 AI 回答里，文字有时看起来突然变大
+- 当回答中出现 `##`、`###` 这类 Markdown 标题时，标题字号会明显跳出当前回答区视觉节奏
+- 同一块 AI 回答里会出现“正文很小、标题很大”的不协调感
+
+### 根因
+
+`components/ai/ai-page-assistant.tsx` 已经为段落、列表、代码块等 Markdown 元素做了样式收敛，但之前漏掉了 `h1` 到 `h6`：
+
+1. `ReactMarkdown` 遇到 Markdown 标题时会输出原生 `h1` ~ `h6`
+2. 因为没有自定义组件映射，这些标题直接使用浏览器默认样式
+3. 默认标题字号明显大于 AI 回答区正文，于是视觉上出现忽大忽小
+
+### 修复
+
+在 `components/ai/ai-page-assistant.tsx` 的 `answerMarkdownComponents` 中补齐 `h1` ~ `h6`：
+
+1. 统一收敛到适合回答区的小型标题样式
+2. 保留 heading 语义标签，不把标题降级成普通段落
+3. 不改动 `p`、`ul`、`ol`、`li`、`code`、`pre` 等现有样式映射
+
+### 如何验证
+
+1. 在文章页或作者页输入一个会返回 Markdown 标题的提问
+2. 确认 `## 小标题`、`### 小节` 会渲染成真正的 heading 标签
+3. 确认标题比正文只略强一级，不会再出现浏览器默认大标题
+4. 回归运行：
+   - `npm run test -- tests/components/page-ai-assistant.test.tsx`
+
+---
+
 ## 2026-05-05 Worker LLM 非敏感配置继续以 secret 形式存在，排障不便
 
 ### 现象

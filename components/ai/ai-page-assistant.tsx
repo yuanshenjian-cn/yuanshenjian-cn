@@ -19,10 +19,40 @@ interface AiPageAssistantProps {
 }
 
 const answerMarkdownComponents = {
-  p: ({ children }: { children?: ReactNode }) => <p className="my-3 break-words leading-7">{children}</p>,
-  ul: ({ children }: { children?: ReactNode }) => <ul className="my-4 list-disc space-y-2 pl-5">{children}</ul>,
-  ol: ({ children }: { children?: ReactNode }) => <ol className="my-4 list-decimal space-y-2 pl-5">{children}</ol>,
-  li: ({ children }: { children?: ReactNode }) => <li className="my-1 break-words pl-1">{children}</li>,
+  h1: ({ children }: { children?: ReactNode }) => (
+    <h1 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: { children?: ReactNode }) => (
+    <h2 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: ReactNode }) => (
+    <h3 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }: { children?: ReactNode }) => (
+    <h4 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h4>
+  ),
+  h5: ({ children }: { children?: ReactNode }) => (
+    <h5 className="mt-4 break-words text-sm font-medium leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h5>
+  ),
+  h6: ({ children }: { children?: ReactNode }) => (
+    <h6 className="mt-4 break-words text-sm font-medium leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h6>
+  ),
+  p: ({ children }: { children?: ReactNode }) => <p className="my-3 break-words leading-6">{children}</p>,
+  ul: ({ children }: { children?: ReactNode }) => <ul className="my-3 list-disc space-y-1.5 pl-5">{children}</ul>,
+  ol: ({ children }: { children?: ReactNode }) => <ol className="my-3 list-decimal space-y-1.5 pl-5">{children}</ol>,
+  li: ({ children }: { children?: ReactNode }) => <li className="break-words pl-1 leading-6">{children}</li>,
   strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
   a: ({ children, href }: { children?: ReactNode; href?: string }) => (
     <a href={href} className="break-all text-primary hover:underline">
@@ -121,7 +151,7 @@ export function AiPageAssistant({
             type="submit"
             disabled={!canSubmit}
             aria-label={isStreaming ? "思考中..." : "问 AI"}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:hover:bg-muted"
+            className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:hover:bg-muted ${isStreaming ? "px-3.5" : "px-4"}`}
           >
             {isStreaming ? <AnimatedEllipsisText text="思考中" /> : "问 AI"}
           </button>

@@ -11,9 +11,12 @@ export function AnimatedEllipsisText({ className, text }: AnimatedEllipsisTextPr
   return (
     <span className={cn("inline-flex", className)}>
       <span className="sr-only">{`${text}...`}</span>
-      <span aria-hidden="true" className="inline-flex items-baseline">
+      <span
+        aria-hidden="true"
+        className="inline-flex items-baseline animate-[pulse_1.8s_ease-in-out_infinite]"
+      >
         <span>{text}</span>
-        <span className="inline-flex w-[3ch] justify-start">
+        <span className="inline-flex pl-px">
           {DOT_DELAYS_MS.map((delay) => (
             <span
               key={delay}

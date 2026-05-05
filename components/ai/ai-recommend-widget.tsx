@@ -231,7 +231,7 @@ export function AiRecommendWidget({
             type="submit"
             disabled={!canSubmit}
             aria-label={isSubmitting ? "思考中..." : "问 AI"}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground text-background px-4 py-2 text-sm font-medium hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-40 transition-all"
+            className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground py-2 text-sm font-medium text-background hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-40 transition-all ${isSubmitting ? "px-3.5" : "px-4"}`}
           >
             {isSubmitting ? <AnimatedEllipsisText text="思考中" /> : "问 AI"}
           </button>
