@@ -42,7 +42,9 @@ describe("build-ai-data helpers", () => {
     expect(payload.chunks.length).toBeGreaterThan(payload.entities.skills.length);
     expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("project-locammend-智能顾问-研发交付");
     expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("skill-ai-agent");
-    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("certificate-csm2020年");
+    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("certificate-csm-2020年");
+    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("experience-thoughtworks-技术教练-and-咨询顾问");
+    expect(payload.chunks.every((chunk: { id: string }) => !chunk.id.includes("---"))).toBe(true);
     expect(payload.sections.find((section: { id: string }) => section.id === "project-locammend-智能顾问-研发交付")?.anchorId).toBe(
       "projects",
     );

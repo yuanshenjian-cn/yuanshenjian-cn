@@ -101,19 +101,54 @@ function dedupeStrings(values) {
   return Array.from(new Set(values.filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim())));
 }
 
-function extractKeywords(...values) {
+function normalizeKeyword(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  let text = toPlainText(value)
+    .normalize("NFKC")
+    .replace(/^(技能等级|专业认证)[：:]?/u, "")
+    .replace(/^(精通|熟练|熟悉|擅长|采用|基于|引入|主导|负责|推动|完成|作为|这是一个|聚焦在|集成|实现|设计和落地)+/u, "")
+    .replace(/^[\-—–:：，、；,.()（）\s]+|[\-—–:：，、；,.()（）\s]+$/gu, "")
+    .trim();
+
+  if (!text || text.length < 2 || text.length > 24) {
+    return "";
+  }
+
+  return text;
+}
+
+function extractKeywordParts(...values) {
   return dedupeStrings(
-    values.flatMap((value) =>
-      String(value ?? "")
-        .split(/[\s，。、；：,:/()（）|]+/)
-        .map((item) => item.trim())
-        .filter((item) => item.length >= 2),
-    ),
+    values.flatMap((value) => {
+      if (Array.isArray(value)) {
+        return extractKeywordParts(...value);
+      }
+
+      return String(value ?? "")
+        .split(/[，、；|]+|\s+-\s+|\s*&\s*|[:：]/u)
+        .map((item) => normalizeKeyword(item))
+        .filter(Boolean);
+    }),
   );
 }
 
+function createAuthorIdSlug(label) {
+  const normalized = toPlainText(String(label ?? ""))
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return normalized || "item";
+}
+
 function createAuthorScopedId(slugger, prefix, label) {
-  return `${prefix}-${slugger.slug(label)}`;
+  return `${prefix}-${slugger.slug(createAuthorIdSlug(label))}`;
 }
 
 function parseEntityTitle(title) {
@@ -282,7 +317,7 @@ function buildAuthorPayload() {
       sectionType: hero.id,
       entityType: "profile",
       entityId: profile.id,
-      keywords: dedupeStrings([...profile.roles, ...extractKeywords(...profile.summary)]),
+      keywords: dedupeStrings([...profile.roles, "软件架构", "服务端开发", "研发效能", "敏捷实践"]),
     }),
     ...skillsEntities.map((item) => {
       const levelLabel = SKILL_LEVEL_LABELS[item.level] ?? item.level;
@@ -295,7 +330,7 @@ function buildAuthorPayload() {
         sectionType: skills.id,
         entityType: "skill",
         entityId: item.id,
-        keywords: dedupeStrings([item.title, levelLabel, ...extractKeywords(item.description)]),
+        keywords: dedupeStrings([item.title, levelLabel, ...extractKeywordParts(item.description)]),
       });
     }),
     ...certificateEntities.map((item) =>
@@ -307,7 +342,7 @@ function buildAuthorPayload() {
         sectionType: skills.id,
         entityType: "certificate",
         entityId: item.id,
-        keywords: dedupeStrings([item.title, ...extractKeywords(item.title)]),
+        keywords: dedupeStrings([item.title, ...extractKeywordParts(item.title)]),
       }),
     ),
     createAuthorChunk({
@@ -319,7 +354,7 @@ function buildAuthorPayload() {
       entityType: "education",
       entityId: educationEntity.id,
       period: educationEntity.period,
-      keywords: dedupeStrings([educationEntity.school, educationEntity.major, ...extractKeywords(educationEntity.school, educationEntity.major)]),
+      keywords: dedupeStrings([educationEntity.school, educationEntity.major, ...extractKeywordParts(educationEntity.school, educationEntity.major)]),
     }),
     ...experienceEntities.map((item) =>
       createAuthorChunk({
@@ -333,7 +368,7 @@ function buildAuthorPayload() {
         organization: item.organization,
         role: item.role,
         period: item.period,
-        keywords: dedupeStrings([item.title, item.organization, item.role, ...extractKeywords(item.description, ...(item.list ?? []))]),
+        keywords: dedupeStrings([item.organization, item.role, ...extractKeywordParts(item.title, item.description, ...(item.list ?? []))]).slice(0, 8),
       }),
     ),
     ...projectEntities.map((item) =>
@@ -359,7 +394,13 @@ function buildAuthorPayload() {
         organization: item.organization,
         role: item.role,
         period: item.period,
-        keywords: dedupeStrings([item.name, item.organization, item.role, ...extractKeywords(item.description, ...item.highlights.map((highlight) => highlight.text))]),
+        keywords: dedupeStrings([
+          item.organization,
+          item.role,
+          ...item.techs,
+          ...item.achievements.map((achievement) => achievement.metric).filter(Boolean),
+          ...extractKeywordParts(item.name, ...item.highlights.map((highlight) => highlight.text)),
+        ]).slice(0, 12),
         techs: item.techs,
       }),
     ),
