@@ -69,6 +69,12 @@ import { getAllPosts } from "@/lib/blog";
 
 ## 核心架构
 
+### 作者资料数据源约定
+- `lib/author-profile-data.js` 是作者资料的**单一真相源**（Single Source of Truth）
+- 作者页 UI 与 AI 数据生成都必须从这份数据派生，不要各维护一套
+- `lib/author-profile.ts` 只作为 TS 封装与消费入口，不应手写另一份作者资料
+- `public/ai-data/author.json` 是构建产物，由 `scripts/build-ai-data.js` 自动生成，**禁止手改**
+
 ### 目录结构
 ```
 app/          # Next.js App Router（路由和页面）

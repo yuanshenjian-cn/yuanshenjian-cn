@@ -299,6 +299,7 @@
 
 建议新增：
 
+- `lib/author-profile-data.js`
 - `lib/author-profile.ts`
 
 该模块负责输出：
@@ -309,6 +310,11 @@
 - 经历概览
 - 项目经历
 - 额外信息
+
+其中：
+
+- `lib/author-profile-data.js` 作为原始共享数据源
+- `lib/author-profile.ts` 作为 TS 封装与页面消费入口
 
 然后：
 
@@ -321,6 +327,7 @@
 
 - 页面渲染一套数据
 - `author.json` 手写另一套数据
+- 手动修改 `public/ai-data/author.json` 构建产物
 
 否则后续内容会快速漂移。
 
