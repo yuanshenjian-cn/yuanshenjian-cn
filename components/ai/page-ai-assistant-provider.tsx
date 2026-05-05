@@ -19,7 +19,7 @@ const TURNSTILE_ACTIONS = {
 } as const;
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const TURNSTILE_TIMEOUT_MS = 10000;
+const TURNSTILE_TIMEOUT_MS = 20000;
 
 let turnstileScriptPromise: Promise<void> | null = null;
 

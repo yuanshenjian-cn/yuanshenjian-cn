@@ -161,7 +161,7 @@ describe("article scene", () => {
     expect(references).toHaveLength(3);
   });
 
-  it("prompt 明确要求文章回答使用正文导向措辞", () => {
+  it("prompt 明确要求自然回答并避免模板化来源前缀", () => {
     const prompt = buildArticleSystemPrompt({
       slug: "tdd-introduction",
       title: "TDD 入门",
@@ -173,10 +173,11 @@ describe("article scene", () => {
       ],
     });
 
-    expect(prompt).toContain("文章中提到");
-    expect(prompt).toContain("文中提到");
-    expect(prompt).toContain("本文介绍了");
+    expect(prompt).toContain("直接、自然地回答用户问题，不要使用模板化来源前缀");
+    expect(prompt).toContain("如需解释依据，可在句中自然表达");
     expect(prompt).toContain("避免使用“页面中显示……”或“当前文章页展示的信息……”这类页面化措辞");
+    expect(prompt).toContain("不要写成“文章中提到……”");
+    expect(prompt).not.toContain("回答时优先使用“文章中提到……”“文中提到……”“本文介绍了……”");
     expect(prompt).toContain("sectionId: intro");
   });
 });

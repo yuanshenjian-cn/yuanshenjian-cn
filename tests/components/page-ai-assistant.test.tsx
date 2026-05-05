@@ -51,6 +51,7 @@ describe("PageAIAssistantProvider", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("流式回答会逐步追加，并在 references 事件后展示依据", async () => {
@@ -448,5 +449,45 @@ describe("PageAIAssistantProvider", () => {
 
     await screen.findByText("最终结果");
     expect(aiChatStreamMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("Turnstile 等待超时统一为 20 秒", async () => {
+    vi.useFakeTimers();
+
+    window.turnstile = {
+      render: () => "widget-id",
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <PageAIAssistantProvider
+        scene="author"
+        context={{ page: "author" }}
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        streamEnabled
+        maxInputChars={200}
+      >
+        <AuthorAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "作者擅长什么方向" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    expect(screen.getByRole("button", { name: "思考中..." })).toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(19999);
+    });
+    expect(screen.queryByText("Turnstile 响应超时，请稍后重试。")).not.toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(screen.getByText("Turnstile 响应超时，请稍后重试。")).toBeInTheDocument();
   });
 });

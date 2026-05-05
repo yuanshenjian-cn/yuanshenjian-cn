@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
 
@@ -35,6 +35,10 @@ describe("AiRecommendWidget", () => {
       },
       reset: () => undefined,
     };
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("提交新搜索时保留旧结果，直到新结果返回前不闪空", async () => {
@@ -81,5 +85,42 @@ describe("AiRecommendWidget", () => {
 
     expect(screen.getByText("先看旧结果")).toBeInTheDocument();
     expect(screen.getByText("旧文章")).toBeInTheDocument();
+  });
+
+  it("Turnstile 等待超时统一为 20 秒", async () => {
+    vi.useFakeTimers();
+
+    window.turnstile = {
+      render: () => "widget-id",
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <AiRecommendWidget
+        enabled
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        maxInputChars={200}
+        quickTopics={[]}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想找什么主题的文章？直接告诉我"), {
+      target: { value: "TDD" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    expect(screen.getByRole("button", { name: "思考中..." })).toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(19999);
+    });
+    expect(screen.queryByText("Turnstile 响应超时，请稍后重试。")).not.toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(screen.getByText("Turnstile 响应超时，请稍后重试。")).toBeInTheDocument();
   });
 });

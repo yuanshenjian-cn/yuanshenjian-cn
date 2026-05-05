@@ -68,7 +68,7 @@ describe("author scene", () => {
     );
 
     chatMock.mockResolvedValue({
-      content: `作者经历中提到他有团队协作与交付经验，作者技能中提到 AI Agent 相关能力，因此我倾向判断他更适合技术负责人和研发效能方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience-thoughtworks","skill-ai-agent"]}`,
+      content: `他有团队协作与交付经验，也具备 AI Agent 相关能力，因此我倾向判断他更适合技术负责人和研发效能方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience-thoughtworks","skill-ai-agent"]}`,
     });
 
     const result = await handleAuthorScene(
@@ -81,7 +81,9 @@ describe("author scene", () => {
       env,
     );
 
-    expect(result.answer).toContain("作者经历中提到");
+    expect(result.answer).toContain("团队协作与交付经验");
+    expect(result.answer).not.toContain("作者经历中提到");
+    expect(result.answer).not.toContain("作者技能中提到");
     expect(result.references).toEqual([
       {
         id: "experience-thoughtworks",
@@ -126,7 +128,7 @@ describe("author scene", () => {
     );
 
     chatMock.mockResolvedValue({
-      content: `作者经历中提到他有相关交付经验，我倾向判断他更适合技术负责人方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience"]}`,
+      content: `他有相关交付经验，我倾向判断他更适合技术负责人方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience"]}`,
     });
 
     const result = await handleAuthorScene(
@@ -150,7 +152,7 @@ describe("author scene", () => {
     ]);
   });
 
-  it("prompt 明确要求岗位归纳使用结构化来源措辞", () => {
+  it("prompt 明确要求自然回答并避免模板化来源前缀", () => {
     const prompt = buildAuthorSystemPrompt({
       slug: "author",
       title: "袁慎建",
@@ -169,11 +171,11 @@ describe("author scene", () => {
       ],
     });
 
-    expect(prompt).toContain("作者技能中提到");
-    expect(prompt).toContain("作者项目经验中提到");
-    expect(prompt).toContain("作者经历中提到");
-    expect(prompt).toContain("作者证书信息显示");
+    expect(prompt).toContain("直接、自然地回答用户问题，不要使用模板化来源前缀");
+    expect(prompt).toContain("如需解释依据，可在句中自然说明");
     expect(prompt).toContain("避免使用“页面中显示……”或“根据当前作者页展示的信息……”这类页面化措辞");
+    expect(prompt).toContain("不要写成“作者技能中提到……”");
+    expect(prompt).not.toContain("优先使用更贴近结构化信息来源的措辞");
     expect(prompt).not.toContain("必须显式以“根据当前作者页展示的信息”开头");
     expect(prompt).toContain("不要输出薪资建议、级别判断、招聘决策建议或行业适配结论");
     expect(prompt).toContain("sectionId: hero");

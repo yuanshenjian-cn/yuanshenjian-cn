@@ -9,7 +9,7 @@ import { aiChat } from "@/lib/ai-client";
 import type { AIQuickTopic, RecommendResponse } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const TURNSTILE_TIMEOUT_MS = 15000;
+const TURNSTILE_TIMEOUT_MS = 20000;
 const TURNSTILE_ACTION = "homepage_recommend";
 
 let turnstileScriptPromise: Promise<void> | null = null;
