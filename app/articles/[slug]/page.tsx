@@ -123,6 +123,7 @@ export default async function PostPage({ params }: Props) {
       context={{ slug }}
       workerUrl={config.ai.workerUrl}
       turnstileSiteKey={config.ai.turnstileSiteKey}
+      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
       streamEnabled={config.ai.pageAssistantStreamEnabled}
       maxInputChars={config.ai.maxInputChars}
     >

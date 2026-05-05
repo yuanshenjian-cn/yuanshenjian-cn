@@ -1,5 +1,9 @@
 import type { AIQuickTopic } from "@/types/ai";
 
+const HOMEPAGE_RECOMMEND_TURNSTILE_TIMEOUT_MS = 20000;
+const ARTICLE_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS = 20000;
+const AUTHOR_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS = 20000;
+
 const aiQuickTopics: AIQuickTopic[] = [
   {
     label: "AI 前沿",
@@ -65,6 +69,15 @@ export const config = {
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
     workerUrl: process.env.NEXT_PUBLIC_AI_WORKER_URL || "/api/ai",
     turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
+    turnstile: {
+      timeoutMs: {
+        homepageRecommend: HOMEPAGE_RECOMMEND_TURNSTILE_TIMEOUT_MS,
+        pageAssistant: {
+          article: ARTICLE_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS,
+          author: AUTHOR_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS,
+        },
+      },
+    },
     maxInputChars: 200,
     pageAssistantEnabled:
       process.env.NEXT_PUBLIC_AI_ENABLED !== "false" &&

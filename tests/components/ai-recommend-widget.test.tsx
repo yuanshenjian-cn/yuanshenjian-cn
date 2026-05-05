@@ -62,6 +62,7 @@ describe("AiRecommendWidget", () => {
         enabled
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         maxInputChars={200}
         quickTopics={[]}
       />,
@@ -87,7 +88,7 @@ describe("AiRecommendWidget", () => {
     expect(screen.getByText("旧文章")).toBeInTheDocument();
   });
 
-  it("Turnstile 等待超时统一为 20 秒", async () => {
+  it("Turnstile 等待超时使用传入值", async () => {
     vi.useFakeTimers();
 
     window.turnstile = {
@@ -101,6 +102,7 @@ describe("AiRecommendWidget", () => {
         enabled
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={3210}
         maxInputChars={200}
         quickTopics={[]}
       />,
@@ -114,7 +116,7 @@ describe("AiRecommendWidget", () => {
     expect(screen.getByRole("button", { name: "思考中..." })).toBeInTheDocument();
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(19999);
+      await vi.advanceTimersByTimeAsync(3209);
     });
     expect(screen.queryByText("Turnstile 响应超时，请稍后重试。")).not.toBeInTheDocument();
 

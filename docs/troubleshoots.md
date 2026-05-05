@@ -36,33 +36,42 @@
 
 ---
 
-## 2026-05-05 Turnstile 前端等待超时不一致且过短，统一调整为 20 秒
+## 2026-05-05 Turnstile timeout 原先散落在组件内部且值不一致，现已按场景收口到 config
 
 ### 现象
 
-- 页面级 AI 使用 10 秒 Turnstile 等待超时
-- 首页推荐组件使用 15 秒 Turnstile 等待超时
-- 在网络抖动或 Turnstile 响应偏慢时，用户容易过早看到超时报错
+- 页面级 AI 曾在组件内部写死 `10000ms`
+- 首页推荐组件曾在组件内部写死 `15000ms`
+- 同样是 Turnstile 前端等待逻辑，却分散在不同组件里维护，后续难以按场景调整
 
 ### 根因
 
-1. `components/ai/page-ai-assistant-provider.tsx` 中 `TURNSTILE_TIMEOUT_MS = 10000`
-2. `components/ai/ai-recommend-widget.tsx` 中 `TURNSTILE_TIMEOUT_MS = 15000`
-3. 两处等待逻辑一致，但超时常量没有统一
+1. `components/ai/page-ai-assistant-provider.tsx` 和 `components/ai/ai-recommend-widget.tsx` 都直接在组件内部维护 timeout 常量
+2. 首页推荐、文章页 AI、作者页 AI 没有统一的场景化配置入口
+3. 导致 timeout 值不一致，也缺少统一的版本化配置入口
 
 ### 修复
 
-1. 保持现有等待与错误处理逻辑不变
-2. 只调整真正控制等待超时的常量
-3. 将页面级 AI 与首页推荐的 Turnstile 等待超时统一为 `20000ms`
+1. 在 `lib/config.ts` 中新增 `config.ai.turnstile.timeoutMs`
+2. 按场景拆成：
+   - `homepageRecommend`
+   - `pageAssistant.article`
+   - `pageAssistant.author`
+3. 三个默认值都收口为 `20000ms`
+4. Turnstile timeout 统一只认 `lib/config.ts` 里的按场景版本化配置，不再支持 env override
+5. 组件不直接读取全局 config，继续由页面层通过 props 传入 timeout
 
 ### 如何确认修复生效
 
 1. 运行相关组件测试：
    - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/components/ai-recommend-widget.test.tsx`
-2. 使用 fake timers 验证：
-   - 19.999 秒时还不会报 `Turnstile 响应超时，请稍后重试。`
-   - 到 20 秒时才出现超时错误
+2. 使用 fake timers 验证传入值生效：
+   - 在自定义 timeout 前 1ms 仍不会报 `Turnstile 响应超时，请稍后重试。`
+   - 到达传入 timeout 时才出现超时错误
+3. 检查页面传参：
+   - 首页从 `config.ai.turnstile.timeoutMs.homepageRecommend` 传入
+   - 文章页从 `config.ai.turnstile.timeoutMs.pageAssistant.article` 传入
+   - 作者页从 `config.ai.turnstile.timeoutMs.pageAssistant.author` 传入
 
 ---
 

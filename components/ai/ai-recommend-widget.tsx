@@ -9,7 +9,6 @@ import { aiChat } from "@/lib/ai-client";
 import type { AIQuickTopic, RecommendResponse } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const TURNSTILE_TIMEOUT_MS = 20000;
 const TURNSTILE_ACTION = "homepage_recommend";
 
 let turnstileScriptPromise: Promise<void> | null = null;
@@ -58,11 +57,19 @@ interface AiRecommendWidgetProps {
   enabled: boolean;
   workerUrl: string;
   turnstileSiteKey: string;
+  turnstileTimeoutMs: number;
   maxInputChars: number;
   quickTopics: AIQuickTopic[];
 }
 
-export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInputChars, quickTopics }: AiRecommendWidgetProps) {
+export function AiRecommendWidget({
+  enabled,
+  workerUrl,
+  turnstileSiteKey,
+  turnstileTimeoutMs,
+  maxInputChars,
+  quickTopics,
+}: AiRecommendWidgetProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<RecommendResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +157,7 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInp
       turnstileRejectRef.current = reject;
       turnstileTimeoutRef.current = window.setTimeout(() => {
         rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。");
-      }, TURNSTILE_TIMEOUT_MS);
+      }, turnstileTimeoutMs);
 
       window.turnstile?.execute(widgetId);
     });

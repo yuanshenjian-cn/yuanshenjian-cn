@@ -19,7 +19,6 @@ const TURNSTILE_ACTIONS = {
 } as const;
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const TURNSTILE_TIMEOUT_MS = 20000;
 
 let turnstileScriptPromise: Promise<void> | null = null;
 
@@ -43,6 +42,7 @@ interface PageAIAssistantProviderProps {
   maxInputChars: number;
   streamEnabled: boolean;
   turnstileSiteKey: string;
+  turnstileTimeoutMs: number;
   workerUrl: string;
 }
 
@@ -117,6 +117,7 @@ export function PageAIAssistantProvider({
   scene,
   streamEnabled,
   turnstileSiteKey,
+  turnstileTimeoutMs,
   workerUrl,
 }: TypedPageAIAssistantProviderProps) {
   const [currentAnswer, setCurrentAnswer] = useState("");
@@ -224,7 +225,7 @@ export function PageAIAssistantProvider({
       turnstileRejectRef.current = reject;
       turnstileTimeoutRef.current = window.setTimeout(() => {
         rejectTurnstileRequest("Turnstile 响应超时，请稍后重试。", requestId);
-      }, TURNSTILE_TIMEOUT_MS);
+      }, turnstileTimeoutMs);
 
       window.turnstile?.execute(widgetId);
     });

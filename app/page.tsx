@@ -50,6 +50,7 @@ export default function Home() {
               enabled={config.ai.enabled}
               workerUrl={config.ai.workerUrl}
               turnstileSiteKey={config.ai.turnstileSiteKey}
+              turnstileTimeoutMs={config.ai.turnstile.timeoutMs.homepageRecommend}
               maxInputChars={config.ai.maxInputChars}
               quickTopics={config.ai.quickTopics}
             />

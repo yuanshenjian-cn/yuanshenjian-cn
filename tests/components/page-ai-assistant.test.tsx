@@ -79,6 +79,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -108,6 +109,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -143,6 +145,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -200,6 +203,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -261,6 +265,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -302,6 +307,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -345,6 +351,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ page: "author" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled={false}
         maxInputChars={200}
       >
@@ -385,6 +392,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ page: "author" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -424,6 +432,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ slug: "tdd-introduction" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
         streamEnabled
         maxInputChars={200}
       >
@@ -451,7 +460,7 @@ describe("PageAIAssistantProvider", () => {
     expect(aiChatStreamMock).toHaveBeenCalledTimes(1);
   });
 
-  it("Turnstile 等待超时统一为 20 秒", async () => {
+  it("Turnstile 等待超时使用传入值", async () => {
     vi.useFakeTimers();
 
     window.turnstile = {
@@ -466,6 +475,7 @@ describe("PageAIAssistantProvider", () => {
         context={{ page: "author" }}
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={4321}
         streamEnabled
         maxInputChars={200}
       >
@@ -481,7 +491,7 @@ describe("PageAIAssistantProvider", () => {
     expect(screen.getByRole("button", { name: "思考中..." })).toBeInTheDocument();
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(19999);
+      await vi.advanceTimersByTimeAsync(4320);
     });
     expect(screen.queryByText("Turnstile 响应超时，请稍后重试。")).not.toBeInTheDocument();
 
