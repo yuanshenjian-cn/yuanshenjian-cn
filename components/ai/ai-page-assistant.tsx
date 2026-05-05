@@ -6,6 +6,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
 import { usePageAIAssistant } from "@/components/ai/page-ai-assistant-provider";
 import type { AIQuickTopic } from "@/types/ai";
 
@@ -119,9 +120,10 @@ export function AiPageAssistant({
           <button
             type="submit"
             disabled={!canSubmit}
+            aria-label={isStreaming ? "思考中..." : "问 AI"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:hover:bg-muted"
           >
-            {isStreaming ? "思考中..." : "问 AI"}
+            {isStreaming ? <AnimatedEllipsisText text="思考中" /> : "问 AI"}
           </button>
         </div>
       </form>
@@ -140,11 +142,13 @@ export function AiPageAssistant({
                 </ReactMarkdown>
               </div>
             ) : isStreaming ? (
-              <p className="text-sm text-muted-foreground">AI 正在整理当前页面内容...</p>
+              <p className="text-sm text-muted-foreground">
+                <AnimatedEllipsisText text="AI 正在思考你的问题" />
+              </p>
             ) : null}
           </div>
 
-          {currentError && !currentAnswer ? (
+          {currentError && !isInterrupted ? (
             <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
               {currentError}
             </div>

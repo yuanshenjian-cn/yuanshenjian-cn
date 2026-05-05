@@ -14,7 +14,7 @@ const QUICK_TOPICS: AIQuickTopic[] = [
 export function AuthorAiAssistant() {
   return (
     <AiPageAssistant
-      title="问 AI：快速了解作者"
+      title="AI 带你快速了解作者"
       description=""
       placeholder="想快速了解作者？直接问我"
       quickTopics={QUICK_TOPICS}

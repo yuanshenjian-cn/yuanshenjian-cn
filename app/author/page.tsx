@@ -60,7 +60,7 @@ export default function ResumePage() {
             description={authorSummary}
           />
           <a
-            href="/docs/resume.pdf"
+            href={authorProfile.hero.resumeHref}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-muted hover:bg-muted/80 text-muted-foreground text-xs font-medium rounded-full transition-colors"

@@ -33,10 +33,14 @@ describe("build-ai-data helpers", () => {
 
   it("作者 payload 生成结构化实体和细粒度 chunks", () => {
     const payload = buildAuthorPayload();
+    const heroChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "hero");
+    const educationChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "education");
+    const publicationChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "extra-著作发表");
 
     expect(payload.slug).toBe("author");
     expect(payload.title).toBe("袁慎建");
     expect(payload.entities.profile.name).toBe("袁慎建");
+    expect(payload.entities.profile.resumeHref).toBe("/docs/resume.pdf");
     expect(payload.entities.skills.length).toBeGreaterThan(0);
     expect(payload.entities.projects.length).toBeGreaterThan(0);
     expect(payload.chunks.length).toBeGreaterThan(payload.entities.skills.length);
@@ -48,5 +52,8 @@ describe("build-ai-data helpers", () => {
     expect(payload.sections.find((section: { id: string }) => section.id === "project-locammend-智能顾问-研发交付")?.anchorId).toBe(
       "projects",
     );
+    expect(heroChunk?.content).toContain("简历 PDF：/docs/resume.pdf");
+    expect(educationChunk?.content).toContain("学校官网：https://www.chd.edu.cn/");
+    expect(publicationChunk?.content).toContain("整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design");
   });
 });

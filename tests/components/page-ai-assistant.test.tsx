@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArticleAiAssistant } from "@/components/ai/article-ai-assistant";
@@ -166,6 +166,162 @@ describe("PageAIAssistantProvider", () => {
     firstOnEvent?.({ type: "answer-delta", delta: "旧流结果" });
 
     expect(screen.queryByText("旧流结果")).not.toBeInTheDocument();
+  });
+
+  it("二次提问时保留旧回答和旧引用，直到新流式回答真正开始后再覆盖", async () => {
+    let secondOnEvent: ((event: { type: string; delta?: string; references?: unknown[] }) => void) | null = null;
+
+    aiChatStreamMock
+      .mockImplementationOnce(async ({ onEvent }: { onEvent: (event: { type: string; delta?: string; references?: unknown[] }) => void }) => {
+        onEvent({ type: "answer-delta", delta: "旧回答" });
+        onEvent({
+          type: "references",
+          references: [
+            {
+              id: "old-ref",
+              title: "旧依据",
+              excerpt: "旧摘录",
+              sourceType: "article-section",
+              anchorId: "old-ref",
+            },
+          ],
+        });
+        onEvent({ type: "done" });
+      })
+      .mockImplementationOnce(async ({ onEvent }: { onEvent: (event: { type: string; delta?: string; references?: unknown[] }) => void }) => {
+        secondOnEvent = onEvent;
+        await new Promise(() => undefined);
+      });
+
+    render(
+      <PageAIAssistantProvider
+        scene="article"
+        context={{ slug: "tdd-introduction" }}
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        streamEnabled
+        maxInputChars={200}
+      >
+        <ArticleAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    const input = screen.getByPlaceholderText("想快速了解这篇文章？直接问我");
+
+    fireEvent.change(input, { target: { value: "第一次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await screen.findByText("旧回答");
+    expect(screen.getByText("旧依据")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "第二次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await waitFor(() => expect(aiChatStreamMock).toHaveBeenCalledTimes(2));
+    expect(screen.getByRole("button", { name: "思考中..." })).toBeInTheDocument();
+    expect(screen.getByText("旧回答")).toBeInTheDocument();
+    expect(screen.getByText("旧依据")).toBeInTheDocument();
+
+    act(() => {
+      secondOnEvent?.({
+        type: "references",
+        references: [
+          {
+            id: "new-ref",
+            title: "新依据",
+            excerpt: "新摘录",
+            sourceType: "article-section",
+            anchorId: "new-ref",
+          },
+        ],
+      });
+    });
+
+    expect(screen.getByText("旧回答")).toBeInTheDocument();
+    expect(screen.getByText("旧依据")).toBeInTheDocument();
+    expect(screen.queryByText("新依据")).not.toBeInTheDocument();
+
+    act(() => {
+      secondOnEvent?.({ type: "answer-delta", delta: "新回答" });
+    });
+
+    await screen.findByText("新回答");
+    expect(screen.queryByText("旧回答")).not.toBeInTheDocument();
+    expect(screen.queryByText("旧依据")).not.toBeInTheDocument();
+    expect(screen.getByText("新依据")).toBeInTheDocument();
+  });
+
+  it("动态思考按钮文案仍可通过可访问名称选中", async () => {
+    aiChatStreamMock.mockImplementation(async () => new Promise(() => undefined));
+
+    render(
+      <PageAIAssistantProvider
+        scene="article"
+        context={{ slug: "tdd-introduction" }}
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        streamEnabled
+        maxInputChars={200}
+      >
+        <ArticleAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想快速了解这篇文章？直接问我"), {
+      target: { value: "正在测试按钮文案" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    expect(await screen.findByRole("button", { name: "思考中..." })).toBeInTheDocument();
+  });
+
+  it("新请求失败时保留旧回答，只额外展示错误", async () => {
+    aiChatStreamMock
+      .mockImplementationOnce(async ({ onEvent }: { onEvent: (event: { type: string; delta?: string; references?: unknown[] }) => void }) => {
+        onEvent({ type: "answer-delta", delta: "旧回答" });
+        onEvent({
+          type: "references",
+          references: [
+            {
+              id: "old-ref",
+              title: "旧依据",
+              excerpt: "旧摘录",
+              sourceType: "article-section",
+              anchorId: "old-ref",
+            },
+          ],
+        });
+        onEvent({ type: "done" });
+      })
+      .mockRejectedValueOnce(new Error("请求失败，请稍后重试"));
+
+    render(
+      <PageAIAssistantProvider
+        scene="article"
+        context={{ slug: "tdd-introduction" }}
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        streamEnabled
+        maxInputChars={200}
+      >
+        <ArticleAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    const input = screen.getByPlaceholderText("想快速了解这篇文章？直接问我");
+
+    fireEvent.change(input, { target: { value: "第一次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await screen.findByText("旧回答");
+    expect(screen.getByText("旧依据")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "第二次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await screen.findByText("请求失败，请稍后重试");
+    expect(screen.getByText("旧回答")).toBeInTheDocument();
+    expect(screen.getByText("旧依据")).toBeInTheDocument();
   });
 
   it("关闭 stream 时会走非流式 fallback", async () => {

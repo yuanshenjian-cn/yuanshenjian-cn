@@ -262,6 +262,7 @@ export function PageAIAssistantProvider({
 
     updateAnswer(response.answer);
     setCurrentReferences(response.references);
+    setIsInterrupted(false);
     setIsStreaming(false);
     abortControllerRef.current = null;
     return true;
@@ -285,12 +286,12 @@ export function PageAIAssistantProvider({
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
+    let hasStartedResponse = false;
+    let pendingReferences: PageReference[] | null = null;
 
     setCurrentError(null);
-    setCurrentReferences([]);
     setIsInterrupted(false);
     setIsStreaming(true);
-    updateAnswer("");
 
     if (options.scrollToResult) {
       resultContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -314,12 +315,23 @@ export function PageAIAssistantProvider({
         }
 
         if (event.type === "answer-delta") {
+          if (!hasStartedResponse) {
+            hasStartedResponse = true;
+            updateAnswer(event.delta);
+            setCurrentReferences(pendingReferences ?? []);
+            return;
+          }
+
           updateAnswer((previous) => previous + event.delta);
           return;
         }
 
         if (event.type === "references") {
-          setCurrentReferences(event.references);
+          if (hasStartedResponse) {
+            setCurrentReferences(event.references);
+          } else {
+            pendingReferences = event.references;
+          }
           return;
         }
 
@@ -330,7 +342,7 @@ export function PageAIAssistantProvider({
         }
 
         setCurrentError(event.message);
-        setIsInterrupted(answerRef.current.trim().length > 0);
+        setIsInterrupted(hasStartedResponse);
         setIsStreaming(false);
         abortControllerRef.current = null;
       };
@@ -373,7 +385,7 @@ export function PageAIAssistantProvider({
       }
 
       setCurrentError(error instanceof Error ? error.message : "AI 请求失败，请稍后重试。");
-      setIsInterrupted(answerRef.current.trim().length > 0);
+      setIsInterrupted(hasStartedResponse);
       setIsStreaming(false);
       abortControllerRef.current = null;
       return false;

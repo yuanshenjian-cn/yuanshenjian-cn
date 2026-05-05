@@ -262,6 +262,7 @@ function buildAuthorPayload() {
     roles: hero.roles,
     phone: hero.phone,
     email: hero.email,
+    resumeHref: hero.resumeHref,
     summary: hero.summary,
   };
   const skillsEntities = skills.items.map((item) => ({
@@ -313,7 +314,14 @@ function buildAuthorPayload() {
       id: profile.id,
       anchorId: hero.id,
       heading: hero.heading,
-      content: [profile.name, profile.roles.join("，"), ...profile.summary, `联系电话：${profile.phone}`, `邮箱：${profile.email}`].join("\n"),
+      content: [
+        profile.name,
+        profile.roles.join("，"),
+        ...profile.summary,
+        `联系电话：${profile.phone}`,
+        `邮箱：${profile.email}`,
+        `简历 PDF：${profile.resumeHref}`,
+      ].join("\n"),
       sectionType: hero.id,
       entityType: "profile",
       entityId: profile.id,
@@ -349,7 +357,9 @@ function buildAuthorPayload() {
       id: educationEntity.id,
       anchorId: education.id,
       heading: education.heading,
-      content: `${educationEntity.school}，${educationEntity.major}，${educationEntity.period}`,
+      content: [educationEntity.school, educationEntity.major, educationEntity.period, educationEntity.href ? `学校官网：${educationEntity.href}` : ""]
+        .filter(Boolean)
+        .join("\n"),
       sectionType: education.id,
       entityType: "education",
       entityId: educationEntity.id,
@@ -409,7 +419,10 @@ function buildAuthorPayload() {
         id: group.id,
         anchorId: extras.id,
         heading: `兴趣｜${group.title}`,
-        content: `${group.title}：${group.items.map((item) => item.label).join("、")}`,
+        content: [
+          `${group.title}：`,
+          ...group.items.map((item) => (item.type === "link" ? `${item.label}：${item.href}` : item.label)),
+        ].join("\n"),
         sectionType: extras.id,
         entityType: "extra",
         entityId: group.id,

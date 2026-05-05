@@ -29,7 +29,7 @@ export function ArticleAiAssistant({ variant = "primary" }: ArticleAiAssistantPr
 
   return (
     <AiPageAssistant
-      title="AI 快速读懂这篇文章"
+      title="AI 带你快速读懂文章"
       description=""
       placeholder="想快速了解这篇文章？直接问我"
       quickTopics={PRIMARY_QUICK_TOPICS}

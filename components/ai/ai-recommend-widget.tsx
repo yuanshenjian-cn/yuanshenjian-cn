@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Sparkles } from "lucide-react";
+
+import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
 import { aiChat } from "@/lib/ai-client";
 import type { AIQuickTopic, RecommendResponse } from "@/types/ai";
 
@@ -221,9 +223,10 @@ export function AiRecommendWidget({ enabled, workerUrl, turnstileSiteKey, maxInp
           <button
             type="submit"
             disabled={!canSubmit}
+            aria-label={isSubmitting ? "思考中..." : "问 AI"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-foreground text-background px-4 py-2 text-sm font-medium hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-40 transition-all"
           >
-            {isSubmitting ? "思考中..." : "问 AI"}
+            {isSubmitting ? <AnimatedEllipsisText text="思考中" /> : "问 AI"}
           </button>
         </div>
       </form>

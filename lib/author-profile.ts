@@ -7,6 +7,7 @@ export interface AuthorHeroProfile {
   roles: string[];
   phone: string;
   email: string;
+  resumeHref: string;
   summary: string[];
 }
 
