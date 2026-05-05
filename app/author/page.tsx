@@ -52,7 +52,7 @@ export default function ResumePage() {
       <ResumeExtras />
 
       {/* 简历分享 */}
-      <section className="py-8 px-6">
+      {/* <section className="py-8 px-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <ShareButtons
             url={resumeUrl}
@@ -70,7 +70,7 @@ export default function ResumePage() {
             <span>下载 PDF</span>
           </a>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }

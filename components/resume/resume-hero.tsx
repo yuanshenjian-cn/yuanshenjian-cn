@@ -31,7 +31,7 @@ export function ResumeHero() {
         </div>
 
         {/* 下载 PDF 按钮 */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <a
             href={hero.resumeHref}
             target="_blank"
@@ -42,7 +42,7 @@ export function ResumeHero() {
             <Download className="w-2.5 h-2.5" />
             <span>下载 PDF</span>
           </a>
-        </div>
+        </div> */}
 
         {/* 主标题 - 更有质感的排版 */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4 text-foreground">
