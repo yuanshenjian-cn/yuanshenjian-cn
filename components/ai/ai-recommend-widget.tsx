@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
 import { aiRecommendStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
@@ -12,6 +14,55 @@ const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api
 const TURNSTILE_ACTION = "homepage_recommend";
 
 let turnstileScriptPromise: Promise<void> | null = null;
+
+const answerMarkdownComponents = {
+  h1: ({ children }: { children?: ReactNode }) => (
+    <h1 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: { children?: ReactNode }) => (
+    <h2 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: ReactNode }) => (
+    <h3 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }: { children?: ReactNode }) => (
+    <h4 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h4>
+  ),
+  h5: ({ children }: { children?: ReactNode }) => (
+    <h5 className="mt-4 break-words text-sm font-medium leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h5>
+  ),
+  h6: ({ children }: { children?: ReactNode }) => (
+    <h6 className="mt-4 break-words text-sm font-medium leading-6 tracking-tight text-foreground first:mt-0">
+      {children}
+    </h6>
+  ),
+  p: ({ children }: { children?: ReactNode }) => <p className="my-3 break-words leading-6 first:mt-0 last:mb-0">{children}</p>,
+  ul: ({ children }: { children?: ReactNode }) => <ul className="my-3 list-disc space-y-1.5 pl-5 first:mt-0 last:mb-0">{children}</ul>,
+  ol: ({ children }: { children?: ReactNode }) => <ol className="my-3 list-decimal space-y-1.5 pl-5 first:mt-0 last:mb-0">{children}</ol>,
+  li: ({ children }: { children?: ReactNode }) => <li className="break-words pl-1 leading-6">{children}</li>,
+  strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  a: ({ children, href }: { children?: ReactNode; href?: string }) => (
+    <a href={href} className="break-all text-primary hover:underline">
+      {children}
+    </a>
+  ),
+  code: ({ children }: { children?: ReactNode }) => (
+    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground">{children}</code>
+  ),
+  pre: ({ children }: { children?: ReactNode }) => (
+    <pre className="my-4 overflow-x-auto rounded-xl bg-muted p-4 text-sm text-foreground first:mt-0 last:mb-0">{children}</pre>
+  ),
+} as const;
 
 function loadTurnstileScript(): Promise<void> {
   if (typeof window === "undefined") {
@@ -355,7 +406,11 @@ export function AiRecommendWidget({
               <Sparkles className="w-4 h-4 text-primary" />
               <p className="text-sm font-medium text-foreground">AI 回答</p>
             </div>
-            <p className="text-sm leading-7 text-muted-foreground">{response.answer}</p>
+            <div className="text-sm text-muted-foreground">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={answerMarkdownComponents}>
+                {response.answer}
+              </ReactMarkdown>
+            </div>
           </div>
 
           {response.references.length > 0 ? (

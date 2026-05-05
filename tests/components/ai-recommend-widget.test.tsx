@@ -156,6 +156,36 @@ describe("AiRecommendWidget", () => {
     expect(screen.getByText("AI 服务刚刚开小差了，请稍后重试。")).toBeInTheDocument();
   });
 
+  it("回答中的 Markdown 会按结构渲染，不再显示原始语法", async () => {
+    aiRecommendStreamMock.mockImplementationOnce(
+      async ({ onEvent }: { onEvent: (event: { type: string; delta?: string }) => void }) => {
+        onEvent({ type: "answer-delta", delta: "这是 **重点** 建议" });
+        onEvent({ type: "done" });
+      },
+    );
+
+    render(
+      <AiRecommendWidget
+        enabled
+        workerUrl="/api/ai"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={20000}
+        maxInputChars={200}
+        quickTopics={[]}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想找什么主题的文章？直接告诉我"), {
+      target: { value: "推荐几篇重点文章" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await screen.findByText("重点");
+    expect(screen.queryByText("这是 **重点** 建议")).not.toBeInTheDocument();
+    expect(screen.getByText("重点", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText("这是", { exact: false })).toHaveTextContent("这是 重点 建议");
+  });
+
   it("流式在首个 answer 前失败时保留旧结果，并展示统一错误文案", async () => {
     aiRecommendStreamMock
       .mockImplementationOnce(async ({ onEvent }: { onEvent: (event: { type: string; delta?: string; references?: unknown[] }) => void }) => {

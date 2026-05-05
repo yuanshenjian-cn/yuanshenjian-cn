@@ -83,8 +83,10 @@ npm run llm:deploy
 - `llm:use`：只更新本地 `.llm-active-profile`，不改线上
 - `llm:deploy -- provider/modelKey`：先更新 active profile，再把当前配置写入 Worker 并执行 `wrangler deploy`
 - `llm:deploy`：读取当前 `.llm-active-profile`，把当前配置写入 Worker 并执行 `wrangler deploy`
+- `deploy`：默认安全部署入口，等价于 `llm:deploy`
+- `deploy:raw`：原始 `wrangler deploy`，只在你明确知道自己在做什么时使用
 
-`llm:deploy` 会按“4 个明文变量 + 1 个 secret”写入 Worker：
+`llm:deploy` / `deploy` 会按“4 个明文变量 + 1 个 secret”写入 Worker：
 
 明文变量：
 
@@ -103,6 +105,7 @@ secret：
 - selector 只支持 `provider/modelKey`
 - 当前运行时支持 `tencent-tokenhub`、`deepseek`、`moonshot-cn`
 - `llm:deploy` 会在部署后尝试删除同名旧 secret（如果存在），避免非敏感字段继续以 secret 形式残留在 Cloudflare 上
+- 如果直接执行原始 `wrangler deploy`，而这些 `LLM_*` 变量又不在 `wrangler.toml` 的 `[vars]` 中，就可能把线上 Worker 切到一个缺少 LLM 配置的新版本
 
 ### 1.3 Worker vars / secrets
 
@@ -128,11 +131,19 @@ cd blog-ai-worker
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-改完 `wrangler.toml` 后，需要重新部署：
+改完 `wrangler.toml` 后，仍建议使用默认安全部署：
 
 ```bash
 cd blog-ai-worker
 npm run deploy
+```
+
+这里的 `npm run deploy` 默认会走 `llm:deploy`，以免覆盖掉 Worker 上通过 profile 注入的 `LLM_*` vars。
+如果你非常确定这次只是做一次原始 Wrangler 发布，且愿意自行承担 LLM vars 被冲掉的风险，才使用：
+
+```bash
+cd blog-ai-worker
+npm run deploy:raw
 ```
 
 ---

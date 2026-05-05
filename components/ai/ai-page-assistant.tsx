@@ -20,12 +20,12 @@ interface AiPageAssistantProps {
 
 const answerMarkdownComponents = {
   h1: ({ children }: { children?: ReactNode }) => (
-    <h1 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+    <h1 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
       {children}
     </h1>
   ),
   h2: ({ children }: { children?: ReactNode }) => (
-    <h2 className="mt-4 break-words text-base font-semibold leading-6 tracking-tight text-foreground first:mt-0">
+    <h2 className="mt-4 break-words text-sm font-semibold leading-6 tracking-tight text-foreground first:mt-0">
       {children}
     </h2>
   ),

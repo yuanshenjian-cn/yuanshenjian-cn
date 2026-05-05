@@ -147,6 +147,9 @@ describe("article scene", () => {
     expect(prompt).toContain("如需解释依据，可在句中自然表达");
     expect(prompt).toContain("避免使用“页面中显示……”或“当前文章页展示的信息……”这类页面化措辞");
     expect(prompt).toContain("不要写成“文章中提到……”");
+    expect(prompt).toContain("对于总结、要点、核心观点、快速读懂这类问题，优先使用 2 到 4 条编号列表或 bullet list 输出");
+    expect(prompt).toContain("每条先给出结论，再用 1 到 2 句简短解释");
+    expect(prompt).toContain("不要把所有要点挤在一个长段落里");
     expect(prompt).not.toContain("回答时优先使用“文章中提到……”");
     expect(prompt).toContain("sectionId: intro");
   });

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run llm:deploy",
+    "deploy:raw": "wrangler deploy",
     "llm:list": "node scripts/llm-profile-cli.mjs list",
     "llm:use": "node scripts/llm-profile-cli.mjs use",
     "llm:deploy": "node scripts/llm-profile-cli.mjs deploy",

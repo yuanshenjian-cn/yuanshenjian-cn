@@ -4,6 +4,79 @@
 
 ---
 
+## 2026-05-05 首页 AiRecommendWidget 把 Markdown 当纯文本渲染，导致 `**` 等语法直接外露
+
+### 现象
+
+- 首页 `AiRecommendWidget` 的流式回答里，如果模型返回 `**粗体**`、列表等 Markdown 语法，页面会直接显示原始符号
+- 页面级 AI 已经能正确渲染 Markdown，因此首页与页面级 AI 的表现不一致
+
+### 根因
+
+1. 首页组件此前直接用 `<p>{response.answer}</p>` 输出 `response.answer`
+2. `response.answer` 已经是模型生成的 Markdown 文本，但首页没有接入 `ReactMarkdown + remarkGfm`
+
+### 修复
+
+1. 在 `components/ai/ai-recommend-widget.tsx` 中把回答区改为 `ReactMarkdown + remarkGfm` 渲染
+2. 回答区样式对齐页面级 AI：
+   - 容器保持 `text-sm`
+   - 段落与列表使用 `leading-6`，避免正文行高过松
+3. 不改首页推荐文章卡片结构，只替换回答正文渲染方式
+
+### 如何确认修复生效
+
+1. 运行：
+   - `npm run test -- tests/components/ai-recommend-widget.test.tsx`
+2. 确认首页回答里的 `**粗体**` 不再原样显示
+3. 确认粗体会渲染为实际的 `<strong>` 结构
+4. 确认推荐文章卡片结构与半流式更新时机不变
+
+---
+
+## 2026-05-05 直接执行 blog-ai-worker 的原始 wrangler deploy，可能把 LLM profile vars 冲掉
+
+### 现象
+
+- Worker 之前可正常调用 LLM
+- 执行一次普通的 `npm run deploy` / `wrangler deploy` 后，线上开始报：
+  - `Worker misconfigured: LLM_ACTIVE_PROFILE is missing`
+  - 或类似的 `LLM_PROVIDER_NAME` / `LLM_MODEL_ID` / `LLM_PROVIDER_BASE_URL` 缺失
+- 但这些变量此前明明是存在的
+
+### 根因
+
+1. 本项目的 LLM 运行时变量并不写在 `blog-ai-worker/wrangler.toml` 的 `[vars]` 中
+2. 它们是通过 `npm run llm:deploy` 在部署时动态注入的：
+   - `LLM_ACTIVE_PROFILE`
+   - `LLM_PROVIDER_NAME`
+   - `LLM_MODEL_ID`
+   - `LLM_PROVIDER_BASE_URL`
+   - `LLM_PROVIDER_API_KEY`（secret）
+3. 如果直接执行原始 `wrangler deploy`，新版本只会带上 `wrangler.toml` 中声明的 vars；没有被重新传入的 `LLM_*` 变量就会在新版本中缺失
+
+### 修复
+
+1. 恢复线上 LLM 配置时，执行：
+   - `cd blog-ai-worker`
+   - `npm run llm:deploy`
+2. 将默认部署入口改成安全版：
+   - `npm run deploy` → 默认走 `llm:deploy`
+   - `npm run deploy:raw` → 保留原始 `wrangler deploy`
+3. 文档中明确：除非非常确定只想做一次原始 Wrangler 发布，否则不要直接使用 `deploy:raw`
+
+### 如何确认修复生效
+
+1. 执行：
+   - `cd blog-ai-worker`
+   - `npm run deploy`
+2. 确认线上 Worker 不再报：
+   - `Worker misconfigured: LLM_ACTIVE_PROFILE is missing`
+3. 确认首页推荐、文章页 AI、作者页 AI 能正常调用 LLM
+4. 如需原始发布，必须显式执行 `npm run deploy:raw`，避免误用默认入口
+
+---
+
 ## 2026-05-05 AI 流式正文里的 `--` 需要只在 answer 层最小清洗，不能误伤 delimiter 与 JSON tail
 
 ### 现象
@@ -1136,6 +1209,13 @@ AI_EMERGENCY_DISABLE = "true"
 3. 确认标题比正文只略强一级，不会再出现浏览器默认大标题
 4. 回归运行：
    - `npm run test -- tests/components/page-ai-assistant.test.tsx`
+
+### 补充说明
+
+- 页面级 AI 回答外层容器本身已经是 `text-sm`，正文段落的基准字号其实没有偏大
+- 用户仍会觉得“整段回答看起来偏大”，主要是因为 Markdown 里的 `h1` / `h2` 之前仍使用 `text-base`
+- 在流式回答里，只要模型输出了一级或二级标题，这两个标题就会比周围正文明显大一档，主观读感就会被拉大
+- 这次只把 `h1` / `h2` 从 `text-base` 收敛到 `text-sm`，继续保留 heading 语义和 `font-semibold` 的层级区分
 
 ---
 

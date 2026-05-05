@@ -134,6 +134,10 @@ describe("author scene", () => {
     expect(prompt).toContain("如需解释依据，可在句中自然说明");
     expect(prompt).toContain("避免使用“页面中显示……”或“根据当前作者页展示的信息……”这类页面化措辞");
     expect(prompt).toContain("不要写成“作者技能中提到……”");
+    expect(prompt).toContain("对于岗位匹配、优势总结、擅长什么方向、主要能力/优势这类归纳问题");
+    expect(prompt).toContain("这类归纳问题优先使用 2 到 4 条编号列表或 bullet list 输出");
+    expect(prompt).toContain("每条先给出方向或结论，再用 1 到 2 句简短解释");
+    expect(prompt).toContain("不要把所有方向或优势挤在一个长段落里");
     expect(prompt).not.toContain("优先使用更贴近结构化信息来源的措辞");
     expect(prompt).not.toContain("必须显式以“根据当前作者页展示的信息”开头");
     expect(prompt).toContain("不要输出薪资建议、级别判断、招聘决策建议或行业适配结论");
