@@ -5,8 +5,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Sparkles } from "lucide-react";
 
 import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
-import { aiChat } from "@/lib/ai-client";
-import type { AIQuickTopic, RecommendResponse } from "@/types/ai";
+import { aiRecommendStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
+import type { AIQuickTopic, RecommendResponse, RecommendStreamEvent } from "@/types/ai";
 
 const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_ACTION = "homepage_recommend";
@@ -75,6 +75,8 @@ export function AiRecommendWidget({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const turnstileResolveRef = useRef<((token: string) => void) | null>(null);
@@ -119,6 +121,7 @@ export function AiRecommendWidget({
 
   useEffect(() => () => {
     clearTurnstileWaiters();
+    abortControllerRef.current?.abort();
   }, []);
 
   async function ensureTurnstileWidget(): Promise<string> {
@@ -178,25 +181,110 @@ export function AiRecommendWidget({
       return;
     }
 
+    requestIdRef.current += 1;
+    const requestId = requestIdRef.current;
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    let hasStartedResponse = false;
+    let nextAnswer = "";
+    let pendingReferences: RecommendResponse["references"] | null = null;
+
     setIsSubmitting(true);
     setError(null);
 
     try {
       const turnstileToken = await getTurnstileToken();
-      const nextResponse = await aiChat({
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
+
+
+      const onEvent = (event: RecommendStreamEvent) => {
+        if (requestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (event.type === "answer-delta") {
+          nextAnswer += event.delta;
+
+          if (!hasStartedResponse) {
+            hasStartedResponse = true;
+            setResponse(() => ({
+              answer: nextAnswer,
+              references: pendingReferences ?? [],
+            }));
+          } else {
+            setResponse((previous) =>
+              previous
+                ? {
+                    ...previous,
+                    answer: nextAnswer,
+                  }
+                : {
+                    answer: nextAnswer,
+                    references: pendingReferences ?? [],
+                  },
+            );
+          }
+          return;
+        }
+
+        if (event.type === "references") {
+          if (hasStartedResponse) {
+            setResponse((previous) =>
+              previous
+                ? {
+                    ...previous,
+                    references: event.references,
+                  }
+                : {
+                    answer: nextAnswer,
+                    references: event.references,
+                  },
+            );
+          } else {
+            pendingReferences = event.references;
+          }
+          return;
+        }
+
+        if (event.type === "done") {
+          setIsSubmitting(false);
+          abortControllerRef.current = null;
+          setMessage("");
+          return;
+        }
+
+        setError(event.message);
+        setIsSubmitting(false);
+        abortControllerRef.current = null;
+      };
+
+      await aiRecommendStream({
         workerUrl,
         scene: "recommend",
         message: nextMessage,
         turnstileToken,
+        signal: controller.signal,
+        onEvent,
       });
 
-      setResponse(nextResponse);
-      setMessage("");
+      if (requestIdRef.current === requestId) {
+        setIsSubmitting(false);
+        abortControllerRef.current = null;
+      }
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "AI 请求失败，请稍后重试。");
+      if (controller.signal.aborted || requestIdRef.current !== requestId) {
+        return;
+      }
+
+      setError(submitError instanceof Error ? submitError.message : USER_FACING_AI_ERROR_MESSAGE);
+      setIsSubmitting(false);
+      abortControllerRef.current = null;
     } finally {
       resetTurnstileWidget();
-      setIsSubmitting(false);
     }
   }
 

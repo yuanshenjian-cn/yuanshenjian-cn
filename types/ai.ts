@@ -32,71 +32,37 @@ export interface PageResponse {
   usage?: AIUsage;
 }
 
-export interface RecommendRequestPayload {
-  scene: "recommend";
-  message: string;
-  cf_turnstile_response: string;
-}
-
-export interface ArticleRequestPayload {
-  scene: "article";
-  message: string;
-  context: { slug: string };
-  cf_turnstile_response: string;
-}
-
-export interface AuthorRequestPayload {
-  scene: "author";
-  message: string;
-  context: { page: "author" };
-  cf_turnstile_response: string;
-}
-
-export type AIChatRequest = RecommendRequestPayload | ArticleRequestPayload | AuthorRequestPayload;
-
-interface BaseAIChatOptions {
-  workerUrl: string;
-  message: string;
-  turnstileToken: string;
-}
-
-export interface RecommendChatOptions extends BaseAIChatOptions {
-  scene: "recommend";
-  context?: undefined;
-}
-
-export interface ArticleChatOptions extends BaseAIChatOptions {
-  scene: "article";
-  context: { slug: string };
-}
-
-export interface AuthorChatOptions extends BaseAIChatOptions {
-  scene: "author";
-  context: { page: "author" };
-}
-
-export type AIChatOptions = RecommendChatOptions | ArticleChatOptions | AuthorChatOptions;
-
 interface BaseAIChatStreamOptions {
   workerUrl: string;
   message: string;
   turnstileToken: string;
   signal?: AbortSignal;
-  onEvent: (event: PageStreamEvent) => void;
+}
+
+export interface RecommendChatStreamOptions extends BaseAIChatStreamOptions {
+  scene: "recommend";
+  context?: undefined;
+  onEvent: (event: RecommendStreamEvent) => void;
 }
 
 export interface ArticleChatStreamOptions extends BaseAIChatStreamOptions {
   scene: "article";
   context: { slug: string };
+  onEvent: (event: PageStreamEvent) => void;
 }
 
 export interface AuthorChatStreamOptions extends BaseAIChatStreamOptions {
   scene: "author";
   context: { page: "author" };
+  onEvent: (event: PageStreamEvent) => void;
 }
 
 export type AIChatStreamOptions = ArticleChatStreamOptions | AuthorChatStreamOptions;
-export type PageChatOptions = ArticleChatOptions | AuthorChatOptions;
+export type RecommendStreamEvent =
+  | { type: "answer-delta"; delta: string }
+  | { type: "references"; references: RecommendReference[] }
+  | { type: "done"; usage?: AIUsage }
+  | { type: "error"; message: string };
 
 export type PageStreamEvent =
   | { type: "answer-delta"; delta: string }
@@ -105,10 +71,6 @@ export type PageStreamEvent =
   | { type: "error"; message: string };
 
 export type AIReference = RecommendReference;
-export type AIChatResponse = RecommendResponse | PageResponse;
-export type AIChatResponseByScene<T extends AIChatOptions["scene"]> = T extends "recommend"
-  ? RecommendResponse
-  : PageResponse;
 
 export interface AIQuickTopic {
   label: string;

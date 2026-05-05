@@ -1,19 +1,19 @@
 import { createProvider } from "../providers";
-import type { ChatRequest, ChatResponse } from "../providers/types";
+import type { ChatRequest } from "../providers/types";
 import type {
   AIUsage,
   Env,
   PageData,
   PageReference,
-  PageResponse,
-  PageScene,
   PageSection,
 } from "../types";
 import { HttpError } from "../types";
+import { createAnswerDeltaSanitizer } from "../utils/answer";
 import { eventStreamResponse } from "../utils/response";
+import { USER_FACING_AI_ERROR_MESSAGE } from "./errors";
 
 export const PAGE_REFERENCE_DELIMITER = "<<<AI_PAGE_REFERENCES>>>";
-export const PAGE_AI_ERROR_MESSAGE = "AI 暂时无法整理当前页面内容，请稍后再试。";
+export const PAGE_AI_ERROR_MESSAGE = USER_FACING_AI_ERROR_MESSAGE;
 
 const MAX_REFERENCES = 3;
 
@@ -28,7 +28,6 @@ interface ParsedPageOutput {
 
 interface BuildPageSceneOptions {
   env: Env;
-  scene: PageScene;
   pageDataPath: string;
   sourceType: PageReference["sourceType"];
   message: string;
@@ -213,23 +212,6 @@ function createChatRequest(systemPrompt: string, message: string, stream: boolea
   };
 }
 
-export async function handlePageScene(options: BuildPageSceneOptions): Promise<PageResponse> {
-  const pageData = await fetchPageData(options.env, options.pageDataPath, options.validatePageData);
-  const provider = createProvider(options.env, options.env.LLM_MODEL_ID);
-  const llmResponse: ChatResponse = await provider.chat(
-    createChatRequest(options.buildSystemPrompt(pageData), options.message, false),
-  );
-
-  const parsed = parsePageOutput(llmResponse.content);
-  const referenceSections = options.getReferenceSections?.(pageData) ?? (Array.isArray(pageData.sections) ? pageData.sections : []);
-
-  return {
-    answer: parsed.answer,
-    references: assemblePageReferences(referenceSections, options.sourceType, parsed.sectionIds),
-    usage: llmResponse.usage,
-  };
-}
-
 function encodeSSEEvent(event: string, payload: unknown): Uint8Array {
   return new TextEncoder().encode(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
 }
@@ -344,17 +326,30 @@ export async function handlePageSceneStream(options: BuildPageSceneOptions): Pro
     throw new HttpError(501, "Current AI provider does not support streaming");
   }
 
-  const upstreamStream = await provider.streamChat(
-    createChatRequest(options.buildSystemPrompt(pageData), options.message, true),
-  );
+  let upstreamStream: ReadableStream<Uint8Array>;
+
+  try {
+    upstreamStream = await provider.streamChat(
+      createChatRequest(options.buildSystemPrompt(pageData), options.message, true),
+    );
+  } catch (error) {
+    if (error instanceof HttpError && error.status >= 500) {
+      throw new HttpError(502, PAGE_AI_ERROR_MESSAGE);
+    }
+
+    throw error;
+  }
   const referenceSections = options.getReferenceSections?.(pageData) ?? (Array.isArray(pageData.sections) ? pageData.sections : []);
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const reader = upstreamStream.getReader();
       const decoder = new TextDecoder();
-      const processor = createAnswerStreamProcessor((delta) => {
+      const sanitizer = createAnswerDeltaSanitizer((delta) => {
         controller.enqueue(encodeSSEEvent("answer-delta", { delta }));
+      });
+      const processor = createAnswerStreamProcessor((delta) => {
+        sanitizer.push(delta);
       });
 
       let buffer = "";
@@ -395,6 +390,7 @@ export async function handlePageSceneStream(options: BuildPageSceneOptions): Pro
         }
 
         const result = processor.finish();
+        sanitizer.finish();
         let sectionIds: string[] = [];
 
         if (result.sawDelimiter) {

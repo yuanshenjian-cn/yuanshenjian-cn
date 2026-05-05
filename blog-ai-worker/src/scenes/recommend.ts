@@ -1,27 +1,30 @@
-import { buildRecommendSystemPrompt } from "../prompts/recommend";
+import { buildRecommendStreamSystemPrompt, RECOMMEND_REFERENCE_DELIMITER } from "../prompts/recommend";
 import { createProvider } from "../providers";
-import type { ChatResponse } from "../providers/types";
-import type { Env, RecommendReference, RecommendResponse } from "../types";
+import type { ChatRequest } from "../providers/types";
+import type { AIUsage, Env, RecommendReference } from "../types";
 import { HttpError } from "../types";
+import { createAnswerDeltaSanitizer } from "../utils/answer";
+import { eventStreamResponse } from "../utils/response";
+import { USER_FACING_AI_ERROR_MESSAGE } from "./errors";
 
 const MAX_CONTEXT_POSTS = 8;
 const MAX_REFERENCES = 3;
-const DEFAULT_ANSWER = "我暂时没整理出明确推荐，你可以换个更具体的话题再试一次。";
+const DEFAULT_FALLBACK_ANSWER = "我暂时没整理出明确推荐，你可以换个更具体的话题再试一次。";
 const QUERY_STOPWORDS = ["推荐", "几篇", "关于", "文章", "博客", "一下", "帮我", "想读", "主题", "相关", "内容", "请", "的"];
+const RECOMMEND_AI_ERROR_MESSAGE = USER_FACING_AI_ERROR_MESSAGE;
 
 interface AIIndexPayload {
   generated: string;
   posts: RecommendReference[];
 }
 
-interface RecommendModelPayload {
-  answer: string;
-  slugs: string[];
-}
-
 interface SelectedPostsResult {
   posts: RecommendReference[];
   hasMatch: boolean;
+}
+
+interface RecommendTailPayload {
+  slugs: string[];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,70 +52,15 @@ function isIndexPayload(value: unknown): value is AIIndexPayload {
   );
 }
 
-function extractJson(content: string): string {
-  const fencedMatch = content.match(/```json\s*([\s\S]*?)```/i);
-  if (fencedMatch?.[1]) {
-    return fencedMatch[1].trim();
-  }
+function parseRecommendTailPayload(value: string): RecommendTailPayload {
+  const payload: unknown = JSON.parse(value);
 
-  const objectStart = content.indexOf("{");
-  const objectEnd = content.lastIndexOf("}");
-
-  if (objectStart >= 0 && objectEnd > objectStart) {
-    return content.slice(objectStart, objectEnd + 1);
-  }
-
-  return content;
-}
-
-function looksLikeStructuredPayload(content: string): boolean {
-  const trimmed = content.trim();
-  return trimmed.startsWith("{") || trimmed.startsWith("```json");
-}
-
-function extractAnswerField(content: string): string | null {
-  const match = content.match(/"answer"\s*:\s*"((?:\\.|[^"\\])*)"/s);
-  if (!match?.[1]) {
-    return null;
-  }
-
-  try {
-    const answer = JSON.parse(`"${match[1]}"`);
-    return typeof answer === "string" && answer.trim() ? answer.trim() : null;
-  } catch {
-    return match[1].trim() || null;
-  }
-}
-
-function parseModelResponse(content: string): RecommendModelPayload {
-  const rawJson = extractJson(content);
-
-  try {
-    const payload: unknown = JSON.parse(rawJson);
-    if (isRecord(payload) && typeof payload.answer === "string") {
-      return {
-        answer: payload.answer.trim() || DEFAULT_ANSWER,
-        slugs:
-          Array.isArray(payload.slugs) && payload.slugs.every((slug) => typeof slug === "string")
-            ? payload.slugs
-            : [],
-      };
-    }
-  } catch {
-    // 让下方回退到纯文本 answer，避免把偶发的模型格式问题暴露为 500。
-  }
-
-  const extractedAnswer = extractAnswerField(rawJson) ?? extractAnswerField(content);
-  if (extractedAnswer) {
-    return {
-      answer: extractedAnswer,
-      slugs: [],
-    };
+  if (!isRecord(payload) || !Array.isArray(payload.slugs) || !payload.slugs.every((slug) => typeof slug === "string")) {
+    throw new Error("Invalid recommend reference tail payload");
   }
 
   return {
-    answer: looksLikeStructuredPayload(content) ? DEFAULT_ANSWER : content.trim() || DEFAULT_ANSWER,
-    slugs: [],
+    slugs: payload.slugs,
   };
 }
 
@@ -285,12 +233,15 @@ function buildFallbackReason(post: RecommendReference): string {
   return "和你这次想读的主题比较接近。";
 }
 
-function buildFallbackResponse(message: string, posts: RecommendReference[], hasMatch: boolean): RecommendResponse {
+function buildFallbackResponse(message: string, posts: RecommendReference[], hasMatch: boolean): {
+  answer: string;
+  references: RecommendReference[];
+} {
   const references = posts.slice(0, MAX_REFERENCES);
 
   if (references.length === 0) {
     return {
-      answer: DEFAULT_ANSWER,
+      answer: DEFAULT_FALLBACK_ANSWER,
       references: [],
     };
   }
@@ -307,12 +258,12 @@ function buildFallbackResponse(message: string, posts: RecommendReference[], has
   };
 }
 
-async function getRecommendResponse(message: string, provider: ReturnType<typeof createProvider>, posts: RecommendReference[]): Promise<ChatResponse> {
-  return provider.chat({
+function createRecommendChatRequest(systemPrompt: string, message: string, stream: boolean): ChatRequest {
+  return {
     messages: [
       {
         role: "system",
-        content: buildRecommendSystemPrompt(posts),
+        content: systemPrompt,
       },
       {
         role: "user",
@@ -321,48 +272,281 @@ async function getRecommendResponse(message: string, provider: ReturnType<typeof
     ],
     maxTokens: 800,
     temperature: 0.4,
-    stream: false,
-  });
+    stream,
+  };
+}
+
+function encodeSSEEvent(event: string, payload: unknown): Uint8Array {
+  return new TextEncoder().encode(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+}
+
+function parseUpstreamEventBlock(block: string): { data: string } | null {
+  const lines = block.split(/\r?\n/);
+  const dataLines = [];
+
+  for (const line of lines) {
+    if (!line.startsWith("data:")) {
+      continue;
+    }
+
+    dataLines.push(line.slice(5).trimStart());
+  }
+
+  if (dataLines.length === 0) {
+    return null;
+  }
+
+  return {
+    data: dataLines.join("\n"),
+  };
+}
+
+function extractTextParts(value: unknown): string[] {
+  if (typeof value === "string") {
+    return value.length > 0 ? [value] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => extractTextParts(item));
+  }
+
+  if (!isRecord(value)) {
+    return [];
+  }
+
+  const parts = [];
+
+  if (typeof value.text === "string") {
+    parts.push(value.text);
+  }
+
+  if (typeof value.content === "string") {
+    parts.push(value.content);
+  }
+
+  if (Array.isArray(value.content) || isRecord(value.content)) {
+    parts.push(...extractTextParts(value.content));
+  }
+
+  return parts;
+}
+
+function normalizeTextParts(parts: string[]): string {
+  return parts.join("");
+}
+
+function extractUpstreamDelta(payload: unknown): string {
+  if (!isRecord(payload) || !Array.isArray(payload.choices)) {
+    return "";
+  }
+
+  const firstChoice = payload.choices[0];
+  if (!isRecord(firstChoice)) {
+    return "";
+  }
+
+  if (typeof firstChoice.text === "string") {
+    return firstChoice.text;
+  }
+
+  if (!isRecord(firstChoice.delta)) {
+    return "";
+  }
+
+  return normalizeTextParts(extractTextParts(firstChoice.delta.content));
+}
+
+function toUsage(payload: unknown): AIUsage | undefined {
+  if (!isRecord(payload) || !isRecord(payload.usage)) {
+    return undefined;
+  }
+
+  const promptTokens = typeof payload.usage.prompt_tokens === "number" ? payload.usage.prompt_tokens : undefined;
+  const completionTokens = typeof payload.usage.completion_tokens === "number" ? payload.usage.completion_tokens : undefined;
+  const totalTokens = typeof payload.usage.total_tokens === "number" ? payload.usage.total_tokens : undefined;
+
+  if (promptTokens === undefined && completionTokens === undefined && totalTokens === undefined) {
+    return undefined;
+  }
+
+  return {
+    promptTokens,
+    completionTokens,
+    totalTokens,
+  };
+}
+
+function createRecommendAnswerStreamProcessor(onDelta: (delta: string) => void) {
+  let beforeDelimiterBuffer = "";
+  let tailBuffer = "";
+  let sawDelimiter = false;
+
+  function flushSafePrefix() {
+    const safeLength = Math.max(0, beforeDelimiterBuffer.length - (RECOMMEND_REFERENCE_DELIMITER.length - 1));
+    if (safeLength <= 0) {
+      return;
+    }
+
+    const safeText = beforeDelimiterBuffer.slice(0, safeLength);
+    beforeDelimiterBuffer = beforeDelimiterBuffer.slice(safeLength);
+    if (safeText) {
+      onDelta(safeText);
+    }
+  }
+
+  return {
+    push(chunk: string) {
+      if (!chunk) {
+        return;
+      }
+
+      if (sawDelimiter) {
+        tailBuffer += chunk;
+        return;
+      }
+
+      beforeDelimiterBuffer += chunk;
+      const delimiterIndex = beforeDelimiterBuffer.indexOf(RECOMMEND_REFERENCE_DELIMITER);
+
+      if (delimiterIndex >= 0) {
+        const answerChunk = beforeDelimiterBuffer.slice(0, delimiterIndex);
+        if (answerChunk) {
+          onDelta(answerChunk);
+        }
+
+        tailBuffer += beforeDelimiterBuffer.slice(delimiterIndex + RECOMMEND_REFERENCE_DELIMITER.length);
+        beforeDelimiterBuffer = "";
+        sawDelimiter = true;
+        return;
+      }
+
+      flushSafePrefix();
+    },
+    finish() {
+      if (!sawDelimiter && beforeDelimiterBuffer) {
+        onDelta(beforeDelimiterBuffer);
+        beforeDelimiterBuffer = "";
+      }
+
+      return {
+        sawDelimiter,
+        tail: tailBuffer.trim(),
+      };
+    },
+  };
 }
 
 async function fetchIndex(env: Env): Promise<AIIndexPayload> {
   const response = await fetch(`${env.AI_DATA_BASE_URL.replace(/\/$/, "")}/index.json`);
 
   if (!response.ok) {
-    throw new HttpError(502, "Failed to load AI index data");
+    throw new HttpError(502, RECOMMEND_AI_ERROR_MESSAGE);
   }
 
   const payload: unknown = await response.json().catch(() => null);
   if (!isIndexPayload(payload)) {
-    throw new HttpError(502, "AI index payload is invalid");
+    throw new HttpError(502, RECOMMEND_AI_ERROR_MESSAGE);
   }
 
   return payload;
 }
 
-export async function handleRecommendScene(message: string, env: Env): Promise<RecommendResponse> {
+export async function handleRecommendSceneStream(message: string, env: Env, origin?: string): Promise<Response> {
   const index = await fetchIndex(env);
   const selection = selectContextPosts(index.posts, message);
   const posts = selection.posts;
   const provider = createProvider(env, env.LLM_MODEL_ID);
-  let llmResponse: ChatResponse;
+
+  if (!provider.streamChat) {
+    throw new HttpError(501, "Current AI provider does not support streaming");
+  }
+
+  let upstreamStream: ReadableStream<Uint8Array>;
 
   try {
-    llmResponse = await getRecommendResponse(message, provider, posts);
+    upstreamStream = await provider.streamChat(
+      createRecommendChatRequest(buildRecommendStreamSystemPrompt(posts), message, true),
+    );
   } catch (error) {
     if (error instanceof HttpError && error.status >= 500) {
-      return buildFallbackResponse(message, posts, selection.hasMatch);
+      throw new HttpError(502, RECOMMEND_AI_ERROR_MESSAGE);
     }
 
     throw error;
   }
+  const fallbackReferences = buildFallbackResponse(message, posts, selection.hasMatch).references;
 
-  const modelResponse = parseModelResponse(llmResponse.content);
-  const references = mapReferences(posts, modelResponse.slugs);
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const reader = upstreamStream.getReader();
+      const decoder = new TextDecoder();
+      const sanitizer = createAnswerDeltaSanitizer((delta) => {
+        controller.enqueue(encodeSSEEvent("answer-delta", { delta }));
+      });
+      const processor = createRecommendAnswerStreamProcessor((delta) => {
+        sanitizer.push(delta);
+      });
 
-  return {
-    answer: modelResponse.answer,
-    references: references.length > 0 ? references : buildFallbackResponse(message, posts, selection.hasMatch).references,
-    usage: llmResponse.usage,
-  };
+      let buffer = "";
+      let usage: AIUsage | undefined;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+
+          const blocks = buffer.split(/\r?\n\r?\n/);
+          buffer = blocks.pop() ?? "";
+
+          for (const block of blocks) {
+            const parsed = parseUpstreamEventBlock(block.trim());
+            if (!parsed || parsed.data === "[DONE]") {
+              continue;
+            }
+
+            const payload: unknown = JSON.parse(parsed.data);
+            usage = toUsage(payload) ?? usage;
+            processor.push(extractUpstreamDelta(payload));
+          }
+
+          if (done) {
+            break;
+          }
+        }
+
+        const remainingBlock = buffer.trim();
+        if (remainingBlock) {
+          const parsed = parseUpstreamEventBlock(remainingBlock);
+          if (parsed && parsed.data !== "[DONE]") {
+            const payload: unknown = JSON.parse(parsed.data);
+            usage = toUsage(payload) ?? usage;
+            processor.push(extractUpstreamDelta(payload));
+          }
+        }
+
+        const result = processor.finish();
+        sanitizer.finish();
+        let references = fallbackReferences;
+
+        if (result.sawDelimiter) {
+          try {
+            const slugs = parseRecommendTailPayload(result.tail).slugs;
+            const mappedReferences = mapReferences(posts, slugs);
+            references = mappedReferences.length > 0 ? mappedReferences : fallbackReferences;
+          } catch {
+            references = fallbackReferences;
+          }
+        }
+
+        controller.enqueue(encodeSSEEvent("references", { references }));
+        controller.enqueue(encodeSSEEvent("done", { usage }));
+        controller.close();
+      } catch {
+        controller.enqueue(encodeSSEEvent("error", { message: RECOMMEND_AI_ERROR_MESSAGE }));
+        controller.close();
+      }
+    },
+  });
+
+  return eventStreamResponse(stream, origin);
 }

@@ -83,11 +83,6 @@ export const config = {
       process.env.NEXT_PUBLIC_AI_ENABLED !== "false" &&
       process.env.NEXT_PUBLIC_AI_PAGE_ASSISTANT_ENABLED !== "false" &&
       (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim().length > 0,
-    pageAssistantStreamEnabled:
-      process.env.NEXT_PUBLIC_AI_ENABLED !== "false" &&
-      process.env.NEXT_PUBLIC_AI_PAGE_ASSISTANT_ENABLED !== "false" &&
-      process.env.NEXT_PUBLIC_AI_PAGE_ASSISTANT_STREAM_ENABLED !== "false" &&
-      (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim().length > 0,
     quickTopics: aiQuickTopics,
   },
 } as const;

@@ -1,18 +1,18 @@
 import type {
-  AIChatOptions,
-  AIChatResponse,
-  AIChatResponseByScene,
-  AIChatRequest,
   AIChatStreamOptions,
   AIUsage,
   PageReference,
   PageResponse,
   PageStreamEvent,
+  RecommendChatStreamOptions,
   RecommendReference,
   RecommendResponse,
+  RecommendStreamEvent,
 } from "@/types/ai";
 
 const SSE_EVENT_SEPARATOR = /\r?\n\r?\n/;
+
+export const USER_FACING_AI_ERROR_MESSAGE = "AI 服务刚刚开小差了，请稍后重试。";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -87,43 +87,6 @@ function isPageResponse(value: unknown): value is PageResponse {
   );
 }
 
-function isAIChatResponse(value: unknown): value is AIChatResponse {
-  return isRecommendResponse(value) || isPageResponse(value);
-}
-
-function toRequestPayload(options: AIChatOptions): AIChatRequest {
-  if (options.scene === "recommend") {
-    return {
-      scene: "recommend",
-      message: options.message,
-      cf_turnstile_response: options.turnstileToken,
-    };
-  }
-
-  if (options.scene === "article") {
-    return {
-      scene: "article",
-      message: options.message,
-      context: options.context,
-      cf_turnstile_response: options.turnstileToken,
-    };
-  }
-
-  return {
-    scene: "author",
-    message: options.message,
-    context: options.context,
-    cf_turnstile_response: options.turnstileToken,
-  };
-}
-
-export class AIStreamUnsupportedError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "AIStreamUnsupportedError";
-  }
-}
-
 function getErrorMessage(payload: unknown, status: number): string {
   if (isRecord(payload) && typeof payload.error === "string") {
     return payload.error;
@@ -143,7 +106,7 @@ function parseSSEEventBlock(block: string): { event: string; data: string } | nu
   }
 
   let event = "message";
-  const dataLines = [] as string[];
+  const dataLines: string[] = [];
 
   for (const line of lines) {
     if (line.startsWith(":") || !line.includes(":")) {
@@ -220,29 +183,99 @@ function parsePageStreamEvent(block: string): PageStreamEvent {
   }
 }
 
-export async function aiChat<TScene extends AIChatOptions["scene"]>(
-  options: Extract<AIChatOptions, { scene: TScene }>,
-): Promise<AIChatResponseByScene<TScene>> {
-  const workerUrl = options.workerUrl.replace(/\/$/, "");
-  const response = await fetch(`${workerUrl}/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(toRequestPayload(options)),
-  });
-
-  const payload: unknown = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(payload, response.status));
+function parseRecommendStreamEvent(block: string): RecommendStreamEvent {
+  const parsedEvent = parseSSEEventBlock(block);
+  if (!parsedEvent) {
+    throw new Error("Invalid SSE event block");
   }
 
-  if (!isAIChatResponse(payload)) {
-    throw new Error("Invalid AI response payload");
+  const payload: unknown = parsedEvent.data ? JSON.parse(parsedEvent.data) : {};
+
+  switch (parsedEvent.event) {
+    case "answer-delta":
+      if (!isRecord(payload) || typeof payload.delta !== "string") {
+        throw new Error("Invalid answer-delta event payload");
+      }
+
+      return {
+        type: "answer-delta",
+        delta: payload.delta,
+      };
+    case "references":
+      if (!isRecord(payload) || !Array.isArray(payload.references) || !payload.references.every(isRecommendReference)) {
+        throw new Error("Invalid references event payload");
+      }
+
+      return {
+        type: "references",
+        references: payload.references,
+      };
+    case "done":
+      if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
+        throw new Error("Invalid done event payload");
+      }
+
+      return {
+        type: "done",
+        usage: payload.usage,
+      };
+    case "error":
+      if (!isRecord(payload) || typeof payload.message !== "string") {
+        throw new Error("Invalid error event payload");
+      }
+
+      return {
+        type: "error",
+        message: payload.message,
+      };
+    default:
+      throw new Error(`Unsupported SSE event: ${parsedEvent.event}`);
+  }
+}
+
+async function readEventStream<TEvent>(
+  response: Response,
+  onEvent: (event: TEvent) => void,
+  parseEvent: (block: string) => TEvent,
+): Promise<void> {
+  if (!response.body) {
+    throw new Error("AI stream response body is missing");
   }
 
-  return payload as AIChatResponseByScene<TScene>;
+  const contentType = response.headers.get("Content-Type") ?? "";
+  if (!contentType.includes("text/event-stream")) {
+    throw new Error("AI stream response is not SSE");
+  }
+
+  const decoder = new TextDecoder();
+  const reader = response.body.getReader();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+
+    const blocks = buffer.split(SSE_EVENT_SEPARATOR);
+    buffer = blocks.pop() ?? "";
+
+    for (const block of blocks) {
+      const trimmedBlock = block.trim();
+      if (!trimmedBlock) {
+        continue;
+      }
+
+      onEvent(parseEvent(trimmedBlock));
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  const remainingBlock = buffer.trim();
+  if (remainingBlock) {
+    onEvent(parseEvent(remainingBlock));
+  }
 }
 
 export async function aiChatStream(options: AIChatStreamOptions): Promise<void> {
@@ -263,57 +296,33 @@ export async function aiChatStream(options: AIChatStreamOptions): Promise<void> 
 
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null);
-    const message = getErrorMessage(payload, response.status);
-
-    if (response.status === 404 || response.status === 501) {
-      throw new AIStreamUnsupportedError(message);
-    }
-
-    throw new Error(message);
+    throw new Error(getErrorMessage(payload, response.status));
   }
 
-  if (!response.body) {
-    throw new Error("AI stream response body is missing");
-  }
-
-  const contentType = response.headers.get("Content-Type") ?? "";
-  if (!contentType.includes("text/event-stream")) {
-    throw new AIStreamUnsupportedError("AI stream response is not SSE");
-  }
-
-  const decoder = new TextDecoder();
-  const reader = response.body.getReader();
-  let buffer = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
-
-    const blocks = buffer.split(SSE_EVENT_SEPARATOR);
-    buffer = blocks.pop() ?? "";
-
-    for (const block of blocks) {
-      const trimmedBlock = block.trim();
-      if (!trimmedBlock) {
-        continue;
-      }
-
-      options.onEvent(parsePageStreamEvent(trimmedBlock));
-    }
-
-    if (done) {
-      break;
-    }
-  }
-
-  const remainingBlock = buffer.trim();
-  if (remainingBlock) {
-    options.onEvent(parsePageStreamEvent(remainingBlock));
-  }
+  await readEventStream(response, options.onEvent, parsePageStreamEvent);
 }
 
-export {
-  getErrorMessage,
-  isAIChatResponse,
-  parsePageStreamEvent,
-};
+export async function aiRecommendStream(options: RecommendChatStreamOptions): Promise<void> {
+  const workerUrl = options.workerUrl.replace(/\/$/, "");
+  const response = await fetch(`${workerUrl}/chat/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      scene: "recommend",
+      message: options.message,
+      cf_turnstile_response: options.turnstileToken,
+    }),
+    signal: options.signal,
+  });
+
+  if (!response.ok) {
+    const payload: unknown = await response.json().catch(() => null);
+    throw new Error(getErrorMessage(payload, response.status));
+  }
+
+  await readEventStream(response, options.onEvent, parseRecommendStreamEvent);
+}
+
+export { getErrorMessage, isPageResponse, isRecommendResponse, parsePageStreamEvent, parseRecommendStreamEvent };

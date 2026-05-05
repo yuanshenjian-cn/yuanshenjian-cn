@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { AIStreamUnsupportedError, aiChat, aiChatStream } from "@/lib/ai-client";
+import { aiChatStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 import type { PageReference, PageStreamEvent } from "@/types/ai";
 
 const TURNSTILE_ACTIONS = {
@@ -40,7 +40,6 @@ interface PageAIAssistantContextValue {
 interface PageAIAssistantProviderProps {
   children: ReactNode;
   maxInputChars: number;
-  streamEnabled: boolean;
   turnstileSiteKey: string;
   turnstileTimeoutMs: number;
   workerUrl: string;
@@ -115,7 +114,6 @@ export function PageAIAssistantProvider({
   context,
   maxInputChars,
   scene,
-  streamEnabled,
   turnstileSiteKey,
   turnstileTimeoutMs,
   workerUrl,
@@ -239,35 +237,6 @@ export function PageAIAssistantProvider({
     });
   }
 
-  async function runNonStreamFallback(requestId: number, nextMessage: string, turnstileToken: string): Promise<boolean> {
-    const response =
-      scene === "article"
-        ? await aiChat({
-            workerUrl,
-            scene: "article",
-            message: nextMessage,
-            context,
-            turnstileToken,
-          })
-        : await aiChat({
-            workerUrl,
-            scene: "author",
-            message: nextMessage,
-            context,
-            turnstileToken,
-          });
-
-    if (requestIdRef.current !== requestId) {
-      return true;
-    }
-
-    updateAnswer(response.answer);
-    setCurrentReferences(response.references);
-    setIsInterrupted(false);
-    setIsStreaming(false);
-    abortControllerRef.current = null;
-    return true;
-  }
 
   async function submitMessage(message: string, options: SubmitMessageOptions = {}): Promise<boolean> {
     const nextMessage = message.trim();
@@ -306,9 +275,6 @@ export function PageAIAssistantProvider({
         return true;
       }
 
-      if (!streamEnabled) {
-        return await runNonStreamFallback(requestId, nextMessage, turnstileToken);
-      }
 
       const onEvent = (event: PageStreamEvent) => {
         if (requestIdRef.current !== requestId) {
@@ -381,11 +347,8 @@ export function PageAIAssistantProvider({
         return true;
       }
 
-      if (streamEnabled && error instanceof AIStreamUnsupportedError) {
-        return await runNonStreamFallback(requestId, nextMessage, turnstileToken);
-      }
 
-      setCurrentError(error instanceof Error ? error.message : "AI 请求失败，请稍后重试。");
+      setCurrentError(error instanceof Error ? error.message : USER_FACING_AI_ERROR_MESSAGE);
       setIsInterrupted(hasStartedResponse);
       setIsStreaming(false);
       abortControllerRef.current = null;

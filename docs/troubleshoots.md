@@ -4,6 +4,150 @@
 
 ---
 
+## 2026-05-05 AI 流式正文里的 `--` 需要只在 answer 层最小清洗，不能误伤 delimiter 与 JSON tail
+
+### 现象
+
+- 首页 AI 推荐、文章页 AI、作者页 AI 的回答里，模型偶尔会输出 `--` 作为停顿或破折号
+- 这类写法在中文语境下读感生硬，尤其在流式 `answer-delta` 里更明显
+- 但当前 Worker 协议依赖固定 delimiter 与尾部 JSON，如果做全量字符串替换，容易破坏协议解析
+
+### 根因
+
+1. prompt 之前没有明确约束不要使用 `--`
+2. Worker 流式链路此前直接透传正文 delta，没有做最小兜底清洗
+3. delimiter `<<<AI_PAGE_REFERENCES>>>`、`<<<AI_RECOMMEND_REFERENCES>>>` 和 JSON tail 都属于协议层内容，不能参与正文替换
+
+### 修复
+
+1. 在 `blog-ai-worker/src/prompts/recommend.ts`、`article.ts`、`author.ts` 中补充约束：
+   - 不要使用 `--` 作为破折号或停顿符号
+   - 需要停顿或强调时，优先使用中文标点，或使用中文破折号 `——`
+2. 在 Worker 流式输出链路新增仅作用于 `answer-delta` 的最小清洗器：
+   - 页面级 stream：`blog-ai-worker/src/scenes/page.ts`
+   - recommend 半流式：`blog-ai-worker/src/scenes/recommend.ts`
+3. 清洗规则仅为：将正文中的 `--` 规范成 `——`
+4. delimiter 检测和 tail JSON 解析仍然先按原逻辑完成，再单独对 answer delta 做输出清洗
+
+### 如何确认修复生效
+
+1. 运行：
+   - `npm run test -- tests/blog-ai-worker/index-runtime-config.test.ts tests/blog-ai-worker/recommend-scene.test.ts`
+2. 确认页面级 stream 中 `answer-delta` 的 `--` 会输出为 `——`
+3. 确认 recommend stream 中 `answer-delta` 的 `--` 会输出为 `——`
+4. 确认 `references` 事件、delimiter 与 JSON tail 仍保持原协议，不被替换
+
+---
+
+## 2026-05-05 首页 AI 推荐从整包 JSON 改为半流式后，必须保持 answer 先流出、references 末尾一次性返回
+
+### 现象
+
+- 首页 `AiRecommendWidget` 原先依赖 `/chat` 一次性返回完整 JSON
+- 用户在等待推荐时只能看到按钮 loading，正文必须等推荐文章列表一并准备好才会出现
+- 如果后续继续优化体验，容易把首页推荐也强行揉进页面级 stream 类型，导致协议不清或状态覆盖时机回退
+
+### 根因
+
+1. 首页 recommend scene 和页面级 article / author scene 的输出结构不一样
+2. recommend 最终需要返回的是文章 `slugs -> references`，不是页面 section ids
+3. 如果继续要求模型直接流式输出完整 JSON，正文和尾部结构会互相干扰，前端也更难做到“正文先显示，推荐列表最后替换”
+
+### 修复
+
+1. Worker 为 recommend scene 增加 `/chat/stream`
+2. prompt 改为：
+   - 先输出自然语言 answer
+   - 再输出固定分隔符 `<<<AI_RECOMMEND_REFERENCES>>>`
+   - 最后输出只含 `slugs` 的 JSON tail
+3. Worker 解析上游流后，对前端统一发 SSE：
+   - `answer-delta`
+   - `references`
+   - `done`
+   - `error`
+4. 前端新增独立 `aiRecommendStream()`，不和页面级 `PageStreamEvent` 强行混用
+5. 首页组件沿用页面级“惰性覆盖”策略：
+   - 新请求发出时保留旧 `response`
+   - 只有在首个新的 `answer-delta` 到达后，才替换旧 answer
+   - `references` 在收到对应事件后一次性更新
+   - 流式开始后失败时保留已流出的 answer 并显示错误
+   - 流式在首个 answer 前失败时保留旧结果并显示错误
+
+### 如何确认修复生效
+
+1. 执行：
+   - `npm run test -- tests/components/ai-recommend-widget.test.tsx tests/lib/ai-client.test.ts tests/blog-ai-worker/recommend-scene.test.ts tests/blog-ai-worker/index-runtime-config.test.ts`
+2. 确认首页第二次搜索时，在新 `answer-delta` 到达前旧结果不闪空
+3. 确认收到 `references` 之前不会提前展示新推荐列表
+4. 确认 Worker recommend stream 的 SSE body 中包含：
+   - `event: answer-delta`
+   - `event: references`
+   - `event: done`
+5. 确认首页推荐始终只走 `/chat/stream`，不会再回退到 `/chat`
+
+---
+
+## 2026-05-05 AI 产品链路最终收口为纯流式，旧 `/chat` 与 fallback 说明失效
+
+### 现象
+
+- 早期实现为了兼容旧 Worker 和不支持 stream 的 provider，保留了 `/chat` 非流式入口与前端 fallback
+- 随着首页 recommend stream、页面级 stream、prompt 骨架与状态覆盖策略都稳定下来，这些 fallback 已不再是产品期望行为
+- 如果文档和测试仍保留“自动回退 `/chat`”的描述，会误导后续维护者继续保留双链路
+
+### 根因
+
+1. 产品链路一旦同时维护流式主链路和非流式 fallback，前端、Worker、测试与文档都会持续携带双入口复杂度
+2. 页面级 `streamEnabled`、`AIStreamUnsupportedError`、首页 `aiChat` fallback 都会让“删除 `/chat`”变得困难
+3. 用户可见错误文案也容易在首页推荐、文章页、作者页之间分叉
+
+### 修复
+
+1. 前端删除 `aiChat()` 调用与 `AIStreamUnsupportedError` fallback 分支
+2. 页面级 article / author 与首页 recommend 全部只调用 `/chat/stream`
+3. `PageAIAssistantProvider` 删除 `streamEnabled`，页面层不再传 `pageAssistantStreamEnabled`
+4. Worker 删除 `/chat` / `/api/ai/chat` 路由与 `handleRecommendScene`、`handleArticleScene`、`handleAuthorScene` 等非流式产品入口
+5. 用户可见 AI 服务错误统一为：`AI 服务刚刚开小差了，请稍后重试。`
+
+### 如何确认修复生效
+
+1. 执行：
+   - `npm run test -- tests/lib/ai-client.test.ts tests/components/ai-recommend-widget.test.tsx tests/blog-ai-worker/recommend-scene.test.ts tests/blog-ai-worker/index-runtime-config.test.ts`
+2. 确认 `POST /api/ai/chat` 返回 `404 Not found`
+3. 确认首页推荐、文章页、作者页都只调用 `/api/ai/chat/stream`
+4. 确认首页推荐和页面级 AI 在用户可见失败场景下统一展示：`AI 服务刚刚开小差了，请稍后重试。`
+
+---
+
+## 2026-05-05 统一 AI 用户可见错误文案，避免首页推荐与页面级问答各说各话
+
+### 现象
+
+- 首页推荐、文章页 AI、作者页 AI 在 502 类用户可见失败场景下，历史上分别出现过不同文案
+- 同一类 AI 服务异常如果在不同位置显示不同句式，用户感知会割裂，测试也容易碎片化
+
+### 根因
+
+1. 首页 recommend stream 和 page stream 各自维护错误文案
+2. 页面数据无效、上游流中断、scene 校验失败等 502 用户可见错误没有统一出口
+
+### 修复
+
+1. 前端 `lib/ai-client.ts` 收口 `USER_FACING_AI_ERROR_MESSAGE`
+2. Worker `blog-ai-worker/src/scenes/errors.ts` 收口同一常量
+3. 页面级 article / author 与首页 recommend 的用户可见 502 错误统一改为：`AI 服务刚刚开小差了，请稍后重试。`
+4. 配置错误、请求格式错误、Turnstile 等开发者/客户端错误继续保留原有明确信息
+
+### 如何确认修复生效
+
+1. 运行：
+   - `npm run test -- tests/components/page-ai-assistant.test.tsx tests/components/ai-recommend-widget.test.tsx tests/lib/ai-client.test.ts tests/blog-ai-worker/article-scene.test.ts tests/blog-ai-worker/author-scene.test.ts tests/blog-ai-worker/recommend-scene.test.ts`
+2. 确认首页推荐流式 `event: error` 使用统一文案
+3. 确认文章页 / 作者页 page data 无效时抛出的 502 使用统一文案
+4. 确认 Turnstile、payload 校验、Worker 配置错误仍然保留原有明确错误
+
+---
+
 ## 2026-05-05 页面级 AI 回答前缀过强，作者页与文章页应直接自然回答
 
 ### 现象

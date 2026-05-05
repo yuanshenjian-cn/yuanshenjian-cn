@@ -32,7 +32,6 @@ export default function ResumePage() {
               workerUrl={config.ai.workerUrl}
               turnstileSiteKey={config.ai.turnstileSiteKey}
               turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.author}
-              streamEnabled={config.ai.pageAssistantStreamEnabled}
               maxInputChars={config.ai.maxInputChars}
             >
               <AuthorAiAssistant />

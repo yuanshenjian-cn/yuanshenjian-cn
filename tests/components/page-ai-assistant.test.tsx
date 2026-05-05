@@ -4,9 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ArticleAiAssistant } from "@/components/ai/article-ai-assistant";
 import { AuthorAiAssistant } from "@/components/ai/author-ai-assistant";
 import { PageAIAssistantProvider } from "@/components/ai/page-ai-assistant-provider";
-import { AIStreamUnsupportedError } from "@/lib/ai-client";
 
-const aiChatMock = vi.fn();
 const aiChatStreamMock = vi.fn();
 
 vi.mock("@/lib/ai-client", async (importOriginal) => {
@@ -14,7 +12,6 @@ vi.mock("@/lib/ai-client", async (importOriginal) => {
 
   return {
     ...actual,
-    aiChat: (...args: unknown[]) => aiChatMock(...args),
     aiChatStream: (...args: unknown[]) => aiChatStreamMock(...args),
   };
 });
@@ -31,7 +28,6 @@ declare global {
 
 describe("PageAIAssistantProvider", () => {
   beforeEach(() => {
-    aiChatMock.mockReset();
     aiChatStreamMock.mockReset();
     Element.prototype.scrollIntoView = vi.fn();
 
@@ -80,7 +76,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -110,7 +105,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -140,7 +134,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -176,7 +169,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <>
@@ -234,7 +226,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -296,7 +287,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -311,7 +301,7 @@ describe("PageAIAssistantProvider", () => {
     expect(await screen.findByRole("button", { name: "思考中..." })).toBeInTheDocument();
   });
 
-  it("新请求失败时保留旧回答，只额外展示错误", async () => {
+  it("新请求失败时保留旧回答，只额外展示统一错误文案", async () => {
     aiChatStreamMock
       .mockImplementationOnce(async ({ onEvent }: { onEvent: (event: { type: string; delta?: string; references?: unknown[] }) => void }) => {
         onEvent({ type: "answer-delta", delta: "旧回答" });
@@ -329,7 +319,7 @@ describe("PageAIAssistantProvider", () => {
         });
         onEvent({ type: "done" });
       })
-      .mockRejectedValueOnce(new Error("请求失败，请稍后重试"));
+      .mockRejectedValueOnce(new Error("AI 服务刚刚开小差了，请稍后重试。"));
 
     render(
       <PageAIAssistantProvider
@@ -338,7 +328,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <ArticleAiAssistant />
@@ -356,88 +345,9 @@ describe("PageAIAssistantProvider", () => {
     fireEvent.change(input, { target: { value: "第二次问题" } });
     fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
 
-    await screen.findByText("请求失败，请稍后重试");
+    await screen.findByText("AI 服务刚刚开小差了，请稍后重试。");
     expect(screen.getByText("旧回答")).toBeInTheDocument();
     expect(screen.getByText("旧依据")).toBeInTheDocument();
-  });
-
-  it("关闭 stream 时会走非流式 fallback", async () => {
-    aiChatMock.mockResolvedValue({
-      answer: "非流式结果",
-      references: [
-        {
-          id: "hero",
-          title: "个人简介",
-          excerpt: "个人简介摘录",
-          sourceType: "author-section",
-          anchorId: "hero",
-        },
-      ],
-    });
-
-    render(
-      <PageAIAssistantProvider
-        scene="author"
-        context={{ page: "author" }}
-        workerUrl="/api/ai"
-        turnstileSiteKey="test-site-key"
-        turnstileTimeoutMs={20000}
-        streamEnabled={false}
-        maxInputChars={200}
-      >
-        <ArticleAiAssistant />
-      </PageAIAssistantProvider>,
-    );
-
-    fireEvent.change(screen.getByRole("textbox"), {
-      target: { value: "作者擅长什么方向" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
-
-    await screen.findByText("非流式结果");
-    expect(aiChatMock).toHaveBeenCalledTimes(1);
-    expect(aiChatStreamMock).not.toHaveBeenCalled();
-  });
-
-  it("流式不受支持时会自动回退到非流式结果", async () => {
-    aiChatStreamMock.mockRejectedValue(
-      new AIStreamUnsupportedError("Current AI provider does not support streaming"),
-    );
-    aiChatMock.mockResolvedValue({
-      answer: "回退后的非流式结果",
-      references: [
-        {
-          id: "hero",
-          title: "个人简介",
-          excerpt: "个人简介摘录",
-          sourceType: "author-section",
-          anchorId: "hero",
-        },
-      ],
-    });
-
-    render(
-      <PageAIAssistantProvider
-        scene="author"
-        context={{ page: "author" }}
-        workerUrl="/api/ai"
-        turnstileSiteKey="test-site-key"
-        turnstileTimeoutMs={20000}
-        streamEnabled
-        maxInputChars={200}
-      >
-        <AuthorAiAssistant />
-      </PageAIAssistantProvider>,
-    );
-
-    fireEvent.change(screen.getByRole("textbox"), {
-      target: { value: "作者擅长什么方向" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
-
-    await screen.findByText("回退后的非流式结果");
-    expect(aiChatStreamMock).toHaveBeenCalledTimes(1);
-    expect(aiChatMock).toHaveBeenCalledTimes(1);
   });
 
   it("第二次提交会清理第一次 Turnstile 等待态，避免旧请求污染新请求", async () => {
@@ -463,7 +373,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={20000}
-        streamEnabled
         maxInputChars={200}
       >
         <>
@@ -506,7 +415,6 @@ describe("PageAIAssistantProvider", () => {
         workerUrl="/api/ai"
         turnstileSiteKey="test-site-key"
         turnstileTimeoutMs={4321}
-        streamEnabled
         maxInputChars={200}
       >
         <AuthorAiAssistant />

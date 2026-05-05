@@ -1,8 +1,9 @@
 import { buildAuthorSystemPrompt } from "../prompts/author";
-import type { AuthorChunk, AuthorPageData, AuthorRequestBody, PageData, PageResponse, PageSection } from "../types";
+import type { AuthorChunk, AuthorPageData, AuthorRequestBody, PageData, PageSection } from "../types";
 import type { Env } from "../types";
 import { HttpError } from "../types";
-import { handlePageScene, handlePageSceneStream, isPageData } from "./page";
+import { USER_FACING_AI_ERROR_MESSAGE } from "./errors";
+import { handlePageSceneStream, isPageData } from "./page";
 
 function isAuthorPageData(pageData: PageData): pageData is AuthorPageData {
   return typeof (pageData as AuthorPageData).summary === "string";
@@ -44,29 +45,9 @@ function resolveAuthorReferenceSections(pageData: AuthorPageData): PageSection[]
   return pageData.sections ?? [];
 }
 
-export async function handleAuthorScene(body: AuthorRequestBody, env: Env): Promise<PageResponse> {
-  return handlePageScene({
-    env,
-    scene: "author",
-    pageDataPath: "author.json",
-    sourceType: "author-section",
-    message: body.message,
-    validatePageData: isAuthorPagePayload,
-    getReferenceSections: (pageData) => resolveAuthorReferenceSections(pageData as AuthorPageData),
-    buildSystemPrompt: (pageData) => {
-      if (!isAuthorPageData(pageData)) {
-        throw new HttpError(502, "AI 暂时无法整理当前页面内容，请稍后再试。");
-      }
-
-      return buildAuthorSystemPrompt(pageData);
-    },
-  });
-}
-
 export async function streamAuthorScene(body: AuthorRequestBody, env: Env, origin?: string): Promise<Response> {
   return handlePageSceneStream({
     env,
-    scene: "author",
     pageDataPath: "author.json",
     sourceType: "author-section",
     message: body.message,
@@ -74,7 +55,7 @@ export async function streamAuthorScene(body: AuthorRequestBody, env: Env, origi
     getReferenceSections: (pageData) => resolveAuthorReferenceSections(pageData as AuthorPageData),
     buildSystemPrompt: (pageData) => {
       if (!isAuthorPageData(pageData)) {
-        throw new HttpError(502, "AI 暂时无法整理当前页面内容，请稍后再试。");
+        throw new HttpError(502, USER_FACING_AI_ERROR_MESSAGE);
       }
 
       return buildAuthorSystemPrompt(pageData);

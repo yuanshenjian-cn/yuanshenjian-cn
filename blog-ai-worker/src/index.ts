@@ -1,9 +1,9 @@
 import { validateOrigin } from "./middleware/origin";
 import { assertAIEnabled, checkDailyAIBudget, checkRateLimit } from "./middleware/rate-limit";
 import { verifyTurnstile } from "./middleware/turnstile";
-import { handleArticleScene, streamArticleScene } from "./scenes/article";
-import { handleAuthorScene, streamAuthorScene } from "./scenes/author";
-import { handleRecommendScene } from "./scenes/recommend";
+import { streamArticleScene } from "./scenes/article";
+import { streamAuthorScene } from "./scenes/author";
+import { handleRecommendSceneStream } from "./scenes/recommend";
 import type { ChatRequestBody, Env, ExecutionContext } from "./types";
 import { HttpError } from "./types";
 import { errorResponse, jsonResponse, noContentResponse } from "./utils/response";
@@ -49,11 +49,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function getRouteType(pathname: string): "chat" | "stream" | null {
-  if (pathname === "/chat" || pathname === "/api/ai/chat") {
-    return "chat";
-  }
-
+function getRouteType(pathname: string): "stream" | null {
   if (pathname === "/chat/stream" || pathname === "/api/ai/chat/stream") {
     return "stream";
   }
@@ -185,15 +181,15 @@ export default {
       assertAIEnabled(env);
       const body = await parseBody(request, env);
 
-      if (routeType === "stream" && body.scene === "recommend") {
-        throw new HttpError(400, "Streaming is only supported for article and author scenes");
-      }
-
       await verifyTurnstile(body.cf_turnstile_response, request, env, body.scene);
       await checkRateLimit(request, env);
       await checkDailyAIBudget(env);
 
       if (routeType === "stream") {
+        if (body.scene === "recommend") {
+          return await handleRecommendSceneStream(body.message, env, origin);
+        }
+
         if (body.scene === "article") {
           return await streamArticleScene(body, env, origin);
         }
@@ -202,18 +198,11 @@ export default {
           return await streamAuthorScene(body, env, origin);
         }
 
-        throw new HttpError(400, "Streaming is only supported for article and author scenes");
+        throw new HttpError(400, "Streaming is only supported for recommend, article and author scenes");
       }
 
-      if (body.scene === "recommend") {
-        return jsonResponse(await handleRecommendScene(body.message, env), { origin });
-      }
+      throw new HttpError(404, "Not found");
 
-      if (body.scene === "article") {
-        return jsonResponse(await handleArticleScene(body, env), { origin });
-      }
-
-      return jsonResponse(await handleAuthorScene(body, env), { origin });
     } catch (error) {
       return errorResponse(error instanceof Error ? error : new Error("Internal server error"), origin);
     }
