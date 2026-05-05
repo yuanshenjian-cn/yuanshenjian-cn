@@ -31,18 +31,20 @@ describe("build-ai-data helpers", () => {
     expect(sections.map((section: { id: string }) => section.id)).toEqual(["intro", "第一节", "第一节-1"]);
   });
 
-  it("作者 payload 来自共享单一数据源", () => {
+  it("作者 payload 生成结构化实体和细粒度 chunks", () => {
     const payload = buildAuthorPayload();
 
     expect(payload.slug).toBe("author");
     expect(payload.title).toBe("袁慎建");
-    expect(payload.sections.map((section: { id: string }) => section.id)).toEqual([
-      "hero",
-      "skills",
-      "education",
-      "experience",
+    expect(payload.entities.profile.name).toBe("袁慎建");
+    expect(payload.entities.skills.length).toBeGreaterThan(0);
+    expect(payload.entities.projects.length).toBeGreaterThan(0);
+    expect(payload.chunks.length).toBeGreaterThan(payload.entities.skills.length);
+    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("project-locammend-智能顾问-研发交付");
+    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("skill-ai-agent");
+    expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("certificate-csm2020年");
+    expect(payload.sections.find((section: { id: string }) => section.id === "project-locammend-智能顾问-研发交付")?.anchorId).toBe(
       "projects",
-      "extras",
-    ]);
+    );
   });
 });

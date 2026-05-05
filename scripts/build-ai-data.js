@@ -14,6 +14,11 @@ const OUTPUT_ARTICLES_DIRECTORY = path.join(OUTPUT_DIRECTORY, "articles");
 const OUTPUT_AUTHOR_FILE = path.join(OUTPUT_DIRECTORY, "author.json");
 const EXCERPT_LENGTH = 200;
 const SECTION_EXCERPT_LENGTH = 160;
+const SKILL_LEVEL_LABELS = {
+  master: "精通",
+  proficient: "熟练",
+  familiar: "熟悉",
+};
 
 function getAllMarkdownFiles(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -92,6 +97,60 @@ function createSection(id, heading, content, anchorId = id) {
   };
 }
 
+function dedupeStrings(values) {
+  return Array.from(new Set(values.filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim())));
+}
+
+function extractKeywords(...values) {
+  return dedupeStrings(
+    values.flatMap((value) =>
+      String(value ?? "")
+        .split(/[\s，。、；：,:/()（）|]+/)
+        .map((item) => item.trim())
+        .filter((item) => item.length >= 2),
+    ),
+  );
+}
+
+function createAuthorScopedId(slugger, prefix, label) {
+  return `${prefix}-${slugger.slug(label)}`;
+}
+
+function parseEntityTitle(title) {
+  const [organization, role] = String(title).split(/\s+-\s+/);
+
+  return {
+    organization: organization?.trim() || undefined,
+    role: role?.trim() || undefined,
+  };
+}
+
+function createAuthorChunk(input) {
+  const section = createSection(input.id, input.heading, input.content, input.anchorId);
+
+  return {
+    ...section,
+    sectionType: input.sectionType,
+    entityType: input.entityType,
+    entityId: input.entityId,
+    ...(input.organization ? { organization: input.organization } : {}),
+    ...(input.role ? { role: input.role } : {}),
+    ...(input.period ? { period: input.period } : {}),
+    ...(input.keywords?.length ? { keywords: input.keywords } : {}),
+    ...(input.techs?.length ? { techs: input.techs } : {}),
+  };
+}
+
+function toLegacySections(chunks) {
+  return chunks.map(({ id, anchorId, heading, content, excerpt }) => ({
+    id,
+    anchorId,
+    heading,
+    content,
+    excerpt,
+  }));
+}
+
 function extractArticleSections(content) {
   const slugger = new GitHubSlugger();
   slugger.reset();
@@ -156,84 +215,183 @@ function extractArticleSections(content) {
   return sections;
 }
 
-function buildAuthorSectionContent() {
+function buildAuthorPayload() {
   const { hero, skills, education, experience, projects, extras } = authorProfileData;
+  const slugger = new GitHubSlugger();
+  slugger.reset();
 
-  return [
-    {
-      id: hero.id,
+  const profile = {
+    id: hero.id,
+    heading: hero.heading,
+    name: hero.name,
+    roles: hero.roles,
+    phone: hero.phone,
+    email: hero.email,
+    summary: hero.summary,
+  };
+  const skillsEntities = skills.items.map((item) => ({
+    id: createAuthorScopedId(slugger, "skill", item.title),
+    title: item.title,
+    level: item.level,
+    icon: item.icon,
+    description: item.description,
+  }));
+  const certificateEntities = skills.certificates.map((title) => ({
+    id: createAuthorScopedId(slugger, "certificate", title),
+    title,
+  }));
+  const educationEntity = {
+    id: education.id,
+    heading: education.heading,
+    school: education.school,
+    major: education.major,
+    period: education.period,
+    href: education.href,
+  };
+  const experienceEntities = experience.items.map((item) => ({
+    id: createAuthorScopedId(slugger, "experience", item.title),
+    title: item.title,
+    period: item.period,
+    description: item.description,
+    list: item.list ?? [],
+    ...parseEntityTitle(item.title),
+  }));
+  const projectEntities = projects.items.map((item) => ({
+    id: createAuthorScopedId(slugger, "project", item.name),
+    period: item.period,
+    name: item.name,
+    role: item.role,
+    description: item.description,
+    achievements: item.achievements,
+    highlights: item.highlights ?? [],
+    techs: (item.techs ?? []).map((tech) => tech.name),
+    organization: parseEntityTitle(item.name).organization,
+  }));
+  const extraEntities = extras.groups.map((group) => ({
+    id: createAuthorScopedId(slugger, "extra", group.title),
+    title: group.title,
+    items: group.items,
+  }));
+
+  const chunks = [
+    createAuthorChunk({
+      id: profile.id,
       anchorId: hero.id,
       heading: hero.heading,
-      content: [
-        hero.name,
-        hero.roles.join("，"),
-        ...hero.summary,
-        `联系电话：${hero.phone}`,
-        `邮箱：${hero.email}`,
-      ].join("\n"),
-    },
-    {
-      id: skills.id,
-      anchorId: skills.id,
-      heading: skills.heading,
-      content: [
-        skills.items.map((item) => `${item.title}：${item.description}`).join("\n"),
-        `专业认证：${skills.certificates.join("、")}`,
-      ].join("\n"),
-    },
-    {
-      id: education.id,
+      content: [profile.name, profile.roles.join("，"), ...profile.summary, `联系电话：${profile.phone}`, `邮箱：${profile.email}`].join("\n"),
+      sectionType: hero.id,
+      entityType: "profile",
+      entityId: profile.id,
+      keywords: dedupeStrings([...profile.roles, ...extractKeywords(...profile.summary)]),
+    }),
+    ...skillsEntities.map((item) => {
+      const levelLabel = SKILL_LEVEL_LABELS[item.level] ?? item.level;
+
+      return createAuthorChunk({
+        id: item.id,
+        anchorId: skills.id,
+        heading: `技能｜${item.title}`,
+        content: [`技能等级：${levelLabel}`, item.description].join("\n"),
+        sectionType: skills.id,
+        entityType: "skill",
+        entityId: item.id,
+        keywords: dedupeStrings([item.title, levelLabel, ...extractKeywords(item.description)]),
+      });
+    }),
+    ...certificateEntities.map((item) =>
+      createAuthorChunk({
+        id: item.id,
+        anchorId: skills.id,
+        heading: `证书｜${item.title}`,
+        content: `专业认证：${item.title}`,
+        sectionType: skills.id,
+        entityType: "certificate",
+        entityId: item.id,
+        keywords: dedupeStrings([item.title, ...extractKeywords(item.title)]),
+      }),
+    ),
+    createAuthorChunk({
+      id: educationEntity.id,
       anchorId: education.id,
       heading: education.heading,
-      content: `${education.school}，${education.major}，${education.period}`,
-    },
-    {
-      id: experience.id,
-      anchorId: experience.id,
-      heading: experience.heading,
-      content: experience.items
-        .map((item) => [item.period, item.title, item.description, ...(item.list ?? [])].filter(Boolean).join("，"))
-        .join("\n"),
-    },
-    {
-      id: projects.id,
-      anchorId: projects.id,
-      heading: projects.heading,
-      content: projects.items
-        .map((item) =>
-          [
-            item.period,
-            item.name,
-            item.role,
-            item.description,
-            item.achievements.map((achievement) => `${achievement.metric ? `${achievement.metric} ` : ""}${achievement.text}`).join("；"),
-            (item.highlights ?? []).map((highlight) => highlight.text).join("；"),
-            (item.techs ?? []).map((tech) => tech.name).join("、"),
-          ]
-            .filter(Boolean)
-            .join("，"),
-        )
-        .join("\n"),
-    },
-    {
-      id: extras.id,
-      anchorId: extras.id,
-      heading: extras.heading,
-      content: extras.groups
-        .map((group) => `${group.title}：${group.items.map((item) => item.label).join("、")}`)
-        .join("\n"),
-    },
-  ].map((section) => ({
-    ...createSection(section.id, section.heading, section.content, section.anchorId),
-  }));
-}
+      content: `${educationEntity.school}，${educationEntity.major}，${educationEntity.period}`,
+      sectionType: education.id,
+      entityType: "education",
+      entityId: educationEntity.id,
+      period: educationEntity.period,
+      keywords: dedupeStrings([educationEntity.school, educationEntity.major, ...extractKeywords(educationEntity.school, educationEntity.major)]),
+    }),
+    ...experienceEntities.map((item) =>
+      createAuthorChunk({
+        id: item.id,
+        anchorId: experience.id,
+        heading: `经历｜${item.title}`,
+        content: [item.period, item.title, item.description, ...(item.list ?? [])].filter(Boolean).join("\n"),
+        sectionType: experience.id,
+        entityType: "experience",
+        entityId: item.id,
+        organization: item.organization,
+        role: item.role,
+        period: item.period,
+        keywords: dedupeStrings([item.title, item.organization, item.role, ...extractKeywords(item.description, ...(item.list ?? []))]),
+      }),
+    ),
+    ...projectEntities.map((item) =>
+      createAuthorChunk({
+        id: item.id,
+        anchorId: projects.id,
+        heading: `项目｜${item.name}`,
+        content: [
+          `时间：${item.period}`,
+          `角色：${item.role}`,
+          item.description,
+          item.achievements.length > 0
+            ? `核心成果：${item.achievements.map((achievement) => `${achievement.metric ? `${achievement.metric} ` : ""}${achievement.text}`).join("；")}`
+            : "",
+          item.highlights.length > 0 ? `主要职责和贡献：${item.highlights.map((highlight) => highlight.text).join("；")}` : "",
+          item.techs.length > 0 ? `技术栈：${item.techs.join("、")}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        sectionType: projects.id,
+        entityType: "project",
+        entityId: item.id,
+        organization: item.organization,
+        role: item.role,
+        period: item.period,
+        keywords: dedupeStrings([item.name, item.organization, item.role, ...extractKeywords(item.description, ...item.highlights.map((highlight) => highlight.text))]),
+        techs: item.techs,
+      }),
+    ),
+    ...extraEntities.map((group) =>
+      createAuthorChunk({
+        id: group.id,
+        anchorId: extras.id,
+        heading: `兴趣｜${group.title}`,
+        content: `${group.title}：${group.items.map((item) => item.label).join("、")}`,
+        sectionType: extras.id,
+        entityType: "extra",
+        entityId: group.id,
+        keywords: dedupeStrings([group.title, ...group.items.map((item) => item.label)]),
+      }),
+    ),
+  ];
 
-function buildAuthorPayload() {
   return {
     slug: "author",
     title: authorProfileData.hero.name,
     summary: authorProfileData.hero.roles.join(" | "),
-    sections: buildAuthorSectionContent(),
+    entities: {
+      profile,
+      skills: skillsEntities,
+      certificates: certificateEntities,
+      education: educationEntity,
+      experiences: experienceEntities,
+      projects: projectEntities,
+      extras: extraEntities,
+    },
+    chunks,
+    sections: toLegacySections(chunks),
   };
 }
 

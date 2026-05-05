@@ -857,3 +857,50 @@ AI_EMERGENCY_DISABLE = "true"
 3. 回归运行：
    - `npm run test -- tests/blog-ai-worker/llm-profile-cli.test.ts`
    - `npm --prefix blog-ai-worker run typecheck`
+
+---
+
+## 2026-05-05 作者页 AI 数据只有粗粒度 sections，导致项目/技能/经历边界不清
+
+### 现象
+
+- `public/ai-data/author.json` 之前只生成 6 个大 section：`hero`、`skills`、`education`、`experience`、`projects`、`extras`
+- `skills`、`experience`、`projects` 中大量条目被压成大段纯文本
+- 导致作者页 AI 在以下方面效果较差：
+  - 不同项目之间的边界不明显
+  - 不同技能和证书条目的区分度低
+  - 大 section 容易在 prompt 中被截断
+  - 引用只能落到粗粒度模块，不能精确到具体项目/技能/经历
+
+### 根因
+
+`scripts/build-ai-data.js` 之前把作者页数据当作“页面模块快照”而不是“AI 检索索引”生成：
+
+1. `skills.items` 全部拼成一个 `skills` section
+2. `experience.items` 全部拼成一个 `experience` section
+3. `projects.items` 全部拼成一个 `projects` section
+4. 再经过 `toPlainText()` 和空白归一化后，结构边界进一步被抹平
+
+### 修复
+
+将作者页 AI 数据升级为“双层结构”：
+
+1. `entities`
+   - 结构化保留作者资料真相：`profile`、`skills`、`certificates`、`education`、`experiences`、`projects`、`extras`
+2. `chunks`
+   - 作为 AI 检索与引用单元
+   - 将技能、证书、经历、项目、兴趣分组拆成细粒度 chunk
+3. `sections`
+   - 先保留为兼容 fallback
+   - 由 `chunks` 简化映射生成，不再是旧的 6 个粗粒度大块
+4. Worker 作者场景优先消费 `chunks`，如果线上仍是旧 payload，再回退到 legacy `sections`
+
+### 如何确认修复生效
+
+1. 重新生成数据：`npm run build:ai-data`
+2. 检查 `public/ai-data/author.json`：
+   - 顶层包含 `entities` 与 `chunks`
+   - `chunks` 中可见诸如 `project-*`、`skill-*`、`certificate-*`、`experience-*` 的细粒度条目
+3. 回归运行：
+   - `npm run test -- tests/lib/build-ai-data.test.ts tests/blog-ai-worker/author-scene.test.ts tests/blog-ai-worker/index-runtime-config.test.ts tests/blog-ai-worker/article-scene.test.ts`
+   - `npm --prefix blog-ai-worker run typecheck`

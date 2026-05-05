@@ -7,11 +7,11 @@ function truncate(text: string): string {
 }
 
 export function buildAuthorSystemPrompt(author: AuthorPageData): string {
-  const sections = author.sections
-    .map((section) => [
-      `sectionId: ${section.id}`,
-      `heading: ${section.heading}`,
-      `content: ${truncate(section.content)}`,
+  const sections = author.chunks
+    .map((chunk) => [
+      `sectionId: ${chunk.id}`,
+      `heading: ${chunk.heading}`,
+      `content: ${truncate(chunk.content)}`,
     ].join("\n"))
     .join("\n\n");
 
@@ -28,7 +28,7 @@ export function buildAuthorSystemPrompt(author: AuthorPageData): string {
     "sectionIds 只能填写当前作者页真实存在的 sectionId，数量限制为 1 到 3 个。",
     `作者：${author.title}`,
     `简介：${author.summary}`,
-    "当前作者页 sections：",
+    "当前作者页可引用内容：",
     sections,
   ].join("\n\n");
 }

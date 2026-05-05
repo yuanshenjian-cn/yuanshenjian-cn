@@ -32,6 +32,8 @@ interface BuildPageSceneOptions {
   pageDataPath: string;
   sourceType: PageReference["sourceType"];
   message: string;
+  validatePageData?: (value: unknown) => value is PageData;
+  getReferenceSections?: (pageData: PageData) => PageSection[];
   buildSystemPrompt: (pageData: PageData) => string;
   origin?: string;
 }
@@ -51,7 +53,7 @@ function isPageSection(value: unknown): value is PageSection {
   );
 }
 
-function isPageData(value: unknown): value is PageData {
+export function isPageData(value: unknown): value is PageData {
   return (
     isRecord(value) &&
     typeof value.slug === "string" &&
@@ -174,7 +176,11 @@ export function assemblePageReferences(
     }));
 }
 
-async function fetchPageData(env: Env, pageDataPath: string): Promise<PageData> {
+async function fetchPageData(
+  env: Env,
+  pageDataPath: string,
+  validatePageData: (value: unknown) => value is PageData = isPageData,
+): Promise<PageData> {
   const response = await fetch(`${env.AI_DATA_BASE_URL.replace(/\/$/, "")}/${pageDataPath.replace(/^\//, "")}`);
 
   if (!response.ok) {
@@ -182,7 +188,7 @@ async function fetchPageData(env: Env, pageDataPath: string): Promise<PageData> 
   }
 
   const payload: unknown = await response.json().catch(() => null);
-  if (!isPageData(payload)) {
+  if (!validatePageData(payload)) {
     throw new HttpError(502, PAGE_AI_ERROR_MESSAGE);
   }
 
@@ -208,17 +214,18 @@ function createChatRequest(systemPrompt: string, message: string, stream: boolea
 }
 
 export async function handlePageScene(options: BuildPageSceneOptions): Promise<PageResponse> {
-  const pageData = await fetchPageData(options.env, options.pageDataPath);
+  const pageData = await fetchPageData(options.env, options.pageDataPath, options.validatePageData);
   const provider = createProvider(options.env, options.env.LLM_MODEL_ID);
   const llmResponse: ChatResponse = await provider.chat(
     createChatRequest(options.buildSystemPrompt(pageData), options.message, false),
   );
 
   const parsed = parsePageOutput(llmResponse.content);
+  const referenceSections = options.getReferenceSections?.(pageData) ?? (Array.isArray(pageData.sections) ? pageData.sections : []);
 
   return {
     answer: parsed.answer,
-    references: assemblePageReferences(pageData.sections, options.sourceType, parsed.sectionIds),
+    references: assemblePageReferences(referenceSections, options.sourceType, parsed.sectionIds),
     usage: llmResponse.usage,
   };
 }
@@ -330,7 +337,7 @@ function createAnswerStreamProcessor(onDelta: (delta: string) => void) {
 }
 
 export async function handlePageSceneStream(options: BuildPageSceneOptions): Promise<Response> {
-  const pageData = await fetchPageData(options.env, options.pageDataPath);
+  const pageData = await fetchPageData(options.env, options.pageDataPath, options.validatePageData);
   const provider = createProvider(options.env, options.env.LLM_MODEL_ID);
 
   if (!provider.streamChat) {
@@ -340,6 +347,7 @@ export async function handlePageSceneStream(options: BuildPageSceneOptions): Pro
   const upstreamStream = await provider.streamChat(
     createChatRequest(options.buildSystemPrompt(pageData), options.message, true),
   );
+  const referenceSections = options.getReferenceSections?.(pageData) ?? (Array.isArray(pageData.sections) ? pageData.sections : []);
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -397,7 +405,7 @@ export async function handlePageSceneStream(options: BuildPageSceneOptions): Pro
           }
         }
 
-        const references = assemblePageReferences(pageData.sections, options.sourceType, sectionIds);
+        const references = assemblePageReferences(referenceSections, options.sourceType, sectionIds);
         controller.enqueue(encodeSSEEvent("references", { references }));
         controller.enqueue(encodeSSEEvent("done", { usage }));
         controller.close();

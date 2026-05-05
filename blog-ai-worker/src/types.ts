@@ -99,6 +99,87 @@ export interface PageSection {
   anchorId?: string;
 }
 
+export interface AuthorChunk extends PageSection {
+  sectionType?: string;
+  entityType?: "profile" | "skill" | "certificate" | "education" | "experience" | "project" | "extra";
+  entityId?: string;
+  organization?: string;
+  role?: string;
+  period?: string;
+  keywords?: string[];
+  techs?: string[];
+}
+
+export interface AuthorProfileEntity {
+  id: string;
+  heading: string;
+  name: string;
+  roles: string[];
+  phone: string;
+  email: string;
+  summary: string[];
+}
+
+export interface AuthorSkillEntity {
+  id: string;
+  title: string;
+  level: string;
+  icon: string;
+  description: string;
+}
+
+export interface AuthorCertificateEntity {
+  id: string;
+  title: string;
+}
+
+export interface AuthorEducationEntity {
+  id: string;
+  heading: string;
+  school: string;
+  major: string;
+  period: string;
+  href?: string;
+}
+
+export interface AuthorExperienceEntity {
+  id: string;
+  title: string;
+  period: string;
+  description?: string;
+  list: string[];
+  organization?: string;
+  role?: string;
+}
+
+export interface AuthorProjectEntity {
+  id: string;
+  period: string;
+  name: string;
+  role: string;
+  description: string;
+  achievements: Array<{ metric?: string; text: string }>;
+  highlights: Array<{ text: string }>;
+  techs: string[];
+  organization?: string;
+}
+
+export interface AuthorExtraEntity {
+  id: string;
+  title: string;
+  items: Array<{ type: string; label: string; href?: string }>;
+}
+
+export interface AuthorEntities {
+  profile: AuthorProfileEntity;
+  skills: AuthorSkillEntity[];
+  certificates: AuthorCertificateEntity[];
+  education: AuthorEducationEntity;
+  experiences: AuthorExperienceEntity[];
+  projects: AuthorProjectEntity[];
+  extras: AuthorExtraEntity[];
+}
+
 export interface ArticlePageData {
   slug: string;
   title: string;
@@ -112,7 +193,9 @@ export interface AuthorPageData {
   slug: "author";
   title: string;
   summary: string;
-  sections: PageSection[];
+  entities: AuthorEntities;
+  chunks: AuthorChunk[];
+  sections?: PageSection[];
 }
 
 export type PageData = ArticlePageData | AuthorPageData;
