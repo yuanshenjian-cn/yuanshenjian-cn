@@ -11,7 +11,7 @@ import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 
 const RESUME_DESCRIPTION =
-  "AI 软件工程师·研发效能专家·敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者";
+  "AI 效率工程师·研发效能专家·敏捷开发教练 - 10多年深耕软件交付与咨询，用AI工具和敏捷方法帮助企业提升研发效能，具备代码洁癖与优秀业务Sense的技术实践者";
 
 export const metadata: Metadata = generateListPageSEO(
   "简历",

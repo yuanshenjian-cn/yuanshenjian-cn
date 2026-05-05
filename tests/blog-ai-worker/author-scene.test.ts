@@ -44,7 +44,7 @@ describe("author scene", () => {
         JSON.stringify({
           slug: "author",
           title: "袁慎建",
-          summary: "AI 软件工程师 | 研发效能专家 | 敏捷开发教练",
+          summary: "AI 效率工程师 | 研发效能专家 | 敏捷开发教练",
           entities: {
             profile: { id: "hero", heading: "个人简介", name: "袁慎建", roles: [], phone: "", email: "", summary: [] },
             skills: [],
@@ -68,7 +68,7 @@ describe("author scene", () => {
     );
 
     chatMock.mockResolvedValue({
-      content: `根据当前作者页展示的信息，我倾向判断他更适合技术负责人和研发效能方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience-thoughtworks","skill-ai-agent"]}`,
+      content: `作者经历中提到他有团队协作与交付经验，作者技能中提到 AI Agent 相关能力，因此我倾向判断他更适合技术负责人和研发效能方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience-thoughtworks","skill-ai-agent"]}`,
     });
 
     const result = await handleAuthorScene(
@@ -81,7 +81,7 @@ describe("author scene", () => {
       env,
     );
 
-    expect(result.answer).toContain("根据当前作者页展示的信息");
+    expect(result.answer).toContain("作者经历中提到");
     expect(result.references).toEqual([
       {
         id: "experience-thoughtworks",
@@ -106,7 +106,7 @@ describe("author scene", () => {
         JSON.stringify({
           slug: "author",
           title: "袁慎建",
-          summary: "AI 软件工程师 | 研发效能专家 | 敏捷开发教练",
+          summary: "AI 效率工程师 | 研发效能专家 | 敏捷开发教练",
           entities: {
             profile: { id: "hero", heading: "个人简介", name: "袁慎建", roles: [], phone: "", email: "", summary: [] },
             skills: [],
@@ -126,7 +126,7 @@ describe("author scene", () => {
     );
 
     chatMock.mockResolvedValue({
-      content: `根据当前作者页展示的信息，我倾向判断他更适合技术负责人方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience"]}`,
+      content: `作者经历中提到他有相关交付经验，我倾向判断他更适合技术负责人方向。\n${PAGE_REFERENCE_DELIMITER}\n{"sectionIds":["experience"]}`,
     });
 
     const result = await handleAuthorScene(
@@ -150,11 +150,11 @@ describe("author scene", () => {
     ]);
   });
 
-  it("prompt 明确要求岗位归纳使用谨慎表述", () => {
+  it("prompt 明确要求岗位归纳使用结构化来源措辞", () => {
     const prompt = buildAuthorSystemPrompt({
       slug: "author",
       title: "袁慎建",
-      summary: "AI 软件工程师 | 研发效能专家 | 敏捷开发教练",
+      summary: "AI 效率工程师 | 研发效能专家 | 敏捷开发教练",
       entities: {
         profile: { id: "hero", heading: "个人简介", name: "袁慎建", roles: [], phone: "", email: "", summary: [] },
         skills: [],
@@ -169,7 +169,12 @@ describe("author scene", () => {
       ],
     });
 
-    expect(prompt).toContain("根据当前作者页展示的信息");
+    expect(prompt).toContain("作者技能中提到");
+    expect(prompt).toContain("作者项目经验中提到");
+    expect(prompt).toContain("作者经历中提到");
+    expect(prompt).toContain("作者证书信息显示");
+    expect(prompt).toContain("避免使用“页面中显示……”或“根据当前作者页展示的信息……”这类页面化措辞");
+    expect(prompt).not.toContain("必须显式以“根据当前作者页展示的信息”开头");
     expect(prompt).toContain("不要输出薪资建议、级别判断、招聘决策建议或行业适配结论");
     expect(prompt).toContain("sectionId: hero");
   });

@@ -14,6 +14,7 @@ vi.mock("../../blog-ai-worker/src/providers/index", () => ({
 }));
 
 import { handleArticleScene, streamArticleScene } from "../../blog-ai-worker/src/scenes/article";
+import { buildArticleSystemPrompt } from "../../blog-ai-worker/src/prompts/article";
 import { assemblePageReferences, parsePageOutput, PAGE_REFERENCE_DELIMITER } from "../../blog-ai-worker/src/scenes/page";
 import type { Env } from "../../blog-ai-worker/src/types";
 
@@ -158,5 +159,24 @@ describe("article scene", () => {
     );
 
     expect(references).toHaveLength(3);
+  });
+
+  it("prompt 明确要求文章回答使用正文导向措辞", () => {
+    const prompt = buildArticleSystemPrompt({
+      slug: "tdd-introduction",
+      title: "TDD 入门",
+      date: "2026-05-05T00:00:00.000Z",
+      excerpt: "从反馈回路理解 TDD。",
+      tags: ["TDD"],
+      sections: [
+        { id: "intro", heading: "前言", content: "前言内容", excerpt: "前言摘录", anchorId: "intro" },
+      ],
+    });
+
+    expect(prompt).toContain("文章中提到");
+    expect(prompt).toContain("文中提到");
+    expect(prompt).toContain("本文介绍了");
+    expect(prompt).toContain("避免使用“页面中显示……”或“当前文章页展示的信息……”这类页面化措辞");
+    expect(prompt).toContain("sectionId: intro");
   });
 });

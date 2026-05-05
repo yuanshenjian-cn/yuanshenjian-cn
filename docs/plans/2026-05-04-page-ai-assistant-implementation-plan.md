@@ -83,7 +83,7 @@ Create a single exported object/structure in `lib/author-profile.ts` that contai
 export const authorProfile = {
   hero: {
     name: "袁慎建",
-    roles: ["AI 软件工程师", "研发效能专家", "敏捷开发教练"],
+    roles: ["AI 效率工程师", "研发效能专家", "敏捷开发教练"],
     phone: "18192235667",
     email: "yuanshenjian@foxmail.com",
     summary: [
@@ -215,7 +215,7 @@ Expected:
 +{
 +  "slug": "author",
 +  "title": "袁慎建",
-+  "summary": "AI 软件工程师 | 研发效能专家 | 敏捷开发教练",
++  "summary": "AI 效率工程师 | 研发效能专家 | 敏捷开发教练",
 +  "sections": [
 +    {
 +      "id": "hero",
