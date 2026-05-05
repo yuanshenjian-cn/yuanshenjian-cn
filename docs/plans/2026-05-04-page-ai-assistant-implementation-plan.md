@@ -8,6 +8,14 @@
 
 **Tech Stack:** Next.js 15、React 19、TypeScript、Vitest、Cloudflare Workers、Workers KV、Cloudflare Turnstile、ReadableStream + SSE。
 
+## Final Implementation Notes
+
+- Turnstile timeout 已收口到 `lib/config.ts`，并按场景挂在 `config.ai.turnstile.timeoutMs.homepageRecommend`、`config.ai.turnstile.timeoutMs.pageAssistant.article`、`config.ai.turnstile.timeoutMs.pageAssistant.author`。
+- 首页、文章页、作者页分别由独立常量 `HOMEPAGE_RECOMMEND_TURNSTILE_TIMEOUT_MS`、`ARTICLE_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS`、`AUTHOR_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS` 提供 timeout 值。
+- Turnstile timeout 当前只认 `lib/config.ts` 中的版本化配置，不支持 env override。
+- `AiRecommendWidget` 与 `PageAIAssistantProvider` 都通过 `turnstileTimeoutMs` props 接收 timeout，具体值由页面层传入；当前传入位置分别是 `app/page.tsx`、`app/articles/[slug]/page.tsx`、`app/author/page.tsx`。
+- 页面级 AI 正文直接、自然回答用户问题，继续严格基于当前页面内容；回答依据主要由 `references` 模块承担，不鼓励正文使用模板前缀或页面化措辞。
+
 ---
 
 ## File Structure
