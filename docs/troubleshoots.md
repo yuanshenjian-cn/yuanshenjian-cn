@@ -25,7 +25,7 @@ updateAnswer("");
 
 这会让旧结果在新请求真正开始产出内容之前就被清空。
 
-2. `scripts/build-ai-data.js` 构建 author chunks 时，`extras` 里的链接只保留了 `label`，没有把 `href` 写进 chunk content；作者页顶部的 `下载 PDF` 链接也没有进入作者资料单一数据源。
+2. `scripts/build-ai-data.js` 构建 author chunks 时，`extras` 里的链接只保留了 `label`，没有把 `href` 写进 chunk content；同时作者页里其他可见链接信息没有系统化进入作者资料单一数据源。
 
 ### 修复
 
@@ -34,9 +34,8 @@ updateAnswer("");
 3. 只有在收到首个新的 `answer-delta` 时，才用新回答和新引用覆盖旧内容
 4. 如果新请求在开始返回前失败，则继续保留旧回答和旧引用，只额外展示错误
 5. 将作者页可见链接补进单一数据源和 `author chunks`，包括：
-6. `hero.resumeHref`
-7. `education.href`
-8. `extras.groups[].items[].href`
+6. `education.href`
+7. `extras.groups[].items[].href`
 
 ### 如何确认修复生效
 
@@ -44,7 +43,44 @@ updateAnswer("");
 2. 再发起第二次提问，确认按钮进入 `思考中...` 时旧回答仍继续显示
 3. 仅在新流式回答真正开始返回后，旧回答和旧引用才被替换
 4. 如果第二次请求失败，确认旧回答仍在，同时页面出现新的错误提示
-5. 重新生成 `author.json` 后，确认作者页相关 chunk 中含有 `整洁软件设计：https://...`、`学校官网：https://...`、`简历 PDF：/docs/resume.pdf`
+5. 重新生成 `author.json` 后，确认作者页相关 chunk 中含有 `整洁软件设计：https://...`、`学校官网：https://...` 等页面可见链接信息
+
+---
+
+## 2026-05-05 作者页下载 PDF 简历入口注释后，build 仍出现未使用变量 warning
+
+### 现象
+
+- 已经把作者页中的下载 PDF 简历入口注释掉
+- 但执行 `npm run build` 时，仍然出现 `@typescript-eslint/no-unused-vars` warning
+- warning 主要集中在 `app/author/page.tsx` 和 `components/resume/resume-hero.tsx`
+
+### 根因
+
+只是把 JSX 入口注释掉了，但没有同步删除只服务于该入口的残留代码，包括：
+
+1. `Download` 图标导入
+2. `ShareButtons` 导入
+3. `resumeUrl` / `authorSummary` 等局部变量
+4. 整段已经失效的注释块
+
+Next.js build 阶段会执行 ESLint，因此这些残留会继续触发 warning。
+
+### 修复
+
+1. 删除作者页和 hero 组件中仅供 PDF 下载入口使用的残留导入
+2. 删除对应的未使用局部变量
+3. 删除整段已失效的注释 JSX，而不是只保留注释
+4. 如果业务上已确认不再提供 PDF 简历，就同步把 `resumeHref` 从作者数据结构、AI 构建链和测试中一并移除，避免后续再次漂移
+
+### 如何确认修复生效
+
+1. 执行 `npm run build`
+2. 确认不再出现：
+   - `ShareButtons is defined but never used`
+   - `Download is defined but never used`
+   - `resumeUrl is assigned a value but never used`
+   - `authorSummary is assigned a value but never used`
 
 ---
 

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Phone, Mail, Download } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { authorProfile } from "@/lib/author-profile";
 
 export function ResumeHero() {
@@ -30,19 +30,6 @@ export function ResumeHero() {
           />
         </div>
 
-        {/* 下载 PDF 按钮 */}
-        {/* <div className="mb-4">
-          <a
-            href={hero.resumeHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-primary/70 hover:bg-primary text-primary-foreground text-[10px] font-medium rounded-full transition-colors"
-            aria-label="下载简历 PDF"
-          >
-            <Download className="w-2.5 h-2.5" />
-            <span>下载 PDF</span>
-          </a>
-        </div> */}
 
         {/* 主标题 - 更有质感的排版 */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4 text-foreground">

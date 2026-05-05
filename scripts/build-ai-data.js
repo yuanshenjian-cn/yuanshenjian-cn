@@ -262,7 +262,6 @@ function buildAuthorPayload() {
     roles: hero.roles,
     phone: hero.phone,
     email: hero.email,
-    resumeHref: hero.resumeHref,
     summary: hero.summary,
   };
   const skillsEntities = skills.items.map((item) => ({
@@ -320,7 +319,6 @@ function buildAuthorPayload() {
         ...profile.summary,
         `联系电话：${profile.phone}`,
         `邮箱：${profile.email}`,
-        `简历 PDF：${profile.resumeHref}`,
       ].join("\n"),
       sectionType: hero.id,
       entityType: "profile",
