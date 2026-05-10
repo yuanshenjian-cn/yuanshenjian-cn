@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isLatestRoute = date === "latest";
   const url = `${config.site.url}${isLatestRoute ? "/ai/daily-briefings/latest" : briefing.url}`;
   const ogImage = `${url}/opengraph-image`;
-  const shareTitle = isLatestRoute ? "AI 简报 · Latest | YSJ 主页" : briefing.title;
+  const shareTitle = isLatestRoute ? "AI 简报 · Latest | YSJ" : briefing.title;
   const shareDescription = isLatestRoute
     ? "AI 简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的 AI 动态。"
     : briefing.excerpt;
@@ -90,7 +90,7 @@ export default async function BriefingDetailPage({ params }: Props) {
   const { prev, next } = getAdjacentBriefings(briefing.slug);
   const headings = extractHeadings(briefing.content);
   const url = `${config.site.url}${date === "latest" ? "/ai/daily-briefings/latest" : briefing.url}`;
-  const shareTitle = date === "latest" ? "AI 简报 · Latest | YSJ 主页" : briefing.title;
+  const shareTitle = date === "latest" ? "AI 简报 · Latest | YSJ" : briefing.title;
   const shareDescription = date === "latest"
     ? "AI 简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的 AI 动态。"
     : briefing.excerpt;
