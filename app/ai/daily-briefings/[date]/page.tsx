@@ -9,6 +9,10 @@ import { ShareButtons } from "@/components/share-buttons";
 import { TableOfContents } from "@/components/table-of-contents";
 import { FloatingTocButton } from "@/components/floating-toc-button";
 
+function getDisplayTag(tag: string): string {
+  return tag === "AI每日简报" ? "AI" : tag;
+}
+
 interface Props {
   params: Promise<{ date: string }>;
 }
@@ -123,7 +127,7 @@ export default async function BriefingDetailPage({ params }: Props) {
                 <div className="mt-4 flex flex-wrap gap-2">
                   {briefing.tags.map((tag) => (
                     <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                      {tag}
+                      {getDisplayTag(tag)}
                     </span>
                   ))}
                 </div>

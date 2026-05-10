@@ -14,6 +14,10 @@ import {
 } from "@/lib/investment-briefings";
 import { MDXContent, extractHeadings } from "@/lib/mdx";
 
+function getDisplayTag(tag: string): string {
+  return tag === "投资每日简报" ? "投资" : tag;
+}
+
 export const dynamicParams = false;
 
 interface Props {
@@ -127,7 +131,7 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
               <div className="mt-4 flex flex-wrap gap-2">
                 {briefing.tags.map((tag) => (
                   <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                    {tag}
+                    {getDisplayTag(tag)}
                   </span>
                 ))}
               </div>
