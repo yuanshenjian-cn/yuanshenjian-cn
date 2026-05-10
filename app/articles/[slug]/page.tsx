@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
 
   const isLatestRoute = slug === "latest";
   const postUrl = `${config.site.url}${isLatestRoute ? "/articles/latest" : `/articles/${post.slug}`}`;
-  const shareTitle = isLatestRoute ? `文章 · Latest | ${config.site.name}` : post.title;
+  const shareTitle = isLatestRoute ? "文章 · Latest | YSJ 主页" : post.title;
   const shareDescription = isLatestRoute
     ? "这是文章的固定最新入口，每次打开都会显示当前最新发布的一篇文章，适合长期收藏、固定访问与持续跟踪最新内容。"
     : post.excerpt;
@@ -87,7 +87,7 @@ export default async function PostPage({ params }: Props) {
   const { prev, next } = getAdjacentPosts(post.slug);
   const headings = extractHeadings(post.content);
   const postUrl = `${config.site.url}${slug === "latest" ? "/articles/latest" : `/articles/${post.slug}`}`;
-  const shareTitle = slug === "latest" ? `文章 · Latest | ${config.site.name}` : post.title;
+  const shareTitle = slug === "latest" ? "文章 · Latest | YSJ 主页" : post.title;
   const shareDescription = slug === "latest"
     ? "这是文章的固定最新入口，每次打开都会显示当前最新发布的一篇文章，适合长期收藏、固定访问与持续跟踪最新内容。"
     : post.excerpt;

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { config } from "@/lib/config";
 import { getInvestmentColumnBySlug, getInvestmentColumns } from "@/lib/investment-columns";
 
 export const dynamicParams = false;

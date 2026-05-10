@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isLatestRoute = date === "latest";
   const url = `${config.site.url}${isLatestRoute ? "/investment/daily-briefings/latest" : briefing.url}`;
   const ogImage = `${url}/opengraph-image`;
-  const shareTitle = isLatestRoute ? `投资简报 · Latest | ${config.site.name}` : briefing.title;
+  const shareTitle = isLatestRoute ? "投资简报 · Latest | YSJ 主页" : briefing.title;
   const shareDescription = isLatestRoute
     ? "投资简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
     : briefing.excerpt;
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: shareTitle,
       description: shareDescription,
       url,
-      siteName: config.site.name,
+      siteName: "YSJ 主页",
       locale: config.site.locale,
       type: "article",
       images: [
@@ -97,7 +97,7 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
   const { prev, next } = getAdjacentInvestmentBriefings(briefing.slug);
   const headings = extractHeadings(briefing.content);
   const url = `${config.site.url}${date === "latest" ? "/investment/daily-briefings/latest" : briefing.url}`;
-  const shareTitle = date === "latest" ? `投资简报 · Latest | ${config.site.name}` : briefing.title;
+  const shareTitle = date === "latest" ? "投资简报 · Latest | YSJ 主页" : briefing.title;
   const shareDescription = date === "latest"
     ? "投资简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
     : briefing.excerpt;

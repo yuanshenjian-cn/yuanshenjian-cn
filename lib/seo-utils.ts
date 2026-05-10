@@ -3,6 +3,7 @@ import { config } from "./config";
 import { Post } from "@/types/blog";
 
 const SITE_NAME = config.site.name;
+const SHARE_SITE_NAME = "YSJ 主页";
 const TAB_TITLE_SUFFIX = "YSJ";
 const DEFAULT_OG_IMAGE = `${config.site.url}${config.site.ogImage}`;
 
@@ -33,7 +34,7 @@ export function generateOpenGraph(
     description: enrichedDescription,
     type: 'article' as const,
     url: url,
-    siteName: SITE_NAME,
+    siteName: SHARE_SITE_NAME,
     locale: config.site.locale,
     images: [
       {
@@ -119,7 +120,7 @@ export function generateListPageSEO(
       description,
       type: 'website',
       url: currentUrl,
-      siteName: SITE_NAME,
+      siteName: SHARE_SITE_NAME,
       locale: config.site.locale,
       images: [{
         url: ogImage,

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { config } from "@/lib/config";
 import { getInvestmentBriefingArchives, getInvestmentBriefingsByMonth } from "@/lib/investment-briefings";
 
 export const dynamicParams = false;
