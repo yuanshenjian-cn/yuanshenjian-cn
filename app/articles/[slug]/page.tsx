@@ -105,11 +105,37 @@ export default async function PostPage({ params }: Props) {
   const allStructuredData = [articleStructuredData, breadcrumbStructuredData];
   const pageAssistantEnabled = config.ai.pageAssistantEnabled;
 
-  const articleBody = (
+  const primaryAssistant = pageAssistantEnabled ? (
+    <PageAIAssistantProvider
+      scene="article"
+      context={{ slug }}
+      workerUrl={config.ai.workerUrl}
+      turnstileSiteKey={config.ai.turnstileSiteKey}
+      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
+      maxInputChars={config.ai.maxInputChars}
+    >
+      <ArticleAiAssistant variant="primary" />
+    </PageAIAssistantProvider>
+  ) : null;
+
+  const footerAssistant = pageAssistantEnabled ? (
+    <PageAIAssistantProvider
+      scene="article"
+      context={{ slug }}
+      workerUrl={config.ai.workerUrl}
+      turnstileSiteKey={config.ai.turnstileSiteKey}
+      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
+      maxInputChars={config.ai.maxInputChars}
+    >
+      <ArticleAiAssistant variant="footer" />
+    </PageAIAssistantProvider>
+  ) : undefined;
+
+  const articleContent = (
     <>
       <ArticleHeader post={post} />
 
-      {pageAssistantEnabled ? <ArticleAiAssistant variant="primary" /> : null}
+      {primaryAssistant}
 
       {headings.length > 0 ? (
         <div className="my-8 lg:hidden">
@@ -129,24 +155,9 @@ export default async function PostPage({ params }: Props) {
           shareTitle={shareTitle}
           shareDescription={shareDescription}
           columnContext={columnContext}
-          footerAssistant={pageAssistantEnabled ? <ArticleAiAssistant variant="footer" /> : undefined}
+          footerAssistant={footerAssistant}
         />
     </>
-  );
-
-  const articleContent = pageAssistantEnabled ? (
-    <PageAIAssistantProvider
-      scene="article"
-      context={{ slug }}
-      workerUrl={config.ai.workerUrl}
-      turnstileSiteKey={config.ai.turnstileSiteKey}
-      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
-      maxInputChars={config.ai.maxInputChars}
-    >
-      {articleBody}
-    </PageAIAssistantProvider>
-  ) : (
-    articleBody
   );
 
   return (

@@ -150,7 +150,7 @@ describe("PageAIAssistantProvider", () => {
     expect(screen.getByText("正文内容")).toBeInTheDocument();
   });
 
-  it("第二次请求会中断第一次流式请求，并忽略旧流写入", async () => {
+  it("同一实例第二次请求会中断第一次流式请求，并忽略旧流写入", async () => {
     let firstOnEvent: ((event: { type: string; delta?: string }) => void) | null = null;
 
     aiChatStreamMock
@@ -171,27 +171,74 @@ describe("PageAIAssistantProvider", () => {
         turnstileTimeoutMs={20000}
         maxInputChars={200}
       >
-        <>
-          <ArticleAiAssistant />
-          <ArticleAiAssistant variant="footer" />
-        </>
+        <ArticleAiAssistant />
       </PageAIAssistantProvider>,
     );
 
-    const inputs = screen.getAllByRole("textbox");
+    const input = screen.getByRole("textbox");
 
-    fireEvent.change(inputs[0], { target: { value: "第一次问题" } });
-    fireEvent.click(screen.getAllByRole("button", { name: "问 AI" })[0]);
+    fireEvent.change(input, { target: { value: "第一次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
 
     await waitFor(() => expect(aiChatStreamMock).toHaveBeenCalledTimes(1));
 
-    fireEvent.change(inputs[1], { target: { value: "第二次问题" } });
-    fireEvent.click(screen.getAllByRole("button", { name: "问 AI" })[1]);
+    fireEvent.change(input, { target: { value: "第二次问题" } });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
 
     await screen.findByText("新请求结果");
     firstOnEvent?.({ type: "answer-delta", delta: "旧流结果" });
 
     expect(screen.queryByText("旧流结果")).not.toBeInTheDocument();
+  });
+
+  it("上下两个实例使用独立 provider 时互不覆盖彼此结果", async () => {
+    aiChatStreamMock
+      .mockImplementationOnce(async ({ message, onEvent }: { message: string; onEvent: (event: unknown) => void }) => {
+        onEvent({ type: "answer-delta", delta: message.includes("底部") ? "下方结果" : "上方结果" });
+        onEvent({ type: "done" });
+      })
+      .mockImplementationOnce(async ({ message, onEvent }: { message: string; onEvent: (event: unknown) => void }) => {
+        onEvent({ type: "answer-delta", delta: message.includes("底部") ? "下方结果" : "上方结果" });
+        onEvent({ type: "done" });
+      });
+
+    render(
+      <>
+        <PageAIAssistantProvider
+          scene="article"
+          context={{ slug: "tdd-introduction" }}
+          workerUrl="/api/ai"
+          turnstileSiteKey="test-site-key"
+          turnstileTimeoutMs={20000}
+          maxInputChars={200}
+        >
+          <ArticleAiAssistant />
+        </PageAIAssistantProvider>
+        <PageAIAssistantProvider
+          scene="article"
+          context={{ slug: "tdd-introduction" }}
+          workerUrl="/api/ai"
+          turnstileSiteKey="test-site-key"
+          turnstileTimeoutMs={20000}
+          maxInputChars={200}
+        >
+          <ArticleAiAssistant variant="footer" />
+        </PageAIAssistantProvider>
+      </>,
+    );
+
+    const inputs = screen.getAllByRole("textbox");
+    fireEvent.change(inputs[1], { target: { value: "底部问题" } });
+    fireEvent.click(screen.getAllByRole("button", { name: "问 AI" })[1]);
+    await screen.findByText("下方结果");
+    expect(screen.queryByText("上方结果")).not.toBeInTheDocument();
+
+    fireEvent.change(inputs[0], { target: { value: "顶部问题" } });
+    fireEvent.click(screen.getAllByRole("button", { name: "问 AI" })[0]);
+    await screen.findByText("上方结果");
+
+    expect(screen.getByText("下方结果")).toBeInTheDocument();
+    expect(screen.getByText("上方结果")).toBeInTheDocument();
   });
 
   it("二次提问时保留旧回答和旧引用，直到新流式回答真正开始后再覆盖", async () => {
@@ -367,19 +414,28 @@ describe("PageAIAssistantProvider", () => {
     });
 
     render(
-      <PageAIAssistantProvider
-        scene="article"
-        context={{ slug: "tdd-introduction" }}
-        workerUrl="/api/ai"
-        turnstileSiteKey="test-site-key"
-        turnstileTimeoutMs={20000}
-        maxInputChars={200}
-      >
-        <>
+      <>
+        <PageAIAssistantProvider
+          scene="article"
+          context={{ slug: "tdd-introduction" }}
+          workerUrl="/api/ai"
+          turnstileSiteKey="test-site-key"
+          turnstileTimeoutMs={20000}
+          maxInputChars={200}
+        >
           <ArticleAiAssistant />
+        </PageAIAssistantProvider>
+        <PageAIAssistantProvider
+          scene="article"
+          context={{ slug: "tdd-introduction" }}
+          workerUrl="/api/ai"
+          turnstileSiteKey="test-site-key"
+          turnstileTimeoutMs={20000}
+          maxInputChars={200}
+        >
           <ArticleAiAssistant variant="footer" />
-        </>
-      </PageAIAssistantProvider>,
+        </PageAIAssistantProvider>
+      </>,
     );
 
     const inputs = screen.getAllByRole("textbox");
@@ -395,7 +451,7 @@ describe("PageAIAssistantProvider", () => {
     const latestCallback = widgetOptions?.callback as ((token: string) => void) | undefined;
     latestCallback?.("turnstile-token");
 
-    await screen.findByText("最终结果");
+    await screen.findAllByText("最终结果");
     expect(aiChatStreamMock).toHaveBeenCalledTimes(1);
   });
 

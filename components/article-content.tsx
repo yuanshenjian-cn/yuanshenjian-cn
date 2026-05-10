@@ -45,6 +45,8 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
         />
       </div>
 
+      {footerAssistant ? footerAssistant : null}
+
       {/* 专栏导航（含上下篇）或全局上下篇导航，二选一 */}
       {columnContext ? (
         <div className="mt-8">
@@ -55,8 +57,6 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
           <PostNavigation prev={prev} next={next} />
         </div>
       )}
-
-      {footerAssistant ? footerAssistant : null}
 
       <GiscusCommentsContainer path={`/articles/${slug}`} />
     </>

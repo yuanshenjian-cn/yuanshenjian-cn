@@ -65,6 +65,35 @@
 
 ---
 
+## 2026-05-10 文章页上下两个“问 AI”实例共用 provider 时，底部提问结果会错误渲染到顶部实例
+
+### 现象
+
+- 文章详情页同时存在顶部问答组件和底部“继续问 AI”组件
+- 从底部发起提问后，返回结果显示在上面的组件里，看起来像“底部按钮触发了顶部回复”
+
+### 根因
+
+1. 两个组件共用同一个 `PageAIAssistantProvider`
+2. provider 内只有一份共享状态：`currentAnswer / currentReferences / currentError / isStreaming`
+3. 旧实现只允许 `primary` 变体渲染结果，因此任何请求结果最终都会显示在顶部实例
+
+### 修复
+
+1. 为每个 `AiPageAssistant` 实例生成独立 `instanceId`
+2. `submitMessage` 时把 `instanceId` 传给 provider，并记录当前活跃实例
+3. 结果区只在 `activeInstanceId` 对应的实例中渲染
+4. 底部继续提问时，结果归属到底部实例；顶部提问时，结果归属到顶部实例
+
+### 如何确认修复生效
+
+1. 在文章页同时渲染顶部和底部两个问答组件
+2. 从底部输入框提交问题
+3. 确认只有底部实例出现 `AI 回答` 和回答内容，顶部实例不显示该次结果
+4. 参考测试：`tests/components/page-ai-assistant.test.tsx`
+
+---
+
 ## 2026-05-10 投资每日简报不应混入“本期重点是如何排序/为何不追某些新闻”的生成前思考说明
 
 ### 现象

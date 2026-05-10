@@ -87,7 +87,7 @@ export function AiPageAssistant({
   } = usePageAIAssistant();
 
   const canSubmit = message.trim().length > 0 && !isStreaming;
-  const shouldShowResult = variant === "primary" && (isStreaming || currentAnswer || currentError || currentReferences.length > 0);
+  const shouldShowResult = isStreaming || currentAnswer || currentError || currentReferences.length > 0;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,7 +107,7 @@ export function AiPageAssistant({
 
   return (
     <div
-      ref={variant === "primary" ? resultContainerRef : undefined}
+      ref={resultContainerRef}
       className={
         variant === "primary"
           ? "my-8 rounded-2xl border border-border/70 bg-card/70 p-6 shadow-sm"
