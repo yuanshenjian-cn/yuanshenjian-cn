@@ -90,10 +90,10 @@ export default function Home() {
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <Link
-                    href={latestBriefing?.url ?? "/ai/daily-briefings"}
+                    href="/ai/daily-briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
                   >
-                    看今天
+                    看最新
                     <ArrowRight className="h-2.5 w-2.5" />
                   </Link>
                   <Link
@@ -133,10 +133,10 @@ export default function Home() {
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <Link
-                    href={latestInvestmentBriefing?.url ?? "/investment/daily-briefings"}
+                    href="/investment/daily-briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
                   >
-                    看今天
+                    看最新
                     <ArrowRight className="h-2.5 w-2.5" />
                   </Link>
                   <Link
