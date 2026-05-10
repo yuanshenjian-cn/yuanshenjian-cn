@@ -4,6 +4,39 @@
 
 ---
 
+## 2026-05-10 `next/font/google` 会让本地 `dev/build` 依赖外网，网络异常时启动与构建都可能直接失败
+
+### 现象
+
+- `npm run dev` 在本地启动时因为网络问题直接报错
+- `npm run build` 或 `pre-push` 里的构建在网络不稳定时也可能失败
+- 业务代码本身没有主动请求外部 API，但开发者误以为静态博客构建不应依赖网络
+
+### 根因
+
+1. `app/layout.tsx` 使用了 `next/font/google`
+2. `next/font/google` 会在开发启动和构建阶段拉取 Google Fonts 资源
+3. 当本地网络无法稳定访问 Google Fonts 时，Next 会在字体准备阶段直接失败
+
+### 修复
+
+1. 移除 `app/layout.tsx` 中的 `next/font/google`
+2. 保留现有 `--font-inter` / `--font-playfair` 变量接口，避免改动全站 `font-sans` / `font-serif` 的消费代码
+3. 在 `app/globals.css` 中将这两个变量改为系统本地字体栈：
+   - sans 使用 `Inter` 命中本机已安装字体时优先，否则回退到系统无衬线字体
+   - serif 使用 `Iowan Old Style / Palatino / Songti SC` 一类本地衬线字体栈
+4. 这样 `dev/build` 不再依赖 Google Fonts 网络请求
+
+### 如何确认修复生效
+
+1. 断网或在无法访问 Google 的网络环境下执行：
+   - `npm run dev`
+   - `npm run build`
+2. 确认不再出现 Google Fonts 下载相关报错
+3. 确认页面正文和标题仍分别走 `font-sans` / `font-serif`，站点排版没有明显错乱
+
+---
+
 ## 2026-05-10 投资每日简报不应混入“本期重点是如何排序/为何不追某些新闻”的生成前思考说明
 
 ### 现象

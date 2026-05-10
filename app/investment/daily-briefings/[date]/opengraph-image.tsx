@@ -84,9 +84,7 @@ export default async function OpengraphImage({ params }: Props) {
                 width: 84,
                 height,
                 borderRadius: 22,
-                background: "linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.18))",
-                border: "1px solid rgba(255,255,255,0.08)",
-                boxShadow: "0 14px 36px rgba(0,0,0,0.22)",
+                background: "#FFFFFF",
               }}
             />
           ))}
