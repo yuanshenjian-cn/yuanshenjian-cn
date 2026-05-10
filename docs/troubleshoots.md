@@ -4,6 +4,40 @@
 
 ---
 
+## 2026-05-10 投资每日简报不应混入“本期重点是如何排序/为何不追某些新闻”的生成前思考说明
+
+### 现象
+
+- 已发布投资简报正文中出现类似“本期重点是把已官宣节点重新排序，而不是追逐零碎周末新闻”的描述
+- 这类句子不是公开事实、数据或观察结论，而是生成简报时的选材与写作过程说明
+
+### 根因
+
+1. investment skill 虽然已经禁止“内部审核式说明”进入公开正文，但示例主要覆盖“暂不纳入本期”这一类排除理由
+2. `scripts/validate-post.js` 之前没有把“排序理由 / 写作意图 / 取舍说明”作为独立门禁拦截
+3. 因此模型即使没有输出荐股或黑名单内容，仍可能把内部思考过程写进已发布稿
+
+### 修复
+
+1. 在 `skills/investment-daily-briefing/SKILL.md` 与镜像副本中明确补充：生成前的取舍说明、排序理由、写作意图不得进入公开正文
+2. 在 `skills/investment-daily-briefing/README.md` 与镜像副本中同步补充同一条公开稿约束
+3. 在 `scripts/validate-post.js` 新增 investment process leak 门禁，拦截例如：
+   - `本期重点是把...`
+   - `而不是追逐...`
+   - `暂不纳入本期 / 未纳入本期 / 为什么没纳入`
+4. 已发布稿如出现这类句子，应改写成客观事实描述，不保留“我是怎么选材/排序”的主观说明
+
+### 如何确认修复生效
+
+1. 运行：
+   - `npm run validate-post -- content/investment-briefings/2026-05-10-investment-daily-briefing.md`
+   - `npm run test -- tests/scripts/validate-post.test.ts tests/skills/investment-skill-sync.test.ts`
+2. 确认已发布投资简报中不再出现“本期重点是...”“而不是追逐...”这类元说明
+3. 如有新稿误写入这类内容，`validate-post.js` 应报错：
+   - `投资每日简报包含生成前思考/取舍说明，不得进入公开正文：...`
+
+---
+
 ## 2026-05-05 AI 前端验证与配置提示过于技术化，需统一改成人话并仅在长期不可用场景附带联系邮箱
 
 ### 现象

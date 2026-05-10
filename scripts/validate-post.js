@@ -30,6 +30,11 @@ const INVESTMENT_CONFIG_ROOT = path.join(ROOT, "config/investment");
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const INVESTMENT_REDLINE_RE = /(值得买入|建议加仓|目标价|推荐买入|推荐关注|仓位|上车|抄底|止盈|止损|强推|配置价值|买入|卖出|加仓|减仓|建仓|看多|看空|增持|跑赢大市|弹性空间|持有)/;
+const INVESTMENT_PROCESS_LEAK_PATTERNS = [
+  /(?:本期|这期)重点是把[^。；\n]*/,
+  /而不是追逐[^。；\n]*/,
+  /(?:暂不纳入本期|未纳入本期|为什么没纳入)/,
+];
 const OLD_ARTICLE_DATE_LINK_RE = /\]\(\/articles\/\d{4}\/\d{2}\/\d{2}\//g;
 const OLD_BLOG_LINK_RE = /\]\(\/blog\//g;
 const GENERIC_ALT_RE = /^\s*(|image|alt text|图片)\s*$/i;
@@ -673,6 +678,18 @@ function validateInvestmentBriefingFile(file, slugs) {
   const redline = parsed.body.match(INVESTMENT_REDLINE_RE);
   if (redline) {
     addError(`投资每日简报命中红线表达：${redline[0]}`, relativeFile, getLineNumber(parsed.body, redline.index ?? 0));
+  }
+
+  for (const pattern of INVESTMENT_PROCESS_LEAK_PATTERNS) {
+    const leakedProcess = parsed.body.match(pattern);
+    if (leakedProcess) {
+      addError(
+        `投资每日简报包含生成前思考/取舍说明，不得进入公开正文：${leakedProcess[0]}`,
+        relativeFile,
+        getLineNumber(parsed.body, leakedProcess.index ?? 0),
+      );
+      break;
+    }
   }
 
   const blockedCompany = detectBlockedInvestmentCompany(parsed.body);
