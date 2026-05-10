@@ -5,6 +5,7 @@ import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
 import { getAllPosts } from "@/lib/blog";
 import { getLatestBriefing } from "@/lib/briefings";
 import { config } from "@/lib/config";
+import { getLatestInvestmentBriefing } from "@/lib/investment-briefings";
 import { generateListPageSEO } from "@/lib/seo-utils";
 
 export const metadata: Metadata = generateListPageSEO(
@@ -17,6 +18,7 @@ export default function Home() {
   const posts = getAllPosts();
   const recentPosts = posts.slice(0, 3);
   const latestBriefing = getLatestBriefing();
+  const latestInvestmentBriefing = getLatestInvestmentBriefing();
 
   return (
     <>
@@ -59,48 +61,93 @@ export default function Home() {
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-primary/10 p-2 text-primary">
-                    <Newspaper className="h-4 w-4" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-full bg-primary/10 p-2 text-primary">
+                      <Newspaper className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                        AI 每日简报
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      AI 每日简报
-                    </p>
-                  </div>
+
+                  {latestBriefing ? (
+                    <time className="shrink-0 text-xs text-muted-foreground" dateTime={latestBriefing.date}>
+                      {new Date(latestBriefing.date).toLocaleDateString("zh-CN")}
+                    </time>
+                  ) : null}
                 </div>
 
-                {latestBriefing ? (
-                  <time className="shrink-0 text-xs text-muted-foreground" dateTime={latestBriefing.date}>
-                    {new Date(latestBriefing.date).toLocaleDateString("zh-CN")}
-                  </time>
-                ) : null}
-              </div>
+                <p className="mt-4 line-clamp-4 text-sm leading-6 text-foreground/75">
+                  {latestBriefing
+                    ? latestBriefing.excerpt
+                    : "每天早上更新，聚焦重点 AI 厂商的确定性动态。"}
+                </p>
 
-              <p className="mt-4 text-sm leading-6 text-foreground/75">
-                {latestBriefing
-                  ? latestBriefing.excerpt
-                  : "每天早上更新，聚焦重点 AI 厂商的确定性动态。"}
-              </p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <Link
+                    href={latestBriefing?.url ?? "/ai/daily-briefings"}
+                    className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
+                  >
+                    看今天
+                    <ArrowRight className="h-2.5 w-2.5" />
+                  </Link>
+                  <Link
+                    href="/ai/daily-briefings"
+                    className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    看往期
+                  </Link>
+                </div>
+              </section>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                <Link
-                  href={latestBriefing?.url ?? "/ai/daily-briefings"}
-                  className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
-                >
-                  看今天
-                  <ArrowRight className="h-2.5 w-2.5" />
-                </Link>
-                <Link
-                  href="/ai/daily-briefings"
-                  className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  看往期
-                </Link>
-              </div>
-            </section>
+              <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-full bg-primary/10 p-2 text-primary">
+                      <Newspaper className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                        投资每日简报
+                      </p>
+                    </div>
+                  </div>
+
+                  {latestInvestmentBriefing ? (
+                    <time className="shrink-0 text-xs text-muted-foreground" dateTime={latestInvestmentBriefing.date}>
+                      {new Date(latestInvestmentBriefing.date).toLocaleDateString("zh-CN")}
+                    </time>
+                  ) : null}
+                </div>
+
+                <p className="mt-4 line-clamp-4 text-sm leading-6 text-foreground/75">
+                  {latestInvestmentBriefing
+                    ? latestInvestmentBriefing.excerpt
+                    : "每天整理重点公司的公开动态与未来观察，帮助你快速把握最新投资线索。"}
+                </p>
+
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <Link
+                    href={latestInvestmentBriefing?.url ?? "/investment/daily-briefings"}
+                    className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
+                  >
+                    看今天
+                    <ArrowRight className="h-2.5 w-2.5" />
+                  </Link>
+                  <Link
+                    href="/investment/daily-briefings"
+                    className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    看往期
+                  </Link>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
 

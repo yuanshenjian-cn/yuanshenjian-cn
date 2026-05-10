@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const ogImage = `${url}/opengraph-image`;
   const shareTitle = isLatestRoute ? `AI 每日简报 · Latest | ${config.site.name}` : briefing.title;
   const shareDescription = isLatestRoute
-    ? "AI 每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新动态。"
+    ? "AI 每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的 AI 动态。"
     : briefing.excerpt;
 
   return {
@@ -92,7 +92,7 @@ export default async function BriefingDetailPage({ params }: Props) {
   const url = `${config.site.url}${date === "latest" ? "/ai/daily-briefings/latest" : briefing.url}`;
   const shareTitle = date === "latest" ? `AI 每日简报 · Latest | ${config.site.name}` : briefing.title;
   const shareDescription = date === "latest"
-    ? "AI 每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新动态。"
+    ? "AI 每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的 AI 动态。"
     : briefing.excerpt;
 
   return (
