@@ -21,11 +21,9 @@
 ### 修复
 
 1. 移除 `app/layout.tsx` 中的 `next/font/google`
-2. 保留现有 `--font-inter` / `--font-playfair` 变量接口，避免改动全站 `font-sans` / `font-serif` 的消费代码
-3. 在 `app/globals.css` 中将这两个变量改为系统本地字体栈：
-   - sans 使用 `Inter` 命中本机已安装字体时优先，否则回退到系统无衬线字体
-   - serif 使用 `Iowan Old Style / Palatino / Songti SC` 一类本地衬线字体栈
-4. 这样 `dev/build` 不再依赖 Google Fonts 网络请求
+2. 将 `Inter` 与 `Playfair Display` 的开源字体文件落库到 `app/fonts/`
+3. 改为 `next/font/local`，继续沿用 `--font-inter` / `--font-playfair` 变量接口，避免改动全站 `font-sans` / `font-serif` 的消费代码
+4. 这样 `dev/build` 不再依赖 Google Fonts 网络请求，同时不同机器的字体表现也更一致
 
 ### 如何确认修复生效
 
@@ -34,6 +32,36 @@
    - `npm run build`
 2. 确认不再出现 Google Fonts 下载相关报错
 3. 确认页面正文和标题仍分别走 `font-sans` / `font-serif`，站点排版没有明显错乱
+
+---
+
+## 2026-05-10 Cloudflare 主站缓存规则已收敛为 6 类，后续调整以 `docs/guides/cloudflare-cache-rules.md` 为准
+
+### 现象
+
+- Cloudflare 面板里缓存规则容易越加越多
+- 规则一多就会出现重复覆盖、顺序冲突、TTL 难统一的问题
+
+### 根因
+
+1. 站点路径类型逐步增多：页面、latest、JSON 数据、OG 图、静态资源、文档、元文件
+2. 如果每类都拆得很细，维护成本会快速升高
+
+### 修复
+
+1. 将主站缓存策略正式收口为 6 类：
+   - `sw-no-cache`
+   - `static-asset-cache`
+   - `document-cache`
+   - `latest-cache`
+   - `data-and-meta-cache`
+   - `site-page-cache`
+2. 在 `docs/guides/cloudflare-cache-rules.md` 固化规则顺序、Expression、TTL、迁移方式与验证步骤
+
+### 如何确认修复生效
+
+1. 后续修改缓存策略前，先对照 `docs/guides/cloudflare-cache-rules.md`
+2. Cloudflare 面板中的最终规则数应控制在 6 类左右，而不是继续横向扩张
 
 ---
 

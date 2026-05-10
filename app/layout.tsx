@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -6,6 +7,20 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { BackToTop } from "@/components/back-to-top";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 import { config } from "@/lib/config";
+
+const inter = localFont({
+  src: "./fonts/Inter-Variable.ttf",
+  variable: "--font-inter",
+  display: "swap",
+  preload: true,
+});
+
+const playfair = localFont({
+  src: "./fonts/PlayfairDisplay-Variable.ttf",
+  variable: "--font-playfair",
+  display: "swap",
+  preload: true,
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(config.site.url),
@@ -45,7 +60,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="zh-CN" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-sans min-h-screen flex flex-col">
         <ThemeProvider>
           <Header />
