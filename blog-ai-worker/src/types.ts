@@ -1,0 +1,232 @@
+export interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+}
+
+export interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): void;
+  passThroughOnException(): void;
+}
+
+export interface Env {
+  RATE_LIMIT_KV: KVNamespace;
+  LLM_ACTIVE_PROFILE: string;
+  LLM_PROVIDER_NAME: string;
+  LLM_MODEL_ID: string;
+  LLM_PROVIDER_API_KEY: string;
+  LLM_PROVIDER_BASE_URL: string;
+  TURNSTILE_SECRET_KEY: string;
+  TURNSTILE_ALLOWED_HOSTNAMES: string;
+  TURNSTILE_EXPECTED_ACTION?: string;
+  ALLOWED_ORIGINS: string;
+  AI_IP_RATE_LIMIT_WINDOW_SECONDS?: string;
+  AI_IP_RATE_LIMIT_MAX_REQUESTS?: string;
+  AI_EMERGENCY_DISABLE?: string;
+  AI_DAILY_REQUEST_LIMIT?: string;
+  AI_REQUEST_MAX_BODY_BYTES?: string;
+  AI_REQUEST_MAX_MESSAGE_CHARS?: string;
+  AI_DATA_BASE_URL: string;
+}
+
+export type ChatScene = "recommend" | "briefing-recommend" | "investment-briefing-recommend" | "article" | "author";
+export type PageScene = "article" | "author";
+
+export interface RecommendRequestBody {
+  scene: "recommend";
+  message: string;
+  cf_turnstile_response: string;
+}
+
+export interface BriefingRecommendRequestBody {
+  scene: "briefing-recommend";
+  message: string;
+  context: {
+    range: "today" | "3d" | "7d" | "14d" | "30d";
+  };
+  cf_turnstile_response: string;
+}
+
+export interface InvestmentBriefingRecommendRequestBody {
+  scene: "investment-briefing-recommend";
+  message: string;
+  context: {
+    range: "3d" | "7d" | "14d" | "30d";
+  };
+  cf_turnstile_response: string;
+}
+
+export interface ArticleRequestBody {
+  scene: "article";
+  message: string;
+  context: {
+    slug: string;
+  };
+  cf_turnstile_response: string;
+}
+
+export interface AuthorRequestBody {
+  scene: "author";
+  message: string;
+  context: {
+    page: "author";
+  };
+  cf_turnstile_response: string;
+}
+
+export type ChatRequestBody = RecommendRequestBody | BriefingRecommendRequestBody | InvestmentBriefingRecommendRequestBody | ArticleRequestBody | AuthorRequestBody;
+
+export interface RecommendReference {
+  slug: string;
+  title: string;
+  excerpt: string;
+  tags: string[];
+  date: string;
+  url?: string;
+}
+
+export interface PageReference {
+  id: string;
+  title: string;
+  excerpt: string;
+  sourceType: "article-section" | "author-section";
+  anchorId?: string;
+}
+
+export interface AIUsage {
+  promptTokens?: number;
+  completionTokens?: number;
+  totalTokens?: number;
+}
+
+export interface RecommendResponse {
+  answer: string;
+  references: RecommendReference[];
+  usage?: AIUsage;
+}
+
+export interface PageResponse {
+  answer: string;
+  references: PageReference[];
+  usage?: AIUsage;
+}
+
+export interface PageSection {
+  id: string;
+  heading: string;
+  content: string;
+  excerpt: string;
+  anchorId?: string;
+}
+
+export interface AuthorChunk extends PageSection {
+  sectionType?: string;
+  entityType?: "profile" | "skill" | "certificate" | "education" | "experience" | "project" | "extra";
+  entityId?: string;
+  organization?: string;
+  role?: string;
+  period?: string;
+  keywords?: string[];
+  techs?: string[];
+}
+
+export interface AuthorProfileEntity {
+  id: string;
+  heading: string;
+  name: string;
+  roles: string[];
+  phone: string;
+  email: string;
+  summary: string[];
+}
+
+export interface AuthorSkillEntity {
+  id: string;
+  title: string;
+  level: string;
+  icon: string;
+  description: string;
+}
+
+export interface AuthorCertificateEntity {
+  id: string;
+  title: string;
+}
+
+export interface AuthorEducationEntity {
+  id: string;
+  heading: string;
+  school: string;
+  major: string;
+  period: string;
+  href?: string;
+}
+
+export interface AuthorExperienceEntity {
+  id: string;
+  title: string;
+  period: string;
+  description?: string;
+  list: string[];
+  organization?: string;
+  role?: string;
+}
+
+export interface AuthorProjectEntity {
+  id: string;
+  period: string;
+  name: string;
+  role: string;
+  description: string;
+  achievements: Array<{ metric?: string; text: string }>;
+  highlights: Array<{ text: string }>;
+  techs: string[];
+  organization?: string;
+}
+
+export interface AuthorExtraEntity {
+  id: string;
+  title: string;
+  items: Array<{ type: string; label: string; href?: string }>;
+}
+
+export interface AuthorEntities {
+  profile: AuthorProfileEntity;
+  skills: AuthorSkillEntity[];
+  certificates: AuthorCertificateEntity[];
+  education: AuthorEducationEntity;
+  experiences: AuthorExperienceEntity[];
+  projects: AuthorProjectEntity[];
+  extras: AuthorExtraEntity[];
+}
+
+export interface ArticlePageData {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  tags: string[];
+  sections: PageSection[];
+}
+
+export interface AuthorPageData {
+  slug: "author";
+  title: string;
+  summary: string;
+  entities: AuthorEntities;
+  chunks: AuthorChunk[];
+  sections?: PageSection[];
+}
+
+export type PageData = ArticlePageData | AuthorPageData;
+
+export class HttpError extends Error {
+  status: number;
+  headers: HeadersInit;
+
+  constructor(status: number, message: string, headers: HeadersInit = {}) {
+    super(message);
+    this.name = "HttpError";
+    this.status = status;
+    this.headers = headers;
+  }
+}

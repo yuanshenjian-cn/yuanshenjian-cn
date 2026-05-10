@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(ln -s ../../skills/investment-daily-briefing /Users/ysj/Personal/blog/.opencode/skills/investment-daily-briefing)"
+    ]
+  }
+}

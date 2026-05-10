@@ -1,0 +1,259 @@
+{
+  "slug": "oh-my-opencode-categories-quick-reference",
+  "title": "Oh My OpenCode：Categories 速查手册",
+  "date": "2026-02-11T00:00:00.000Z",
+  "excerpt": "我系统梳理 oh-my-openagent 的 Category 机制，重点介绍当前最常用的 4 个核心 Category（visual-engineering、ultrabrain、deep、quick），以及 writing、unspecified-low、unspecified-high 这些通用补位项。Category 是针对特定领域优化的 Agent 配置预设，通过 `task(category=\"xxx\")` 调用时由 Sisyphus-Junior 执行器完成工作。本文还介绍 Category 与 Skill 的组合策略、自定义 Category 配置方法、模型解析优先级机制，以及实际开发中的最佳实践。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "OpenCode",
+    "Oh My OpenCode"
+  ],
+  "sections": [
+    {
+      "id": "什么是-category",
+      "anchorId": "什么是-category",
+      "heading": "什么是 Category？",
+      "content": "仓库和推荐的 plugin entry 现在都叫 oh-my-openagent，但 npm 包名和命令行仍然是 oh-my-opencode。我下面提到安装命令时沿用旧命令名，提到仓库和配置文件时则优先用新名字。 Category 是针对特定领域优化的 Agent 配置预设。它回答的核心问题是：\"这是什么类型的工作？\" 当你使用 task() 工具指定 category 参数时，系统会： 创建 Sisyphus-Junior 执行器：一个专用的子 Agent 应用预配置：自动设置模型、温度、提示词等 执行任务：专注完成，不会无限委托",
+      "excerpt": "仓库和推荐的 plugin entry 现在都叫 oh-my-openagent，但 npm 包名和命令行仍然是 oh-my-opencode。我下面提到安装命令时沿用旧命令名，提到仓库和配置文件时则优先用新名字。 Category 是针对特定领域优化的 Agent 配置预设。它回答的核心问题是：\"这是什么类型的工作？..."
+    },
+    {
+      "id": "category-vs-agent-vs-skill",
+      "anchorId": "category-vs-agent-vs-skill",
+      "heading": "Category vs Agent vs Skill",
+      "content": "概念 定义 回答的问题 示例 ------ ------ ------------ ------ Agent 固定身份的专家 \"谁来做？\" Sisyphus、Oracle、Librarian Category 运行时配置预设 \"什么类型的工作？\" visual-engineering、ultrabrain Skill 领域知识和工具 \"需要什么能力？\" git-master、playwright 三者可以组合使用：",
+      "excerpt": "概念 定义 回答的问题 示例 ------ ------ ------------ ------ Agent 固定身份的专家 \"谁来做？\" Sisyphus、Oracle、Librarian Category 运行时配置预设 \"什么类型的工作？\" visual-engineering、ultrabrain Skill ..."
+    },
+    {
+      "id": "当前最值得记住的-7-个-categories",
+      "anchorId": "当前最值得记住的-7-个-categories",
+      "heading": "当前最值得记住的 7 个 Categories",
+      "content": "我现在会先记住 4 个核心 Category，再把另外 3 个通用补位项当成兜底选项。这样选型时不会乱。",
+      "excerpt": "我现在会先记住 4 个核心 Category，再把另外 3 个通用补位项当成兜底选项。这样选型时不会乱。"
+    },
+    {
+      "id": "category-快速参考表",
+      "anchorId": "category-快速参考表",
+      "heading": "Category 快速参考表",
+      "content": "Category 默认模型 变体 / 推理强度 适用场景 成本 ---------- --------- ---------------- ---------- ------ visual-engineering google/gemini-3.1-pro - 前端、UI/UX、设计、样式、动画 中 ultrabrain openai/gpt-5.4 xhigh 硬逻辑、复杂架构、关键决策 高 deep openai/gpt-5.4 medium 自主研究 + 执行、复杂改造 高 quick openai/gpt-5.4-mini - 单文件修改、拼写修复、小修小补 低 writing google/gemini-3-flash - 文档、README、技术写作 低 unspecified-low anthropic/claude-sonnet-4-6 - 不好分类但复杂度中等的任务 中 unspecified-high anthropic/claude-opus-4-7 max 不好分类但要求高质量的任务 高",
+      "excerpt": "Category 默认模型 变体 / 推理强度 适用场景 成本 ---------- --------- ---------------- ---------- ------ visual-engineering google/gemini-3.1-pro - 前端、UI/UX、设计、样式、动画 中 ultrabrai..."
+    },
+    {
+      "id": "visual-engineering视觉工程",
+      "anchorId": "visual-engineering视觉工程",
+      "heading": "visual-engineering（视觉工程）",
+      "content": "这是我做前端和 UI 任务时最常用的 Category，默认路由到 google/gemini-3.1-pro。 适用场景： 开发 React/Vue 组件 实现响应式布局 处理交互细节、视觉层次、动画过渡 把设计稿或截图快速落成页面",
+      "excerpt": "这是我做前端和 UI 任务时最常用的 Category，默认路由到 google/gemini-3.1-pro。 适用场景： 开发 React/Vue 组件 实现响应式布局 处理交互细节、视觉层次、动画过渡 把设计稿或截图快速落成页面"
+    },
+    {
+      "id": "ultrabrain超脑",
+      "anchorId": "ultrabrain超脑",
+      "heading": "ultrabrain（超脑）",
+      "content": "这是默认的高推理路由，走 openai/gpt-5.4 的 xhigh 配置。我通常把它留给真正需要深度权衡的任务。 适用场景： 系统架构评审和设计 复杂业务逻辑分析 多方案权衡和关键决策 很硬的算法和流程推理",
+      "excerpt": "这是默认的高推理路由，走 openai/gpt-5.4 的 xhigh 配置。我通常把它留给真正需要深度权衡的任务。 适用场景： 系统架构评审和设计 复杂业务逻辑分析 多方案权衡和关键决策 很硬的算法和流程推理"
+    },
+    {
+      "id": "deep深度",
+      "anchorId": "deep深度",
+      "heading": "deep（深度）",
+      "content": "deep 也是 gpt-5.4，但推理强度降到 medium。它不是纯分析，而是偏向“研究明白以后继续动手做”。 适用场景： 理解复杂代码库 调试疑难问题 重构已有模块 需要一边研究一边实现的任务 与 ultrabrain 的区别： ultrabrain：更适合硬逻辑和架构决策 deep：更适合研究之后继续推进实现",
+      "excerpt": "deep 也是 gpt-5.4，但推理强度降到 medium。它不是纯分析，而是偏向“研究明白以后继续动手做”。 适用场景： 理解复杂代码库 调试疑难问题 重构已有模块 需要一边研究一边实现的任务 与 ultrabrain 的区别： ultrabrain：更适合硬逻辑和架构决策 deep：更适合研究之后继续推进实现"
+    },
+    {
+      "id": "quick快速",
+      "anchorId": "quick快速",
+      "heading": "quick（快速）",
+      "content": "quick 默认路由到 openai/gpt-5.4-mini。我把它当成“便宜、快、别想太多”的修补刀。 适用场景： 修复拼写错误 单文件小修改 简单重命名 小范围格式清理",
+      "excerpt": "quick 默认路由到 openai/gpt-5.4-mini。我把它当成“便宜、快、别想太多”的修补刀。 适用场景： 修复拼写错误 单文件小修改 简单重命名 小范围格式清理"
+    },
+    {
+      "id": "writing写作",
+      "anchorId": "writing写作",
+      "heading": "writing（写作）",
+      "content": "writing 走 google/gemini-3-flash，适合把思路整理成能直接给人看的文字。 适用场景： 编写技术文档 撰写 README API 文档生成 博客文章起草",
+      "excerpt": "writing 走 google/gemini-3-flash，适合把思路整理成能直接给人看的文字。 适用场景： 编写技术文档 撰写 README API 文档生成 博客文章起草"
+    },
+    {
+      "id": "unspecified-low未指定-低",
+      "anchorId": "unspecified-low未指定-低",
+      "heading": "unspecified-low（未指定-低）",
+      "content": "有些任务不太适合硬塞进某个专业分类，但复杂度也没高到要开超高推理，这时我会用 unspecified-low。 适用场景： 不适合其他 Category 的普通任务 中等复杂度的实现 需要稳定输出，但不需要极高推理投入",
+      "excerpt": "有些任务不太适合硬塞进某个专业分类，但复杂度也没高到要开超高推理，这时我会用 unspecified-low。 适用场景： 不适合其他 Category 的普通任务 中等复杂度的实现 需要稳定输出，但不需要极高推理投入"
+    },
+    {
+      "id": "unspecified-high未指定-高",
+      "anchorId": "unspecified-high未指定-高",
+      "heading": "unspecified-high（未指定-高）",
+      "content": "如果任务难归类，但我又明确希望模型投入更高，unspecified-high 会比 unspecified-low 更稳。 适用场景： 不适合其他 Category 但需要高投入的任务 复杂功能实现 我更看重输出质量而不是速度的场景",
+      "excerpt": "如果任务难归类，但我又明确希望模型投入更高，unspecified-high 会比 unspecified-low 更稳。 适用场景： 不适合其他 Category 但需要高投入的任务 复杂功能实现 我更看重输出质量而不是速度的场景"
+    },
+    {
+      "id": "sisyphus-juniorcategory-的执行者",
+      "anchorId": "sisyphus-juniorcategory-的执行者",
+      "heading": "Sisyphus-Junior：Category 的执行者",
+      "content": "当使用 Category 时，实际执行任务的是 Sisyphus-Junior（小西西弗斯）。",
+      "excerpt": "当使用 Category 时，实际执行任务的是 Sisyphus-Junior（小西西弗斯）。"
+    },
+    {
+      "id": "什么是-sisyphus-junior",
+      "anchorId": "什么是-sisyphus-junior",
+      "heading": "什么是 Sisyphus-Junior？",
+      "content": "属性 详情 ------ ------ 角色 推石头者·少年版 模型 继承自指定的 Category 特点 专注执行，不能再次委托 成本 根据使用的 Category 决定",
+      "excerpt": "属性 详情 ------ ------ 角色 推石头者·少年版 模型 继承自指定的 Category 特点 专注执行，不能再次委托 成本 根据使用的 Category 决定"
+    },
+    {
+      "id": "为什么禁止-task-工具",
+      "anchorId": "为什么禁止-task-工具",
+      "heading": "为什么禁止 task 工具？",
+      "content": "防止无限委托循环：",
+      "excerpt": "防止无限委托循环："
+    },
+    {
+      "id": "category-与-skill-的组合策略",
+      "anchorId": "category-与-skill-的组合策略",
+      "heading": "Category 与 Skill 的组合策略",
+      "content": "通过组合 Category 和 Skill，可以创建强大的专业代理组合：",
+      "excerpt": "通过组合 Category 和 Skill，可以创建强大的专业代理组合："
+    },
+    {
+      "id": "设计师组合ui-实现",
+      "anchorId": "设计师组合ui-实现",
+      "heading": "设计师组合（UI 实现）",
+      "content": "效果： visual-engineering：使用 Gemini 3.1 Pro 的视觉能力 frontend-ui-ux：注入设计原则和美学指导 playwright：完成后自动截图验证",
+      "excerpt": "效果： visual-engineering：使用 Gemini 3.1 Pro 的视觉能力 frontend-ui-ux：注入设计原则和美学指导 playwright：完成后自动截图验证"
+    },
+    {
+      "id": "架构师组合设计评审",
+      "anchorId": "架构师组合设计评审",
+      "heading": "架构师组合（设计评审）",
+      "content": "效果： ultrabrain：使用 GPT-5.4 xhigh 的深度推理 空 skills：纯推理，专注架构分析",
+      "excerpt": "效果： ultrabrain：使用 GPT-5.4 xhigh 的深度推理 空 skills：纯推理，专注架构分析"
+    },
+    {
+      "id": "维护者组合快速修复",
+      "anchorId": "维护者组合快速修复",
+      "heading": "维护者组合（快速修复）",
+      "content": "效果： quick：使用快速的 GPT-5.4 mini 路由 git-master：自动生成规范的 commit message",
+      "excerpt": "效果： quick：使用快速的 GPT-5.4 mini 路由 git-master：自动生成规范的 commit message"
+    },
+    {
+      "id": "文档专家组合",
+      "anchorId": "文档专家组合",
+      "heading": "文档专家组合",
+      "content": "效果： writing：使用适合写作的模型 frontend-ui-ux：理解 UI 组件的设计意图",
+      "excerpt": "效果： writing：使用适合写作的模型 frontend-ui-ux：理解 UI 组件的设计意图"
+    },
+    {
+      "id": "自定义-category-配置",
+      "anchorId": "自定义-category-配置",
+      "heading": "自定义 Category 配置",
+      "content": "在 oh-my-openagent.json 或 oh-my-openagent.jsonc 中可以自定义或覆盖 Category；如果你已经在用旧的 oh-my-opencode.json[c]，它也仍然兼容。",
+      "excerpt": "在 oh-my-openagent.json 或 oh-my-openagent.jsonc 中可以自定义或覆盖 Category；如果你已经在用旧的 oh-my-opencode.json[c]，它也仍然兼容。"
+    },
+    {
+      "id": "配置文件位置",
+      "anchorId": "配置文件位置",
+      "heading": "配置文件位置",
+      "content": "优先级 位置 说明 -------- ------ ------ 1（最高） .opencode/oh-my-openagent.jsonc 项目级推荐配置 2 ~/.config/opencode/oh-my-openagent.jsonc 用户级推荐配置 3 .opencode/oh-my-opencode.jsonc legacy 项目级配置 4 ~/.config/opencode/oh-my-opencode.jsonc legacy 用户级配置",
+      "excerpt": "优先级 位置 说明 -------- ------ ------ 1（最高） .opencode/oh-my-openagent.jsonc 项目级推荐配置 2 ~/.config/opencode/oh-my-openagent.jsonc 用户级推荐配置 3 .opencode/oh-my-opencode.jso..."
+    },
+    {
+      "id": "关键模型解析优先级",
+      "anchorId": "关键模型解析优先级",
+      "heading": "关键：模型解析优先级",
+      "content": "Categories 本身就带有内置默认值；如果你没有覆写，系统会先走这些默认路由。",
+      "excerpt": "Categories 本身就带有内置默认值；如果你没有覆写，系统会先走这些默认路由。"
+    },
+    {
+      "id": "推荐配置",
+      "anchorId": "推荐配置",
+      "heading": "推荐配置",
+      "content": "我自己的习惯是：只覆写我明确想改掉的 Category。其余的让它继续走内置默认值，配置反而更干净。",
+      "excerpt": "我自己的习惯是：只覆写我明确想改掉的 Category。其余的让它继续走内置默认值，配置反而更干净。"
+    },
+    {
+      "id": "provider-优先级链",
+      "anchorId": "provider-优先级链",
+      "heading": "Provider 优先级链",
+      "content": "每个 Category 都有 Provider fallback 机制，当首选模型不可用时自动切换： Category 默认模型 Provider 优先级链 ---------- --------- ------------------ visual-engineering gemini-3.1-pro google → anthropic → zai-coding-plan ultrabrain gpt-5.4 openai → google → anthropic deep gpt-5.4 openai → anthropic → google quick gpt-5.4-mini openai → anthropic → google unspecified-low claude-sonnet-4-6 anthropic → openai → google unspecified-high claude-opus-4-7 anthropic → openai → google writing gemini-3-flash google → anthropic → zai-coding-plan → openai",
+      "excerpt": "每个 Category 都有 Provider fallback 机制，当首选模型不可用时自动切换： Category 默认模型 Provider 优先级链 ---------- --------- ------------------ visual-engineering gemini-3.1-pro google ..."
+    },
+    {
+      "id": "检查配置",
+      "anchorId": "检查配置",
+      "heading": "检查配置",
+      "content": "输出示例：",
+      "excerpt": "输出示例："
+    },
+    {
+      "id": "场景快速开发-ui-组件",
+      "anchorId": "场景快速开发-ui-组件",
+      "heading": "场景：快速开发 UI 组件",
+      "content": "需求：开发一个响应式的导航栏组件 执行过程： ulw 触发 Ultrawork 模式 Sisyphus 识别为前端任务 使用 visual-engineering Category Sisyphus-Junior 使用 Gemini 3.1 Pro 执行",
+      "excerpt": "需求：开发一个响应式的导航栏组件 执行过程： ulw 触发 Ultrawork 模式 Sisyphus 识别为前端任务 使用 visual-engineering Category Sisyphus-Junior 使用 Gemini 3.1 Pro 执行"
+    },
+    {
+      "id": "场景深度架构分析",
+      "anchorId": "场景深度架构分析",
+      "heading": "场景：深度架构分析",
+      "content": "需求：分析当前系统的性能瓶颈 执行过程： 识别需要深度推理 使用 ultrabrain Category GPT-5.4 xhigh 进行分析 输出详细的优化建议",
+      "excerpt": "需求：分析当前系统的性能瓶颈 执行过程： 识别需要深度推理 使用 ultrabrain Category GPT-5.4 xhigh 进行分析 输出详细的优化建议"
+    },
+    {
+      "id": "场景批量小修改",
+      "anchorId": "场景批量小修改",
+      "heading": "场景：批量小修改",
+      "content": "需求：修复项目中的所有 TypeScript 类型错误 执行过程： ulw 触发并行处理 使用 quick Category（快速便宜） GPT-5.4 mini 批量处理 每个文件独立处理，最后汇总",
+      "excerpt": "需求：修复项目中的所有 TypeScript 类型错误 执行过程： ulw 触发并行处理 使用 quick Category（快速便宜） GPT-5.4 mini 批量处理 每个文件独立处理，最后汇总"
+    },
+    {
+      "id": "场景技术文档编写",
+      "anchorId": "场景技术文档编写",
+      "heading": "场景：技术文档编写",
+      "content": "需求：为新功能编写文档 执行过程： 使用 writing Category Gemini 3 Flash 进行写作 生成规范的 API 文档",
+      "excerpt": "需求：为新功能编写文档 执行过程： 使用 writing Category Gemini 3 Flash 进行写作 生成规范的 API 文档"
+    },
+    {
+      "id": "选择正确的-category",
+      "anchorId": "选择正确的-category",
+      "heading": "选择正确的 Category",
+      "content": "你的需求 推荐 Category 理由 ---------- -------------- ------ 开发 UI 组件 visual-engineering 视觉能力强 架构设计/分析 ultrabrain 深度推理 复杂功能实现 deep 自主工作 小修改/批量处理 quick 快速便宜 不确定的任务（简单） unspecified-low 通用 不确定的任务（复杂） unspecified-high 高质量 文档/写作 writing 文本生成",
+      "excerpt": "你的需求 推荐 Category 理由 ---------- -------------- ------ 开发 UI 组件 visual-engineering 视觉能力强 架构设计/分析 ultrabrain 深度推理 复杂功能实现 deep 自主工作 小修改/批量处理 quick 快速便宜 不确定的任务（简单） u..."
+    },
+    {
+      "id": "配置你的-categories",
+      "anchorId": "配置你的-categories",
+      "heading": "配置你的 Categories",
+      "content": "如果你要改默认路由，直接在 oh-my-openagent.json[c] 里覆写：",
+      "excerpt": "如果你要改默认路由，直接在 oh-my-openagent.json[c] 里覆写："
+    },
+    {
+      "id": "使用-ulw-自动选择",
+      "anchorId": "使用-ulw-自动选择",
+      "heading": "使用 ulw 自动选择",
+      "content": "如果不确定用哪个 Category，直接用 ulw： Sisyphus 会自动分析任务类型并选择合适的 Category。",
+      "excerpt": "如果不确定用哪个 Category，直接用 ulw： Sisyphus 会自动分析任务类型并选择合适的 Category。"
+    },
+    {
+      "id": "监控成本",
+      "anchorId": "监控成本",
+      "heading": "监控成本",
+      "content": "Category 相对成本 使用频率建议 ---------- --------- -------------- quick 🟢 低 大量使用 writing 🟢 低 按需使用 visual-engineering 🟡 中 按需使用 unspecified-low 🟡 中 按需使用 deep 🟠 高 谨慎使用 ultrabrain 🔴 很高 少量使用 unspecified-high 🔴 很高 少量使用",
+      "excerpt": "Category 相对成本 使用频率建议 ---------- --------- -------------- quick 🟢 低 大量使用 writing 🟢 低 按需使用 visual-engineering 🟡 中 按需使用 unspecified-low 🟡 中 按需使用 deep 🟠 高 谨慎使用..."
+    },
+    {
+      "id": "总结",
+      "anchorId": "总结",
+      "heading": "总结",
+      "content": "Oh My OpenCode 的 Categories 系统是一个强大的任务分类和资源配置机制： 核心概念 说明 ---------- ------ 7 个常用 Category 覆盖前端、通用实现、写作和高推理场景 Sisyphus-Junior Category 任务的专用执行器 模型优化 每个 Category 针对场景选择最优模型 Skill 组合 Category + Skill 创建专业代理 自定义配置 在 oh-my-openagent.json[c] 中灵活定制 记住：先吃内置默认值，只有当你明确想改路由时再覆写。",
+      "excerpt": "Oh My OpenCode 的 Categories 系统是一个强大的任务分类和资源配置机制： 核心概念 说明 ---------- ------ 7 个常用 Category 覆盖前端、通用实现、写作和高推理场景 Sisyphus-Junior Category 任务的专用执行器 模型优化 每个 Category ..."
+    },
+    {
+      "id": "参考资料",
+      "anchorId": "参考资料",
+      "heading": "参考资料",
+      "content": "oh-my-openagent 仓库 oh-my-openagent 文档目录 Configuration Reference Oh My OpenCode Agent 速查手册",
+      "excerpt": "oh-my-openagent 仓库 oh-my-openagent 文档目录 Configuration Reference Oh My OpenCode Agent 速查手册"
+    }
+  ]
+}

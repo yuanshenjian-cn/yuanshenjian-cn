@@ -1,0 +1,189 @@
+{
+  "title": "投资观察范围",
+  "intro": "固定观察名单为主，重大事件插播；基于公开信息整理，不构成投资建议或个股推荐。",
+  "disclaimer": "**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**",
+  "methodCards": [
+    {
+      "title": "怎么选内容",
+      "description": "固定观察名单为主，重大事件插播，优先保留影响范围明确、来源可靠的信息。"
+    },
+    {
+      "title": "怎么分区",
+      "description": "公开稿固定分为近 24 小时确认动态与未来重点观察；高共识预期只有在显式开启时才会独立出现。"
+    },
+    {
+      "title": "怎么控风险",
+      "description": "默认不提供买卖建议、不荐股、不公开传闻，只基于公开、可追溯、可核验的信息。"
+    }
+  ],
+  "boundaryStatements": [
+    "不覆盖全市场所有标的。",
+    "不保证穷尽所有新闻。",
+    "不提供买卖建议或个股推荐。",
+    "默认只纳入公开、可追溯、可核验信息。",
+    "未核验传闻不会进入公开发布内容。"
+  ],
+  "areas": [
+    {
+      "name": "恒生科技",
+      "type": "index",
+      "priority": "core",
+      "publicSummary": "重点观察港股科技平台、监管节奏、财报与回购信号。",
+      "publicTags": [
+        "港股",
+        "科技平台"
+      ],
+      "sortOrder": 10
+    },
+    {
+      "name": "AI",
+      "type": "theme",
+      "priority": "core",
+      "publicSummary": "重点观察 AI 算力、云、模型与应用层的重要财报、政策和产品催化。",
+      "publicTags": [
+        "AI",
+        "算力"
+      ],
+      "sortOrder": 20
+    },
+    {
+      "name": "新消费",
+      "type": "sector",
+      "priority": "important",
+      "publicSummary": "重点观察销售趋势、爆品周期、渠道效率与利润率变化，识别新消费景气度拐点。",
+      "publicTags": [
+        "新消费",
+        "渠道效率"
+      ],
+      "sortOrder": 30
+    },
+    {
+      "name": "智能制造",
+      "type": "industry",
+      "priority": "important",
+      "publicSummary": "重点观察资本开支、自动化渗透、订单能见度与出海节奏，判断制造业景气变化。",
+      "publicTags": [
+        "智能制造",
+        "资本开支"
+      ],
+      "sortOrder": 40
+    },
+    {
+      "name": "生物医药",
+      "type": "industry",
+      "priority": "important",
+      "publicSummary": "重点观察临床数据、审批注册、医保政策与 BD 授权进展，跟踪创新药兑现节奏。",
+      "publicTags": [
+        "创新药",
+        "政策"
+      ],
+      "sortOrder": 50
+    }
+  ],
+  "companies": [
+    {
+      "name": "腾讯控股",
+      "ticker": "0700.HK",
+      "market": "港股",
+      "priority": "core",
+      "publicSummary": "重点观察财报、回购、游戏与广告经营变化。",
+      "publicFocusPoints": [
+        "财报",
+        "回购",
+        "经营数据"
+      ],
+      "sortOrder": 10
+    },
+    {
+      "name": "阿里巴巴",
+      "ticker": "9988.HK",
+      "market": "港股",
+      "priority": "core",
+      "publicSummary": "重点观察电商、云与资本分配相关变化。",
+      "publicFocusPoints": [
+        "财报",
+        "云业务",
+        "回购"
+      ],
+      "sortOrder": 20
+    },
+    {
+      "name": "小米集团",
+      "ticker": "1810.HK",
+      "market": "港股",
+      "priority": "core",
+      "publicSummary": "重点观察手机、IoT 与汽车业务推进，以及利润率变化。",
+      "publicFocusPoints": [
+        "财报",
+        "汽车业务",
+        "产品催化"
+      ],
+      "sortOrder": 30
+    },
+    {
+      "name": "英伟达",
+      "ticker": "NVDA",
+      "market": "美股",
+      "priority": "important",
+      "publicSummary": "重点观察数据中心收入、AI 芯片供需与资本开支信号。",
+      "publicFocusPoints": [
+        "财报",
+        "指引",
+        "产品催化"
+      ],
+      "sortOrder": 40
+    },
+    {
+      "name": "谷歌",
+      "ticker": "GOOGL",
+      "market": "美股",
+      "priority": "important",
+      "publicSummary": "重点观察广告、云与 AI 产品推进相关变化。",
+      "publicFocusPoints": [
+        "财报",
+        "云业务",
+        "AI 产品"
+      ],
+      "sortOrder": 50
+    },
+    {
+      "name": "特斯拉",
+      "ticker": "TSLA",
+      "market": "美股",
+      "priority": "important",
+      "publicSummary": "重点观察销量、价格调整与自动驾驶业务进展。",
+      "publicFocusPoints": [
+        "销量",
+        "财报",
+        "自动驾驶"
+      ],
+      "sortOrder": 60
+    },
+    {
+      "name": "苹果",
+      "ticker": "AAPL",
+      "market": "美股",
+      "priority": "important",
+      "publicSummary": "重点观察硬件销量、服务收入与 AI 功能推进。",
+      "publicFocusPoints": [
+        "财报",
+        "服务业务",
+        "AI 功能"
+      ],
+      "sortOrder": 70
+    },
+    {
+      "name": "中国平安",
+      "ticker": "2318.HK",
+      "market": "港股",
+      "priority": "event-driven",
+      "publicSummary": "重点观察寿险新业务价值、投资收益与资本分配变化。",
+      "publicFocusPoints": [
+        "财报",
+        "分红",
+        "保险经营"
+      ],
+      "sortOrder": 80
+    }
+  ]
+}

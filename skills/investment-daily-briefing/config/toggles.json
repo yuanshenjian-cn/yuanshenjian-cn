@@ -1,0 +1,6 @@
+{
+  "enableConsensusExpectations": false,
+  "enableRumorWatch": false,
+  "enableMajorEventInsertion": true,
+  "enableCompanyDeepFocus": true
+}

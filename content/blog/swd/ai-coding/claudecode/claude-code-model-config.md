@@ -1,0 +1,433 @@
+---
+title: "Claude Code 模型配置指南"
+date: '2026-04-17'
+tags: ['软件开发', 'AI 编程', 'ClaudeCode']
+published: true
+brief: "全面解析 Claude Code 的模型配置体系：Opus 4.7 发布带来的别名变化、新增 xhigh 努力等级、自适应推理机制、Prompt Caching 配置，以及企业环境下的模型管控方案。"
+---
+
+## 引言
+
+Claude Code 的 `model` 配置看起来简单，实则暗藏不少细节。随着 **Claude Opus 4.7** 的发布，模型体系迎来了几项重要变化：`opus` 别名在 Anthropic API 上已解析为 4.7，新增了 `xhigh` 努力等级，Opus 4.7 引入了**自适应推理**机制，默认行为也有所调整。
+
+
+## 8 个模型别名速览
+
+Claude Code 的 `model` 配置支持两类值：**模型别名**（别名会跟随最新版本滚动更新）和**完整模型名称**（固定到特定版本）。
+
+模型别名共 8 个：
+
+| 别名 | Anthropic API 解析 | Bedrock / Vertex / Foundry 解析 | 适用场景 |
+|------|-------------------|-------------------------------|---------|
+| `default` | 因套餐而异 | 因套餐而异 | 清除覆盖、恢复账户推荐模型 |
+| `best` | 等同于 `opus` | 等同于 `opus` | 最强模型 |
+| `opus` | **Claude Opus 4.7** ⚠️ | Claude Opus 4.6 | 复杂推理、架构设计 |
+| `sonnet` | Claude Sonnet 4.6 | Claude Sonnet 4.5 | 日常编码任务 |
+| `haiku` | Claude Haiku 4.5 | Claude Haiku 4.5 | 简单快速任务 |
+| `sonnet[1m]` | Claude Sonnet 4.6（1M 变体） | Claude Sonnet 4.5（1M 变体） | 长会话、大型代码库 |
+| `opus[1m]` | Claude Opus 4.7（1M 变体） | Claude Opus 4.6（1M 变体） | 超长复杂推理 |
+| `opusplan` | Plan 阶段用 opus，执行阶段用 sonnet | 同左 | 自动混合模式 |
+
+> ⚠️ **重要**：`opus` 别名在 **Anthropic API** 上已解析为 **Opus 4.7**，但在 Bedrock / Vertex / Foundry 上仍为 Opus 4.6。使用 Opus 4.7 需要 Claude Code **v2.1.111 或更高版本**，请先运行 `claude update`。
+
+
+## 上下文窗口深度解析
+
+### 各模型原生上下文窗口
+
+| 模型 | 上下文窗口 | 最大输出 |
+|------|----------|---------|
+| Claude Opus 4.7 | **1M tokens**（~75万词） | 128K tokens |
+| Claude Opus 4.6 | **1M tokens**（~75万词） | 128K tokens |
+| Claude Sonnet 4.6 | **1M tokens**（~75万词） | 64K tokens |
+| Claude Haiku 4.5 | **200K tokens**（~15万词） | 64K tokens |
+
+Opus 4.7、Opus 4.6 和 Sonnet 4.6 的原生上下文窗口都是 1M，但在 Claude Code 里默认是否启用 1M 取决于你的套餐。
+
+### 1M 扩展上下文的套餐可用性
+
+| 套餐 | Opus + 1M | Sonnet + 1M |
+|-----|----------|------------|
+| **Max / Team Premium** | ✅ 订阅内包含，**自动启用** | 需要额外使用付费 |
+| **Pro** | 需要额外使用付费 | 需要额外使用付费 |
+| **Team Standard / Enterprise** | 需要额外使用付费 | 需要额外使用付费 |
+| **API / 按需付费** | ✅ 完全访问 | ✅ 完全访问 |
+
+**关键结论**：
+
+- **Max/Team Premium 用户**：使用 `opus` 别名时，Claude Code 会**自动升级**到 1M 上下文，无需任何配置
+- **Pro 用户**：`opus` 默认为标准上下文，需要显式使用 `opus[1m]` 并开启额外使用
+- **所有套餐**：`sonnet` 默认 200K，想要 1M 必须使用 `sonnet[1m]`
+
+```bash
+# 显式使用 1M 上下文的方式
+/model opus[1m]
+/model sonnet[1m]
+
+# 也可以附加到完整模型名称
+/model claude-opus-4-7[1m]
+/model claude-sonnet-4-6[1m]
+```
+
+## default 模型的实际行为
+
+`default` 根据账户类型解析为不同模型：
+
+| 账户类型 | 当前 `default` 解析结果 | 2026年4月23日起 |
+|---------|----------------------|---------------|
+| **Max 和 Team Premium** | **Opus 4.7** | Opus 4.7（不变） |
+| **Pro 和 Team Standard** | Sonnet 4.6 | Sonnet 4.6（不变） |
+| **Enterprise** | Sonnet 4.6（Opus 4.7 可用但非默认） | **Opus 4.7** |
+| **Anthropic API** | Sonnet 4.6 | **Opus 4.7** |
+| **Bedrock / Vertex / Foundry** | Sonnet 4.5 | Sonnet 4.5（不变） |
+
+> 📅 **即将变化**：2026 年 4 月 23 日起，Enterprise pay-as-you-go 和 Anthropic API 的默认模型将切换为 **Opus 4.7**。如需提前锁定版本，请设置 `ANTHROPIC_DEFAULT_OPUS_MODEL` 或 `ANTHROPIC_DEFAULT_SONNET_MODEL`。
+
+另外，如果 Opus 达到使用阈值，Claude Code 可能**自动回退**到 Sonnet，这个行为是内置的。
+
+
+## opusplan：智能混合模式
+
+`opusplan` 是 Claude Code 特有的混合策略别名，核心思想是**用对的模型做对的事**：
+
+```
+Plan Mode ──▶ opus（强推理、架构决策）
+     ↓ 批准计划后
+执行模式 ──▶ sonnet（代码生成、实现）
+```
+
+实际配置：
+
+```json
+{
+  "model": "opusplan"
+}
+```
+
+**适合场景**：跨文件重构、复杂 Bug 排查、架构设计——这类任务规划阶段需要 Opus 的深度推理，但执行阶段重复性高、适合 Sonnet 的效率。
+
+**配合版本固定**（推荐）：
+
+```json
+{
+  "model": "opusplan",
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-7",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6"
+  }
+}
+```
+
+
+## Effort 努力等级
+
+Effort 和模型选择是正交的两个维度——同一个模型，不同的 effort 等级，性能和成本差异显著。
+
+### Opus 4.7 的 Effort 等级（5 级）
+
+Opus 4.7 新增了 `xhigh` 等级：
+
+| 等级 | 说明 | 跨会话持续 |
+|------|------|----------|
+| `low` | 最快、最省 | ✅ 是 |
+| `medium` | 均衡速度和推理深度 | ✅ 是 |
+| `high` | 深入推理 | ✅ 是 |
+| `xhigh` | **所有套餐的默认值**，扩展推理 | ✅ 是 |
+| `max` | 无 token 限制，最深入推理 | ❌ 仅当前会话 |
+
+### Opus 4.6 / Sonnet 4.6 的 Effort 等级（4 级）
+
+| 等级 | 说明 | 跨会话持续 |
+|------|------|----------|
+| `low` | 最快、最省 | ✅ 是 |
+| `medium` | **Pro / Max 订阅的默认值** | ✅ 是 |
+| `high` | 深入推理；**API key、Team、Enterprise 及第三方部署的默认值** | ✅ 是 |
+| `max` | 无 token 限制，**仅 Opus 4.6 可用** | ❌ 仅当前会话 |
+
+### 配置 Effort 的方式
+
+**会话中动态切换**：
+
+```bash
+/effort low       # 切换到低努力
+/effort medium    # 切换到中等努力
+/effort high      # 切换到高努力
+/effort xhigh     # 扩展推理（Opus 4.7 专属）
+/effort max       # 最高努力（仅 Opus）
+/effort auto      # 重置为模型默认
+```
+
+**一次性高深度推理**（不改变会话设置）：
+
+```
+在提示中包含 "ultrathink" 关键词，触发当次对话的高努力模式
+```
+
+**启动时指定**：
+
+```bash
+claude --effort high
+```
+
+**永久配置**：
+
+```json
+{
+  "effortLevel": "medium"
+}
+```
+
+**环境变量**（优先级最高）：
+
+```bash
+CLAUDE_CODE_EFFORT_LEVEL=high
+```
+
+> 📌 优先级：环境变量 > 会话配置 > 设置文件 > 模型默认值
+
+
+## 自适应推理（Opus 4.7 专属）
+
+Opus 4.7 引入了**自适应推理**机制：模型会**按需**决定是否思考，而非对所有请求强制推理。这让简单请求响应更快，复杂请求自动调用深度推理。
+
+**关键特性**：
+
+- Opus 4.7 **始终**使用自适应推理，无法禁用
+- 环境变量 `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING` 和 `MAX_THINKING_TOKENS` **仅适用于 Opus 4.6 和 Sonnet 4.6**，对 Opus 4.7 无效
+
+如果你在 Opus 4.6 / Sonnet 4.6 上需要禁用推理或控制思考 token 上限：
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "MAX_THINKING_TOKENS": "10000"
+  }
+}
+```
+
+> 💡 Opus 4.7 的自适应推理与 `xhigh` 默认 effort 协同工作，是其核心能力之一，无法单独关闭其中某项。
+
+
+## 如何配置模型
+
+Claude Code 支持四种配置方式，按优先级从高到低：
+
+### 会话中动态切换
+
+```bash
+/model opus           # 切换到 opus
+/model sonnet[1m]     # 切换到带 1M 上下文的 sonnet
+/model claude-sonnet-4-6  # 切换到固定版本
+```
+
+`/model` 命令还支持通过左右箭头键调整 effort 滑块，当前模型和 effort 等级会显示在状态栏中（例如 `with xhigh effort`）。
+
+### 启动时指定
+
+```bash
+claude --model opus
+claude --model sonnet[1m]
+claude --model opusplan
+```
+
+### 环境变量
+
+```bash
+export ANTHROPIC_MODEL=opus
+```
+
+### 设置文件（永久配置）
+
+```json
+{
+  "model": "sonnet"
+}
+```
+
+
+## 环境变量控制别名解析
+
+如果需要将 `sonnet`、`opus`、`haiku` 等别名固定到特定模型版本（而不是跟随最新），使用以下环境变量：
+
+| 环境变量 | 作用 |
+|--------|------|
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` | 控制 `opus` 别名，以及 `opusplan` 的 Plan 阶段 |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | 控制 `sonnet` 别名，以及 `opusplan` 的执行阶段 |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | 控制 `haiku` 别名，以及背景任务 |
+| `CLAUDE_CODE_SUBAGENT_MODEL` | 控制子智能体使用的模型 |
+
+这些变量必须填写**完整模型名称**（如 `claude-opus-4-7`），不支持别名。
+
+**在设置文件中配置**（推荐，避免污染 shell 环境）：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-7",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001"
+  }
+}
+```
+
+如需固定到 Opus 4.6（不跟随 4.7 更新）：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6"
+  }
+}
+```
+
+**附加 `[1m]` 固定启用扩展上下文**：
+
+```bash
+export ANTHROPIC_DEFAULT_OPUS_MODEL='claude-opus-4-7[1m]'
+```
+
+
+## 限制模型选择（企业场景）
+
+企业管理员可以通过 `availableModels` 限制用户能选择的模型：
+
+```json
+{
+  "availableModels": ["sonnet", "haiku"]
+}
+```
+
+设置后，用户无法通过 `/model`、`--model`、`ANTHROPIC_MODEL` 切换到列表外的模型。
+
+**注意事项**：
+
+- `default` 选项**不受** `availableModels` 影响，始终可用
+- `availableModels` 设置在多层级合并时会**合并去重**
+- 要实现严格的白名单，需在 Managed 设置中配置（最高优先级，用户不可覆盖）
+
+**完整的模型管控三件套**（写入 `managed-settings.json`，IT 统一部署，用户不可覆盖）：
+
+```json
+{
+  "model": "claude-sonnet-4-6",
+  "availableModels": ["claude-sonnet-4-6", "haiku"],
+  "env": {
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6"
+  }
+}
+```
+
+三个字段的分工：
+
+| 字段 | 作用 |
+|-----|------|
+| `model` | 设置会话启动时的初始模型 |
+| `availableModels` | 限制用户可切换的模型范围 |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | 固定「默认」选项解析到的版本，防止用户选 `default` 绕过版本固定 |
+
+## 自定义模型选项
+
+如果需要在 `/model` 选择器中添加自定义模型入口（例如内部代理或实验性端点），使用以下环境变量：
+
+```bash
+# 在 /model 选择器中新增一个自定义入口
+ANTHROPIC_CUSTOM_MODEL_OPTION="my-internal-proxy-model"
+ANTHROPIC_CUSTOM_MODEL_OPTION_NAME="内部代理模型"
+ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION="路由到企业内部 LLM 代理"
+```
+
+| 环境变量 | 说明 |
+|--------|------|
+| `ANTHROPIC_CUSTOM_MODEL_OPTION` | 模型 ID（必填） |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION_NAME` | 在选择器中显示的名称 |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION` | 选择器中显示的描述 |
+
+设置后，用户在 `/model` 菜单中可以看到并选择这个自定义入口。
+
+
+## Prompt Caching 配置
+
+Claude Code 默认会对提示进行缓存以降低成本和延迟。如果出于隐私或合规原因需要关闭，可以按模型粒度控制：
+
+```json
+{
+  "env": {
+    "DISABLE_PROMPT_CACHING": "1"
+  }
+}
+```
+
+也可以针对特定模型族关闭：
+
+| 环境变量 | 作用 |
+|--------|------|
+| `DISABLE_PROMPT_CACHING` | 关闭所有模型的 Prompt Caching |
+| `DISABLE_PROMPT_CACHING_HAIKU` | 仅关闭 Haiku 的 Prompt Caching |
+| `DISABLE_PROMPT_CACHING_SONNET` | 仅关闭 Sonnet 的 Prompt Caching |
+| `DISABLE_PROMPT_CACHING_OPUS` | 仅关闭 Opus 的 Prompt Caching |
+
+> ⚠️ 关闭 Prompt Caching 会**显著增加成本**（长会话尤其明显），非必要不建议关闭。
+
+
+## 禁用 1M 上下文
+
+如果出于成本控制或其他原因，不想使用 1M 上下文，可以完全关闭：
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1"
+  }
+}
+```
+
+设置后，`/model` 选择器中不再显示 1M 变体。
+
+同时，建议配合自动压缩阈值，避免单次会话上下文无限膨胀：
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "150000"
+  }
+}
+```
+
+
+## 常见问题
+
+| 问题 | 答案 |
+|------|------|
+| `opus` 现在是哪个版本？ | Anthropic API 上是 **Opus 4.7**（需 v2.1.111+）；Bedrock / Vertex / Foundry 上仍是 Opus 4.6 |
+| 如何锁定 Opus 4.6 不升级到 4.7？ | 设置 `ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6` |
+| `opus` 和 `opus[1m]` 有什么区别？ | Max/Team Premium 用户两者相同（自动 1M）；Pro 用户 `opus` 默认标准上下文，`opus[1m]` 显式启用 1M |
+| `sonnet` 的上下文窗口是多少？ | 默认 **200K tokens**，需要 `sonnet[1m]` 才是 1M |
+| 当前会话在用什么模型？ | 查看状态栏，或运行 `/status` |
+| Opus 4.7 的默认 effort 是什么？ | 所有套餐均为 `xhigh`，首次使用时强制切换 |
+| `xhigh` 和 `max` 的区别？ | `xhigh` 跨会话持续，是扩展推理；`max` 无 token 限制但**仅当前会话**，适合极复杂问题 |
+| 能关闭 Opus 4.7 的自适应推理吗？ | **不能**，Opus 4.7 始终使用自适应推理；`CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING` 只对 4.6/Sonnet 4.6 有效 |
+| `effort` 的默认等级是什么？ | Opus 4.7 默认 `xhigh`；Opus 4.6 / Sonnet 4.6：Pro / Max 默认 `medium`，API / Team / Enterprise / Bedrock 等默认 `high` |
+| `opusplan` 的 1M 上下文怎么启用？ | 在 `ANTHROPIC_DEFAULT_OPUS_MODEL` 中加 `[1m]` 后缀：`claude-opus-4-7[1m]` |
+| `availableModels: []` 会锁住所有模型吗？ | 不会，`default` 选项始终可用，用户仍能使用其套餐的默认模型 |
+| Haiku 支持 1M 上下文吗？ | 不支持，Haiku 4.5 上限为 200K |
+| 别名会一直跟随最新版本吗？ | 是，如需固定版本，用完整模型名（如 `claude-opus-4-7`）或设置 `ANTHROPIC_DEFAULT_*_MODEL` |
+
+
+## 小结
+
+Claude Code 模型配置的核心逻辑可以归纳为三层：
+
+**选模型**：日常用 `sonnet`（快、够用），复杂推理用 `opus`（API 上现为 Opus 4.7），需要自动切换用 `opusplan`
+
+**选上下文**：需要处理大型代码库或超长会话时，显式加 `[1m]` 后缀；不需要时保持默认 200K 更可控
+
+**选深度**：Opus 4.7 默认 `xhigh`（扩展推理），Opus 4.6 / Sonnet 4.6 通过 `effort` 控制——日常 `medium` 足够，复杂问题用 `high`，极端场景才用 `max`
+
+
+## 参考链接
+
+- [Claude Code 模型配置官方文档](https://code.claude.com/docs/en/model-config)
+- [Anthropic 模型概览](https://platform.claude.com/docs/en/about-claude/models/overview)
+- [1M Token 上下文窗口](https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window)
+- [Claude Code 省 Token 技巧](/articles/claude-code-token-saving-tips)

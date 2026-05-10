@@ -1,0 +1,126 @@
+{
+  "slug": "oh-my-opencode-atlas-vs-sisyphus-arch",
+  "title": "Oh My OpenCode：Atlas vs Sisyphus 双 orchestrator 架构解析",
+  "date": "2026-02-24T00:00:00.000Z",
+  "excerpt": "Atlas 和 Sisyphus 是 oh-my-openagent 体系里最有代表性的两条编排思路。Sisyphus 偏向全能主协调器，负责意图解析、动态规划和智能委派；Atlas 则更像纯协调指挥家，不直接写代码，专注于阶段编排和验证。两者在代码权限、适用场景、状态管理、并行策略和验证职责等方面有本质差异，分别代表了高级工程师和技术负责人两种不同的 orchestration 哲学。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "OpenCode",
+    "Oh My OpenCode"
+  ],
+  "sections": [
+    {
+      "id": "atlas-vs-sisyphusohmyopencode-双-orchestrator-架构解析",
+      "anchorId": "atlas-vs-sisyphusohmyopencode-双-orchestrator-架构解析",
+      "heading": "Atlas vs Sisyphus：OhMyOpenCode 双 orchestrator 架构解析",
+      "content": "仓库现在已经更名为 oh-my-openagent，但我下面沿用 OmO 这个简称来讲它的双 orchestrator 结构。Atlas 和 Sisyphus 是这套多代理协调系统里最核心的两条编排链路。",
+      "excerpt": "仓库现在已经更名为 oh-my-openagent，但我下面沿用 OmO 这个简称来讲它的双 orchestrator 结构。Atlas 和 Sisyphus 是这套多代理协调系统里最核心的两条编排链路。"
+    },
+    {
+      "id": "sisyphus-全能主协调器",
+      "anchorId": "sisyphus-全能主协调器",
+      "heading": "Sisyphus ：全能主协调器",
+      "content": "Sisyphus 是 OmO 的默认主代理，定位为\"像 senior engineer 一样工作的 AI 开发者\"。它的核心职责是： 意图解析：通过 IntentGate 分析用户的真实意图 动态规划：根据任务复杂度创建 todo 列表 智能委派：决定什么时候自己执行，什么时候调用 subagent 并行执行：同时启动多个 background task 加速工作 Sisyphus 拥有广泛的工具权限——它可以读写文件、执行命令、通过 task() 调用其他代理。但出于安全考虑，callomoagent 工具被明确禁止，Sisyphus 只能通过 task() 进行任务委派，不能直接调用特定 agent。 权限对比：Sisyphus vs Sisyphus-Junior Agent task() callomoagent 使用场景 ------------------------------------ ---------- ------------------ ---------------------- Sisyphus (主协调器) ✅ 允许 ❌禁止 动态规划、灵活委派 Sisyphus-Junior (子执行器) ❌ 禁止 ✅允许 执行具体任务、自主探索 这种设计形成权限互补：协调器通过 task() 灵活委派，执行者通过 callomoagent 自主获取信息。源码依据： Sisyphus 权限配置（src/plugin-handlers/tool-config-handler）： Sisyphus-Junior 权限配置（src/agents/sisyphus-junior/agent,97）： 重要限制：callomoagent 工具仅允许调用特定类型的 agent：explore、librarian、oracle、hephaestus、metis、momus、multimodal-looker（src/tools/call-omo-agent/constants）。其中 explore 和 librarian 用于代码库探索和文档查询，其他代理用于特定专业任务。",
+      "excerpt": "Sisyphus 是 OmO 的默认主代理，定位为\"像 senior engineer 一样工作的 AI 开发者\"。它的核心职责是： 意图解析：通过 IntentGate 分析用户的真实意图 动态规划：根据任务复杂度创建 todo 列表 智能委派：决定什么时候自己执行，什么时候调用 subagent 并行执行：同时启动..."
+    },
+    {
+      "id": "atlas纯协调指挥家",
+      "anchorId": "atlas纯协调指挥家",
+      "heading": "Atlas：纯协调指挥家",
+      "content": "Atlas 的设计理念截然相反——它不直接写代码，而是专注于协调和验证。Atlas 的定位是\"指挥家，不是乐手；将军，不是士兵\"。 Atlas 的委派工具在 agent 配置层被限制（src/agents/atlas/agent）： 然而，Atlas 的系统提示（src/agents/atlas/default）教导它使用 task() 进行委派： Atlas 在 agent 配置层被限制 task 和 callomoagent 工具权限，但在插件配置处理阶段通过 tool-config-handler.ts 重新授予 task 权限（仍禁止 callomoagent）。这确保 Atlas 可以使用 task() 进行任务委派，但不能直接调用特定的 explore/librarian 等 agent。 权限重授机制源码（src/plugin-handlers/tool-config-handler）： 关键区别： Atlas：主要使用 task() 进行category-based 委派（推荐），但也支持 subagenttype 指定特定代理（如 oracle） Sisyphus：同样只能使用 task()，但它是主协调器，拥有更广泛的任务规划能力 Sisyphus-Junior：被禁止使用 task()，但允许使用 callomo_agent() 直接调用特定 agent Atlas 的核心工作是： 读取预定义的计划（Plan） 分析任务依赖关系，制定并行化策略 委派给 Sisyphus-Junior（category-based subagent）执行具体任务 严格验证结果（读代码、跑测试、检查 LSP） 维护跨会话状态（Boulder State）",
+      "excerpt": "Atlas 的设计理念截然相反——它不直接写代码，而是专注于协调和验证。Atlas 的定位是\"指挥家，不是乐手；将军，不是士兵\"。 Atlas 的委派工具在 agent 配置层被限制（src/agents/atlas/agent）： 然而，Atlas 的系统提示（src/agents/atlas/default）教导它..."
+    },
+    {
+      "id": "核心差异详解",
+      "anchorId": "核心差异详解",
+      "heading": "核心差异详解",
+      "content": "维度 Sisyphus Atlas ------------------ --------------------------- ------------------------------------------ 代码权限 完整（读写文件、执行命令） 零（只能委派） 适用场景 日常开发、探索性任务 复杂多步骤计划（Ralph Loop） 会话范围 单会话 + Background Tasks 多会话协调（Boulder Session Tree） 状态管理 当前会话的 todo API Boulder State JSON + Notepad 并行策略 探索类任务后台并行 执行类任务前台并行（多 subagent） 验证职责 自我验证 强制 QA Gate（4-Phase Protocol） 模型要求 claude-opus-4-7 / kimi-k2.5 / glm-5 以当前工作流配置为准 注：Sisyphus 这条线的当前核心模型链比较明确：claude-opus-4-7 → kimi-k2.5 → glm-5。Atlas 是否继续保持独立模型链，则更适合以当前 features reference 和工作流配置为准。 一个可参考的模型链快照：",
+      "excerpt": "维度 Sisyphus Atlas ------------------ --------------------------- ------------------------------------------ 代码权限 完整（读写文件、执行命令） 零（只能委派） 适用场景 日常开发、探索性任务 复杂多步骤计划（R..."
+    },
+    {
+      "id": "代码修改权限",
+      "anchorId": "代码修改权限",
+      "heading": "代码修改权限",
+      "content": "这是两者最根本的区别。Atlas 的 Prompt 中反复强调： 这种设计的哲学是：最贵的模型应该只做 orchestration，代码实现交给便宜些的 specialist models。",
+      "excerpt": "这是两者最根本的区别。Atlas 的 Prompt 中反复强调： 这种设计的哲学是：最贵的模型应该只做 orchestration，代码实现交给便宜些的 specialist models。"
+    },
+    {
+      "id": "并行执行模式",
+      "anchorId": "并行执行模式",
+      "heading": "并行执行模式",
+      "content": "Sisyphus 的并行： Atlas 的并行： 注意：Atlas 使用 task(category=\"...\") 委派给 Sisyphus-Junior。虽然 Atlas 的 agent 配置限制了 task 工具，但在实际 orchestration 流程中通过系统协调层调用。",
+      "excerpt": "Sisyphus 的并行： Atlas 的并行： 注意：Atlas 使用 task(category=\"...\") 委派给 Sisyphus-Junior。虽然 Atlas 的 agent 配置限制了 task 工具，但在实际 orchestration 流程中通过系统协调层调用。"
+    },
+    {
+      "id": "并行机制的关键区别",
+      "anchorId": "并行机制的关键区别",
+      "heading": "并行机制的关键区别",
+      "content": "两种并行模式有本质差异： 特性 Sisyphus 后台并行 Atlas 消息级并行 ------------------ -------------------------------------------- --------------------------- 参数 runinbackground=true runinbackground=false 阻塞性 非阻塞，立即返回 taskid 阻塞，等待任务完成 结果收集 使用 backgroundoutput(taskid) 稍后收集 直接在响应中返回结果 适用场景 探索类任务（explore/librarian） 执行类任务（需要等待结果） 并发控制 BackgroundManager 管理（默认5并发） 消息级并发，受限于响应时间 关键理解： Sisyphus 使用 runinbackground=true 启动真正的异步后台任务，适合耗时较长的探索任务 Atlas 在单个消息中同时发起多个 task() 调用（每个 runin_background=false），实现 subagent 级别的并行执行，适合需要立即获得结果的任务",
+      "excerpt": "两种并行模式有本质差异： 特性 Sisyphus 后台并行 Atlas 消息级并行 ------------------ -------------------------------------------- --------------------------- 参数 runinbackground=true ru..."
+    },
+    {
+      "id": "状态持久化",
+      "anchorId": "状态持久化",
+      "heading": "状态持久化",
+      "content": "Sisyphus：依赖当前会话的 todo API Atlas：使用 Boulder State 持久化到文件 Boulder State 完整机制（src/hooks/atlas/event-handler.ts）： Boulder continuation 的决策流程包含多个检查点： 关键常量： CONTINUATIONCOOLDOWNMS = 5000（5秒冷却期） MAXCONSECUTIVEFAILURES = 2（失败2次后暂停） Notepad 系统（.sisyphus/notepads/{plan-name}/）： Notepad 用于在 subagent 间传递累积知识，由 Atlas 创建并管理： 工作流程： 创建：Atlas 在 Step 2 初始化 Notepad 目录 读取：每个 subagent 在开始前读取相关 Notepad 文件 追加：subagent 完成后追加发现（使用 Write 追加，绝不覆盖） 继承：后续 subagent 获得累积的知识上下文 这种设计让 Atlas 能够： 跨会话跟踪进度 在子代理失败后恢复（session resume） 通过 Notepad 在 subagent 间传递知识",
+      "excerpt": "Sisyphus：依赖当前会话的 todo API Atlas：使用 Boulder State 持久化到文件 Boulder State 完整机制（src/hooks/atlas/event-handler.ts）： Boulder continuation 的决策流程包含多个检查点： 关键常量： CONTINUAT..."
+    },
+    {
+      "id": "hook-层的协作机制",
+      "anchorId": "hook-层的协作机制",
+      "heading": "Hook 层的协作机制",
+      "content": "在 OhMyOpenCode 的 Hook 系统中，Atlas 和 Sisyphus 的 continuation 机制是分开的：",
+      "excerpt": "在 OhMyOpenCode 的 Hook 系统中，Atlas 和 Sisyphus 的 continuation 机制是分开的："
+    },
+    {
+      "id": "atlas-hookboulder-orchestrator",
+      "anchorId": "atlas-hookboulder-orchestrator",
+      "heading": "Atlas Hook（Boulder Orchestrator）",
+      "content": "两者都监听 session.idle 事件，但通过不同的条件判断来避免冲突。",
+      "excerpt": "两者都监听 session.idle 事件，但通过不同的条件判断来避免冲突。"
+    },
+    {
+      "id": "添加一个-api-端点sisyphus",
+      "anchorId": "添加一个-api-端点sisyphus",
+      "heading": "添加一个 API 端点（Sisyphus）",
+      "content": "Sisyphus 的处理： Intent Gate：识别为\"实现\"意图 创建 todos：分析代码 → 实现 handler → 添加路由 → 写测试 可能启动 explore 找现有模式（background） 自己实现或委派给 quick category 验证：LSP + 测试",
+      "excerpt": "Sisyphus 的处理： Intent Gate：识别为\"实现\"意图 创建 todos：分析代码 → 实现 handler → 添加路由 → 写测试 可能启动 explore 找现有模式（background） 自己实现或委派给 quick category 验证：LSP + 测试"
+    },
+    {
+      "id": "ralph-loop-全栈功能开发atlas",
+      "anchorId": "ralph-loop-全栈功能开发atlas",
+      "heading": "Ralph Loop 全栈功能开发（Atlas）",
+      "content": "Atlas 的处理： Prometheus 生成 Plan（10个任务） Atlas 启动，创建 Boulder State 并行委派： - Task 1-3：Sisyphus-Junior (quick) 创建数据库模型、API 路由、中间件 - Task 4-6：Sisyphus-Junior (visual-engineering) 创建登录页面组件 - Task 7：Sisyphus-Junior (deep) 实现 token 刷新逻辑 4-Phase 验证每个结果： Atlas 的 4-Phase QA Protocol 确保每个委派任务都得到严格验证： - Phase 1: Automated Verification - lspdiagnostics() → ZERO errors at project level - bun run build or bun run typecheck → exit code 0 - bun test → ALL tests pass - Phase 2: Manual Code Review（NON-NEGOTIABLE） - Read EVERY file the subagent created or modified - Check line by line: logic correctness, stubs/TODOs, edge cases - Cross-reference: subagent's claims vs actual code - Phase 3: Hands-On QA（if applicable） - Frontend/UI: Browser testing via /playwright - TUI/CLI: Interactive testing via interactivebash - API/Backend: Real requests via curl - Phase 4: Boulder State Check - Read(\".sisyphus/tasks/{plan-name}.yaml\") - Count remaining - [ ] tasks - Confirm current progress 失败的任务使用任务 ID 或当前工作流保留的上下文继续恢复 Loop until all tasks complete",
+      "excerpt": "Atlas 的处理： Prometheus 生成 Plan（10个任务） Atlas 启动，创建 Boulder State 并行委派： - Task 1-3：Sisyphus-Junior (quick) 创建数据库模型、API 路由、中间件 - Task 4-6：Sisyphus-Junior (visual-en..."
+    },
+    {
+      "id": "如何选择",
+      "anchorId": "如何选择",
+      "heading": "如何选择？",
+      "content": "使用 Sisyphus（默认）： 日常开发任务 需要探索和灵活性的工作 不确定如何分解的开放式任务 不需要跨会话持久化的短期任务 使用 Atlas（Ralph Loop / Plan）： 复杂多步骤项目 需要严格验证的关键功能 需要并行执行多个独立子任务 需要跨会话恢复的长时任务",
+      "excerpt": "使用 Sisyphus（默认）： 日常开发任务 需要探索和灵活性的工作 不确定如何分解的开放式任务 不需要跨会话持久化的短期任务 使用 Atlas（Ralph Loop / Plan）： 复杂多步骤项目 需要严格验证的关键功能 需要并行执行多个独立子任务 需要跨会话恢复的长时任务"
+    },
+    {
+      "id": "sub-agent-的会话创建",
+      "anchorId": "sub-agent-的会话创建",
+      "heading": "Sub Agent 的会话创建",
+      "content": "每个 task() 调用都会创建一个独立的子会话：",
+      "excerpt": "每个 task() 调用都会创建一个独立的子会话："
+    },
+    {
+      "id": "metismomus-的角色与工具权限",
+      "anchorId": "metismomus-的角色与工具权限",
+      "heading": "Metis/Momus 的角色与工具权限",
+      "content": "重要澄清：Metis 和 Momus 是 read-only / pre-planning 代理，它们的工具权限有特定限制： 关键区别：Metis/Momus 不能使用 task 工具，但保留 callomoagent 工具权限。 这意味着： ❌ 不能使用 task(category=\"...\") 委派给 Sisyphus-Junior ✅ 可以使用 callomoagent(runinbackground=true) 启动 background task 实际能力： Metis：预规划分析时，可以并行启动多个 callomoagent(subagenttype=\"explore\") 进行代码库探索 Momus：质量审核时，可以并行启动多个 callomoagent(subagenttype=\"librarian\") 查找参考资料 callomoagent 支持 runinbackground 参数（REQUIRED），设为 true 时启动后台任务，行为与 task 工具的 background 模式相同。 与 Sisyphus 的区别： Sisyphus：使用 task() 进行 category-based 委派（更灵活的模型选择） Metis/Momus：使用 callomoagent() 进行固定代理委派（仅 explore/librarian 两种）",
+      "excerpt": "重要澄清：Metis 和 Momus 是 read-only / pre-planning 代理，它们的工具权限有特定限制： 关键区别：Metis/Momus 不能使用 task 工具，但保留 callomoagent 工具权限。 这意味着： ❌ 不能使用 task(category=\"...\") 委派给 Sisyph..."
+    },
+    {
+      "id": "结语",
+      "anchorId": "结语",
+      "heading": "结语",
+      "content": "Atlas 和 Sisyphus 代表了两种 orchestration 哲学： Sisyphus 是\"高级工程师\"模式——它像人类开发者一样思考、规划、执行，必要时寻求帮助。 Atlas 是\"技术负责人\"模式——它专注于架构设计、任务分解、质量把控，把实现细节交给团队成员。 理解这种分工，能够帮助你在不同场景下选择合适的代理模式，发挥 OhMyOpenCode 的最大效能。",
+      "excerpt": "Atlas 和 Sisyphus 代表了两种 orchestration 哲学： Sisyphus 是\"高级工程师\"模式——它像人类开发者一样思考、规划、执行，必要时寻求帮助。 Atlas 是\"技术负责人\"模式——它专注于架构设计、任务分解、质量把控，把实现细节交给团队成员。 理解这种分工，能够帮助你在不同场景下选择合..."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" role="img" aria-label="AI Brief — folded document">
+  <path d="M14 8a2 2 0 0 1 2-2h24l12 12v36a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V8z"/>
+  <path d="M40 6v12h12"/>
+  <path d="M32 30 L35 37 L42 40 L35 43 L32 50 L29 43 L22 40 L29 37 Z" fill="currentColor" stroke="none"/>
+</svg>

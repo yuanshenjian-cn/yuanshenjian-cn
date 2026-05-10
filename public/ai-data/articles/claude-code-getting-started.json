@@ -1,0 +1,244 @@
+{
+  "slug": "claude-code-getting-started",
+  "title": "Claude Code 第二篇：快速上手——安装、登录、选入口、跑通第一个真实任务",
+  "date": "2026-04-02T00:00:00.000Z",
+  "excerpt": "从安装到跑通第一个真实任务，只需要十分钟。本文覆盖三种安装方式、四种登录认证、五大入口选择，并带你用一个真实项目闭环走完\"理解代码→修改→验证→提交\"的全流程。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "ClaudeCode"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "十分钟内，让 Claude Code 在你的项目里跑起来。",
+      "excerpt": "十分钟内，让 Claude Code 在你的项目里跑起来。"
+    },
+    {
+      "id": "引言你的第一个-claude-code-会话",
+      "anchorId": "引言你的第一个-claude-code-会话",
+      "heading": "引言：你的第一个 Claude Code 会话",
+      "content": "上一篇我们建立了从 OpenCode 到 Claude Code 的心智模型。这一篇只做一件事：让你从零开始，跑通第一个真实任务。 不是 Hello World，不是玩具项目，而是在你的真实代码库里完成一个有意义的操作闭环：",
+      "excerpt": "上一篇我们建立了从 OpenCode 到 Claude Code 的心智模型。这一篇只做一件事：让你从零开始，跑通第一个真实任务。 不是 Hello World，不是玩具项目，而是在你的真实代码库里完成一个有意义的操作闭环："
+    },
+    {
+      "id": "三种安装方式",
+      "anchorId": "三种安装方式",
+      "heading": "三种安装方式",
+      "content": "安装方式 命令 自动更新 适用场景 --------- ------ :------: --------- Native Install（推荐） curl -fsSL https://claude.ai/install.sh \\ bash ✅ 日常开发，保持最新 Homebrew brew install --cask claude-code ❌ macOS 用户偏好 brew 管理 WinGet winget install Anthropic.ClaudeCode ❌ Windows 用户 macOS / Linux / WSL 推荐： Windows 推荐： Windows 前置条件：需要先安装 Git for Windows。 验证安装：",
+      "excerpt": "安装方式 命令 自动更新 适用场景 --------- ------ :------: --------- Native Install（推荐） curl -fsSL https://claude.ai/install.sh \\ bash ✅ 日常开发，保持最新 Homebrew brew install --cask..."
+    },
+    {
+      "id": "更新策略",
+      "anchorId": "更新策略",
+      "heading": "更新策略",
+      "content": "Native Install：自动后台更新，无需手动操作 Homebrew：需要定期运行 brew upgrade claude-code WinGet：需要定期运行 winget upgrade Anthropic.ClaudeCode 从 OpenCode 迁移者注意：OpenCode 用 npm install -g opencode-ai 或 curl 脚本安装。Claude Code 不推荐 npm 安装方式，主推 Native Install。",
+      "excerpt": "Native Install：自动后台更新，无需手动操作 Homebrew：需要定期运行 brew upgrade claude-code WinGet：需要定期运行 winget upgrade Anthropic.ClaudeCode 从 OpenCode 迁移者注意：OpenCode 用 npm install ..."
+    },
+    {
+      "id": "登录认证",
+      "anchorId": "登录认证",
+      "heading": "登录认证",
+      "content": "安装后，在任何项目目录启动 Claude Code： 首次启动会提示登录。使用 /login 命令选择认证方式。",
+      "excerpt": "安装后，在任何项目目录启动 Claude Code： 首次启动会提示登录。使用 /login 命令选择认证方式。"
+    },
+    {
+      "id": "四种认证方式",
+      "anchorId": "四种认证方式",
+      "heading": "四种认证方式",
+      "content": "认证方式 适合人群 特点 --------- --------- ------ Claude Pro / Max 个人开发者 按月订阅，功能最完整 Claude Teams / Enterprise 团队 / 企业 SSO、集中管理、托管策略 Anthropic Console（API） API 开发者 按用量付费，通过环境变量配置 API Key 第三方 Provider 企业云用户 Amazon Bedrock / Google Vertex AI / Microsoft Foundry 个人用户推荐：Claude Pro 或 Max 订阅，功能最全、限制最少。 重要区别：使用 claude.ai 账户登录可以获得最完整的功能（包括 Remote Control、Channels、Cloud Sessions 等）。第三方 Provider 登录虽然支持基础编码功能，但部分高级功能（如 Chrome 调试、Agent Teams）可能不可用。 登录凭证会安全存储在本地，后续无需重复登录。",
+      "excerpt": "认证方式 适合人群 特点 --------- --------- ------ Claude Pro / Max 个人开发者 按月订阅，功能最完整 Claude Teams / Enterprise 团队 / 企业 SSO、集中管理、托管策略 Anthropic Console（API） API 开发者 按用量付费，通..."
+    },
+    {
+      "id": "选择你的入口",
+      "anchorId": "选择你的入口",
+      "heading": "选择你的入口",
+      "content": "Claude Code 有五种主要入口，选哪个取决于你的工作场景：",
+      "excerpt": "Claude Code 有五种主要入口，选哪个取决于你的工作场景："
+    },
+    {
+      "id": "terminal-cli本文重点",
+      "anchorId": "terminal-cli本文重点",
+      "heading": "Terminal CLI（本文重点）",
+      "content": "作为从 OpenCode 迁移过来的用户，你最熟悉的就是 Terminal CLI。好消息是：Claude Code 的 CLI 体验和 OpenCode 非常相似，上手成本极低。",
+      "excerpt": "作为从 OpenCode 迁移过来的用户，你最熟悉的就是 Terminal CLI。好消息是：Claude Code 的 CLI 体验和 OpenCode 非常相似，上手成本极低。"
+    },
+    {
+      "id": "vs-code-扩展",
+      "anchorId": "vs-code-扩展",
+      "heading": "VS Code 扩展",
+      "content": "或在 VS Code 扩展市场搜索 \"Claude Code\"。安装后通过命令面板（Cmd+Shift+P）搜索 \"Claude Code\" 打开。 核心优势：内联 diff 预览、@-提及文件引用、计划审查面板。",
+      "excerpt": "或在 VS Code 扩展市场搜索 \"Claude Code\"。安装后通过命令面板（Cmd+Shift+P）搜索 \"Claude Code\" 打开。 核心优势：内联 diff 预览、@-提及文件引用、计划审查面板。"
+    },
+    {
+      "id": "desktop-app",
+      "anchorId": "desktop-app",
+      "heading": "Desktop App",
+      "content": "从 claude.com/download 下载安装。 核心优势： 并行运行多个会话 Dispatch：从手机发送任务 可视化 diff 审查 定时任务管理 云端会话",
+      "excerpt": "从 claude.com/download 下载安装。 核心优势： 并行运行多个会话 Dispatch：从手机发送任务 可视化 diff 审查 定时任务管理 云端会话"
+    },
+    {
+      "id": "web",
+      "anchorId": "web",
+      "heading": "Web",
+      "content": "直接访问 claude.ai/code，无需本地安装。 核心优势： 无需本地环境 长时间运行任务 处理你本地没有的仓库 移动端可用",
+      "excerpt": "直接访问 claude.ai/code，无需本地安装。 核心优势： 无需本地环境 长时间运行任务 处理你本地没有的仓库 移动端可用"
+    },
+    {
+      "id": "jetbrains-插件",
+      "anchorId": "jetbrains-插件",
+      "heading": "JetBrains 插件",
+      "content": "从 JetBrains Marketplace 安装，支持 IntelliJ IDEA、PyCharm、WebStorm 等。 建议：初期先用 Terminal CLI 熟悉核心操作，之后根据需要添加 IDE 扩展或 Desktop App 作为补充。",
+      "excerpt": "从 JetBrains Marketplace 安装，支持 IntelliJ IDEA、PyCharm、WebStorm 等。 建议：初期先用 Terminal CLI 熟悉核心操作，之后根据需要添加 IDE 扩展或 Desktop App 作为补充。"
+    },
+    {
+      "id": "跑通第一个真实任务",
+      "anchorId": "跑通第一个真实任务",
+      "heading": "跑通第一个真实任务",
+      "content": "现在让我们在你的真实项目里完成一个完整的操作闭环。以下以一个实际的博客项目为例演示。",
+      "excerpt": "现在让我们在你的真实项目里完成一个完整的操作闭环。以下以一个实际的博客项目为例演示。"
+    },
+    {
+      "id": "第一步让-claude-理解你的项目",
+      "anchorId": "第一步让-claude-理解你的项目",
+      "heading": "第一步：让 Claude 理解你的项目",
+      "content": "进入交互会话后，先让 Claude 熟悉你的代码库： Claude 会自动读取你的项目文件（package.json、tsconfig.json、目录结构等），给出一份项目概要。 你也可以问更具体的问题： 关键区别：和 OpenCode 不同，你不需要手动把文件\"添加到上下文\"。Claude Code 会根据需要自动读取文件。",
+      "excerpt": "进入交互会话后，先让 Claude 熟悉你的代码库： Claude 会自动读取你的项目文件（package.json、tsconfig.json、目录结构等），给出一份项目概要。 你也可以问更具体的问题： 关键区别：和 OpenCode 不同，你不需要手动把文件\"添加到上下文\"。Claude Code 会根据需要自动读..."
+    },
+    {
+      "id": "第二步做一个小改动",
+      "anchorId": "第二步做一个小改动",
+      "heading": "第二步：做一个小改动",
+      "content": "选一个真实的小任务，比如： Claude 会： 读取现有的 README 文件 分析项目的 package.json 了解可用命令 生成修改建议并展示 diff 等待你的批准 输入 y 确认，Claude 会执行修改。",
+      "excerpt": "选一个真实的小任务，比如： Claude 会： 读取现有的 README 文件 分析项目的 package.json 了解可用命令 生成修改建议并展示 diff 等待你的批准 输入 y 确认，Claude 会执行修改。"
+    },
+    {
+      "id": "第三步跑验证",
+      "anchorId": "第三步跑验证",
+      "heading": "第三步：跑验证",
+      "content": "让 Claude 帮你验证修改没有破坏任何东西： Claude 会根据你的项目自动选择正确的命令（npm run build、npm test、pytest 等）。首次运行时，Claude 会请求执行 shell 命令的权限。",
+      "excerpt": "让 Claude 帮你验证修改没有破坏任何东西： Claude 会根据你的项目自动选择正确的命令（npm run build、npm test、pytest 等）。首次运行时，Claude 会请求执行 shell 命令的权限。"
+    },
+    {
+      "id": "第四步查看-diff-和提交",
+      "anchorId": "第四步查看-diff-和提交",
+      "heading": "第四步：查看 diff 和提交",
+      "content": "Claude 会执行 git diff 并展示变更摘要。 Claude 会： 暂存修改的文件 根据变更内容生成一条描述性的提交信息 请求你确认后执行提交",
+      "excerpt": "Claude 会执行 git diff 并展示变更摘要。 Claude 会： 暂存修改的文件 根据变更内容生成一条描述性的提交信息 请求你确认后执行提交"
+    },
+    {
+      "id": "完整闭环回顾",
+      "anchorId": "完整闭环回顾",
+      "heading": "完整闭环回顾",
+      "content": "恭喜！你刚刚完成了一个完整的 Claude Code 操作闭环： 这五步是你日常使用 Claude Code 最核心的工作流。",
+      "excerpt": "恭喜！你刚刚完成了一个完整的 Claude Code 操作闭环： 这五步是你日常使用 Claude Code 最核心的工作流。"
+    },
+    {
+      "id": "你需要先知道的-6-个概念",
+      "anchorId": "你需要先知道的-6-个概念",
+      "heading": "你需要先知道的 6 个概念",
+      "content": "在深入日常使用之前，先了解这 6 个核心概念：",
+      "excerpt": "在深入日常使用之前，先了解这 6 个核心概念："
+    },
+    {
+      "id": "会话session",
+      "anchorId": "会话session",
+      "heading": "会话（Session）",
+      "content": "每次 claude 启动是一个独立会话，拥有自己的上下文窗口。会话自动保存在本地。",
+      "excerpt": "每次 claude 启动是一个独立会话，拥有自己的上下文窗口。会话自动保存在本地。"
+    },
+    {
+      "id": "代理循环agentic-loop",
+      "anchorId": "代理循环agentic-loop",
+      "heading": "代理循环（Agentic Loop）",
+      "content": "Claude Code 不是简单的问答，而是一个代理循环： 一个任务可能触发十几次工具调用（读文件、搜索、编辑、运行命令），Claude 会根据每一步的结果决定下一步做什么。",
+      "excerpt": "Claude Code 不是简单的问答，而是一个代理循环： 一个任务可能触发十几次工具调用（读文件、搜索、编辑、运行命令），Claude 会根据每一步的结果决定下一步做什么。"
+    },
+    {
+      "id": "内置工具",
+      "anchorId": "内置工具",
+      "heading": "内置工具",
+      "content": "Claude Code 自带五类内置工具，覆盖大部分编码任务： 类别 能力 示例 ------ ------ ------ 文件操作 读取、编辑、创建、重命名 读代码、改文件 搜索 文件搜索、内容搜索（正则） 找到所有使用某个函数的地方 执行 Shell 命令、git、测试 跑构建、跑测试、git 提交 网络 Web 搜索、获取文档 搜索错误信息、查看库文档 代码智能 类型检查、跳转定义、查找引用 查看类型错误（需要插件）",
+      "excerpt": "Claude Code 自带五类内置工具，覆盖大部分编码任务： 类别 能力 示例 ------ ------ ------ 文件操作 读取、编辑、创建、重命名 读代码、改文件 搜索 文件搜索、内容搜索（正则） 找到所有使用某个函数的地方 执行 Shell 命令、git、测试 跑构建、跑测试、git 提交 网络 Web ..."
+    },
+    {
+      "id": "权限模式",
+      "anchorId": "权限模式",
+      "heading": "权限模式",
+      "content": "Claude 不会未经许可就修改你的代码。默认模式下，每次编辑和命令都需要你确认。 按 Shift+Tab 循环切换模式： 模式 行为 适合场景 ------ ------ --------- 默认 编辑和命令都要确认 初期使用、敏感操作 自动接受编辑 编辑自动通过，命令仍需确认 信任 Claude 的代码修改 Plan Mode 只做分析和规划，但可以读文件和运行探索性 shell 命令 复杂任务前先看计划 Auto Mode：需要额外启用（非 Shift+Tab 循环中的选项），启用后 Claude 自主评估并执行操作，仅在安全规则阻止时才暂停请求确认。适合高度信任场景。",
+      "excerpt": "Claude 不会未经许可就修改你的代码。默认模式下，每次编辑和命令都需要你确认。 按 Shift+Tab 循环切换模式： 模式 行为 适合场景 ------ ------ --------- 默认 编辑和命令都要确认 初期使用、敏感操作 自动接受编辑 编辑自动通过，命令仍需确认 信任 Claude 的代码修改 Pla..."
+    },
+    {
+      "id": "上下文窗口",
+      "anchorId": "上下文窗口",
+      "heading": "上下文窗口",
+      "content": "Claude 的上下文窗口有限。它保存了你的对话历史、文件内容、命令输出、CLAUDE.md 等所有信息。随着对话推进，上下文会逐渐填满。 Claude 会自动压缩（compact）旧的对话内容 你可以手动运行 /compact 来释放空间 运行 /context 查看当前上下文使用情况 超长对话建议开新会话",
+      "excerpt": "Claude 的上下文窗口有限。它保存了你的对话历史、文件内容、命令输出、CLAUDE.md 等所有信息。随着对话推进，上下文会逐渐填满。 Claude 会自动压缩（compact）旧的对话内容 你可以手动运行 /compact 来释放空间 运行 /context 查看当前上下文使用情况 超长对话建议开新会话"
+    },
+    {
+      "id": "检查点checkpoint",
+      "anchorId": "检查点checkpoint",
+      "heading": "检查点（Checkpoint）",
+      "content": "Claude 在编辑文件前会自动快照。如果改坏了： 按两次 Esc 回退到上一个检查点 或者直接告诉 Claude \"撤销刚才的修改\" 注意：检查点只覆盖文件修改。影响远程系统的操作（数据库写入、API 调用、部署）无法回退。",
+      "excerpt": "Claude 在编辑文件前会自动快照。如果改坏了： 按两次 Esc 回退到上一个检查点 或者直接告诉 Claude \"撤销刚才的修改\" 注意：检查点只覆盖文件修改。影响远程系统的操作（数据库写入、API 调用、部署）无法回退。"
+    },
+    {
+      "id": "启动命令",
+      "anchorId": "启动命令",
+      "heading": "启动命令",
+      "content": "命令 作用 示例 ------ ------ ------ claude 启动交互会话 claude claude \"task\" 一次性任务 claude \"fix the build error\" claude -p \"query\" 查询后退出 claude -p \"explain this function\" claude -c 继续最近会话 claude -c claude -r 恢复历史会话 claude -r",
+      "excerpt": "命令 作用 示例 ------ ------ ------ claude 启动交互会话 claude claude \"task\" 一次性任务 claude \"fix the build error\" claude -p \"query\" 查询后退出 claude -p \"explain this function\" cl..."
+    },
+    {
+      "id": "会话内命令",
+      "anchorId": "会话内命令",
+      "heading": "会话内命令",
+      "content": "命令 作用 ------ ------ /help 显示帮助信息 /clear 清除对话历史 /compact 压缩上下文 /context 查看上下文使用情况 /model 切换模型 /memory 查看 / 管理记忆系统 /mcp 查看 MCP 连接状态 /init 初始化项目（创建 CLAUDE.md） /status 查看当前状态 exit 或 Ctrl+D 退出会话",
+      "excerpt": "命令 作用 ------ ------ /help 显示帮助信息 /clear 清除对话历史 /compact 压缩上下文 /context 查看上下文使用情况 /model 切换模型 /memory 查看 / 管理记忆系统 /mcp 查看 MCP 连接状态 /init 初始化项目（创建 CLAUDE.md） /sta..."
+    },
+    {
+      "id": "快捷键",
+      "anchorId": "快捷键",
+      "heading": "快捷键",
+      "content": "快捷键 作用 -------- ------ Shift+Tab 循环切换权限模式 Esc × 2 回退到检查点（rewind） Ctrl+C 取消当前操作 Ctrl+D 退出会话 Ctrl+G 在编辑器中打开输入 Ctrl+O 切换详细输出 Alt+P 切换模型 Tab 命令补全 ↑ 查看历史输入",
+      "excerpt": "快捷键 作用 -------- ------ Shift+Tab 循环切换权限模式 Esc × 2 回退到检查点（rewind） Ctrl+C 取消当前操作 Ctrl+D 退出会话 Ctrl+G 在编辑器中打开输入 Ctrl+O 切换详细输出 Alt+P 切换模型 Tab 命令补全 ↑ 查看历史输入"
+    },
+    {
+      "id": "初始化你的项目",
+      "anchorId": "初始化你的项目",
+      "heading": "初始化你的项目",
+      "content": "在你的项目里运行一次 /init，Claude 会引导你创建一份 CLAUDE.md： Claude 会分析你的项目结构、技术栈、构建工具，然后生成一份包含核心约定的 CLAUDE.md 文件。 如果你已经有 AGENTS.md（从 OpenCode 带过来的），推荐的做法是在 CLAUDE.md 中引用它： 关于记忆系统：/init 只是开始。Claude Code 还有 Auto Memory、.claude/rules/ 条件规则等更丰富的记忆能力，将在本系列第 5 篇详细介绍。",
+      "excerpt": "在你的项目里运行一次 /init，Claude 会引导你创建一份 CLAUDE.md： Claude 会分析你的项目结构、技术栈、构建工具，然后生成一份包含核心约定的 CLAUDE.md 文件。 如果你已经有 AGENTS.md（从 OpenCode 带过来的），推荐的做法是在 CLAUDE.md 中引用它： 关于记忆..."
+    },
+    {
+      "id": "安装问题",
+      "anchorId": "安装问题",
+      "heading": "安装问题",
+      "content": "问题 解决方案 ------ --------- command not found: claude 重新打开终端，或检查 PATH 配置 Windows 安装失败 确保已安装 Git for Windows 权限错误 macOS/Linux 下尝试 sudo 或检查目录权限",
+      "excerpt": "问题 解决方案 ------ --------- command not found: claude 重新打开终端，或检查 PATH 配置 Windows 安装失败 确保已安装 Git for Windows 权限错误 macOS/Linux 下尝试 sudo 或检查目录权限"
+    },
+    {
+      "id": "登录问题",
+      "anchorId": "登录问题",
+      "heading": "登录问题",
+      "content": "问题 解决方案 ------ --------- 浏览器未自动打开 手动复制终端显示的 URL 到浏览器 令牌过期 运行 /login 重新登录 第三方 Provider 连接失败 检查 IAM 凭证或 Service Account 配置",
+      "excerpt": "问题 解决方案 ------ --------- 浏览器未自动打开 手动复制终端显示的 URL 到浏览器 令牌过期 运行 /login 重新登录 第三方 Provider 连接失败 检查 IAM 凭证或 Service Account 配置"
+    },
+    {
+      "id": "使用问题",
+      "anchorId": "使用问题",
+      "heading": "使用问题",
+      "content": "问题 解决方案 ------ --------- Claude 读不到我的文件 确认在正确的项目目录启动 claude 终端显示乱码 检查终端是否支持 Unicode，尝试不同终端 响应很慢 检查网络连接；或换用更快的模型（/model） 上下文溢出 运行 /compact 或开新会话",
+      "excerpt": "问题 解决方案 ------ --------- Claude 读不到我的文件 确认在正确的项目目录启动 claude 终端显示乱码 检查终端是否支持 Unicode，尝试不同终端 响应很慢 检查网络连接；或换用更快的模型（/model） 上下文溢出 运行 /compact 或开新会话"
+    },
+    {
+      "id": "小结",
+      "anchorId": "小结",
+      "heading": "小结",
+      "content": "这篇文章带你完成了 Claude Code 的完整起步流程： 安装：推荐 Native Install，自动后台更新 登录：Claude Pro/Max 体验最完整 选入口：先从 Terminal CLI 开始，按需扩展 跑通闭环：理解项目 → 做修改 → 验证 → 查看 diff → 提交 核心概念：会话、代理循环、内置工具、权限模式、上下文窗口、检查点 初始化项目：用 /init 创建 CLAUDE.md 下一篇，我们将深入 Claude Code 的日常工作流：如何高效地探索代码、修 Bug、重构、写测试、做 Git 操作和代码审查。",
+      "excerpt": "这篇文章带你完成了 Claude Code 的完整起步流程： 安装：推荐 Native Install，自动后台更新 登录：Claude Pro/Max 体验最完整 选入口：先从 Terminal CLI 开始，按需扩展 跑通闭环：理解项目 → 做修改 → 验证 → 查看 diff → 提交 核心概念：会话、代理循环、..."
+    }
+  ]
+}
