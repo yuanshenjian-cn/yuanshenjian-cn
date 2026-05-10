@@ -24,9 +24,21 @@ export function Footer() {
               © {currentYear}
             </span>
             <span className="text-foreground/30">·</span>
-            <span className="text-foreground/40">
-              {posts.length} 篇 · {tags.length} 标签
-            </span>
+            <div className="flex items-center gap-1 text-foreground/40">
+              <Link
+                href="/articles"
+                className="hover:text-foreground transition-colors"
+              >
+                {posts.length} 篇
+              </Link>
+              <span>·</span>
+              <Link
+                href="/articles"
+                className="hover:text-foreground transition-colors"
+              >
+                {tags.length} 标签
+              </Link>
+            </div>
             <span className="text-foreground/30">·</span>
             <a 
               href="/feed" 

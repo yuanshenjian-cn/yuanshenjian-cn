@@ -30,7 +30,7 @@ describe("InvestmentPage", () => {
 
     expect(screen.getByRole("heading", { name: "投资 · 简报 · 2026-05-09" })).toBeInTheDocument();
     expect(screen.getByText("最新一期摘要")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "阅读最新一期" })).toHaveAttribute("href", "/investment/daily-briefings/2026-05-09");
+    expect(screen.getByRole("link", { name: "阅读最新" })).toHaveAttribute("href", "/investment/daily-briefings/2026-05-09");
     expect(screen.queryByText("投资栏目说明")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "重点观察公司/领域说明入口" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "前往 coverage 说明页" })).not.toBeInTheDocument();

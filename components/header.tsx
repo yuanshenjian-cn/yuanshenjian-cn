@@ -5,7 +5,7 @@ import { getPostsForSearch } from "@/lib/blog";
 const navItems = [
   { href: "/ai", label: "AI", icon: "sparkles" },
   { href: "/investment", label: "投资" },
-  { href: "/articles", label: "文章" },
+  { href: "/health", label: "健康" },
   { href: "/author", label: "作者" },
 ];
 

@@ -55,7 +55,7 @@ export default async function AIColumnsPage() {
                 href={latestBriefing.url}
                 className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
               >
-                阅读最新一期
+                阅读最新
                 <ArrowRight className="h-2.5 w-2.5" />
               </Link>
               <Link
