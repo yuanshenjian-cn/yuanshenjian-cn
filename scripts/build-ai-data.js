@@ -485,6 +485,10 @@ function parsePostFile(filePath) {
   }
 }
 
+function normalizeBriefingTitle(title) {
+  return title.replace(/^AI\s+每日简报/, "AI 简报");
+}
+
 function parseBriefingFile(filePath) {
   try {
     const fileContents = fs.readFileSync(filePath, "utf8");
@@ -506,7 +510,7 @@ function parseBriefingFile(filePath) {
 
     return {
       slug,
-      title: data.title,
+      title: normalizeBriefingTitle(data.title),
       excerpt,
       tags,
       date: new Date(data.date).toISOString(),

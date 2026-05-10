@@ -10,7 +10,7 @@ vi.mock("@/components/briefings/briefing-recommend-widget", () => ({
 const briefings: Briefing[] = [
   {
     slug: "2026-05-08",
-    title: "AI 每日简报 · 2026-05-08",
+    title: "AI 简报 · 2026-05-08",
     date: new Date().toISOString(),
     year: "2026",
     month: "05",
@@ -25,7 +25,7 @@ const briefings: Briefing[] = [
   },
   {
     slug: "2026-05-01",
-    title: "AI 每日简报 · 2026-05-01",
+    title: "AI 简报 · 2026-05-01",
     date: "2026-05-01T00:00:00.000Z",
     year: "2026",
     month: "05",

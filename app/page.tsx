@@ -8,11 +8,24 @@ import { config } from "@/lib/config";
 import { getLatestInvestmentBriefing } from "@/lib/investment-briefings";
 import { generateListPageSEO } from "@/lib/seo-utils";
 
-export const metadata: Metadata = generateListPageSEO(
+const homepageSeo = generateListPageSEO(
   config.site.name,
   config.site.description,
   config.site.url,
 );
+
+export const metadata: Metadata = {
+  ...homepageSeo,
+  title: "YSJ 主页",
+  openGraph: {
+    ...homepageSeo.openGraph,
+    title: "YSJ 主页",
+  },
+  twitter: {
+    ...homepageSeo.twitter,
+    title: "YSJ 主页",
+  },
+};
 
 export default function Home() {
   const posts = getAllPosts();
@@ -70,7 +83,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        AI 每日简报
+                        AI 简报
                       </p>
                     </div>
                   </div>
@@ -113,7 +126,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        投资每日简报
+                        投资简报
                       </p>
                     </div>
                   </div>

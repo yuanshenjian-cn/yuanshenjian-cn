@@ -7,8 +7,8 @@ import { getAllInvestmentBriefings, getRecentInvestmentBriefings } from "@/lib/i
 import { InvestmentBriefingsPageClient } from "@/components/investment/investment-briefings-page-client";
 
 export const metadata: Metadata = generateListPageSEO(
-  "投资每日简报",
-  "最近 30 天的投资每日简报，以及按月份浏览更早历史归档。",
+  "投资简报",
+  "最近 30 天的投资简报，以及按月份浏览更早历史归档。",
   `${config.site.url}/investment/daily-briefings`,
 );
 

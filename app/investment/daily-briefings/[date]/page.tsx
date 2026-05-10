@@ -34,20 +34,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!briefing) {
     return {
-      title: `投资每日简报 | ${config.site.name}`,
+      title: "投资简报 | YSJ",
     };
   }
 
   const isLatestRoute = date === "latest";
   const url = `${config.site.url}${isLatestRoute ? "/investment/daily-briefings/latest" : briefing.url}`;
   const ogImage = `${url}/opengraph-image`;
-  const shareTitle = isLatestRoute ? `投资每日简报 · Latest | ${config.site.name}` : briefing.title;
+  const shareTitle = isLatestRoute ? `投资简报 · Latest | ${config.site.name}` : briefing.title;
   const shareDescription = isLatestRoute
-    ? "投资每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
+    ? "投资简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
     : briefing.excerpt;
 
   return {
-    title: isLatestRoute ? shareTitle : `${briefing.title} | ${config.site.name}`,
+    title: isLatestRoute ? "投资简报 · Latest | YSJ" : `${briefing.title} | YSJ`,
     description: shareDescription,
     keywords: briefing.tags,
     alternates: {
@@ -97,9 +97,9 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
   const { prev, next } = getAdjacentInvestmentBriefings(briefing.slug);
   const headings = extractHeadings(briefing.content);
   const url = `${config.site.url}${date === "latest" ? "/investment/daily-briefings/latest" : briefing.url}`;
-  const shareTitle = date === "latest" ? `投资每日简报 · Latest | ${config.site.name}` : briefing.title;
+  const shareTitle = date === "latest" ? `投资简报 · Latest | ${config.site.name}` : briefing.title;
   const shareDescription = date === "latest"
-    ? "投资每日简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
+    ? "投资简报的最新一期内容入口，适合长期收藏、固定访问与持续跟踪最新的投资观察。"
     : briefing.excerpt;
 
   return (
@@ -110,7 +110,7 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
             <nav className="mb-8 text-sm text-muted-foreground">
               <Link href="/investment/daily-briefings" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
                 <ArrowLeft className="h-3.5 w-3.5" />
-                投资每日简报
+                投资简报
               </Link>
             </nav>
 
@@ -152,13 +152,13 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {prev ? (
                 <Link href={prev.url} className="rounded-xl border p-4 transition hover:bg-muted/40">
-                  <p className="mb-2 text-xs text-muted-foreground">上一期简报</p>
+                  <p className="mb-2 text-xs text-muted-foreground">上一期</p>
                   <h2 className="text-sm font-medium">{prev.title}</h2>
                 </Link>
               ) : <div />}
               {next ? (
                 <Link href={next.url} className="rounded-xl border p-4 text-right transition hover:bg-muted/40">
-                  <p className="mb-2 text-xs text-muted-foreground">下一期简报</p>
+                  <p className="mb-2 text-xs text-muted-foreground">下一期</p>
                   <h2 className="inline-flex items-center justify-end gap-1 text-sm font-medium">
                     {next.title}
                     <ArrowRight className="h-3.5 w-3.5" />

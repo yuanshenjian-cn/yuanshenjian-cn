@@ -68,7 +68,7 @@ describe("build-ai-data helpers", () => {
     expect(publicationChunk?.content).toContain("整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design");
   });
 
-  it("会解析 AI 每日简报索引条目并生成独立 URL", () => {
+  it("会解析 AI 简报索引条目并生成独立 URL", () => {
     const file = path.join(os.tmpdir(), "2099-01-01-ai-daily-briefing.md");
     tempFiles.push(file);
     fs.writeFileSync(
@@ -87,7 +87,7 @@ tags:
 
     expect(parseBriefingFile(file)).toMatchObject({
       slug: "2099-01-01",
-      title: "AI 每日简报 · 2099-01-01",
+      title: "AI 简报 · 2099-01-01",
       excerpt: "测试摘要",
       url: "/ai/daily-briefings/2099-01-01",
     });

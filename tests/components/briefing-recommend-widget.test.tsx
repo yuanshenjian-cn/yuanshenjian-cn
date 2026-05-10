@@ -60,7 +60,7 @@ describe("BriefingRecommendWidget", () => {
         references: [
           {
             slug: "2026-05-08",
-            title: "AI 每日简报 · 2026-05-08",
+            title: "AI 简报 · 2026-05-08",
             date: "2026-05-08T00:00:00.000Z",
             excerpt: "OpenAI 今日动态",
             tags: ["AI每日简报"],
@@ -92,6 +92,6 @@ describe("BriefingRecommendWidget", () => {
       turnstileToken: "turnstile-token",
     })));
     expect(screen.getByText("推荐今日简报")).toBeInTheDocument();
-    expect(screen.getByText("AI 每日简报 · 2026-05-08")).toBeInTheDocument();
+    expect(screen.getByText("AI 简报 · 2026-05-08")).toBeInTheDocument();
   });
 });

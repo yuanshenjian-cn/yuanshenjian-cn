@@ -73,6 +73,10 @@ function calculateReadingTime(content: string): number {
   return Math.max(1, Math.ceil(readingTime));
 }
 
+function normalizeBriefingTitle(title: string): string {
+  return title.replace(/^AI\s+每日简报/, "AI 简报");
+}
+
 function isValidFrontmatter(data: Partial<BriefingFrontmatter>): data is BriefingFrontmatter {
   return typeof data.title === "string" && typeof data.date === "string";
 }
@@ -100,7 +104,7 @@ function parseBriefingFile(filePath: string): Briefing | null {
 
     return {
       slug,
-      title: data.title,
+      title: normalizeBriefingTitle(data.title),
       date: new Date(data.date).toISOString(),
       ...dateParts,
       excerpt,

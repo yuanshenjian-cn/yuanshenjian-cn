@@ -63,7 +63,7 @@ tags:
     expect(target).toEqual(
       expect.objectContaining({
         slug: "2099-01-03",
-        title: "投资每日简报 · 2099-01-03",
+        title: "投资简报 · 2099-01-03",
         brief: "测试摘要",
         url: "/investment/daily-briefings/2099-01-03",
       }),

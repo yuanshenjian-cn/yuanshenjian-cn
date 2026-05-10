@@ -102,7 +102,7 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有投资每日简报。
+              这个时间范围内还没有投资简报。
             </p>
           )}
         </div>
@@ -112,7 +112,7 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-sm font-medium text-foreground">查看更早简报</h3>
-                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史投资每日简报</p>
+                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史投资简报</p>
               </div>
               <Link
                 href="/investment/daily-briefings/archive"

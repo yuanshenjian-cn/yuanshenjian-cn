@@ -64,6 +64,10 @@ function calculateReadingTime(content: string): number {
   return Math.max(1, Math.ceil(readingTime));
 }
 
+function normalizeInvestmentBriefingTitle(title: string): string {
+  return title.replace(/^投资每日简报/, "投资简报");
+}
+
 function isValidFrontmatter(data: Partial<InvestmentBriefingFrontmatter>): data is InvestmentBriefingFrontmatter {
   return typeof data.title === "string"
     && typeof data.date === "string"
@@ -93,7 +97,7 @@ function parseInvestmentBriefingFile(filePath: string): InvestmentBriefing | nul
 
     return {
       slug,
-      title: data.title,
+      title: normalizeInvestmentBriefingTitle(data.title),
       date: new Date(data.date).toISOString(),
       brief: data.brief,
       published: true,

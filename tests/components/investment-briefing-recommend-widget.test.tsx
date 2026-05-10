@@ -46,8 +46,8 @@ describe("InvestmentBriefingRecommendWidget", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "投资每日简报推荐" })).toBeInTheDocument();
-    expect(screen.getByText("基于“近 30 天”的投资每日简报范围推荐，不构成投资建议。")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "投资简报推荐" })).toBeInTheDocument();
+    expect(screen.getByText("基于“近 30 天”的投资简报范围推荐，不构成投资建议。")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "问 AI" })).toBeInTheDocument();
     expect(screen.queryByText(/投资简报推荐结果/)).not.toBeInTheDocument();
   });
@@ -60,7 +60,7 @@ describe("InvestmentBriefingRecommendWidget", () => {
         references: [
           {
             slug: "2026-05-08",
-            title: "投资每日简报 · 2026-05-08",
+            title: "投资简报 · 2026-05-08",
             date: "2026-05-08T00:00:00.000Z",
             excerpt: "英伟达与算力链动态",
             tags: ["投资每日简报"],
@@ -92,6 +92,6 @@ describe("InvestmentBriefingRecommendWidget", () => {
       turnstileToken: "turnstile-token",
     })));
     expect(screen.getByText("建议先看英伟达相关两期。")).toBeInTheDocument();
-    expect(screen.getByText("投资每日简报 · 2026-05-08")).toBeInTheDocument();
+    expect(screen.getByText("投资简报 · 2026-05-08")).toBeInTheDocument();
   });
 });

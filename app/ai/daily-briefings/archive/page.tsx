@@ -6,8 +6,8 @@ import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 
 export const metadata: Metadata = generateListPageSEO(
-  "AI 每日简报归档",
-  "按自然月份浏览 AI 每日简报归档。",
+  "AI 简报归档",
+  "按自然月份浏览 AI 简报归档。",
   `${config.site.url}/ai/daily-briefings/archive`,
 );
 
@@ -20,13 +20,13 @@ export default function BriefingArchivePage() {
         <nav className="mb-8 text-sm text-muted-foreground">
           <Link href="/ai/daily-briefings" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
             <ArrowLeft className="h-3.5 w-3.5" />
-            返回 AI 每日简报
+            返回 AI 简报
           </Link>
         </nav>
 
         <header className="mb-8">
           <h1 className="text-2xl font-medium tracking-tight">历史归档</h1>
-          <p className="mt-2 text-sm text-muted-foreground">按月份浏览更早的 AI 每日简报。</p>
+          <p className="mt-2 text-sm text-muted-foreground">按月份浏览更早的 AI 简报。</p>
         </header>
 
         <div className="space-y-3">

@@ -283,7 +283,7 @@ export function BriefingRecommendWidget({
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <h2 className="text-lg font-medium tracking-tight">AI 每日简报推荐</h2>
+          <h2 className="text-lg font-medium tracking-tight">AI 简报推荐</h2>
         </div>
       </div>
 
@@ -353,7 +353,7 @@ export function BriefingRecommendWidget({
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有每日简报。
+              这个时间范围内还没有简报。
             </p>
           )}
         </div>

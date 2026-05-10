@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props) {
   const twitter = generateTwitterCard(post);
 
   return {
-    title: isLatestRoute ? shareTitle : `${post.title} | ${config.site.name}`,
+    title: isLatestRoute ? "文章 · Latest | YSJ" : `${post.title} | YSJ`,
     description: shareDescription,
     keywords: post.tags,
     authors: [{ name: config.author.name }],

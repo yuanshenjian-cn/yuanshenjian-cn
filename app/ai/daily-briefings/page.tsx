@@ -7,8 +7,8 @@ import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 
 export const metadata: Metadata = generateListPageSEO(
-  "AI 每日简报",
-  "每日追踪重点 AI 厂商动态，展示最近 30 天简报并支持按月份查看历史归档。",
+  "AI 简报",
+  "持续追踪重点 AI 厂商动态，展示最近 30 天简报并支持按月份查看历史归档。",
   `${config.site.url}/ai/daily-briefings`,
 );
 

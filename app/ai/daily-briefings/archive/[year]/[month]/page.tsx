@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return generateListPageSEO(
-    `${year} 年 ${month} 月 AI 每日简报`,
-    `${year} 年 ${month} 月 AI 每日简报归档列表。`,
+    `${year} 年 ${month} 月 AI 简报`,
+    `${year} 年 ${month} 月 AI 简报归档列表。`,
     `${config.site.url}/ai/daily-briefings/archive/${year}/${month}`,
   );
 }
@@ -54,7 +54,7 @@ export default async function BriefingArchiveMonthPage({ params }: Props) {
 
         <header className="mb-8">
           <h1 className="text-2xl font-medium tracking-tight">{year} 年 {month} 月</h1>
-          <p className="mt-2 text-sm text-muted-foreground">共 {briefings.length} 期 AI 每日简报</p>
+          <p className="mt-2 text-sm text-muted-foreground">共 {briefings.length} 期 AI 简报</p>
         </header>
 
         <div className="space-y-3">

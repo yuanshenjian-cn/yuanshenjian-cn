@@ -20,11 +20,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const column = getInvestmentColumnBySlug(slug);
 
   if (!column) {
-    return { title: `投资专栏 | ${config.site.name}` };
+    return { title: "投资专栏 | YSJ" };
   }
 
   return {
-    title: `${column.title} | ${config.site.name}`,
+    title: `${column.title} | YSJ`,
     description: column.description,
   };
 }

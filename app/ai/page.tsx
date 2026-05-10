@@ -9,7 +9,7 @@ import { generateListPageSEO } from "@/lib/seo-utils";
 
 export const metadata: Metadata = generateListPageSEO(
   "AI 栏目",
-  "每日简报、AI 效率工程、AI Agent 与 AI Coding 相关的主题内容。",
+  "AI 简报、AI 效率工程、AI Agent 与 AI Coding 相关的主题内容。",
   `${config.site.url}/ai`,
 );
 
@@ -34,7 +34,7 @@ export default async function AIColumnsPage() {
               </div>
               <div>
                 <h2 className="mt-1 text-xl font-semibold tracking-tight">
-                  {latestBriefingDateLabel ? `AI · 每日简报 · ${latestBriefingDateLabel}` : "AI · 每日简报"}
+                  {latestBriefingDateLabel ? `AI · 简报 · ${latestBriefingDateLabel}` : "AI · 简报"}
                 </h2>
               </div>
             </div>
@@ -46,7 +46,7 @@ export default async function AIColumnsPage() {
           <p className="mt-4 text-sm leading-6 text-muted-foreground">
             {latestBriefing
               ? latestBriefing.excerpt
-              : "每天追踪重点 AI 厂商动态，经过来源与时间证据审核后发布。"}
+              : "持续追踪重点 AI 厂商动态，经过来源与时间证据审核后发布。"}
           </p>
 
           {latestBriefing ? (

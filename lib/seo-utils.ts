@@ -3,6 +3,7 @@ import { config } from "./config";
 import { Post } from "@/types/blog";
 
 const SITE_NAME = config.site.name;
+const TAB_TITLE_SUFFIX = "YSJ";
 const DEFAULT_OG_IMAGE = `${config.site.url}${config.site.ogImage}`;
 
 /**
@@ -100,7 +101,7 @@ export function generateListPageSEO(
 
   const fullTitle = pageTitle === SITE_NAME
     ? pageTitle
-    : `${pageTitle} | ${SITE_NAME}`;
+    : `${pageTitle} | ${TAB_TITLE_SUFFIX}`;
 
   const ogImage = options?.image || DEFAULT_OG_IMAGE;
   const resolvePageUrl = (page?: number) => {

@@ -10,7 +10,7 @@ vi.mock("@/components/investment/investment-briefing-recommend-widget", () => ({
 const briefings: InvestmentBriefing[] = [
   {
     slug: "2026-05-09",
-    title: "投资每日简报 · 2026-05-09",
+    title: "投资简报 · 2026-05-09",
     date: new Date().toISOString(),
     year: "2026",
     month: "05",
@@ -26,7 +26,7 @@ const briefings: InvestmentBriefing[] = [
   },
   {
     slug: "2026-04-15",
-    title: "投资每日简报 · 2026-04-15",
+    title: "投资简报 · 2026-04-15",
     date: "2026-04-15T00:00:00.000Z",
     year: "2026",
     month: "04",

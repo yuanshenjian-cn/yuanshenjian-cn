@@ -166,6 +166,10 @@ function buildCoveragePayload() {
   };
 }
 
+function normalizeInvestmentBriefingTitle(title) {
+  return title.replace(/^投资每日简报/, "投资简报");
+}
+
 function parseBriefingFile(filePath) {
   try {
     const fileContents = fs.readFileSync(filePath, "utf8");
@@ -187,7 +191,7 @@ function parseBriefingFile(filePath) {
 
     return {
       slug,
-      title: data.title,
+      title: normalizeInvestmentBriefingTitle(data.title),
       brief: data.brief,
       tags,
       date: new Date(data.date).toISOString(),

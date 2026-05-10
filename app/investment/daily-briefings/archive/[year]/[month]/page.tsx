@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { year, month } = await params;
 
   return {
-    title: `${year} 年 ${month} 月投资每日简报 | ${config.site.name}`,
+    title: `${year} 年 ${month} 月投资简报 | YSJ`,
   };
 }
 
@@ -52,7 +52,7 @@ export default async function InvestmentBriefingArchiveMonthPage({ params }: Pro
 
         <header className="mb-8">
           <h1 className="text-2xl font-medium tracking-tight">{year} 年 {month} 月</h1>
-          <p className="mt-2 text-sm text-muted-foreground">共 {briefings.length} 期投资每日简报</p>
+          <p className="mt-2 text-sm text-muted-foreground">共 {briefings.length} 期投资简报</p>
         </header>
 
         <div className="space-y-3">

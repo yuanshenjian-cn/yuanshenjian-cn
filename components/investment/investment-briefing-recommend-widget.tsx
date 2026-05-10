@@ -282,11 +282,11 @@ export function InvestmentBriefingRecommendWidget({
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <h2 className="text-lg font-medium tracking-tight">投资每日简报推荐</h2>
+          <h2 className="text-lg font-medium tracking-tight">投资简报推荐</h2>
         </div>
       </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">基于“近 30 天”的投资每日简报范围推荐，不构成投资建议。</p>
+      <p className="mt-4 text-xs text-muted-foreground">基于“近 30 天”的投资简报范围推荐，不构成投资建议。</p>
 
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="relative">
@@ -352,7 +352,7 @@ export function InvestmentBriefingRecommendWidget({
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有投资每日简报。
+              这个时间范围内还没有投资简报。
             </p>
           )}
         </div>

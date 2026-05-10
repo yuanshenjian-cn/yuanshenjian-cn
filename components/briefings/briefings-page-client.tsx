@@ -92,7 +92,7 @@ export function BriefingsPageClient({ briefings, totalBriefings, aiConfig }: Bri
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有 AI 每日简报。
+              这个时间范围内还没有 AI 简报。
             </p>
           )}
         </div>
@@ -102,7 +102,7 @@ export function BriefingsPageClient({ briefings, totalBriefings, aiConfig }: Bri
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-sm font-medium text-foreground">查看更早简报</h3>
-                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史 AI 每日简报</p>
+                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史 AI 简报</p>
               </div>
               <Link
                 href="/ai/daily-briefings/archive"

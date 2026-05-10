@@ -8,7 +8,7 @@ import { getInvestmentColumns } from "@/lib/investment-columns";
 
 export const metadata: Metadata = generateListPageSEO(
   "投资栏目",
-  "投资每日简报、重点观察领域与投资专栏内容入口。",
+  "投资简报、重点观察领域与投资专栏内容入口。",
   `${config.site.url}/investment`,
 );
 
@@ -33,7 +33,7 @@ export default async function InvestmentPage() {
               </div>
               <div>
                 <h2 className="mt-1 text-xl font-semibold tracking-tight">
-                  {latestBriefingDateLabel ? `投资 · 每日简报 · ${latestBriefingDateLabel}` : "投资 · 每日简报"}
+                  {latestBriefingDateLabel ? `投资 · 简报 · ${latestBriefingDateLabel}` : "投资 · 简报"}
                 </h2>
               </div>
             </div>
