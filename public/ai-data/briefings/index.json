@@ -1,6 +1,21 @@
 {
-  "generated": "2026-05-10T00:00:00.000Z",
+  "generated": "2026-05-12T00:00:00.000Z",
   "briefings": [
+    {
+      "slug": "2026-05-12",
+      "title": "AI 简报 · 2026-05-12",
+      "excerpt": "OpenAI 拆出独立子品牌 DeployCo 并签约收购 Tomoro，把企业落地交付包装成单独业务线；Anthropic 同日发布 Claude Code v2.1.139，引入 agent view 与 /goal、/scroll-speed 等命令；Morningstar 与 PitchBook 通过 MCP 把数据接入 Perplexity 投研工作流。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Claude Code",
+        "Perplexity",
+        "Gemini"
+      ],
+      "date": "2026-05-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-12"
+    },
     {
       "slug": "2026-05-10",
       "title": "AI 简报 · 2026-05-10",
