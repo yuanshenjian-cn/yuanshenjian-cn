@@ -514,7 +514,7 @@ function parseBriefingFile(filePath) {
       excerpt,
       tags,
       date: new Date(data.date).toISOString(),
-      url: `/ai/daily-briefings/${slug}`,
+      url: `/ai/briefings/${slug}`,
     };
   } catch (error) {
     console.error(`Error parsing briefing file ${path.relative(process.cwd(), filePath)}:`, error);

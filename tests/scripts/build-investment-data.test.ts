@@ -6,7 +6,7 @@ let buildBriefingsPayload: () => { items: Array<{ slug: string; title: string; b
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
 const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
-const testFile = path.join(briefingsDir, "2099-01-03-investment-daily-briefing.md");
+const testFile = path.join(briefingsDir, "2099-01-03-investment-briefing.md");
 
 describe("build-investment-data script", () => {
   beforeAll(async () => {
@@ -18,7 +18,7 @@ describe("build-investment-data script", () => {
     fs.writeFileSync(
       testFile,
       `---
-title: "投资每日简报 · 2099-01-03"
+title: "投资简报 · 2099-01-03"
 date: "2099-01-03"
 brief: "测试摘要"
 published: true
@@ -65,7 +65,7 @@ tags:
         slug: "2099-01-03",
         title: "投资简报 · 2099-01-03",
         brief: "测试摘要",
-        url: "/investment/daily-briefings/2099-01-03",
+        url: "/investment/briefings/2099-01-03",
       }),
     );
   });

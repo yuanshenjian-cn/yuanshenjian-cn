@@ -5,7 +5,7 @@ const path = require("path");
 const matter = require("gray-matter");
 
 const ROOT = path.resolve(__dirname, "..");
-const CONFIG_DIRECTORY = path.join(ROOT, "config", "investment");
+const CONFIG_DIRECTORY = path.join(ROOT, "skills", "investment-briefing", "config");
 const BRIEFINGS_DIRECTORY = path.join(ROOT, "content", "investment-briefings");
 const OUTPUT_DIRECTORY = path.join(ROOT, "public", "investment-data");
 const OUTPUT_BRIEFINGS_DIRECTORY = path.join(OUTPUT_DIRECTORY, "briefings");
@@ -167,7 +167,7 @@ function buildCoveragePayload() {
 }
 
 function normalizeInvestmentBriefingTitle(title) {
-  return title.replace(/^投资每日简报/, "投资简报");
+  return title.replace(/^投资简报/, "投资简报");
 }
 
 function parseBriefingFile(filePath) {
@@ -195,7 +195,7 @@ function parseBriefingFile(filePath) {
       brief: data.brief,
       tags,
       date: new Date(data.date).toISOString(),
-      url: `/investment/daily-briefings/${slug}`,
+      url: `/investment/briefings/${slug}`,
     };
   } catch (error) {
     console.error(`Error parsing investment briefing file ${path.relative(process.cwd(), filePath)}:`, error);

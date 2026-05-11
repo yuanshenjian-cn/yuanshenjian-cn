@@ -4,8 +4,8 @@ import { execFileSync } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
-const testFile = path.join(briefingsDir, "2099-01-04-investment-daily-briefing.md");
-const relativeTestFile = "content/investment-briefings/2099-01-04-investment-daily-briefing.md";
+const testFile = path.join(briefingsDir, "2099-01-04-investment-briefing.md");
+const relativeTestFile = "content/investment-briefings/2099-01-04-investment-briefing.md";
 
 describe("validate-post investment briefing guards", () => {
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe("validate-post investment briefing guards", () => {
     fs.writeFileSync(
       testFile,
       `---
-title: "投资每日简报 · 2099-01-04"
+title: "投资简报 · 2099-01-04"
 date: "2099-01-04"
 brief: "测试元说明门禁"
 published: true
@@ -59,7 +59,7 @@ tags:
       throw new Error("validate-post should have failed");
     } catch (error) {
       const output = error instanceof Error && "stderr" in error ? String(error.stderr) : String(error);
-      expect(output).toContain("投资每日简报包含生成前思考/取舍说明，不得进入公开正文");
+      expect(output).toContain("投资简报包含生成前思考/取舍说明，不得进入公开正文");
       expect(output).toContain("本期重点是把已经官宣的财报节点重新排序");
     }
   });
@@ -68,7 +68,7 @@ tags:
     fs.writeFileSync(
       testFile,
       `---
-title: "投资每日简报 · 2099-01-04"
+title: "投资简报 · 2099-01-04"
 date: "2099-01-04"
 brief: "测试日期与星期门禁"
 published: true
@@ -108,8 +108,8 @@ tags:
       throw new Error("validate-post should have failed");
     } catch (error) {
       const output = error instanceof Error && "stderr" in error ? String(error.stderr) : String(error);
-      expect(output).toContain("投资每日简报日期与星期不一致：2099-01-04（周一）（应为 周日）");
-      expect(output).toContain("投资每日简报日期与星期不一致：1 月 6 日（周三）（应为 周二）");
+      expect(output).toContain("投资简报日期与星期不一致：2099-01-04（周一）（应为 周日）");
+      expect(output).toContain("投资简报日期与星期不一致：1 月 6 日（周三）（应为 周二）");
     }
   });
 });

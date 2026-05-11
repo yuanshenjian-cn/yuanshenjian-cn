@@ -248,7 +248,7 @@ export async function handleBriefingRecommendSceneStream(
         }
 
         const sanitizer = createAnswerDeltaSanitizer((delta) => controller.enqueue(encodeSSEEvent("answer-delta", { delta })));
-        sanitizer.push(answer || "这个时间范围内没有找到足够相关的 AI 每日简报。");
+        sanitizer.push(answer || "这个时间范围内没有找到足够相关的 AI 简报。");
         sanitizer.finish();
         controller.enqueue(encodeSSEEvent("references", { references }));
         controller.enqueue(encodeSSEEvent("done", { usage }));

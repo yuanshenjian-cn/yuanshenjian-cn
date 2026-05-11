@@ -1,0 +1,29 @@
+{
+  "skill_name": "ai-briefing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "生成今天的 AI 简报，默认厂商，发布到博客。",
+      "expected_output": "生成 content/ai-briefings 下的 .md 文件，published: true，正文 700~1100 汉字（不统计 ## 来源 章节），完成两轮审核并在通过后 commit/push。",
+      "files": [],
+      "expectations": [
+        "文件扩展名是 .md 而不是 .mdx",
+        "frontmatter 包含 published: true",
+        "发布前执行最终审核",
+        "审核失败不得 commit 或 push"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "只生成不发布，帮我做最近三天 OpenAI 和 Anthropic 的 AI 简报。",
+      "expected_output": "只生成本地稿件与审核报告，不 commit 不 push，并只覆盖指定厂商与时间窗口。",
+      "files": [],
+      "expectations": [
+        "尊重只生成不发布选项",
+        "只覆盖 OpenAI 和 Anthropic",
+        "正文确定区只包含有时间证据和可靠来源的信息",
+        "待核验线索不进入正文确定区"
+      ]
+    }
+  ]
+}

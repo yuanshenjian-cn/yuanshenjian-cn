@@ -36,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const briefingUrls = briefings.map((briefing) => ({
     url: `${baseUrl}${briefing.url}`,
     lastModified: new Date(briefing.date),
-    changeFrequency: "daily" as const,
+    changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
@@ -57,7 +57,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const investmentBriefingUrls = investmentBriefings.map((briefing) => ({
     url: `${baseUrl}${briefing.url}`,
     lastModified: new Date(briefing.date),
-    changeFrequency: "daily" as const,
+    changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
@@ -79,13 +79,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${baseUrl}/articles`,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "weekly",
       priority: 0.9,
     },
     ...paginationUrls,
@@ -96,13 +96,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/ai/daily-briefings`,
+      url: `${baseUrl}/ai/briefings`,
       lastModified: briefings.length > 0 ? new Date(briefings[0].date) : new Date(),
       changeFrequency: "daily",
       priority: 0.75,
     },
     {
-      url: `${baseUrl}/ai/daily-briefings/archive`,
+      url: `${baseUrl}/ai/briefings/archive`,
       lastModified: briefings.length > 0 ? new Date(briefings[0].date) : new Date(),
       changeFrequency: "monthly",
       priority: 0.65,
@@ -120,13 +120,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.65,
     },
     {
-      url: `${baseUrl}/investment/daily-briefings`,
+      url: `${baseUrl}/investment/briefings`,
       lastModified: investmentBriefings.length > 0 ? new Date(investmentBriefings[0].date) : new Date(),
       changeFrequency: "daily",
       priority: 0.75,
     },
     {
-      url: `${baseUrl}/investment/daily-briefings/archive`,
+      url: `${baseUrl}/investment/briefings/archive`,
       lastModified: investmentBriefings.length > 0 ? new Date(investmentBriefings[0].date) : new Date(),
       changeFrequency: "monthly",
       priority: 0.65,

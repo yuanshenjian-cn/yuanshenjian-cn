@@ -172,11 +172,11 @@ describe("Worker runtime env validation", () => {
             briefings: [
               {
                 slug: "2099-01-08",
-                title: "AI 每日简报 · 2099-01-08",
+                title: "AI 简报 · 2099-01-08",
                 excerpt: "摘要",
-                tags: ["AI每日简报"],
+                tags: ["AI简报"],
                 date: new Date().toISOString(),
-                url: "/ai/daily-briefings/2099-01-08",
+                url: "/ai/briefings/2099-01-08",
               },
             ],
           }),
@@ -239,11 +239,11 @@ describe("Worker runtime env validation", () => {
             items: [
               {
                 slug: "2099-01-08",
-                title: "投资每日简报 · 2099-01-08",
+                title: "投资简报 · 2099-01-08",
                 brief: "摘要",
-                tags: ["投资每日简报"],
+                tags: ["投资简报"],
                 date: new Date().toISOString(),
-                url: "/investment/daily-briefings/2099-01-08",
+                url: "/investment/briefings/2099-01-08",
               },
             ],
           }),

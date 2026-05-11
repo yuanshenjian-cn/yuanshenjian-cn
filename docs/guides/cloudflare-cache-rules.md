@@ -1,12 +1,12 @@
 # Cloudflare Cache Rules Guide
 
-> 适用于当前博客主站：Next.js 15、`output: 'export'`、静态导出、简报日更、文章低频更新，且允许在必要时手动 purge Cloudflare 缓存。
+> 适用于当前博客主站：Next.js 15、`output: 'export'`、静态导出、简报按期发布、文章低频更新，且允许在必要时手动 purge Cloudflare 缓存。
 
 ## 目标
 
 - 控制在 6 类缓存规则以内，避免面板里规则过多、后续难维护
 - 让大多数静态页面和静态资源尽可能长时间命中 Cloudflare 缓存，降低 GitHub Pages 回源压力
-- 对 `/latest` 保持相对更短缓存，兼顾简报日更
+- 对 `/latest` 保持相对更短缓存，兼顾简报按需更新
 - 对已发布文章、作者简介或历史页的修订，默认通过手动 purge 保证及时生效
 
 ## 规则顺序
@@ -127,20 +127,20 @@ and (http.request.method in {"GET" "HEAD"})
 ### 覆盖范围
 
 - `/articles/latest`
-- `/ai/daily-briefings/latest`
-- `/investment/daily-briefings/latest`
-- `/ai/daily-briefings/latest/opengraph-image`
-- `/investment/daily-briefings/latest/opengraph-image`
+- `/ai/briefings/latest`
+- `/investment/briefings/latest`
+- `/ai/briefings/latest/opengraph-image`
+- `/investment/briefings/latest/opengraph-image`
 
 ### Expression
 
 ```txt
 (
   http.request.uri.path eq "/articles/latest"
-  or http.request.uri.path eq "/ai/daily-briefings/latest"
-  or http.request.uri.path eq "/investment/daily-briefings/latest"
-  or http.request.uri.path eq "/ai/daily-briefings/latest/opengraph-image"
-  or http.request.uri.path eq "/investment/daily-briefings/latest/opengraph-image"
+  or http.request.uri.path eq "/ai/briefings/latest"
+  or http.request.uri.path eq "/investment/briefings/latest"
+  or http.request.uri.path eq "/ai/briefings/latest/opengraph-image"
+  or http.request.uri.path eq "/investment/briefings/latest/opengraph-image"
 )
 and (http.request.method in {"GET" "HEAD"})
 ```
@@ -152,7 +152,7 @@ and (http.request.method in {"GET" "HEAD"})
 
 ### 说明
 
-- 你的简报是日更，不是分钟级更新，因此 `6 hours` 仍然能兼顾“当天更新可见”与“尽量少回源”
+- 你的简报更新频率明显低于分钟级，因此 `6 hours` 仍然能兼顾“新一期尽快可见”与“尽量少回源”
 - 如果当天发布后希望立刻全网生效，直接手动 purge 这几个 latest 路径即可
 
 ---
@@ -213,6 +213,7 @@ and (http.request.method in {"GET" "HEAD"})
 - `/author`
 - `/articles*`
 - `/ai*`
+- `/health*`
 - `/investment*`
 - 所有 `.html` 请求
 - 普通日期页 `opengraph-image` 也会被这条排除，交给更前面的规则处理
@@ -226,6 +227,7 @@ and (http.request.method in {"GET" "HEAD"})
   or http.request.uri.path eq "/author"
   or starts_with(http.request.uri.path, "/articles")
   or starts_with(http.request.uri.path, "/ai")
+  or starts_with(http.request.uri.path, "/health")
   or starts_with(http.request.uri.path, "/investment")
   or ends_with(http.request.uri.path, ".html")
 )
@@ -233,10 +235,10 @@ and not (
   starts_with(http.request.uri.path, "/ai-data/")
   or starts_with(http.request.uri.path, "/investment-data/")
   or http.request.uri.path eq "/articles/latest"
-  or http.request.uri.path eq "/ai/daily-briefings/latest"
-  or http.request.uri.path eq "/investment/daily-briefings/latest"
-  or http.request.uri.path eq "/ai/daily-briefings/latest/opengraph-image"
-  or http.request.uri.path eq "/investment/daily-briefings/latest/opengraph-image"
+  or http.request.uri.path eq "/ai/briefings/latest"
+  or http.request.uri.path eq "/investment/briefings/latest"
+  or http.request.uri.path eq "/ai/briefings/latest/opengraph-image"
+  or http.request.uri.path eq "/investment/briefings/latest/opengraph-image"
 )
 and (http.request.method in {"GET" "HEAD"})
 ```
@@ -249,6 +251,7 @@ and (http.request.method in {"GET" "HEAD"})
 ### 说明
 
 - 当前博客文章更新低频、AI/投资非 latest 页面一旦发布后通常不会频繁改动
+- `health` 当前也是普通静态栏目页与栏目聚合页，和 `/ai`、`/investment` 一样适合走通用页面缓存
 - 普通页面直接给到 `7 days` 更符合“尽量利用 CDN、减少 GitHub Pages 回源”的目标
 - 如果后续修改了已发布文章、作者简介或普通页面，直接手动 purge 对应路径即可
 
@@ -261,8 +264,9 @@ and (http.request.method in {"GET" "HEAD"})
 3. 全部创建完成后，做一次 Cache Purge，至少清理：
    - `/`
    - `/articles/latest`
-   - `/ai/daily-briefings/latest`
-   - `/investment/daily-briefings/latest`
+   - `/ai/briefings/latest`
+   - `/health`
+   - `/investment/briefings/latest`
    - `/feed`
    - `/sitemap.xml`
    - `/robots.txt`
@@ -278,6 +282,7 @@ and (http.request.method in {"GET" "HEAD"})
 - 新一期 AI / 投资简报发布后，希望 `/latest` 立即更新
 - 已发布文章正文被修订
 - 作者简介、关于页、首页文案被修改
+- `health` 栏目首页或某个健康专栏页被修改
 - RSS、sitemap、robots、manifest 需要立即反映最新内容
 
 ### 最常用的 purge 路径
@@ -285,11 +290,12 @@ and (http.request.method in {"GET" "HEAD"})
 - 首页：`/`
 - 关于页：`/about`
 - 作者页：`/author`
+- 健康栏目：`/health`
 - 文章 latest：`/articles/latest`
-- AI 简报 latest：`/ai/daily-briefings/latest`
-- 投资简报 latest：`/investment/daily-briefings/latest`
-- AI latest 分享图：`/ai/daily-briefings/latest/opengraph-image`
-- 投资 latest 分享图：`/investment/daily-briefings/latest/opengraph-image`
+- AI 简报 latest：`/ai/briefings/latest`
+- 投资简报 latest：`/investment/briefings/latest`
+- AI latest 分享图：`/ai/briefings/latest/opengraph-image`
+- 投资 latest 分享图：`/investment/briefings/latest/opengraph-image`
 - Feed：`/feed`
 - Sitemap：`/sitemap.xml`
 - Robots：`/robots.txt`
@@ -305,9 +311,10 @@ and (http.request.method in {"GET" "HEAD"})
 ```bash
 curl -I https://yuanshenjian.cn/
 curl -I https://yuanshenjian.cn/articles/latest
-curl -I https://yuanshenjian.cn/ai/daily-briefings/latest
-curl -I https://yuanshenjian.cn/investment/daily-briefings/latest
-curl -I https://yuanshenjian.cn/ai/daily-briefings/2026-05-10/opengraph-image
+curl -I https://yuanshenjian.cn/health
+curl -I https://yuanshenjian.cn/ai/briefings/latest
+curl -I https://yuanshenjian.cn/investment/briefings/latest
+curl -I https://yuanshenjian.cn/ai/briefings/2026-05-10/opengraph-image
 curl -I https://yuanshenjian.cn/ai-data/index.json
 curl -I https://yuanshenjian.cn/feed
 curl -I https://yuanshenjian.cn/sw.js

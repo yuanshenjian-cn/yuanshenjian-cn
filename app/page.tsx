@@ -98,19 +98,19 @@ export default function Home() {
                 <p className="mt-4 line-clamp-4 text-sm leading-6 text-foreground/75">
                   {latestBriefing
                     ? latestBriefing.excerpt
-                    : "每天早上更新，聚焦重点 AI 厂商的确定性动态。"}
+                    : "持续追踪重点 AI 厂商的确定性动态，有更新时发布新一期简报。"}
                 </p>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <Link
-                    href="/ai/daily-briefings/latest"
+                    href="/ai/briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
                   >
                     看最新
                     <ArrowRight className="h-2.5 w-2.5" />
                   </Link>
                   <Link
-                    href="/ai/daily-briefings"
+                    href="/ai/briefings"
                     className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     看往期
@@ -141,19 +141,19 @@ export default function Home() {
                 <p className="mt-4 line-clamp-4 text-sm leading-6 text-foreground/75">
                   {latestInvestmentBriefing
                     ? latestInvestmentBriefing.excerpt
-                    : "每天整理重点公司的公开动态与未来观察，帮助你快速把握最新投资线索。"}
+                    : "持续整理重点公司的公开动态与未来观察，帮助你快速把握最新投资线索。"}
                 </p>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <Link
-                    href="/investment/daily-briefings/latest"
+                    href="/investment/briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
                   >
                     看最新
                     <ArrowRight className="h-2.5 w-2.5" />
                   </Link>
                   <Link
-                    href="/investment/daily-briefings"
+                    href="/investment/briefings"
                     className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     看往期

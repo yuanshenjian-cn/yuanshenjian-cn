@@ -9,7 +9,7 @@ import type {
   MarketWatchConfig,
 } from "@/types/investment";
 
-const investmentConfigDirectory = path.join(process.cwd(), "config", "investment");
+const investmentConfigDirectory = path.join(process.cwd(), "skills", "investment-briefing", "config");
 const publicCoveragePath = path.join(process.cwd(), "public", "investment-data", "coverage.json");
 
 function readJsonFile<T>(filePath: string): T {

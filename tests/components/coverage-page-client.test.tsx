@@ -24,7 +24,7 @@ const coverage = {
 
 describe("CoveragePageClient", () => {
   it("支持优先级和市场轻量筛选", () => {
-    render(<CoveragePageClient coverage={coverage} latestBriefingUrl="/investment/daily-briefings/2026-05-09" />);
+    render(<CoveragePageClient coverage={coverage} latestBriefingUrl="/investment/briefings/2026-05-09" />);
 
     expect(screen.getByRole("heading", { name: "投资观察范围" })).toBeInTheDocument();
     expect(screen.getByText("恒生科技")).toBeInTheDocument();
@@ -40,11 +40,11 @@ describe("CoveragePageClient", () => {
   });
 
   it("查看往期简报跳转到往期简报页而不是归档页", () => {
-    render(<CoveragePageClient coverage={coverage} latestBriefingUrl="/investment/daily-briefings/2026-05-09" />);
+    render(<CoveragePageClient coverage={coverage} latestBriefingUrl="/investment/briefings/2026-05-09" />);
 
     expect(screen.getByRole("link", { name: "查看往期简报" })).toHaveAttribute(
       "href",
-      "/investment/daily-briefings",
+      "/investment/briefings",
     );
   });
 });

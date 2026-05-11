@@ -284,7 +284,7 @@ function validateContentPath(filePath) {
   const relativeToContentRoot = path.relative(contentRoot, absolutePath);
 
   if (isBriefingPath && !BRIEFING_EXT_RE.test(filePath)) {
-    addError(`AI 每日简报文件扩展名必须是 .md（当前：${path.extname(filePath) || "无扩展名"}）`, filePath);
+    addError(`AI 简报文件扩展名必须是 .md（当前：${path.extname(filePath) || "无扩展名"}）`, filePath);
   } else if (!MARKDOWN_EXT_RE.test(filePath)) {
     addError(`文件扩展名必须是 .md 或 .mdx（当前：${path.extname(filePath) || "无扩展名"}）`, filePath);
   }
@@ -542,7 +542,7 @@ function validateBriefingFile(file, slugs) {
   }
 
   if (!BRIEFING_EXT_RE.test(file)) {
-    addError("AI 每日简报必须使用 .md 文件", relativeFile, 1);
+    addError("AI 简报必须使用 .md 文件", relativeFile, 1);
   }
 
   const title = extractField(parsed.raw, "title");
@@ -569,9 +569,9 @@ function validateBriefingFile(file, slugs) {
 
   const publishedRaw = extractField(parsed.raw, "published");
   if (publishedRaw === null) {
-    addError("AI 每日简报必须显式设置 published: true", relativeFile, 1);
+    addError("AI 简报必须显式设置 published: true", relativeFile, 1);
   } else if (unquote(publishedRaw) !== "true") {
-    addError(`AI 每日简报 published 必须为 true（当前：${publishedRaw}）`, relativeFile, 1);
+    addError(`AI 简报 published 必须为 true（当前：${publishedRaw}）`, relativeFile, 1);
   }
 
   const brief = extractBrief(parsed.raw);
@@ -581,7 +581,7 @@ function validateBriefingFile(file, slugs) {
 
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, ["来源"]));
   if (chineseCharacters < 700 || chineseCharacters > 1100) {
-    addError(`AI 每日简报正文汉字数（不含来源章节）应为 700~1100（当前：${chineseCharacters}）`, relativeFile, 1);
+    addError(`AI 简报正文汉字数（不含来源章节）应为 700~1100（当前：${chineseCharacters}）`, relativeFile, 1);
   }
 
   validateLinksAndImages(parsed.body, file, slugs);
@@ -628,11 +628,11 @@ function validateInvestmentBriefingFile(file, slugs) {
   }
 
   if (!BRIEFING_EXT_RE.test(file)) {
-    addError("投资每日简报必须使用 .md 文件", relativeFile, 1);
+    addError("投资简报必须使用 .md 文件", relativeFile, 1);
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}-investment-daily-briefing\.md$/i.test(fileName)) {
-    addError(`投资每日简报文件名必须匹配 YYYY-MM-DD-investment-daily-briefing.md（当前：${fileName}）`, relativeFile, 1);
+  if (!/^\d{4}-\d{2}-\d{2}-investment-briefing\.md$/i.test(fileName)) {
+    addError(`投资简报文件名必须匹配 YYYY-MM-DD-investment-briefing.md（当前：${fileName}）`, relativeFile, 1);
   }
 
   const title = extractField(parsed.raw, "title");
@@ -649,7 +649,7 @@ function validateInvestmentBriefingFile(file, slugs) {
       addError(`date 格式不合法（应为 YYYY-MM-DD，当前：${dateClean}）`, relativeFile, 1);
     } else if (Number.isNaN(new Date(dateClean).getTime())) {
       addError(`date 不是合法日期：${dateClean}`, relativeFile, 1);
-    } else if (fileName !== `${dateClean}-investment-daily-briefing.md`) {
+    } else if (fileName !== `${dateClean}-investment-briefing.md`) {
       addError(`文件名日期必须与 frontmatter date 一致（当前文件名：${fileName}，date：${dateClean}）`, relativeFile, 1);
     }
   }
@@ -658,22 +658,16 @@ function validateInvestmentBriefingFile(file, slugs) {
   if (!tags || tags.length === 0) {
     addError("frontmatter 缺少 tags 或 tags 为空数组", relativeFile, 1);
   } else {
-    if (!tags.includes("投资每日简报")) {
-      addError("投资每日简报 tags 必须包含 `投资每日简报`", relativeFile, 1);
-    }
     if (tags.length < 3) {
-      addError("投资每日简报 tags 至少应包含 3 个标签（含 `投资每日简报`）", relativeFile, 1);
-    }
-    if (tags.length === 1 && tags[0] === "投资每日简报") {
-      addError("投资每日简报 tags 不能只有 `投资每日简报` 一个标签", relativeFile, 1);
+      addError("投资简报 tags 至少应包含 3 个标签", relativeFile, 1);
     }
   }
 
   const publishedRaw = extractField(parsed.raw, "published");
   if (publishedRaw === null) {
-    addError("投资每日简报必须显式设置 published: true", relativeFile, 1);
+    addError("投资简报必须显式设置 published: true", relativeFile, 1);
   } else if (unquote(publishedRaw) !== "true") {
-    addError(`投资每日简报 published 必须为 true（当前：${publishedRaw}）`, relativeFile, 1);
+    addError(`投资简报 published 必须为 true（当前：${publishedRaw}）`, relativeFile, 1);
   }
 
   const brief = extractBrief(parsed.raw);
@@ -683,7 +677,7 @@ function validateInvestmentBriefingFile(file, slugs) {
 
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, ["来源"]));
   if (chineseCharacters < 900 || chineseCharacters > 1500) {
-    addError(`投资每日简报正文汉字数（不含来源章节）应为 900~1500（当前：${chineseCharacters}）`, relativeFile, 1);
+    addError(`投资简报正文汉字数（不含来源章节）应为 900~1500（当前：${chineseCharacters}）`, relativeFile, 1);
   }
 
   const confirmMatch = findHeading(parsed.body, "近 24 小时确认动态");
@@ -692,13 +686,13 @@ function validateInvestmentBriefingFile(file, slugs) {
   const expectationMatch = findHeading(parsed.body, "预期观察");
 
   if (!confirmMatch) {
-    addError("投资每日简报缺少 `## 近 24 小时确认动态` 章节", relativeFile, 1);
+    addError("投资简报缺少 `## 近 24 小时确认动态` 章节", relativeFile, 1);
   }
   if (!watchMatch) {
-    addError("投资每日简报缺少 `## 未来重点观察` 章节", relativeFile, 1);
+    addError("投资简报缺少 `## 未来重点观察` 章节", relativeFile, 1);
   }
   if (!sourcesMatch) {
-    addError("投资每日简报缺少 `## 来源` 章节", relativeFile, 1);
+    addError("投资简报缺少 `## 来源` 章节", relativeFile, 1);
   }
 
   const bodyIndex = (match) => match?.index ?? -1;
@@ -726,24 +720,24 @@ function validateInvestmentBriefingFile(file, slugs) {
 
   const sourcesContent = getSectionContent(parsed.body, "来源");
   if (sourcesContent.length === 0 || !/https?:\/\//.test(sourcesContent)) {
-    addError("投资每日简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
+    addError("投资简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
   }
 
   const disclaimer = "**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**";
   if (!parsed.body.includes(disclaimer)) {
-    addError("投资每日简报缺少固定免责声明", relativeFile, 1);
+    addError("投资简报缺少固定免责声明", relativeFile, 1);
   }
 
   const redline = parsed.body.match(INVESTMENT_REDLINE_RE);
   if (redline) {
-    addError(`投资每日简报命中红线表达：${redline[0]}`, relativeFile, getLineNumber(parsed.body, redline.index ?? 0));
+    addError(`投资简报命中红线表达：${redline[0]}`, relativeFile, getLineNumber(parsed.body, redline.index ?? 0));
   }
 
   for (const pattern of INVESTMENT_PROCESS_LEAK_PATTERNS) {
     const leakedProcess = parsed.body.match(pattern);
     if (leakedProcess) {
       addError(
-        `投资每日简报包含生成前思考/取舍说明，不得进入公开正文：${leakedProcess[0]}`,
+        `投资简报包含生成前思考/取舍说明，不得进入公开正文：${leakedProcess[0]}`,
         relativeFile,
         getLineNumber(parsed.body, leakedProcess.index ?? 0),
       );
@@ -753,12 +747,12 @@ function validateInvestmentBriefingFile(file, slugs) {
 
   const blockedCompany = detectBlockedInvestmentCompany(parsed.body);
   if (blockedCompany) {
-    addError(`投资每日简报包含黑名单企业相关内容：${blockedCompany}`, relativeFile, 1);
+    addError(`投资简报包含黑名单企业相关内容：${blockedCompany}`, relativeFile, 1);
   }
 
   for (const mismatch of findInvestmentWeekdayMismatches(parsed.body)) {
     addError(
-      `投资每日简报日期与星期不一致：${mismatch.text}（应为 ${mismatch.expectedWeekday}）`,
+      `投资简报日期与星期不一致：${mismatch.text}（应为 ${mismatch.expectedWeekday}）`,
       relativeFile,
       mismatch.line,
     );

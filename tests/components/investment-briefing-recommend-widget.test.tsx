@@ -63,8 +63,8 @@ describe("InvestmentBriefingRecommendWidget", () => {
             title: "投资简报 · 2026-05-08",
             date: "2026-05-08T00:00:00.000Z",
             excerpt: "英伟达与算力链动态",
-            tags: ["投资每日简报"],
-            url: "/investment/daily-briefings/2026-05-08",
+            tags: ["投资简报"],
+            url: "/investment/briefings/2026-05-08",
           },
         ],
       });

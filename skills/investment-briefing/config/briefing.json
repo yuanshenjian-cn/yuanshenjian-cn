@@ -1,0 +1,31 @@
+{
+  "timezone": "Asia/Shanghai",
+  "cadence": "as-available",
+  "normalBodyMin": 1200,
+  "normalBodyMax": 1500,
+  "shortBodyMin": 900,
+  "disclaimer": "**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**",
+  "coveragePageTitle": "投资观察范围",
+  "coveragePageIntro": "固定观察名单为主，重大事件插播；基于公开信息整理，不构成投资建议或个股推荐。",
+  "methodCards": [
+    {
+      "title": "怎么选内容",
+      "description": "固定观察名单为主，重大事件插播，优先保留影响范围明确、来源可靠的信息。"
+    },
+    {
+      "title": "怎么分区",
+      "description": "公开稿固定分为近 24 小时确认动态与未来重点观察；高共识预期只有在显式开启时才会独立出现。"
+    },
+    {
+      "title": "怎么控风险",
+      "description": "默认不提供买卖建议、不荐股、不公开传闻，只基于公开、可追溯、可核验的信息。"
+    }
+  ],
+  "boundaryStatements": [
+    "不覆盖全市场所有标的。",
+    "不保证穷尽所有新闻。",
+    "不提供买卖建议或个股推荐。",
+    "默认只纳入公开、可追溯、可核验信息。",
+    "未核验传闻不会进入公开发布内容。"
+  ]
+}

@@ -48,19 +48,19 @@ describe("handleInvestmentBriefingRecommendSceneStream", () => {
           items: [
             {
               slug: "2099-01-08",
-              title: "投资每日简报 · 2099-01-08",
+              title: "投资简报 · 2099-01-08",
               brief: "英伟达发布测试动态。",
-              tags: ["投资每日简报", "英伟达"],
+              tags: ["投资简报", "英伟达"],
               date: new Date().toISOString(),
-              url: "/investment/daily-briefings/2099-01-08",
+              url: "/investment/briefings/2099-01-08",
             },
             {
               slug: "2000-01-01",
-              title: "投资每日简报 · 2000-01-01",
+              title: "投资简报 · 2000-01-01",
               brief: "过期动态。",
-              tags: ["投资每日简报"],
+              tags: ["投资简报"],
               date: "2000-01-01T00:00:00.000Z",
-              url: "/investment/daily-briefings/2000-01-01",
+              url: "/investment/briefings/2000-01-01",
             },
           ],
         }),
@@ -93,6 +93,6 @@ describe("handleInvestmentBriefingRecommendSceneStream", () => {
 
     const body = await response.text();
     expect(body).toContain("event: answer-delta");
-    expect(body).toContain('"url":"/investment/daily-briefings/2099-01-08"');
+    expect(body).toContain('"url":"/investment/briefings/2099-01-08"');
   });
 });

@@ -15,9 +15,9 @@ import {
 
 const briefingsDir = path.join(process.cwd(), "content", "ai-briefings");
 const testFiles = [
-  path.join(briefingsDir, "2099-01-02-ai-daily-briefing-test.md"),
-  path.join(briefingsDir, "2099-01-01-ai-daily-briefing-test.md"),
-  path.join(briefingsDir, "2098-12-31-ai-daily-briefing-test.md"),
+  path.join(briefingsDir, "2099-01-02-ai-briefing-test.md"),
+  path.join(briefingsDir, "2099-01-01-ai-briefing-test.md"),
+  path.join(briefingsDir, "2098-12-31-ai-briefing-test.md"),
 ];
 
 function writeBriefing(filePath: string, title: string, date: string) {
@@ -82,8 +82,8 @@ describe("briefings data layer", () => {
 
     expect(recent.map((item) => item.slug)).toEqual(["2099-01-02", "2099-01-01", "2098-12-31"]);
     expect(archives).toEqual([
-      expect.objectContaining({ year: "2099", month: "01", count: 2, url: "/ai/daily-briefings/archive/2099/01" }),
-      expect.objectContaining({ year: "2098", month: "12", count: 1, url: "/ai/daily-briefings/archive/2098/12" }),
+      expect.objectContaining({ year: "2099", month: "01", count: 2, url: "/ai/briefings/archive/2099/01" }),
+      expect.objectContaining({ year: "2098", month: "12", count: 1, url: "/ai/briefings/archive/2098/12" }),
     ]);
     expect(januaryBriefings.map((item) => item.slug)).toEqual(["2099-01-02", "2099-01-01"]);
     expect(decemberBriefings.map((item) => item.slug)).toEqual(["2098-12-31"]);

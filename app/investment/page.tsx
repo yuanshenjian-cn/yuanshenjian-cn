@@ -56,7 +56,7 @@ export default async function InvestmentPage() {
                 <ArrowRight className="h-2.5 w-2.5" />
               </Link>
               <Link
-                href="/investment/daily-briefings"
+                href="/investment/briefings"
                 className="text-[11px] text-muted-foreground transition hover:text-foreground"
               >
                 查看往期
@@ -71,7 +71,7 @@ export default async function InvestmentPage() {
           ) : (
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <Link
-                href="/investment/daily-briefings"
+                href="/investment/briefings"
                 className="text-[11px] text-muted-foreground transition hover:text-foreground"
               >
                 查看往期

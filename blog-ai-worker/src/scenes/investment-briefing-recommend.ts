@@ -275,7 +275,7 @@ export async function handleInvestmentBriefingRecommendSceneStream(
         }
 
         const sanitizer = createAnswerDeltaSanitizer((delta) => controller.enqueue(encodeSSEEvent("answer-delta", { delta })));
-        sanitizer.push(answer || "这个时间范围内没有找到足够相关的投资每日简报。");
+        sanitizer.push(answer || "这个时间范围内没有找到足够相关的投资简报。");
         sanitizer.finish();
         controller.enqueue(encodeSSEEvent("references", { references }));
         controller.enqueue(encodeSSEEvent("done", { usage }));

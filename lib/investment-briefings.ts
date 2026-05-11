@@ -65,7 +65,7 @@ function calculateReadingTime(content: string): number {
 }
 
 function normalizeInvestmentBriefingTitle(title: string): string {
-  return title.replace(/^投资每日简报/, "投资简报");
+  return title.replace(/^投资简报/, "投资简报");
 }
 
 function isValidFrontmatter(data: Partial<InvestmentBriefingFrontmatter>): data is InvestmentBriefingFrontmatter {
@@ -106,7 +106,7 @@ function parseInvestmentBriefingFile(filePath: string): InvestmentBriefing | nul
       content,
       readingTime: calculateReadingTime(cleanContent(content)),
       relativePath: path.relative(investmentBriefingsDirectory, filePath).split(path.sep).join("/"),
-      url: `/investment/daily-briefings/${slug}`,
+      url: `/investment/briefings/${slug}`,
       ...dateParts,
     };
   } catch (error) {
@@ -162,7 +162,7 @@ export function getInvestmentBriefingArchives(): InvestmentBriefingArchiveItem[]
         count: 1,
         startDate: briefing.slug,
         endDate: briefing.slug,
-        url: `/investment/daily-briefings/archive/${briefing.year}/${briefing.month}`,
+        url: `/investment/briefings/archive/${briefing.year}/${briefing.month}`,
       });
       continue;
     }

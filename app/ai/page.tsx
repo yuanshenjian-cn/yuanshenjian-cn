@@ -59,7 +59,7 @@ export default async function AIColumnsPage() {
                 <ArrowRight className="h-2.5 w-2.5" />
               </Link>
               <Link
-                href="/ai/daily-briefings"
+                href="/ai/briefings"
                 className="text-[11px] text-muted-foreground transition hover:text-foreground"
               >
                 查看往期
@@ -68,7 +68,7 @@ export default async function AIColumnsPage() {
           ) : (
             <div className="mt-5">
               <Link
-                href="/ai/daily-briefings"
+                href="/ai/briefings"
                 className="text-[11px] text-muted-foreground transition hover:text-foreground"
               >
                 查看往期

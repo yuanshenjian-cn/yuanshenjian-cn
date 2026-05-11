@@ -115,7 +115,7 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
                 <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史投资简报</p>
               </div>
               <Link
-                href="/investment/daily-briefings/archive"
+                href="/investment/briefings/archive"
                 className="rounded-xl border px-4 py-2 text-sm transition hover:border-primary/40 hover:bg-muted/30"
               >
                 查看归档

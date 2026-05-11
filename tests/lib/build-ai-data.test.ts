@@ -69,12 +69,12 @@ describe("build-ai-data helpers", () => {
   });
 
   it("会解析 AI 简报索引条目并生成独立 URL", () => {
-    const file = path.join(os.tmpdir(), "2099-01-01-ai-daily-briefing.md");
+    const file = path.join(os.tmpdir(), "2099-01-01-ai-briefing.md");
     tempFiles.push(file);
     fs.writeFileSync(
       file,
       `---
-title: "AI 每日简报 · 2099-01-01"
+title: "AI 简报 · 2099-01-01"
 date: "2099-01-01"
 brief: "测试摘要"
 published: true
@@ -89,7 +89,7 @@ tags:
       slug: "2099-01-01",
       title: "AI 简报 · 2099-01-01",
       excerpt: "测试摘要",
-      url: "/ai/daily-briefings/2099-01-01",
+      url: "/ai/briefings/2099-01-01",
     });
   });
 });

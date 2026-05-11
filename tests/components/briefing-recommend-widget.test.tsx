@@ -63,8 +63,8 @@ describe("BriefingRecommendWidget", () => {
             title: "AI 简报 · 2026-05-08",
             date: "2026-05-08T00:00:00.000Z",
             excerpt: "OpenAI 今日动态",
-            tags: ["AI每日简报"],
-            url: "/ai/daily-briefings/2026-05-08",
+            tags: ["AI简报"],
+            url: "/ai/briefings/2026-05-08",
           },
         ],
       });

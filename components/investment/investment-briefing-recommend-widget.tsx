@@ -329,7 +329,7 @@ export function InvestmentBriefingRecommendWidget({
             displayedBriefings.map((briefing) => (
               <Link
                 key={briefing.slug}
-                href={("url" in briefing && briefing.url) || `/investment/daily-briefings/${briefing.slug}`}
+                href={("url" in briefing && briefing.url) || `/investment/briefings/${briefing.slug}`}
                 className="block rounded-xl border px-4 py-3 transition hover:border-primary/40 hover:bg-muted/30"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">

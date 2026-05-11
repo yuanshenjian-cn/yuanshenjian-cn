@@ -2,10 +2,10 @@ import fs from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const mirroredFiles = [
-  ["skills/ai-daily-briefing/SKILL.md", ".opencode/skills/ai-daily-briefing/SKILL.md"],
-  ["skills/ai-daily-briefing/README.md", ".opencode/skills/ai-daily-briefing/README.md"],
-  ["skills/ai-daily-briefing/references/source-map.md", ".opencode/skills/ai-daily-briefing/references/source-map.md"],
-  ["skills/ai-daily-briefing/evals/evals.json", ".opencode/skills/ai-daily-briefing/evals/evals.json"],
+  ["skills/ai-briefing/SKILL.md", ".opencode/skills/ai-briefing/SKILL.md"],
+  ["skills/ai-briefing/README.md", ".opencode/skills/ai-briefing/README.md"],
+  ["skills/ai-briefing/references/source-map.md", ".opencode/skills/ai-briefing/references/source-map.md"],
+  ["skills/ai-briefing/evals/evals.json", ".opencode/skills/ai-briefing/evals/evals.json"],
 ] as const;
 
 describe("ai skill mirror sync", () => {

@@ -60,13 +60,13 @@ export function CoveragePageClient({ coverage, latestBriefingUrl }: CoveragePage
           <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">{coverage.intro}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              href={latestBriefingUrl ?? "/investment/daily-briefings"}
+              href={latestBriefingUrl ?? "/investment/briefings"}
               className="inline-flex items-center rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90"
             >
               阅读最新简报
             </Link>
             <Link
-              href="/investment/daily-briefings"
+              href="/investment/briefings"
               className="inline-flex items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition hover:text-foreground"
             >
               查看往期简报
@@ -186,7 +186,7 @@ export function CoveragePageClient({ coverage, latestBriefingUrl }: CoveragePage
         <section className="mt-8 rounded-2xl border bg-card/60 p-6">
           <h2 className="text-xl font-medium tracking-tight">更新方式</h2>
           <ul className="mt-4 space-y-2 text-sm leading-6 text-muted-foreground">
-            <li>- 北京时间早报，按市场时段驱动更新。</li>
+            <li>- 按市场时段与已确认事件驱动更新。</li>
             <li>- 公开稿只纳入已确认事实与已官宣未来事件。</li>
             <li>- 高共识预期默认关闭，传闻不进入公开发布内容。</li>
           </ul>

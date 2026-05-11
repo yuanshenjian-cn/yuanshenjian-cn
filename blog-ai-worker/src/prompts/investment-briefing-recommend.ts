@@ -15,7 +15,7 @@ function formatBriefing(briefing: RecommendReference): string {
     `slug: ${briefing.slug}`,
     `title: ${briefing.title}`,
     `date: ${briefing.date.slice(0, 10)}`,
-    `url: ${briefing.url ?? `/investment/daily-briefings/${briefing.slug}`}`,
+    `url: ${briefing.url ?? `/investment/briefings/${briefing.slug}`}`,
     `tags: ${tags}`,
     `excerpt: ${truncate(briefing.excerpt)}`,
   ].join("\n");
@@ -25,7 +25,7 @@ export function buildInvestmentBriefingRecommendStreamSystemPrompt(briefings: Re
   const context = briefings.slice(0, MAX_PROMPT_BRIEFINGS).map(formatBriefing).join("\n\n---\n\n");
 
   return [
-    "你是博客投资每日简报推荐助手。你的任务只是在给定的投资每日简报列表中推荐最相关的 1 到 3 期。",
+    "你是博客投资简报推荐助手。你的任务只是在给定的投资简报列表中推荐最相关的 1 到 3 期。",
     "这些内容仅为公开信息整理与观察记录，不构成投资建议。",
     "不要输出买入、卖出、加仓、减仓、目标价、仓位等建议性表述。",
     "不要推荐上下文里不存在的简报，不要编造日期、标题或链接。",
@@ -34,7 +34,7 @@ export function buildInvestmentBriefingRecommendStreamSystemPrompt(briefings: Re
     `回答正文结束后，必须紧跟固定分隔符 ${INVESTMENT_BRIEFING_RECOMMEND_REFERENCE_DELIMITER}。`,
     '分隔符后只输出 JSON，不要使用 Markdown 代码块，也不要再追加其他说明。',
     'JSON 结构固定为：{"slugs": string[] }。',
-    "可推荐的投资每日简报：",
-    context || "当前时间范围内没有可推荐的投资每日简报。",
+    "可推荐的投资简报：",
+    context || "当前时间范围内没有可推荐的投资简报。",
   ].join("\n\n");
 }

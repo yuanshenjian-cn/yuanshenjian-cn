@@ -14,9 +14,9 @@ import {
 
 const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
 const testFiles = [
-  path.join(briefingsDir, "2099-01-02-investment-daily-briefing.md"),
-  path.join(briefingsDir, "2099-01-01-investment-daily-briefing.md"),
-  path.join(briefingsDir, "2098-12-31-investment-daily-briefing.md"),
+  path.join(briefingsDir, "2099-01-02-investment-briefing.md"),
+  path.join(briefingsDir, "2099-01-01-investment-briefing.md"),
+  path.join(briefingsDir, "2098-12-31-investment-briefing.md"),
 ];
 
 function writeBriefing(filePath: string, title: string, date: string) {
@@ -89,8 +89,8 @@ describe("investment briefings data layer", () => {
     const decemberBriefings = getInvestmentBriefingsByMonth("2098", "12");
 
     expect(archives).toEqual([
-      expect.objectContaining({ year: "2099", month: "01", count: 2, url: "/investment/daily-briefings/archive/2099/01" }),
-      expect.objectContaining({ year: "2098", month: "12", count: 1, url: "/investment/daily-briefings/archive/2098/12" }),
+      expect.objectContaining({ year: "2099", month: "01", count: 2, url: "/investment/briefings/archive/2099/01" }),
+      expect.objectContaining({ year: "2098", month: "12", count: 1, url: "/investment/briefings/archive/2098/12" }),
     ]);
     expect(januaryBriefings.map((item) => item.slug)).toEqual(["2099-01-02", "2099-01-01"]);
     expect(decemberBriefings.map((item) => item.slug)).toEqual(["2098-12-31"]);

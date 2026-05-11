@@ -113,7 +113,7 @@ function parseBriefingFile(filePath: string): Briefing | null {
       content,
       readingTime: calculateReadingTime(cleanContent(content)),
       relativePath: path.relative(briefingsDirectory, filePath).split(path.sep).join("/"),
-      url: `/ai/daily-briefings/${slug}`,
+      url: `/ai/briefings/${slug}`,
     };
   } catch (error) {
     console.error(`[Briefings] Error parsing ${path.relative(process.cwd(), filePath)}:`, error);
@@ -201,7 +201,7 @@ export function getBriefingArchives(): BriefingArchiveItem[] {
         count: 1,
         startDate: briefing.slug,
         endDate: briefing.slug,
-        url: `/ai/daily-briefings/archive/${briefing.year}/${briefing.month}`,
+        url: `/ai/briefings/archive/${briefing.year}/${briefing.month}`,
       });
       continue;
     }

@@ -207,7 +207,7 @@ describe("aiBriefingRecommendStream", () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       createStreamResponse([
         'event: answer-delta\ndata: {"delta":"可以先看今天的 OpenAI 简报。"}\n\n',
-        'event: references\ndata: {"references":[{"slug":"2099-01-01","title":"AI 每日简报 · 2099-01-01","excerpt":"测试摘要","tags":["AI每日简报"],"date":"2099-01-01T00:00:00.000Z","url":"/ai/daily-briefings/2099-01-01"}]}\n\n',
+        'event: references\ndata: {"references":[{"slug":"2099-01-01","title":"AI 简报 · 2099-01-01","excerpt":"测试摘要","tags":["AI简报"],"date":"2099-01-01T00:00:00.000Z","url":"/ai/briefings/2099-01-01"}]}\n\n',
         'event: done\ndata: {}\n\n',
       ]),
     );
@@ -250,7 +250,7 @@ describe("aiInvestmentBriefingRecommendStream", () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       createStreamResponse([
         'event: answer-delta\ndata: {"delta":"可以先看最近的半导体投资简报。"}\n\n',
-        'event: references\ndata: {"references":[{"slug":"2099-01-02","title":"投资每日简报 · 2099-01-02","excerpt":"测试摘要","tags":["投资每日简报"],"date":"2099-01-02T00:00:00.000Z","url":"/investment/daily-briefings/2099-01-02"}]}\n\n',
+        'event: references\ndata: {"references":[{"slug":"2099-01-02","title":"投资简报 · 2099-01-02","excerpt":"测试摘要","tags":["投资简报"],"date":"2099-01-02T00:00:00.000Z","url":"/investment/briefings/2099-01-02"}]}\n\n',
         'event: done\ndata: {}\n\n',
       ]),
     );

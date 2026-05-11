@@ -48,19 +48,19 @@ describe("handleBriefingRecommendSceneStream", () => {
           briefings: [
             {
               slug: "2099-01-08",
-              title: "AI 每日简报 · 2099-01-08",
+              title: "AI 简报 · 2099-01-08",
               excerpt: "OpenAI 发布测试动态。",
-              tags: ["AI每日简报", "OpenAI"],
+              tags: ["AI简报", "OpenAI"],
               date: new Date().toISOString(),
-              url: "/ai/daily-briefings/2099-01-08",
+              url: "/ai/briefings/2099-01-08",
             },
             {
               slug: "2000-01-01",
-              title: "AI 每日简报 · 2000-01-01",
+              title: "AI 简报 · 2000-01-01",
               excerpt: "过期动态。",
-              tags: ["AI每日简报"],
+              tags: ["AI简报"],
               date: "2000-01-01T00:00:00.000Z",
-              url: "/ai/daily-briefings/2000-01-01",
+              url: "/ai/briefings/2000-01-01",
             },
           ],
         }),
@@ -91,6 +91,6 @@ describe("handleBriefingRecommendSceneStream", () => {
 
     const body = await response.text();
     expect(body).toContain("event: answer-delta");
-    expect(body).toContain('"url":"/ai/daily-briefings/2099-01-08"');
+    expect(body).toContain('"url":"/ai/briefings/2099-01-08"');
   });
 });
