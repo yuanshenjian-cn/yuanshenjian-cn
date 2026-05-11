@@ -4,7 +4,7 @@ date: "2026-04-08"
 brief: "OpenAI 升级 Agents SDK，新增原生沙盒执行和可配置内存；OpenAI 要求加州和特拉华州检察长调查 Elon Musk 的反竞争行为。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Agents SDK
 ---

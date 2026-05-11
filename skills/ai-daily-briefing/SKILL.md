@@ -138,7 +138,7 @@ date: "YYYY-MM-DD"
 brief: "一句话概括当天最重要的 AI 厂商动态。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
 ---
 ```

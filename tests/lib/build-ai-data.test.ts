@@ -79,7 +79,7 @@ date: "2099-01-01"
 brief: "测试摘要"
 published: true
 tags:
-  - AI每日简报
+  - AI
 ---
 
 正文内容。`,

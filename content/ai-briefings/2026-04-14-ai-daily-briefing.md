@@ -4,7 +4,7 @@ date: "2026-04-14"
 brief: "OpenAI CRO Denise Dresser 指控 Anthropic 夸大收入 80 亿美元；Google 发布 Gemma 4 开源模型，定位为最强开源权重模型。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Anthropic
   - Google

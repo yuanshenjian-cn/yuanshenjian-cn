@@ -4,7 +4,7 @@ date: "2026-04-03"
 brief: "Anthropic 收购生物 AI 初创公司 Coefficient Bio，交易金额约 4 亿美元；Mythos 模型网络安全能力引发监管关注。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - 生物AI
 ---

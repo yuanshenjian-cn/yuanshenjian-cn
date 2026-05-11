@@ -4,7 +4,7 @@ date: "2026-04-28"
 brief: "Warp 开源 ADE（Agentic Development Environment），采用 Oz 编排引擎；Sentry 推出 Seer Agent，支持自然语言调试与 Slack 多人协作。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Warp
   - Sentry
   - 开发者工具

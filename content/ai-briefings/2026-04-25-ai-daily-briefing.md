@@ -4,7 +4,7 @@ date: "2026-04-25"
 brief: "Anthropic 二级市场估值突破 1 万亿美元，超过 OpenAI；欧洲 AI 公司 Cohere 与 Aleph Alpha 宣布合并，打造 200 亿美元主权 AI 实体。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - Cohere
   - 欧洲AI

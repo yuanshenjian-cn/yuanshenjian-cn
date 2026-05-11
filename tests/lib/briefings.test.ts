@@ -29,7 +29,7 @@ date: "${date}"
 brief: "${title} 摘要"
 published: true
 tags:
-  - AI每日简报
+  - AI
 ---
 
 ## 速览

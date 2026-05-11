@@ -4,7 +4,7 @@ date: "2026-04-26"
 brief: "OpenAI 正式关闭 Sora 视频生成服务；Hollywood 主要制片厂团体谴责 ByteDance AI 视频生成器涉嫌大规模版权侵权。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Sora
   - ByteDance

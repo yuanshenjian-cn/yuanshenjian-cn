@@ -4,7 +4,7 @@ date: "2026-04-21"
 brief: "OpenAI 发布 ChatGPT Images 2.0，集成推理能力的 Agent 化图像生成模型；SpaceX 与 Cursor 达成战略合作，获得 600 亿美元收购期权。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - SpaceX
   - Cursor

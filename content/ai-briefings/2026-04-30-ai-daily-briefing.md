@@ -4,7 +4,7 @@ date: "2026-04-30"
 brief: "Anthropic 将 Claude 接入创意工具生态并推出安全扫描功能；Hippocratic AI 发布 Polaris 5.0 医疗模型；IBM 更新 Granite 4.1 开源模型系列。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - Hippocratic AI
   - IBM

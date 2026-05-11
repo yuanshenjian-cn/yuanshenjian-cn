@@ -4,7 +4,7 @@ date: "2026-04-06"
 brief: "Anthropic 启动 Project Glasswing 防御计划并正式发布 Claude Opus 4.7；英国央行开始测试 AI 对金融系统的系统性风险。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - 网络安全
 ---

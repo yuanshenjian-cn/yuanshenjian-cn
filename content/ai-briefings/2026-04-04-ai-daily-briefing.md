@@ -4,7 +4,7 @@ date: "2026-04-04"
 brief: "OpenAI 完成 1220 亿美元融资，创科技史上最大私募资本募集之一；Amazon 宣布向 OpenAI 投资 500 亿美元。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Amazon
 ---

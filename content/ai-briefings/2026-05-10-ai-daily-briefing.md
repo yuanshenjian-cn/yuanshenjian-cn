@@ -4,7 +4,7 @@ date: "2026-05-10"
 brief: "Anthropic 在 Alignment Science Blog 发布《Teaching Claude Why》，称 Claude Haiku 4.5 起每代模型 agentic 错位评估均为零分；OpenAI 同日发布 Codex 0.130.0 引入远程控制与 Bedrock AWS 登录；Claude Code 紧急修复 Windows VS Code 扩展加载故障。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - OpenAI
   - Claude Code

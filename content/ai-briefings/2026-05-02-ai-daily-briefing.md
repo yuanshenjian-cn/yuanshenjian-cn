@@ -4,7 +4,7 @@ date: "2026-05-02"
 brief: "Meta 收购 ARI 入局具身智能，蚂蚁集团开源万亿参数模型，Google 推出 Chrome Prompt API，Cerebras 递交 IPO 申请，中国多地加速 AI 治理立法。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Meta
   - Ant Group
   - Google

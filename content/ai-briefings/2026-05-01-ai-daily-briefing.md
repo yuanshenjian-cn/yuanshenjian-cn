@@ -4,7 +4,7 @@ date: "2026-05-01"
 brief: "xAI 发布 Grok 4.3 推理模型与语音克隆套件，Meta 收购机器人初创公司 ARI，Anthropic 拓展 Claude 创意工具生态，Mistral 与 DeepSeek 在开源赛道持续施压。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - xAI
   - Meta
   - Anthropic

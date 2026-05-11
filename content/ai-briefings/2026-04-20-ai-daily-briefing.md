@@ -4,7 +4,7 @@ date: "2026-04-20"
 brief: "Hannover Messe 2026 开幕，Siemens 与 NVIDIA 展示工业 AI 操作系统与人形机器人部署；OpenAI 发布 GPT-5.4，支持百万 token 上下文与自主计算机操作。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Hannover Messe
   - Siemens
   - NVIDIA

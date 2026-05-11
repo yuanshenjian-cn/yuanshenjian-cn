@@ -4,7 +4,7 @@ date: "2026-05-08"
 brief: "OpenAI 推出 GPT-5.5-Cyber 限量预览，Perplexity Personal Computer 全量登陆 Mac，Moonshot AI 完成约 20 亿美元融资。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Perplexity
   - Moonshot

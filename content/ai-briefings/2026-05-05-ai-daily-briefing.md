@@ -4,7 +4,7 @@ date: "2026-05-05"
 brief: "OpenAI 发布 GPT-5.5 Instant 默认模型，Anthropic 预告金融 Agent 专场，Google 调整订阅与端侧策略，美国政府推进前沿 AI 国家安全测试。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Anthropic
   - Google

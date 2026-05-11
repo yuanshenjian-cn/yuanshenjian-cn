@@ -4,7 +4,7 @@ date: "2026-04-22"
 brief: "Google 召开 Cloud Next '26 大会，发布 Gemini Enterprise Agent Platform 与第八代 TPU；Sundar Pichai 称 75% 的 Google Cloud 客户已使用 AI 工具。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Google
   - Cloud
   - TPU

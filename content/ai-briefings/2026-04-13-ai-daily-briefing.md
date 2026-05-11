@@ -4,7 +4,7 @@ date: "2026-04-13"
 brief: "Anthropic 推出 Claude for Word，面向 Team 和 Enterprise 用户；Sam Altman 住所遭遇燃烧瓶袭击事件，嫌疑人被起诉。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - OpenAI
 ---

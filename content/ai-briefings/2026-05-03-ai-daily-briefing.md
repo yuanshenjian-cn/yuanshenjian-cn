@@ -4,7 +4,7 @@ date: "2026-05-03"
 brief: "Mistral 发布 128B 旗舰模型与远程编码 Agent，DeepSeek V4 正式开放，Amazon 和 Cloudflare 分别推出购物代理与自主部署能力，AI 编码代理安全漏洞引发关注。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Mistral
   - DeepSeek
   - Amazon

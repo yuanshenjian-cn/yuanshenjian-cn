@@ -4,7 +4,7 @@ date: "2026-04-05"
 brief: "Google 与 Broadcom 签署至 2031 年的长期 AI 芯片合作协议；OpenAI、Anthropic 和 Google 联合应对中国模型克隆行为。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Google
   - Broadcom
 ---

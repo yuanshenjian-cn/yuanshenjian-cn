@@ -4,7 +4,7 @@ date: "2026-04-10"
 brief: "Sam Altman 面临《纽约客》调查报道的可信度危机；OpenAI 准备 IPO，CFO 确认零售投资者股份预留。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - IPO
 ---

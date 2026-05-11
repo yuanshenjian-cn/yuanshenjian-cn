@@ -4,7 +4,7 @@ date: "2026-04-15"
 brief: "Northwestern 大学可印刷人工神经元研究成果发表于 Nature Nanotechnology；OpenAI 和 Anthropic 竞相发布网络安全专用模型。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Northwestern
   - 神经科学
   - OpenAI

@@ -4,7 +4,7 @@ date: "2026-05-07"
 brief: "Anthropic 正式推出 10 个金融 Agent，Meta 遭五大出版商集体诉讼，美国政府与 Google DeepMind、Microsoft、xAI 签署前沿 AI 国家安全测试协议。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - Meta
   - Google

@@ -4,7 +4,7 @@ date: "2026-04-11"
 brief: "高盛、花旗等美国银行加入 Anthropic Project Glasswing，使用 Mythos 模型检测漏洞；特朗普政府鼓励金融机构采用 AI 安全工具。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - 网络安全
 ---

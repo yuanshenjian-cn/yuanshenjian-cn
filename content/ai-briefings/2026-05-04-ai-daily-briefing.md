@@ -4,7 +4,7 @@ date: "2026-05-04"
 brief: "Meta Business AI 周对话破千万，中国四家实验室密集发布开源编码模型，Nous Research 开源 Agent 框架突破 10 万星，Anthropic Mythos 通过英国网络安全测试。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Meta
   - Nous Research
   - Anthropic

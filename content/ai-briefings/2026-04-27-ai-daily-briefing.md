@@ -4,7 +4,7 @@ date: "2026-04-27"
 brief: "中国正式阻止 Meta 收购 AI 智能体公司 Manus；Meta 宣布裁员约 8000 人以聚焦 AI 投资；OpenAI 三位高管离职。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Meta
   - Manus
   - OpenAI

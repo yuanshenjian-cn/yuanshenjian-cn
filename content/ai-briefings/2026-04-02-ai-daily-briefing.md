@@ -4,7 +4,7 @@ date: "2026-04-02"
 brief: "Anthropic 意外泄露约 51.2 万行 Claude Code TypeScript 源代码，同时曝光了未发布的 Claude Mythos 模型；OpenAI 关闭 Sora 公共 API。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - OpenAI
 ---

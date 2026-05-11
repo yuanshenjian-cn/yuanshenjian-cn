@@ -4,7 +4,7 @@ date: "2026-04-16"
 brief: "Anthropic 正式发布 Claude Opus 4.7，新增内部验证层和 xhigh 推理级别；OpenAI 发布 GPT-5.4-Cyber 网络安全专用模型。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - OpenAI
 ---

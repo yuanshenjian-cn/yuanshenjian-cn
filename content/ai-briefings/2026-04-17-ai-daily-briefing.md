@@ -4,7 +4,7 @@ date: "2026-04-17"
 brief: "Anthropic 推出 Claude Design 研究预览版，并宣布与 NEC 达成重大合作；Claude Mythos 扩展至英国金融业用于风险评估。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - Claude
   - NEC

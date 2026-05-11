@@ -4,7 +4,7 @@ date: "2026-04-09"
 brief: "OpenAI 推出 ChatGPT Pro 100 美元/月计划，定位在 Plus 和现有 Pro 之间；Meta 发布首个非开源模型 Muse Spark。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Meta
 ---

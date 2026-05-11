@@ -91,7 +91,7 @@ date: "YYYY-MM-DD"
 brief: "一句话概括本期最重要的投资观察。"
 published: true
 tags:
-  - 投资每日简报
+  - 投资
   - 腾讯控股
   - 港股科技
   - Google I/O

@@ -4,7 +4,7 @@ date: "2026-04-18"
 brief: "Northwestern 大学开发出可印刷人工神经元，首次实现与活体脑细胞直接通信，成果发表于 Nature Nanotechnology。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Northwestern
   - 神经科学
 ---

@@ -4,7 +4,7 @@ date: "2026-04-24"
 brief: "DeepSeek 发布 V4 系列模型，以 MIT 许可开源 1.6T 参数 MoE 架构；Google 宣布最高 400 亿美元投资 Anthropic，配套 5GW TPU 算力。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - DeepSeek
   - Google
   - Anthropic

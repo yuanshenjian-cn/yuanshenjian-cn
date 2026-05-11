@@ -4,7 +4,7 @@ date: "2026-04-19"
 brief: "NVIDIA 在 National Robotics Week 期间发布开源物理 AI 工具集，涵盖 Isaac GR00T N1.6、Newton 1.0 物理引擎和 Cosmos 世界模型系列。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - NVIDIA
   - 机器人
   - 物理 AI

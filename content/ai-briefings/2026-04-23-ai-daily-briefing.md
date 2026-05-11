@@ -4,7 +4,7 @@ date: "2026-04-23"
 brief: "OpenAI 正式发布 GPT-5.5，支持百万 token 上下文与原生计算机使用能力；Sony AI 的 Ace 机器人在竞技乒乓球中首次击败人类高手，成果发表于 Nature 封面。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Sony
   - 机器人

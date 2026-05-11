@@ -4,7 +4,7 @@ date: "2026-04-12"
 brief: "Anthropic 与基督教领袖会面，讨论 Claude 的精神和道德发展；Claude 上下文窗口扩展至 100 万 token 正式全面可用。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - Claude
 ---

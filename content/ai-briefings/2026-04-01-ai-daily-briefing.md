@@ -4,7 +4,7 @@ date: "2026-04-01"
 brief: "OpenAI 将 GPT-4o 从 ChatGPT 商业版中退役；Microsoft 与 OpenAI 修订合作协议，移除 AGI 条款并调整收入分成机制。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Microsoft
 ---

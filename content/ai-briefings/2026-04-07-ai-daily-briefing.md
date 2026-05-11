@@ -4,7 +4,7 @@ date: "2026-04-07"
 brief: "OpenAI 发布 Codex 重大更新，转型为桌面 Agent 工作空间；OpenAI 收购 Hiro Finance 并披露供应链安全事件。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - OpenAI
   - Codex
 ---

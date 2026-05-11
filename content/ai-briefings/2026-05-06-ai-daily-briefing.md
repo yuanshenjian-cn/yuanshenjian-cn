@@ -4,7 +4,7 @@ date: "2026-05-06"
 brief: "xAI 通知 API 用户 Grok 4.3 正式上线并宣布 8 个旧模型退役，Anthropic 举办 Code with Claude 大会公布 SpaceX 算力合作，DeepSeek 融资估值跃升。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - xAI
   - Anthropic
   - DeepSeek

@@ -4,7 +4,7 @@ date: "2026-04-29"
 brief: "Cursor 开放 Agent SDK public beta；Anthropic 与 Amazon 扩大合作协议至 5GW 算力，承诺 1000 亿美元以上的 AWS 支出。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Cursor
   - Anthropic
   - Amazon

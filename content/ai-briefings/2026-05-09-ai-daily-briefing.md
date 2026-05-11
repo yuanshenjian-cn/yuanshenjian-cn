@@ -4,7 +4,7 @@ date: "2026-05-09"
 brief: "Anthropic 在 Code with Claude 大会上释出 Managed Agents 全套更新，OpenAI Realtime API 上线三款语音模型，Meta 被曝开发消费级 AI Agent 代号 Hatch，Google 把 Fitbit 改名为 Google Health 并预告 AI 健康教练。"
 published: true
 tags:
-  - AI每日简报
+  - AI
   - Anthropic
   - OpenAI
   - Meta
