@@ -141,6 +141,7 @@ frontmatter `tags` 规则：
 - 必须对照上一期已发布简报做逐条去重，避免连续两期出现无新增增量的重复动态
 - 内部审核式说明不得进入公开正文，例如“某事件因时间未确认而暂不纳入本期”这类排除理由只能保留在内部审核摘要
 - 生成前的取舍说明、排序理由、写作意图也不得进入公开正文，例如“本期重点是把已官宣节点重新排序，而不是追逐零碎周末新闻”这类表述只能保留在内部审核摘要
+- 正文中凡是写到 `M 月 D 日（周X）`、`YYYY-MM-DD（周X）` 等日期+星期组合，必须显式核对星期是否与日期真实对应；拿不准时宁可只写日期，不要猜星期
 
 ### 3. 发布模式
 
@@ -150,12 +151,13 @@ frontmatter `tags` 规则：
 
 1. 红线语言审查
 2. 来源与时间证据核验
-3. 与上一期已发布简报的重复条目检查
-4. 黑名单企业排除检查
-5. `npm run validate-content`
-6. `npm run build:investment-data`
-7. 确认 `public/investment-data/briefings/index.json` 已更新
-8. git 安全检查
+3. 正文日期与星期一致性核验
+4. 与上一期已发布简报的重复条目检查
+5. 黑名单企业排除检查
+6. `npm run validate-content`
+7. `npm run build:investment-data`
+8. 确认 `public/investment-data/briefings/index.json` 已更新
+9. git 安全检查
 
 默认发布命令：
 

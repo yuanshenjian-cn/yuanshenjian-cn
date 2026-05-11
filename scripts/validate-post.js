@@ -35,6 +35,7 @@ const INVESTMENT_PROCESS_LEAK_PATTERNS = [
   /而不是追逐[^。；\n]*/,
   /(?:暂不纳入本期|未纳入本期|为什么没纳入)/,
 ];
+const WEEKDAY_NAMES = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const OLD_ARTICLE_DATE_LINK_RE = /\]\(\/articles\/\d{4}\/\d{2}\/\d{2}\//g;
 const OLD_BLOG_LINK_RE = /\]\(\/blog\//g;
 const GENERIC_ALT_RE = /^\s*(|image|alt text|图片)\s*$/i;
@@ -100,6 +101,64 @@ function toPosixPath(value) {
  */
 function getLineNumber(content, index) {
   return content.slice(0, index).split(/\r?\n/).length;
+}
+
+/**
+ * @param {string} dateText
+ */
+function getWeekdayNameForDate(dateText) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateText);
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const utcDate = new Date(Date.UTC(year, month - 1, day));
+  if (Number.isNaN(utcDate.getTime())) return null;
+  return WEEKDAY_NAMES[utcDate.getUTCDay()] ?? null;
+}
+
+/**
+ * @param {string} year
+ * @param {string} month
+ * @param {string} day
+ */
+function formatDateParts(year, month, day) {
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+/**
+ * @param {string} body
+ */
+function findInvestmentWeekdayMismatches(body) {
+  /** @type {{ text: string; expectedWeekday: string; line: number }[]} */
+  const mismatches = [];
+  const patterns = [
+    /(?<!\d)(\d{4})-(\d{2})-(\d{2})（(周[日一二三四五六])）/g,
+    /(?<!\d)(\d{1,2})\s*月\s*(\d{1,2})\s*日（(周[日一二三四五六])）/g,
+  ];
+
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(body)) !== null) {
+      const matchedText = match[0];
+      const actualWeekday = match[pattern === patterns[0] ? 4 : 3];
+      const dateText = pattern === patterns[0]
+        ? formatDateParts(match[1], match[2], match[3])
+        : formatDateParts("2026", match[1], match[2]);
+      const expectedWeekday = getWeekdayNameForDate(dateText);
+
+      if (expectedWeekday && actualWeekday !== expectedWeekday) {
+        mismatches.push({
+          text: matchedText,
+          expectedWeekday,
+          line: getLineNumber(body, match.index),
+        });
+      }
+    }
+  }
+
+  return mismatches;
 }
 
 /** @param {string} content */
@@ -695,6 +754,14 @@ function validateInvestmentBriefingFile(file, slugs) {
   const blockedCompany = detectBlockedInvestmentCompany(parsed.body);
   if (blockedCompany) {
     addError(`投资每日简报包含黑名单企业相关内容：${blockedCompany}`, relativeFile, 1);
+  }
+
+  for (const mismatch of findInvestmentWeekdayMismatches(parsed.body)) {
+    addError(
+      `投资每日简报日期与星期不一致：${mismatch.text}（应为 ${mismatch.expectedWeekday}）`,
+      relativeFile,
+      mismatch.line,
+    );
   }
 
   validateLinksAndImages(parsed.body, file, slugs);

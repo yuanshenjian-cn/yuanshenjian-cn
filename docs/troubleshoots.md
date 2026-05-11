@@ -4,6 +4,39 @@
 
 ---
 
+## 2026-05-10 投资简报中的日期与星期可能写错，skill 需要显式要求核对，门禁也要能拦住
+
+### 现象
+
+- 已发布投资简报在 `## 未来重点观察` 中出现日期与星期不匹配，例如：
+  - `5 月 12 日（周一）`，但实际是 `周二`
+  - `5 月 13 日（周二）`，但实际是 `周三`
+  - `5 月 15 日（周四）`，但实际是 `周五`
+
+### 根因
+
+1. `investment-daily-briefing` skill 之前只强调“时间证据核验”，但没有把“正文中出现的日期+星期必须逐条核对”写成明确硬规则
+2. `scripts/validate-post.js` 之前没有投资简报日期与星期一致性的自动校验
+3. 因此模型生成时一旦主观补了星期，发布门禁也不会拦截
+
+### 修复
+
+1. 在 `skills/investment-daily-briefing/SKILL.md` 与镜像副本中补充硬规则：正文中凡是写 `日期 + 星期`，必须显式核对；拿不准时只写日期，不猜星期
+2. 在 `README.md` 与镜像副本中同步补充同一条说明
+3. 在 `scripts/validate-post.js` 新增投资简报日期与星期一致性检查，命中后报错：
+   - `投资每日简报日期与星期不一致：...（应为 周X）`
+4. 修正已发布文件 `content/investment-briefings/2026-05-10-investment-daily-briefing.md` 中写错的星期
+
+### 如何确认修复生效
+
+1. 运行：
+   - `npm run validate-post -- content/investment-briefings/2026-05-10-investment-daily-briefing.md`
+   - `npm run test -- tests/scripts/validate-post.test.ts tests/skills/investment-skill-sync.test.ts`
+2. 确认投资简报正文里出现的 `M 月 D 日（周X）` 与真实日历一致
+3. 如再次写错，`validate-post.js` 应直接报错并阻止发布
+
+---
+
 ## 2026-05-10 `next/font/google` 会让本地 `dev/build` 依赖外网，网络异常时启动与构建都可能直接失败
 
 ### 现象
