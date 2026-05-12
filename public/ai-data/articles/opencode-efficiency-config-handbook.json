@@ -52,6 +52,20 @@
       "excerpt": "避免大目录触发不必要的文件扫描，提升 TUI 响应速度。"
     },
     {
+      "id": "5-额外指令文件",
+      "anchorId": "5-额外指令文件",
+      "heading": "5. 额外指令文件",
+      "content": "除了项目根目录的 AGENTS.md，可以通过顶层 instructions 字段引入更多指令文件，支持 glob： 适合复用已有的 .cursor/rules、团队规范文档等，避免内容重复维护。",
+      "excerpt": "除了项目根目录的 AGENTS.md，可以通过顶层 instructions 字段引入更多指令文件，支持 glob： 适合复用已有的 .cursor/rules、团队规范文档等，避免内容重复维护。"
+    },
+    {
+      "id": "6-会话分享策略",
+      "anchorId": "6-会话分享策略",
+      "heading": "6. 会话分享策略",
+      "content": "\"manual\"（默认）— 显式执行 /share 才上传 \"auto\" — 新会话自动分享 \"disabled\" — 完全禁用分享 涉及敏感代码的项目建议显式设为 \"disabled\"。",
+      "excerpt": "\"manual\"（默认）— 显式执行 /share 才上传 \"auto\" — 新会话自动分享 \"disabled\" — 完全禁用分享 涉及敏感代码的项目建议显式设为 \"disabled\"。"
+    },
+    {
       "id": "二tui-增强配置",
       "anchorId": "二tui-增强配置",
       "heading": "二、TUI 增强配置",
@@ -69,7 +83,7 @@
       "id": "keybinds",
       "anchorId": "keybinds",
       "heading": "Keybinds",
-      "content": "几个值得自定义的绑定： 功能 默认绑定 建议 ------ ---------- ------ commandlist ctrl+p 保持默认，功能搜索入口 modellist m 保持默认 tooldetails none（未绑定） 建议加 d，调试 MCP 时频繁用到 displaythinking none（未绑定） 可按需绑定，切换思考块显示。注意 ctrl+t 默认绑定的是 variant_cycle（切换 variant），不是 thinking Leader 键默认是 ctrl+x，所有 X 都是先按 ctrl+x 再按 X。",
+      "content": "几个值得自定义的绑定： 功能 默认绑定 建议 ------ ---------- ------ commandlist ctrl+p 保持默认，功能搜索入口 modellist m 保持默认 tooldetails none（未绑定） 建议加 d，调试 MCP 时频繁用到 displaythinking none（未绑定） 默认未绑定。若想为它指定快捷键请避开 ctrl+t——后者默认是 variant_cycle（切换推理强度档位） Leader 键默认是 ctrl+x，所有 X 都是先按 ctrl+x 再按 X。",
       "excerpt": "几个值得自定义的绑定： 功能 默认绑定 建议 ------ ---------- ------ commandlist ctrl+p 保持默认，功能搜索入口 modellist m 保持默认 tooldetails none（未绑定） 建议加 d，调试 MCP 时频繁用到 displaythinking none（未绑..."
     },
     {
@@ -111,8 +125,8 @@
       "id": "per-agent-权限",
       "anchorId": "per-agent-权限",
       "heading": "Per-Agent 权限",
-      "content": "在 agent 的 markdown frontmatter 或 opencode.json 的 agent. .permission 中覆盖：",
-      "excerpt": "在 agent 的 markdown frontmatter 或 opencode.json 的 agent. .permission 中覆盖："
+      "content": "在 agent 的 markdown frontmatter 或 opencode.json 的 agent. .permission 中覆盖。下面是一个只读 reviewer agent 的实战示例，禁掉所有编辑，bash 只放行 git diff/log/show 等查询命令：",
+      "excerpt": "在 agent 的 markdown frontmatter 或 opencode.json 的 agent. .permission 中覆盖。下面是一个只读 reviewer agent 的实战示例，禁掉所有编辑，bash 只放行 git diff/log/show 等查询命令："
     },
     {
       "id": "task-权限控制可调用哪些-subagent",
@@ -125,8 +139,8 @@
       "id": "tools-字段-vs-permission",
       "anchorId": "tools-字段-vs-permission",
       "heading": "`tools` 字段 vs `permission`",
-      "content": "早期配置用 tools: { write: false } 控制工具开关，自 v1.1.1 起 tools 已被弃用并合并入 permission，旧配置仅出于向后兼容仍可工作。tools 只能 true/false 二态切换，表达粒度较粗；permission 支持 glob 模式和 allow/ask/deny 三态，表达力更强。建议新配置统一使用 permission：true 等价于 {\"\": \"allow\"}，false 等价于 {\"\": \"deny\"}。本文后续示例统一使用 permission（控制 MCP 工具的可见性除外，详见第七节）。",
-      "excerpt": "早期配置用 tools: { write: false } 控制工具开关，自 v1.1.1 起 tools 已被弃用并合并入 permission，旧配置仅出于向后兼容仍可工作。tools 只能 true/false 二态切换，表达粒度较粗；permission 支持 glob 模式和 allow/ask/deny 三..."
+      "content": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中，true 等价于 {\"\": \"allow\"}，false 等价于 {\"\": \"deny\"}。 不过 tools 并未完全消失，MCP 工具的 per-agent 显隐目前仍只能通过 tools 字段实现（详见第七节）。本文除 MCP 章节外，统一使用 permission。",
+      "excerpt": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中，true 等价于 {\"\": \"allow\"}，false ..."
     },
     {
       "id": "内置-provider",
@@ -139,8 +153,8 @@
       "id": "自定义-provider",
       "anchorId": "自定义-provider",
       "heading": "自定义 Provider",
-      "content": "如果内置列表没有你要的，可以用 @ai-sdk/openai-compatible 包接入任何 OpenAI 兼容 API： 关键规则： /v1/chat/completions 端点用 @ai-sdk/openai-compatible /v1/responses 端点用 @ai-sdk/openai apiKey 支持 {file:path} 引用外部文件，避免明文存储 timeout、chunkTimeout 是通用 options 字段，内置 provider 也可用",
-      "excerpt": "如果内置列表没有你要的，可以用 @ai-sdk/openai-compatible 包接入任何 OpenAI 兼容 API： 关键规则： /v1/chat/completions 端点用 @ai-sdk/openai-compatible /v1/responses 端点用 @ai-sdk/openai apiKey ..."
+      "content": "如果内置列表没有你要的，可以用 @ai-sdk/openai-compatible 包接入任何 OpenAI 兼容 API： 关键规则： /v1/chat/completions 端点用 @ai-sdk/openai-compatible /v1/responses 端点用 @ai-sdk/openai 凭证支持两种引用语法避免明文：{file:~/path/to/key} 读取文件首行；{env:VAR_NAME} 读取环境变量。两种语法适用于配置文件中所有字符串字段，不限于 apiKey timeout、chunkTimeout 是通用 options 字段，内置 provider 也可用",
+      "excerpt": "如果内置列表没有你要的，可以用 @ai-sdk/openai-compatible 包接入任何 OpenAI 兼容 API： 关键规则： /v1/chat/completions 端点用 @ai-sdk/openai-compatible /v1/responses 端点用 @ai-sdk/openai 凭证支持两种引..."
     },
     {
       "id": "model-与-small-model",
@@ -174,8 +188,8 @@
       "id": "实践多模型-agent-矩阵",
       "anchorId": "实践多模型-agent-矩阵",
       "heading": "实践：多模型 Agent 矩阵",
-      "content": "我自己用了一套模型绑定的 Agent 矩阵，核心思路是：primary 和配套的 subagent 用同一系列模型，避免上下文传递时的风格割裂。 Primary Agents： Agent 模型 场景 ------- ------ ------ 赵云 Claude Sonnet 4.6 日常开发 诸葛亮 GPT-5.5 架构设计、深度推理 小七 GPT-5.5（直连） 需要直连 API 的场景 工具人 Kimi K2.6 中文任务、长文档 Subagent 矩阵（每个模型配 explore + general 两个版本）： Primary 的 system prompt 里指定 subagent 委派规则： 这样赵云启动的子任务自动走 Claude Sonnet 系列，整条链路的模型保持一致。",
-      "excerpt": "我自己用了一套模型绑定的 Agent 矩阵，核心思路是：primary 和配套的 subagent 用同一系列模型，避免上下文传递时的风格割裂。 Primary Agents： Agent 模型 场景 ------- ------ ------ 赵云 Claude Sonnet 4.6 日常开发 诸葛亮 GPT-5.5..."
+      "content": "我自己用了一套模型绑定的 Agent 矩阵，核心思路是：primary 和配套的 subagent 用同一系列模型。同系列模型的指令遵循风格、JSON 输出习惯、工具调用偏好一致，整条任务链路的稳定性会明显高于混搭。 下表中的模型 ID 以我本地当时可用的版本为准，具体可用模型请用 opencode models 或 TUI 中 /models 查询，照抄前先替换为当前可用 ID。 Primary Agents： Agent 模型 场景 ------- ------ ------ 赵云 Claude Sonnet 4.6 日常开发 诸葛亮 GPT-5.5 架构设计、深度推理 小七 GPT-5.5（直连） 需要直连 API 的场景 工具人 Kimi K2.6 中文任务、长文档 Subagent 矩阵（每个模型配 explore + general 两个版本）： Primary 的 system prompt 里指定 subagent 委派规则： 这样赵云启动的子任务自动走 Claude Sonnet 系列，整条链路的模型保持一致。",
+      "excerpt": "我自己用了一套模型绑定的 Agent 矩阵，核心思路是：primary 和配套的 subagent 用同一系列模型。同系列模型的指令遵循风格、JSON 输出习惯、工具调用偏好一致，整条任务链路的稳定性会明显高于混搭。 下表中的模型 ID 以我本地当时可用的版本为准，具体可用模型请用 opencode models 或 ..."
     },
     {
       "id": "六skills-系统",
@@ -188,8 +202,8 @@
       "id": "文件格式",
       "anchorId": "文件格式",
       "heading": "文件格式",
-      "content": "每个 skill 是一个目录，内含 SKILL.md：",
-      "excerpt": "每个 skill 是一个目录，内含 SKILL.md："
+      "content": "每个 skill 是一个目录，内含 SKILL.md： metadata 字段不接受嵌套对象、数组或数字，复杂类型会被忽略或导致加载失败。",
+      "excerpt": "每个 skill 是一个目录，内含 SKILL.md： metadata 字段不接受嵌套对象、数组或数字，复杂类型会被忽略或导致加载失败。"
     },
     {
       "id": "搜索路径",
@@ -202,8 +216,8 @@
       "id": "权限控制",
       "anchorId": "权限控制",
       "heading": "权限控制",
-      "content": "被 deny 的 skill 对 Agent 完全不可见。ask 会在加载前弹窗确认。 ⚠️ 多条规则匹配同一名称时，最后一个匹配的规则胜出，请注意顺序。例如把 \"*\": \"allow\" 放在最后会让前面所有 deny 失效。",
-      "excerpt": "被 deny 的 skill 对 Agent 完全不可见。ask 会在加载前弹窗确认。 ⚠️ 多条规则匹配同一名称时，最后一个匹配的规则胜出，请注意顺序。例如把 \"*\": \"allow\" 放在最后会让前面所有 deny 失效。"
+      "content": "被 deny 的 skill 对 Agent 完全不可见。ask 会在加载前弹窗确认。 ⚠️ 多条规则匹配同一名称时，最后一个匹配的规则胜出。约定写法是：通配规则 * 放最前面，更具体的规则放后面，这样具体规则才能覆盖通配。反过来写会让 deny 失效。",
+      "excerpt": "被 deny 的 skill 对 Agent 完全不可见。ask 会在加载前弹窗确认。 ⚠️ 多条规则匹配同一名称时，最后一个匹配的规则胜出。约定写法是：通配规则 * 放最前面，更具体的规则放后面，这样具体规则才能覆盖通配。反过来写会让 deny 失效。"
     },
     {
       "id": "使用方式",
@@ -258,8 +272,8 @@
       "id": "最佳实践-1",
       "anchorId": "最佳实践-1",
       "heading": "最佳实践",
-      "content": "按 agent 控制 MCP 工具可见性 — MCP 工具描述会占用上下文 token，可在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 注意 token 消耗 — GitHub MCP 之类的服务器工具描述很长，容易撑爆上下文 用 timeout 控制超时 — 默认 5000ms，网络慢的 MCP 建议调高 MCP 工具以服务器名为前缀注册（如 githubcreateissue、githublistprs），用 glob \"github_*\" 可匹配该服务器的所有工具。注意：mcp. .enabled: false 会停掉服务器进程，agent 层无法再启用；要做 per-agent 显隐，需保持服务器 enabled: true，再用 tools 字段控制可见性。tools 虽已 deprecated（见第三节），但 MCP 工具级开关目前仍主要靠它。",
-      "excerpt": "按 agent 控制 MCP 工具可见性 — MCP 工具描述会占用上下文 token，可在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 注意 token 消耗 — GitHub MCP 之类的服务器工具描述很长，容易撑爆上下文 用 timeout 控制超时 — 默认 5000ms，网络..."
+      "content": "注意 token 消耗 — MCP 工具描述会随服务器一起注入到上下文，GitHub、Jira 这类工具数量多、描述长，开几个就能撑爆几千 token 按 agent 控制 MCP 工具可见性 — 顺着上一条，在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 用 timeout 控制超时 — 默认 5000ms，网络慢的 MCP 建议调高 MCP 工具以服务器名为前缀注册（如 githubcreateissue、githublistprs），用 glob \"github_*\" 可匹配该服务器的所有工具。注意：mcp. .enabled: false 会停掉服务器进程，agent 层无法再启用；要做 per-agent 显隐，需保持服务器 enabled: true，再用 tools 字段控制可见性。tools 虽已 deprecated（见第三节），但 MCP 工具级开关目前仍主要靠它。",
+      "excerpt": "注意 token 消耗 — MCP 工具描述会随服务器一起注入到上下文，GitHub、Jira 这类工具数量多、描述长，开几个就能撑爆几千 token 按 agent 控制 MCP 工具可见性 — 顺着上一条，在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 用 timeout 控制超时 ..."
     },
     {
       "id": "八plugins-体系",
@@ -279,8 +293,8 @@
       "id": "可用事件",
       "anchorId": "可用事件",
       "heading": "可用事件",
-      "content": "事件 触发时机 ------ ---------- command.executed 命令执行 file.edited / file.watcher.updated 文件编辑/监控更新 lsp.client.diagnostics / lsp.updated LSP 诊断更新 message. 消息增删改 permission.asked / permission.replied 权限请求/响应 session. 会话生命周期 tool.execute.before / tool.execute.after 工具执行前后 tui.* TUI 交互 experimental.session.compacting 上下文压缩（可替换默认压缩 prompt）",
-      "excerpt": "事件 触发时机 ------ ---------- command.executed 命令执行 file.edited / file.watcher.updated 文件编辑/监控更新 lsp.client.diagnostics / lsp.updated LSP 诊断更新 message. 消息增删改 permis..."
+      "content": "OpenCode 官方文档列出的事件钩子按分类如下： 分类 事件 ------ ------ Command command.executed File file.edited、file.watcher.updated Installation installation.updated LSP lsp.client.diagnostics、lsp.updated Message message.updated、message.removed、message.part.updated、message.part.removed Permission permission.asked、permission.replied Server server.connected Session session.created、session.updated、session.deleted、session.idle、session.status、session.error、session.diff、session.compacted Shell shell.env Todo todo.updated Tool tool.execute.before、tool.execute.after TUI tui.prompt.append、tui.command.execute、tui.toast.show 实验性 experimental.session.compacting（替换默认压缩 prompt） 事件名和签名可能随版本调整，开发 plugin 前建议查看 @opencode-ai/plugin 包导出的 TypeScript 类型定义。",
+      "excerpt": "OpenCode 官方文档列出的事件钩子按分类如下： 分类 事件 ------ ------ Command command.executed File file.edited、file.watcher.updated Installation installation.updated LSP lsp.client.d..."
     },
     {
       "id": "开发注意事项",
