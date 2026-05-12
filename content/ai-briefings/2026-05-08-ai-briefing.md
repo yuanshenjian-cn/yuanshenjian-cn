@@ -10,7 +10,9 @@ tags:
   - Moonshot
 ---
 
-5 月 7 日到 5 月 8 日，AI 动态在网络安全、端侧 Agent 和资本市场三个方向集中释放。OpenAI 把 GPT-5.5 的网络安全形态推进到限量预览；Perplexity 把 Mac 端的 Personal Computer 开放给所有付费订阅者；中国侧 Moonshot AI 则完成了大额融资。
+5 月 7 日到 5 月 8 日，AI 动态在网络安全、端侧 Agent 和资本市场三个方向集中释放。OpenAI 把 GPT-5.5 的网络安全形态推进到限量预览；Perplexity 把 Mac 端的 Personal Computer 开放给所有付费订阅者；
+
+中国侧 Moonshot AI 则完成了大额融资。
 
 ## 速览
 
@@ -25,7 +27,9 @@ tags:
 
 OpenAI 在 5 月 7 日发布 GPT-5.5-Cyber，作为两周前 GPT-5.5 的能力延伸。新模型只对负责守护关键基础设施的安全防御方开放，配合 Trusted Access for Cyber（简称 TAC）做身份核验。
 
-对漏洞分析、恶意软件逆向、检测工程、补丁验证等防御任务放宽拒绝率，同时继续阻止凭据窃取、持久化、横向移动等攻击侧用法。OpenAI 同步要求获得 TAC 权限的个人账号必须在 6 月 1 日前启用 Advanced Account Security，企业则需在 SSO 中接入抗钓鱼认证。
+对漏洞分析、恶意软件逆向、检测工程、补丁验证等防御任务放宽拒绝率，同时继续阻止凭据窃取、持久化、横向移动等攻击侧用法。
+
+OpenAI 同步要求获得 TAC 权限的个人账号必须在 6 月 1 日前启用 Advanced Account Security，企业则需在 SSO 中接入抗钓鱼认证。
 
 这是 frontier 模型首次以分层访问的方式正式对外，标志着 OpenAI 开始根据应用场景和客户资质对模型能力进行差异化授权。
 
@@ -39,9 +43,13 @@ Perplexity 在 5 月 7 日把 Personal Computer 从仅限 Max 订阅者扩展到
 
 ### Moonshot AI
 
-Moonshot AI 据 TechCrunch 与 Forbes 报道完成约 20 亿美元融资，估值跃升至 200 亿美元，由 Meituan Dragon Ball 领投，China Mobile 与 CITIC Private Equity Funds 参投，定位是开放权重模型 Kimi 系列的扩张。
+Moonshot AI 据 TechCrunch 与 Forbes 报道完成约 20 亿美元融资，估值跃升至 200 亿美元。
 
-与此同时，xAI 在 5 月 7 日向 API 用户发送邮件确认 Grok 4.3 正式上线，同时宣布 8 个旧模型将于 5 月 15 日退役，开发者仅有 9 天迁移窗口。Grok 4.3 的 API 定价为输入 $1.25/百万 token、输出 $2.50/百万 token，上下文窗口 100 万 token。
+由 Meituan Dragon Ball 领投，China Mobile 与 CITIC Private Equity Funds 参投，定位是开放权重模型 Kimi 系列的扩张。
+
+与此同时，xAI 在 5 月 7 日向 API 用户发送邮件确认 Grok 4.3 正式上线，同时宣布 8 个旧模型将于 5 月 15 日退役，开发者仅有 9 天迁移窗口。
+
+Grok 4.3 的 API 定价为输入 $1.25/百万 token、输出 $2.50/百万 token，上下文窗口 100 万 token。
 
 ## 为什么值得关注
 
