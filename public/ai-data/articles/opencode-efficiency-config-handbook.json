@@ -20,14 +20,14 @@
       "id": "配置文件总览",
       "anchorId": "配置文件总览",
       "heading": "配置文件总览",
-      "content": "OpenCode 的配置分散在多个文件中，搞清楚各自管辖范围才能避免改错地方： 文件 路径 作用范围 优先级 ------ ------ ---------- -------- opencode.json / opencode.jsonc ~/.config/opencode/ 全局 基础 opencode.json / opencode.jsonc .opencode/（项目根目录） 项目级 覆盖全局 tui.json / tui.jsonc ~/.config/opencode/ TUI 界面 独立 agents/.md ~/.config/opencode/agents/ 或 .opencode/agents/ Agent 定义 项目级覆盖全局 skills//SKILL.md ~/.config/opencode/skills/ 或 .opencode/skills/ Skill 定义 项目级覆盖全局 commands/*.md ~/.config/opencode/commands/ 或 .opencode/commands/ 自定义命令 项目级覆盖全局 $schema 字段建议加上，能获得 IDE 的自动补全：",
+      "content": "OpenCode 的配置分散在多个文件中，搞清楚各自管辖范围才能避免改错地方： 文件 路径 作用范围 优先级 ------ ------ ---------- -------- opencode.json / opencode.jsonc ~/.config/opencode/ 全局 基础 opencode.json / opencode.jsonc .opencode/（项目根目录） 项目级 覆盖全局 tui.json / tui.jsonc ~/.config/opencode/ TUI 界面 独立 agents/.md ~/.config/opencode/agents/ 或 .opencode/agents/ Agent 定义 项目级覆盖全局 skills//SKILL.md ~/.config/opencode/skills/ 或 .opencode/skills/ Skill 定义 项目级覆盖全局 commands/*.md ~/.config/opencode/commands/ 或 .opencode/commands/ 自定义命令 项目级覆盖全局 除上述路径外，OpenCode 也会加载 ~/.opencode/ 作为兼容路径（顺序：全局 ~/.config/opencode/ → 项目根 .opencode/ → ~/.opencode/）。还可以用环境变量 OPENCODECONFIGDIR 指定额外的配置目录。 $schema 字段建议加上，能获得 IDE 的自动补全：",
       "excerpt": "OpenCode 的配置分散在多个文件中，搞清楚各自管辖范围才能避免改错地方： 文件 路径 作用范围 优先级 ------ ------ ---------- -------- opencode.json / opencode.jsonc ~/.config/opencode/ 全局 基础 opencode.json ..."
     },
     {
       "id": "1-自动压缩compaction",
       "anchorId": "1-自动压缩compaction",
       "heading": "1. 自动压缩（Compaction）",
-      "content": "长会话的上下文膨胀是实际使用中最大的隐性成本。OpenCode 的 compaction 机制可以在上下文接近上限时自动总结历史，腾出 token 空间。 选项 说明 建议值 ------ ------ -------- auto 上下文满时自动触发压缩 true（默认） prune 压缩时移除旧的工具调用输出，节省 token true（默认） reserved 压缩时预留的 token 缓冲，避免临界点溢出 5000~15000 reserved 这个字段很多人不知道。如果不设，压缩过程本身可能就把上下文撑满，导致压缩失败。建议根据常用模型的上下文窗口大小来设：200K 窗口设 5000，1M 窗口设 10000~15000。",
+      "content": "长会话的上下文膨胀是实际使用中最大的隐性成本。OpenCode 的 compaction 机制可以在上下文接近上限时自动总结历史，腾出 token 空间。 选项 说明 建议值 ------ ------ -------- auto 上下文满时自动触发压缩 true（默认） prune 压缩时移除旧的工具调用输出，节省 token true（默认） tailturns 压缩时保留的最近用户轮数（连同其后续 assistant/tool 响应一起逐字保留） 2（默认） preserverecenttokens 压缩后从最近轮次逐字保留的最大 token 数 视上下文窗口而定 reserved 压缩时预留的 token 缓冲，避免临界点溢出 5000~15000 reserved 这个字段很多人不知道。如果不设，压缩过程本身可能就把上下文撑满，导致压缩失败。建议根据常用模型的上下文窗口大小来设：200K 窗口设 5000，1M 窗口设 10000~15000。 tailturns 和 preserverecenttokens 控制\"最近轮次保留多少不动\"，调大这两个值会牺牲压缩力度换上下文连贯性，对话依赖近期细节时很有用。",
       "excerpt": "长会话的上下文膨胀是实际使用中最大的隐性成本。OpenCode 的 compaction 机制可以在上下文接近上限时自动总结历史，腾出 token 空间。 选项 说明 建议值 ------ ------ -------- auto 上下文满时自动触发压缩 true（默认） prune 压缩时移除旧的工具调用输出，节省 ..."
     },
     {
@@ -118,8 +118,8 @@
       "id": "权限键与对应工具",
       "anchorId": "权限键与对应工具",
       "heading": "权限键与对应工具",
-      "content": "权限键 控制的工具 -------- ----------- read read（对 .env 和 .env.* 默认 deny） edit 所有文件修改：edit, write, patch bash bash task task（调用 subagent） glob, grep 同名工具 webfetch, websearch 同名工具 lsp, skill, question 同名工具 externaldirectory 工作树外文件访问（默认 ask） doomloop 模型陷入循环时的恢复提示（默认 ask） 以上权限键多数支持 glob 模式精细控制（如 bash、edit、task、skill、read、glob、grep）；externaldirectory、doomloop、question 等通常只用 allow/ask/deny 三态简单态。",
-      "excerpt": "权限键 控制的工具 -------- ----------- read read（对 .env 和 .env.* 默认 deny） edit 所有文件修改：edit, write, patch bash bash task task（调用 subagent） glob, grep 同名工具 webfetch, webs..."
+      "content": "权限键 控制的工具 -------- ----------- read read（对 .env 和 .env.* 默认 deny） edit 所有文件修改：edit, write, patch bash bash task task（调用 subagent） glob, grep, list 同名工具 webfetch, websearch 同名工具 lsp, skill, question 同名工具 todowrite todowrite（待办列表写入） repoclone, repooverview 仓库克隆与概览操作 externaldirectory 工作树外文件访问（默认 ask） doomloop 模型陷入循环时的恢复提示（默认 ask） 以上权限键多数支持 glob 模式精细控制（如 bash、edit、task、skill、read、glob、grep）；externaldirectory、doomloop、question 等通常只用 allow/ask/deny 三态简单态。",
+      "excerpt": "权限键 控制的工具 -------- ----------- read read（对 .env 和 .env.* 默认 deny） edit 所有文件修改：edit, write, patch bash bash task task（调用 subagent） glob, grep, list 同名工具 webfetch..."
     },
     {
       "id": "per-agent-权限",
@@ -139,8 +139,8 @@
       "id": "tools-字段-vs-permission",
       "anchorId": "tools-字段-vs-permission",
       "heading": "`tools` 字段 vs `permission`",
-      "content": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中，true 等价于 {\"\": \"allow\"}，false 等价于 {\"\": \"deny\"}。 不过 tools 并未完全消失，MCP 工具的 per-agent 显隐目前仍只能通过 tools 字段实现（详见第七节）。本文除 MCP 章节外，统一使用 permission。",
-      "excerpt": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中，true 等价于 {\"\": \"allow\"}，false ..."
+      "content": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中， : \"allow\" 是简写形式，等价于 : { \"*\": \"allow\" }，deny 和 ask 同理。 不过 tools 并未完全消失，MCP 工具的 per-agent 隐藏（不注入工具描述、省 token）目前仍优先用 tools 字段（详见第七节）。本文除 MCP 章节外，统一使用 permission。",
+      "excerpt": "早期 agent 配置用 tools: { write: false } 二态切换工具开关，官方文档已建议 agent 层优先使用 permission——后者支持 glob 模式和 allow/ask/deny 三态，表达力更强。在 permission 中， : \"allow\" 是简写形式，等价于 : { \"*\":..."
     },
     {
       "id": "内置-provider",
@@ -202,8 +202,8 @@
       "id": "文件格式",
       "anchorId": "文件格式",
       "heading": "文件格式",
-      "content": "每个 skill 是一个目录，内含 SKILL.md： metadata 字段不接受嵌套对象、数组或数字，复杂类型会被忽略或导致加载失败。",
-      "excerpt": "每个 skill 是一个目录，内含 SKILL.md： metadata 字段不接受嵌套对象、数组或数字，复杂类型会被忽略或导致加载失败。"
+      "content": "每个 skill 是一个目录，内含 SKILL.md：",
+      "excerpt": "每个 skill 是一个目录，内含 SKILL.md："
     },
     {
       "id": "搜索路径",
@@ -230,8 +230,8 @@
       "id": "最佳实践",
       "anchorId": "最佳实践",
       "heading": "最佳实践",
-      "content": "description 要具体 — Agent 根据 description 决定是否调用，写得越具体触发越精准 name 要匹配目录名 — 正则要求 ^[a-z0-9]+(-[a-z0-9]+)*$ 跨平台复用 — 一套 skill 可以同时被 OpenCode、Claude Code、Codex 加载 避免重复命名 — 不同路径下 skill name 冲突时，先找到的生效",
-      "excerpt": "description 要具体 — Agent 根据 description 决定是否调用，写得越具体触发越精准 name 要匹配目录名 — 正则要求 ^[a-z0-9]+(-[a-z0-9]+)*$ 跨平台复用 — 一套 skill 可以同时被 OpenCode、Claude Code、Codex 加载 避免重复命名..."
+      "content": "description 要具体 — Agent 根据 description 决定是否调用，写得越具体触发越精准 name 要匹配目录名 — 使用小写字母、数字与连字符 跨平台复用 — 一套 skill 可以同时被 OpenCode、Claude Code、Codex 加载 避免重复命名 — 不同路径下 skill name 冲突时，先找到的生效",
+      "excerpt": "description 要具体 — Agent 根据 description 决定是否调用，写得越具体触发越精准 name 要匹配目录名 — 使用小写字母、数字与连字符 跨平台复用 — 一套 skill 可以同时被 OpenCode、Claude Code、Codex 加载 避免重复命名 — 不同路径下 skill n..."
     },
     {
       "id": "七mcp-服务器",
@@ -272,7 +272,7 @@
       "id": "最佳实践-1",
       "anchorId": "最佳实践-1",
       "heading": "最佳实践",
-      "content": "注意 token 消耗 — MCP 工具描述会随服务器一起注入到上下文，GitHub、Jira 这类工具数量多、描述长，开几个就能撑爆几千 token 按 agent 控制 MCP 工具可见性 — 顺着上一条，在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 用 timeout 控制超时 — 默认 5000ms，网络慢的 MCP 建议调高 MCP 工具以服务器名为前缀注册（如 githubcreateissue、githublistprs），用 glob \"github_*\" 可匹配该服务器的所有工具。注意：mcp. .enabled: false 会停掉服务器进程，agent 层无法再启用；要做 per-agent 显隐，需保持服务器 enabled: true，再用 tools 字段控制可见性。tools 虽已 deprecated（见第三节），但 MCP 工具级开关目前仍主要靠它。",
+      "content": "注意 token 消耗 — MCP 工具描述会随服务器一起注入到上下文，GitHub、Jira 这类工具数量多、描述长，开几个就能撑爆几千 token 按 agent 控制 MCP 工具可见性 — 顺着上一条，在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 用 timeout 控制超时 — 默认 5000ms，网络慢的 MCP 建议调高 MCP 工具以服务器名为前缀注册（如 githubcreateissue、githublistprs），用 glob \"github_*\" 可匹配该服务器的所有工具。注意：mcp. .enabled: false 会停掉服务器进程，agent 层无法再启用；要做 per-agent 显隐，需保持服务器 enabled: true，再用 agent 的 tools 字段控制工具列表的注入——permission 也能拦截调用，但工具描述仍会注入上下文，省 token 优先用 tools。",
       "excerpt": "注意 token 消耗 — MCP 工具描述会随服务器一起注入到上下文，GitHub、Jira 这类工具数量多、描述长，开几个就能撑爆几千 token 按 agent 控制 MCP 工具可见性 — 顺着上一条，在大多数 agent 里关掉非必需 MCP 工具，仅在专用 agent 里启用 用 timeout 控制超时 ..."
     },
     {
@@ -293,8 +293,8 @@
       "id": "可用事件",
       "anchorId": "可用事件",
       "heading": "可用事件",
-      "content": "OpenCode 官方文档列出的事件钩子按分类如下： 分类 事件 ------ ------ Command command.executed File file.edited、file.watcher.updated Installation installation.updated LSP lsp.client.diagnostics、lsp.updated Message message.updated、message.removed、message.part.updated、message.part.removed Permission permission.asked、permission.replied Server server.connected Session session.created、session.updated、session.deleted、session.idle、session.status、session.error、session.diff、session.compacted Shell shell.env Todo todo.updated Tool tool.execute.before、tool.execute.after TUI tui.prompt.append、tui.command.execute、tui.toast.show 实验性 experimental.session.compacting（替换默认压缩 prompt） 事件名和签名可能随版本调整，开发 plugin 前建议查看 @opencode-ai/plugin 包导出的 TypeScript 类型定义。",
-      "excerpt": "OpenCode 官方文档列出的事件钩子按分类如下： 分类 事件 ------ ------ Command command.executed File file.edited、file.watcher.updated Installation installation.updated LSP lsp.client.d..."
+      "content": "事件覆盖工具调用前后、会话生命周期、Permission、Shell 环境、TUI 交互、LSP、Todo 等多个维度。事件名和签名随版本调整较频繁，开发 plugin 前建议直接查看 @opencode-ai/plugin 包导出的 TypeScript 类型定义，按 IDE 补全提示选用。",
+      "excerpt": "事件覆盖工具调用前后、会话生命周期、Permission、Shell 环境、TUI 交互、LSP、Todo 等多个维度。事件名和签名随版本调整较频繁，开发 plugin 前建议直接查看 @opencode-ai/plugin 包导出的 TypeScript 类型定义，按 IDE 补全提示选用。"
     },
     {
       "id": "开发注意事项",
