@@ -388,7 +388,7 @@ OpenCode 支持 40+ 内置 provider，大多数通过 `/connect` 命令图形化
 | 维度 | Primary Agent | Subagent |
 |------|--------------|----------|
 | 交互方式 | 直接对话，`Tab` 切换 | `@name` 手动调用，或 Task tool 自动调用 |
-| `hidden` | 不生效（仍出现在 Tab 循环） | 生效，隐藏后不出现在 `@` 补全 |
+| `hidden` | 生效，隐藏后不出现在 Tab 循环 | 生效，隐藏后不出现在 `@` 补全 |
 | `default_agent` | 可设为默认 | 不可设为默认 |
 | 典型用途 | 主工作流 | 专项任务（搜索、审查、研究） |
 
@@ -413,7 +413,7 @@ description: "Agent 用途描述（必填，subagent 的自动委派依赖它）
 mode: primary | subagent | all
 color: primary | secondary | accent | success | warning | error | info | #hex
 model: provider/model-id
-hidden: true | false        # 仅对 subagent 有效
+hidden: true | false        # 从 Tab 循环（primary）或 @ 补全（subagent）中隐藏
 disable: true | false       # 临时禁用该 agent
 temperature: 0.0-1.0
 top_p: 0.0-1.0
@@ -878,7 +878,7 @@ description: 将本地目录 attach 到远程 Git 仓库
 - API Key 用 `{file:path}` 引用外部文件，或用 `{env:VAR_NAME}` 引用环境变量，避免明文写入配置文件
 - 自定义 provider 的 `npm` 字段指定 SDK 包名，模型 ID 和显示名在 `models` 中映射
 - MCP 的 `enabled` 根据使用频率调整，不常用的先关后开
-- `agent.build` 和 `agent.plan` 设了 `hidden: true` 但 primary agent 不受此影响，它们仍会出现在 Tab 循环中。目前官方没有提供隐藏内置 primary agent 的配置方式，建议忽略它们，专注使用自己的自定义 agent
+- `agent.build` 和 `agent.plan` 设了 `hidden: true` 后会从 Tab 循环中消失，日常 Tab 切换只看到自己定义的 primary agent
 
 ## 小结
 
