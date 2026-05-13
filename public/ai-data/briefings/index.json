@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-12T00:00:00.000Z",
+  "generated": "2026-05-13T00:00:00.000Z",
   "briefings": [
+    {
+      "slug": "2026-05-13",
+      "title": "AI 简报 · 2026-05-13",
+      "excerpt": "Anthropic 发布 Claude for Legal 切入法律市场，Google 将 Gemini 升级为 Android 底层智能系统，OpenAI 推出 Daybreak 网络安全平台，Sam Altman 在 Musk 诉讼案中出庭作证。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-05-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-13"
+    },
     {
       "slug": "2026-05-12",
       "title": "AI 简报 · 2026-05-12",
