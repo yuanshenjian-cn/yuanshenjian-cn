@@ -3,9 +3,10 @@
 const fs = require("fs");
 const path = require("path");
 const matter = require("gray-matter");
+const { INVESTMENT_BRIEFING_SKILL_CONFIG_ROOT } = require("./briefing-skill-config.js");
 
 const ROOT = path.resolve(__dirname, "..");
-const CONFIG_DIRECTORY = path.join(ROOT, "skills", "investment-briefing", "config");
+const CONFIG_DIRECTORY = INVESTMENT_BRIEFING_SKILL_CONFIG_ROOT;
 const BRIEFINGS_DIRECTORY = path.join(ROOT, "content", "investment-briefings");
 const OUTPUT_DIRECTORY = path.join(ROOT, "public", "investment-data");
 const OUTPUT_BRIEFINGS_DIRECTORY = path.join(OUTPUT_DIRECTORY, "briefings");
@@ -212,6 +213,7 @@ function buildBriefingsPayload() {
   return {
     generated: items[0]?.date ?? "",
     items,
+    briefings: items,
   };
 }
 

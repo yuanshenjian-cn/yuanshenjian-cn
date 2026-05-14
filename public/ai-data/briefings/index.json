@@ -1,6 +1,581 @@
 {
-  "generated": "2026-05-13T00:00:00.000Z",
+  "generated": "2026-05-14T00:00:00.000Z",
+  "items": [
+    {
+      "slug": "2026-05-14",
+      "title": "AI 简报 · 2026-05-14",
+      "excerpt": "Anthropic 推出 Claude for Small Business 切入中小企业市场，Google DeepMind 发布 AI 智能指针重构人机交互，小米 MiMo 登顶 OpenRouter 全球调用量榜首，Mistral 为欧洲银行开发网络安全替代方案。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "Xiaomi",
+        "Mistral"
+      ],
+      "date": "2026-05-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-14"
+    },
+    {
+      "slug": "2026-05-13",
+      "title": "AI 简报 · 2026-05-13",
+      "excerpt": "Anthropic 发布 Claude for Legal 切入法律市场，Google 将 Gemini 升级为 Android 底层智能系统，OpenAI 推出 Daybreak 网络安全平台，Sam Altman 在 Musk 诉讼案中出庭作证。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-05-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-13"
+    },
+    {
+      "slug": "2026-05-12",
+      "title": "AI 简报 · 2026-05-12",
+      "excerpt": "OpenAI 推出 DeployCo 并签约收购 Tomoro，Anthropic 发布 Claude Code v2.1.139，Morningstar 与 PitchBook 通过 MCP 接入 Perplexity。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Claude Code",
+        "Perplexity",
+        "Gemini"
+      ],
+      "date": "2026-05-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-12"
+    },
+    {
+      "slug": "2026-05-10",
+      "title": "AI 简报 · 2026-05-10",
+      "excerpt": "Anthropic 在 Alignment Science Blog 发布《Teaching Claude Why》，称 Claude Haiku 4.5 起每代模型 agentic 错位评估均为零分；OpenAI 同日发布 Codex 0.130.0 引入远程控制与 Bedrock AWS 登录；Claude Code 紧急修复 Windows VS Code 扩展加载故障。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Claude Code",
+        "Codex"
+      ],
+      "date": "2026-05-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-10"
+    },
+    {
+      "slug": "2026-05-09",
+      "title": "AI 简报 · 2026-05-09",
+      "excerpt": "Anthropic 在 Code with Claude 大会上释出 Managed Agents 全套更新，OpenAI Realtime API 上线三款语音模型，Meta 被曝开发消费级 AI Agent 代号 Hatch，Google 把 Fitbit 改名为 Google Health 并预告 AI 健康教练。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Meta",
+        "Google",
+        "xAI"
+      ],
+      "date": "2026-05-09T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-09"
+    },
+    {
+      "slug": "2026-05-08",
+      "title": "AI 简报 · 2026-05-08",
+      "excerpt": "OpenAI 推出 GPT-5.5-Cyber 限量预览，Perplexity Personal Computer 全量登陆 Mac，Moonshot AI 完成约 20 亿美元融资。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Perplexity",
+        "Moonshot"
+      ],
+      "date": "2026-05-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-08"
+    },
+    {
+      "slug": "2026-05-07",
+      "title": "AI 简报 · 2026-05-07",
+      "excerpt": "Anthropic 正式推出 10 个金融 Agent，Meta 遭五大出版商集体诉讼，美国政府与 Google DeepMind、Microsoft、xAI 签署前沿 AI 国家安全测试协议。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "Google",
+        "美国政府"
+      ],
+      "date": "2026-05-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-07"
+    },
+    {
+      "slug": "2026-05-06",
+      "title": "AI 简报 · 2026-05-06",
+      "excerpt": "xAI 通知 API 用户 Grok 4.3 正式上线并宣布 8 个旧模型退役，Anthropic 举办 Code with Claude 大会公布 SpaceX 算力合作，DeepSeek 融资估值跃升。",
+      "tags": [
+        "AI",
+        "xAI",
+        "Anthropic",
+        "DeepSeek",
+        "OpenAI"
+      ],
+      "date": "2026-05-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-06"
+    },
+    {
+      "slug": "2026-05-05",
+      "title": "AI 简报 · 2026-05-05",
+      "excerpt": "OpenAI 发布 GPT-5.5 Instant 默认模型，Anthropic 预告金融 Agent 专场，Google 调整订阅与端侧策略，美国政府推进前沿 AI 国家安全测试。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "美国政府"
+      ],
+      "date": "2026-05-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-05"
+    },
+    {
+      "slug": "2026-05-04",
+      "title": "AI 简报 · 2026-05-04",
+      "excerpt": "Meta Business AI 周对话破千万，中国四家实验室密集发布开源编码模型，Nous Research 开源 Agent 框架突破 10 万星，Anthropic Mythos 通过英国网络安全测试。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Nous Research",
+        "Anthropic",
+        "开源模型"
+      ],
+      "date": "2026-05-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-04"
+    },
+    {
+      "slug": "2026-05-03",
+      "title": "AI 简报 · 2026-05-03",
+      "excerpt": "Mistral 发布 128B 旗舰模型与远程编码 Agent，DeepSeek V4 正式开放，Amazon 和 Cloudflare 分别推出购物代理与自主部署能力，AI 编码代理安全漏洞引发关注。",
+      "tags": [
+        "AI",
+        "Mistral",
+        "DeepSeek",
+        "Amazon",
+        "Cloudflare"
+      ],
+      "date": "2026-05-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-03"
+    },
+    {
+      "slug": "2026-05-02",
+      "title": "AI 简报 · 2026-05-02",
+      "excerpt": "Meta 收购 ARI 入局具身智能，蚂蚁集团开源万亿参数模型，Google 推出 Chrome Prompt API，Cerebras 递交 IPO 申请，中国多地加速 AI 治理立法。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Ant Group",
+        "Google",
+        "Cerebras"
+      ],
+      "date": "2026-05-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-02"
+    },
+    {
+      "slug": "2026-05-01",
+      "title": "AI 简报 · 2026-05-01",
+      "excerpt": "xAI 发布 Grok 4.3 推理模型与语音克隆套件，Meta 收购机器人初创公司 ARI，Anthropic 拓展 Claude 创意工具生态，Mistral 与 DeepSeek 在开源赛道持续施压。",
+      "tags": [
+        "AI",
+        "xAI",
+        "Meta",
+        "Anthropic",
+        "Mistral"
+      ],
+      "date": "2026-05-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-01"
+    },
+    {
+      "slug": "2026-04-30",
+      "title": "AI 简报 · 2026-04-30",
+      "excerpt": "Anthropic 将 Claude 接入创意工具生态并推出安全扫描功能；Hippocratic AI 发布 Polaris 5.0 医疗模型；IBM 更新 Granite 4.1 开源模型系列。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Hippocratic AI",
+        "IBM"
+      ],
+      "date": "2026-04-30T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-30"
+    },
+    {
+      "slug": "2026-04-29",
+      "title": "AI 简报 · 2026-04-29",
+      "excerpt": "Cursor 开放 Agent SDK public beta；Anthropic 与 Amazon 扩大合作协议至 5GW 算力，承诺 1000 亿美元以上的 AWS 支出。",
+      "tags": [
+        "AI",
+        "Cursor",
+        "Anthropic",
+        "Amazon"
+      ],
+      "date": "2026-04-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-29"
+    },
+    {
+      "slug": "2026-04-28",
+      "title": "AI 简报 · 2026-04-28",
+      "excerpt": "Warp 开源 ADE（Agentic Development Environment），采用 Oz 编排引擎；Sentry 推出 Seer Agent，支持自然语言调试与 Slack 多人协作。",
+      "tags": [
+        "AI",
+        "Warp",
+        "Sentry",
+        "开发者工具"
+      ],
+      "date": "2026-04-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-28"
+    },
+    {
+      "slug": "2026-04-27",
+      "title": "AI 简报 · 2026-04-27",
+      "excerpt": "中国正式阻止 Meta 收购 AI 智能体公司 Manus；Meta 宣布裁员约 8000 人以聚焦 AI 投资；OpenAI 三位高管离职。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Manus",
+        "OpenAI"
+      ],
+      "date": "2026-04-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-27"
+    },
+    {
+      "slug": "2026-04-26",
+      "title": "AI 简报 · 2026-04-26",
+      "excerpt": "OpenAI 正式关闭 Sora 视频生成服务；Hollywood 主要制片厂团体谴责 ByteDance AI 视频生成器涉嫌大规模版权侵权。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Sora",
+        "ByteDance",
+        "Hollywood"
+      ],
+      "date": "2026-04-26T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-26"
+    },
+    {
+      "slug": "2026-04-25",
+      "title": "AI 简报 · 2026-04-25",
+      "excerpt": "Anthropic 二级市场估值突破 1 万亿美元，超过 OpenAI；欧洲 AI 公司 Cohere 与 Aleph Alpha 宣布合并，打造 200 亿美元主权 AI 实体。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Cohere",
+        "欧洲AI"
+      ],
+      "date": "2026-04-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-25"
+    },
+    {
+      "slug": "2026-04-24",
+      "title": "AI 简报 · 2026-04-24",
+      "excerpt": "DeepSeek 发布 V4 系列模型，以 MIT 许可开源 1.6T 参数 MoE 架构；Google 宣布最高 400 亿美元投资 Anthropic，配套 5GW TPU 算力。",
+      "tags": [
+        "AI",
+        "DeepSeek",
+        "Google",
+        "Anthropic"
+      ],
+      "date": "2026-04-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-24"
+    },
+    {
+      "slug": "2026-04-23",
+      "title": "AI 简报 · 2026-04-23",
+      "excerpt": "OpenAI 正式发布 GPT-5.5，支持百万 token 上下文与原生计算机使用能力；Sony AI 的 Ace 机器人在竞技乒乓球中首次击败人类高手，成果发表于 Nature 封面。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Sony",
+        "机器人"
+      ],
+      "date": "2026-04-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-23"
+    },
+    {
+      "slug": "2026-04-22",
+      "title": "AI 简报 · 2026-04-22",
+      "excerpt": "Google 召开 Cloud Next '26 大会，发布 Gemini Enterprise Agent Platform 与第八代 TPU；Sundar Pichai 称 75% 的 Google Cloud 客户已使用 AI 工具。",
+      "tags": [
+        "AI",
+        "Google",
+        "Cloud",
+        "TPU"
+      ],
+      "date": "2026-04-22T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-22"
+    },
+    {
+      "slug": "2026-04-21",
+      "title": "AI 简报 · 2026-04-21",
+      "excerpt": "OpenAI 发布 ChatGPT Images 2.0，集成推理能力的 Agent 化图像生成模型；SpaceX 与 Cursor 达成战略合作，获得 600 亿美元收购期权。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "SpaceX",
+        "Cursor"
+      ],
+      "date": "2026-04-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-21"
+    },
+    {
+      "slug": "2026-04-20",
+      "title": "AI 简报 · 2026-04-20",
+      "excerpt": "Hannover Messe 2026 开幕，Siemens 与 NVIDIA 展示工业 AI 操作系统与人形机器人部署；OpenAI 发布 GPT-5.4，支持百万 token 上下文与自主计算机操作。",
+      "tags": [
+        "AI",
+        "Hannover Messe",
+        "Siemens",
+        "NVIDIA",
+        "OpenAI"
+      ],
+      "date": "2026-04-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-20"
+    },
+    {
+      "slug": "2026-04-19",
+      "title": "AI 简报 · 2026-04-19",
+      "excerpt": "NVIDIA 在 National Robotics Week 期间发布开源物理 AI 工具集，涵盖 Isaac GR00T N1.6、Newton 1.0 物理引擎和 Cosmos 世界模型系列。",
+      "tags": [
+        "AI",
+        "NVIDIA",
+        "机器人",
+        "物理 AI"
+      ],
+      "date": "2026-04-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-19"
+    },
+    {
+      "slug": "2026-04-18",
+      "title": "AI 简报 · 2026-04-18",
+      "excerpt": "Northwestern 大学开发出可印刷人工神经元，首次实现与活体脑细胞直接通信，成果发表于 Nature Nanotechnology。",
+      "tags": [
+        "AI",
+        "Northwestern",
+        "神经科学"
+      ],
+      "date": "2026-04-18T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-18"
+    },
+    {
+      "slug": "2026-04-17",
+      "title": "AI 简报 · 2026-04-17",
+      "excerpt": "Anthropic 推出 Claude Design 研究预览版，并宣布与 NEC 达成重大合作；Claude Mythos 扩展至英国金融业用于风险评估。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Claude",
+        "NEC"
+      ],
+      "date": "2026-04-17T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-17"
+    },
+    {
+      "slug": "2026-04-16",
+      "title": "AI 简报 · 2026-04-16",
+      "excerpt": "Anthropic 正式发布 Claude Opus 4.7，新增内部验证层和 xhigh 推理级别；OpenAI 发布 GPT-5.4-Cyber 网络安全专用模型。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI"
+      ],
+      "date": "2026-04-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-16"
+    },
+    {
+      "slug": "2026-04-15",
+      "title": "AI 简报 · 2026-04-15",
+      "excerpt": "Northwestern 大学可印刷人工神经元研究成果发表于 Nature Nanotechnology；OpenAI 和 Anthropic 竞相发布网络安全专用模型。",
+      "tags": [
+        "AI",
+        "Northwestern",
+        "神经科学",
+        "OpenAI"
+      ],
+      "date": "2026-04-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-15"
+    },
+    {
+      "slug": "2026-04-14",
+      "title": "AI 简报 · 2026-04-14",
+      "excerpt": "OpenAI CRO Denise Dresser 指控 Anthropic 夸大收入 80 亿美元；Google 发布 Gemma 4 开源模型，定位为最强开源权重模型。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-04-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-14"
+    },
+    {
+      "slug": "2026-04-13",
+      "title": "AI 简报 · 2026-04-13",
+      "excerpt": "Anthropic 推出 Claude for Word，面向 Team 和 Enterprise 用户；Sam Altman 住所遭遇燃烧瓶袭击事件，嫌疑人被起诉。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI"
+      ],
+      "date": "2026-04-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-13"
+    },
+    {
+      "slug": "2026-04-12",
+      "title": "AI 简报 · 2026-04-12",
+      "excerpt": "Anthropic 与基督教领袖会面，讨论 Claude 的精神和道德发展；Claude 上下文窗口扩展至 100 万 token 正式全面可用。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Claude"
+      ],
+      "date": "2026-04-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-12"
+    },
+    {
+      "slug": "2026-04-11",
+      "title": "AI 简报 · 2026-04-11",
+      "excerpt": "高盛、花旗等美国银行加入 Anthropic Project Glasswing，使用 Mythos 模型检测漏洞；特朗普政府鼓励金融机构采用 AI 安全工具。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "网络安全"
+      ],
+      "date": "2026-04-11T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-11"
+    },
+    {
+      "slug": "2026-04-10",
+      "title": "AI 简报 · 2026-04-10",
+      "excerpt": "Sam Altman 面临《纽约客》调查报道的可信度危机；OpenAI 准备 IPO，CFO 确认零售投资者股份预留。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "IPO"
+      ],
+      "date": "2026-04-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-10"
+    },
+    {
+      "slug": "2026-04-09",
+      "title": "AI 简报 · 2026-04-09",
+      "excerpt": "OpenAI 推出 ChatGPT Pro 100 美元/月计划，定位在 Plus 和现有 Pro 之间；Meta 发布首个非开源模型 Muse Spark。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Meta"
+      ],
+      "date": "2026-04-09T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-09"
+    },
+    {
+      "slug": "2026-04-08",
+      "title": "AI 简报 · 2026-04-08",
+      "excerpt": "OpenAI 升级 Agents SDK，新增原生沙盒执行和可配置内存；OpenAI 要求加州和特拉华州检察长调查 Elon Musk 的反竞争行为。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Agents SDK"
+      ],
+      "date": "2026-04-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-08"
+    },
+    {
+      "slug": "2026-04-07",
+      "title": "AI 简报 · 2026-04-07",
+      "excerpt": "OpenAI 发布 Codex 重大更新，转型为桌面 Agent 工作空间；OpenAI 收购 Hiro Finance 并披露供应链安全事件。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Codex"
+      ],
+      "date": "2026-04-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-07"
+    },
+    {
+      "slug": "2026-04-06",
+      "title": "AI 简报 · 2026-04-06",
+      "excerpt": "Anthropic 启动 Project Glasswing 防御计划并正式发布 Claude Opus 4.7；英国央行开始测试 AI 对金融系统的系统性风险。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "网络安全"
+      ],
+      "date": "2026-04-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-06"
+    },
+    {
+      "slug": "2026-04-05",
+      "title": "AI 简报 · 2026-04-05",
+      "excerpt": "Google 与 Broadcom 签署至 2031 年的长期 AI 芯片合作协议；OpenAI、Anthropic 和 Google 联合应对中国模型克隆行为。",
+      "tags": [
+        "AI",
+        "Google",
+        "Broadcom"
+      ],
+      "date": "2026-04-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-05"
+    },
+    {
+      "slug": "2026-04-04",
+      "title": "AI 简报 · 2026-04-04",
+      "excerpt": "OpenAI 完成 1220 亿美元融资，创科技史上最大私募资本募集之一；Amazon 宣布向 OpenAI 投资 500 亿美元。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Amazon"
+      ],
+      "date": "2026-04-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-04"
+    },
+    {
+      "slug": "2026-04-03",
+      "title": "AI 简报 · 2026-04-03",
+      "excerpt": "Anthropic 收购生物 AI 初创公司 Coefficient Bio，交易金额约 4 亿美元；Mythos 模型网络安全能力引发监管关注。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "生物AI"
+      ],
+      "date": "2026-04-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-03"
+    },
+    {
+      "slug": "2026-04-02",
+      "title": "AI 简报 · 2026-04-02",
+      "excerpt": "Anthropic 意外泄露约 51.2 万行 Claude Code TypeScript 源代码，同时曝光了未发布的 Claude Mythos 模型；OpenAI 关闭 Sora 公共 API。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI"
+      ],
+      "date": "2026-04-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-02"
+    },
+    {
+      "slug": "2026-04-01",
+      "title": "AI 简报 · 2026-04-01",
+      "excerpt": "OpenAI 将 GPT-4o 从 ChatGPT 商业版中退役；Microsoft 与 OpenAI 修订合作协议，移除 AGI 条款并调整收入分成机制。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Microsoft"
+      ],
+      "date": "2026-04-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-04-01"
+    }
+  ],
   "briefings": [
+    {
+      "slug": "2026-05-14",
+      "title": "AI 简报 · 2026-05-14",
+      "excerpt": "Anthropic 推出 Claude for Small Business 切入中小企业市场，Google DeepMind 发布 AI 智能指针重构人机交互，小米 MiMo 登顶 OpenRouter 全球调用量榜首，Mistral 为欧洲银行开发网络安全替代方案。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "Xiaomi",
+        "Mistral"
+      ],
+      "date": "2026-05-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-14"
+    },
     {
       "slug": "2026-05-13",
       "title": "AI 简报 · 2026-05-13",

@@ -2,7 +2,17 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import type { Briefing, BriefingFrontmatter, BriefingRecommendationRange } from "@/types/briefing";
-import { config, EXCERPT_LENGTH } from "@/lib/config";
+import { EXCERPT_LENGTH } from "@/lib/config";
+import {
+  buildBriefingExcerpt,
+  buildMonthlyArchives,
+  calculateBriefingReadingTime,
+  getAdjacentItemsBySlug,
+  getMarkdownFiles,
+  getRecentItemsByDays,
+  parseBriefingDateParts,
+  parseBriefingTags,
+} from "@/lib/briefing-core";
 import { cleanContent } from "@/lib/utils";
 
 const briefingsDirectory = path.join(process.cwd(), "content/ai-briefings");
@@ -19,58 +29,6 @@ function withCache<T>(getCache: () => T | null, setCache: (value: T) => void, co
   const value = compute();
   setCache(value);
   return value;
-}
-
-function getAllMarkdownFiles(dir: string): string[] {
-  const files: string[] = [];
-
-  if (!fs.existsSync(dir)) {
-    return files;
-  }
-
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...getAllMarkdownFiles(fullPath));
-    } else if (entry.isFile() && /\.md$/i.test(entry.name)) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
-
-function parseTags(tags: unknown): string[] {
-  if (!Array.isArray(tags)) return [];
-  return tags.filter((tag): tag is string => typeof tag === "string" && tag.trim().length > 0);
-}
-
-function buildExcerpt(brief: unknown, content: string): string {
-  if (typeof brief === "string" && brief.trim().length > 0) {
-    return brief.trim();
-  }
-
-  const cleaned = cleanContent(content);
-  return cleaned.length > EXCERPT_LENGTH ? `${cleaned.slice(0, EXCERPT_LENGTH)}...` : cleaned;
-}
-
-function parseDate(date: string) {
-  const [year = "", month = "", day = ""] = date.split("-");
-  return {
-    year,
-    month,
-    day,
-  };
-}
-
-function calculateReadingTime(content: string): number {
-  const wordsPerMinute = config.readingTime.wordsPerMinute;
-  const charactersPerMinute = config.readingTime.charactersPerMinute;
-  const englishWords = content.match(/[a-zA-Z]+/g)?.length || 0;
-  const chineseCharacters = content.match(/[\u4e00-\u9fff]/g)?.length || 0;
-  const readingTime = englishWords / wordsPerMinute + chineseCharacters / charactersPerMinute;
-
-  return Math.max(1, Math.ceil(readingTime));
 }
 
 function normalizeBriefingTitle(title: string): string {
@@ -92,15 +50,15 @@ function parseBriefingFile(filePath: string): Briefing | null {
     }
 
     const published = data.published === true;
-    const tags = parseTags(data.tags);
-    const excerpt = buildExcerpt(data.brief, content);
+    const tags = parseBriefingTags(data.tags);
+    const excerpt = buildBriefingExcerpt(data.brief, content, EXCERPT_LENGTH);
 
     if (!published || tags.length === 0 || excerpt.length === 0) {
       return null;
     }
 
     const slug = data.date;
-    const dateParts = parseDate(data.date);
+    const dateParts = parseBriefingDateParts(data.date);
 
     return {
       slug,
@@ -111,7 +69,7 @@ function parseBriefingFile(filePath: string): Briefing | null {
       tags,
       published,
       content,
-      readingTime: calculateReadingTime(cleanContent(content)),
+      readingTime: calculateBriefingReadingTime(cleanContent(content)),
       relativePath: path.relative(briefingsDirectory, filePath).split(path.sep).join("/"),
       url: `/ai/briefings/${slug}`,
     };
@@ -132,7 +90,7 @@ export function getAllBriefings(): Briefing[] {
       cachedBriefings = value;
     },
     () =>
-      getAllMarkdownFiles(briefingsDirectory)
+      getMarkdownFiles(briefingsDirectory)
         .map(parseBriefingFile)
         .filter((briefing): briefing is Briefing => briefing !== null)
         .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime()),
@@ -148,26 +106,12 @@ export function getBriefingBySlug(slug: string): Briefing | null {
 }
 
 export function getAdjacentBriefings(slug: string): { prev: Briefing | null; next: Briefing | null } {
-  const briefings = getAllBriefings();
-  const index = briefings.findIndex((briefing) => briefing.slug === slug);
-
-  if (index === -1) {
-    return { prev: null, next: null };
-  }
-
-  return {
-    prev: briefings[index + 1] ?? null,
-    next: briefings[index - 1] ?? null,
-  };
+  return getAdjacentItemsBySlug(getAllBriefings(), slug);
 }
 
 export function getBriefingsByRange(range: BriefingRecommendationRange, now = new Date()): Briefing[] {
   const days = range === "today" ? 1 : Number.parseInt(range.replace("d", ""), 10);
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - days + 1);
-
-  return getAllBriefings().filter((briefing) => new Date(briefing.date).getTime() >= start.getTime());
+  return getRecentItemsByDays(getAllBriefings(), days, now);
 }
 
 export interface BriefingArchiveItem {
@@ -180,42 +124,11 @@ export interface BriefingArchiveItem {
 }
 
 export function getRecentBriefings(days = 30, now = new Date()): Briefing[] {
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - days + 1);
-
-  return getAllBriefings().filter((briefing) => new Date(briefing.date).getTime() >= start.getTime());
+  return getRecentItemsByDays(getAllBriefings(), days, now);
 }
 
 export function getBriefingArchives(): BriefingArchiveItem[] {
-  const archiveMap = new Map<string, BriefingArchiveItem>();
-
-  for (const briefing of getAllBriefings()) {
-    const key = `${briefing.year}-${briefing.month}`;
-    const existing = archiveMap.get(key);
-
-    if (!existing) {
-      archiveMap.set(key, {
-        year: briefing.year,
-        month: briefing.month,
-        count: 1,
-        startDate: briefing.slug,
-        endDate: briefing.slug,
-        url: `/ai/briefings/archive/${briefing.year}/${briefing.month}`,
-      });
-      continue;
-    }
-
-    existing.count += 1;
-    existing.startDate = briefing.slug < existing.startDate ? briefing.slug : existing.startDate;
-    existing.endDate = briefing.slug > existing.endDate ? briefing.slug : existing.endDate;
-  }
-
-  return Array.from(archiveMap.values()).sort((left, right) => {
-    const leftKey = `${left.year}-${left.month}`;
-    const rightKey = `${right.year}-${right.month}`;
-    return rightKey.localeCompare(leftKey);
-  });
+  return buildMonthlyArchives(getAllBriefings(), (briefing) => `/ai/briefings/archive/${briefing.year}/${briefing.month}`);
 }
 
 export function getBriefingsByMonth(year: string, month: string): Briefing[] {

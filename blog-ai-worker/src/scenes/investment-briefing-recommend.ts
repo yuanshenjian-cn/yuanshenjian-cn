@@ -25,7 +25,8 @@ interface InvestmentBriefingIndexItem {
 
 interface InvestmentBriefingIndexPayload {
   generated: string;
-  items: InvestmentBriefingIndexItem[];
+  items?: InvestmentBriefingIndexItem[];
+  briefings?: InvestmentBriefingIndexItem[];
 }
 
 interface InvestmentBriefingRecommendTailPayload {
@@ -53,7 +54,12 @@ function isIndexItem(value: unknown): value is InvestmentBriefingIndexItem {
 }
 
 function isIndexPayload(value: unknown): value is InvestmentBriefingIndexPayload {
-  return isRecord(value) && typeof value.generated === "string" && Array.isArray(value.items) && value.items.every(isIndexItem);
+  if (!isRecord(value) || typeof value.generated !== "string") {
+    return false;
+  }
+
+  const items = Array.isArray(value.items) ? value.items : Array.isArray(value.briefings) ? value.briefings : null;
+  return Array.isArray(items) && items.every(isIndexItem);
 }
 
 function normalizeText(value: string): string {
@@ -188,6 +194,10 @@ function toRecommendReference(item: InvestmentBriefingIndexItem): RecommendRefer
   };
 }
 
+function getIndexItems(payload: InvestmentBriefingIndexPayload): InvestmentBriefingIndexItem[] {
+  return Array.isArray(payload.items) ? payload.items : Array.isArray(payload.briefings) ? payload.briefings : [];
+}
+
 function buildInvestmentBriefingIndexUrl(env: Env): string {
   return new URL("../investment-data/briefings/index.json", `${env.AI_DATA_BASE_URL.replace(/\/?$/, "/")}`).toString();
 }
@@ -204,7 +214,7 @@ async function fetchIndex(env: Env): Promise<RecommendReference[]> {
     throw new HttpError(502, INVESTMENT_BRIEFING_RECOMMEND_AI_ERROR_MESSAGE);
   }
 
-  return payload.items.map(toRecommendReference);
+  return getIndexItems(payload).map(toRecommendReference);
 }
 
 export async function handleInvestmentBriefingRecommendSceneStream(

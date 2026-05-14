@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { buildAuthorPayload, extractArticleSections, parseBriefingFile } = require("../../scripts/build-ai-data.js");
+const { buildAuthorPayload, buildBriefingsPayload, extractArticleSections, parseBriefingFile } = require("../../scripts/build-ai-data.js");
 
 const tempFiles: string[] = [];
 
@@ -91,5 +91,12 @@ tags:
       excerpt: "测试摘要",
       url: "/ai/briefings/2099-01-01",
     });
+  });
+
+  it("生成 AI 简报索引时同时输出 items 和 briefings 字段", () => {
+    const payload = buildBriefingsPayload();
+
+    expect(Array.isArray(payload.items)).toBe(true);
+    expect(payload.items).toEqual(payload.briefings);
   });
 });

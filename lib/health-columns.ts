@@ -15,6 +15,19 @@ const HEALTH_COLUMNS: HealthColumnConfig[] = [
       ],
     },
   },
+  {
+    slug: "eat-your-way-to-health",
+    title: "吃出来的健康",
+    description: "从日常食材选择、烹饪方式和饮食习惯出发，用简单可操作的方法把健康吃进门。",
+    contentDir: "health/eat-your-way-to-health",
+    guide: {
+      intro: "聚焦厨房里最常用的食材和做法，不搞复杂理论，只给能立刻上手的判断和搭配建议。",
+      paths: [
+        { label: "想改善日常用油", description: "从橄榄油选购与使用开始，建立正确的油脂使用习惯。" },
+        { label: "想吃得更清爽", description: "关注白灼、凉拌等轻量烹饪方式的搭配技巧。" },
+      ],
+    },
+  },
 ];
 
 export function getHealthColumns(): HealthColumnWithPosts[] {

@@ -1,0 +1,10 @@
+{
+  "timezone": "Asia/Shanghai",
+  "defaultWindowHours": 24,
+  "bodyMin": 700,
+  "bodyMax": 1100,
+  "dedupeLookbackIssues": 5,
+  "requiredSections": ["速览", "重点动态", "为什么值得关注", "来源"],
+  "dedupeSectionHeading": "重点动态",
+  "sourceSectionHeading": "来源"
+}

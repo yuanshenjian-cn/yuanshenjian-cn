@@ -21,14 +21,31 @@
 
 const fs = require("fs");
 const path = require("path");
+const { loadAiBriefingSkillConfig, loadInvestmentBriefingSkillConfig } = require("./briefing-skill-config.js");
 
 const ROOT = path.resolve(__dirname, "..");
 const CONTENT_ROOT = path.join(ROOT, "content/blog");
 const BRIEFINGS_ROOT = path.join(ROOT, "content/ai-briefings");
 const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings");
-const INVESTMENT_CONFIG_ROOT = path.join(ROOT, "config/investment");
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
+const DEFAULT_AI_BRIEFING_CONFIG = {
+  bodyMin: 700,
+  bodyMax: 1100,
+  dedupeLookbackIssues: 5,
+  requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
+  dedupeSectionHeading: "重点动态",
+  sourceSectionHeading: "来源",
+};
+const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
+  shortBodyMin: 900,
+  normalBodyMax: 1500,
+  dedupeLookbackIssues: 5,
+  confirmSectionHeading: "近 24 小时确认动态",
+  watchSectionHeading: "未来重点观察",
+  sourceSectionHeading: "来源",
+  disclaimer: "**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**",
+};
 const INVESTMENT_REDLINE_RE = /(值得买入|建议加仓|目标价|推荐买入|推荐关注|仓位|上车|抄底|止盈|止损|强推|配置价值|买入|卖出|加仓|减仓|建仓|看多|看空|增持|跑赢大市|弹性空间|持有)/;
 const INVESTMENT_PROCESS_LEAK_PATTERNS = [
   /(?:本期|这期)重点是把[^。；\n]*/,
@@ -70,15 +87,36 @@ if (checkPathOnly && !targetPath) {
 const errors = [];
 
 /** @type {{ name: string; aliases?: string[] }[]} */
+let aiFocusCompanies = [];
+
+let aiBriefingConfig = { ...DEFAULT_AI_BRIEFING_CONFIG };
+let investmentBriefingConfig = { ...DEFAULT_INVESTMENT_BRIEFING_CONFIG };
+
+/** @type {{ name: string; aliases?: string[] }[]} */
 let investmentBlockedCompanies = [];
 
 try {
-  const blockedCompaniesPath = path.join(INVESTMENT_CONFIG_ROOT, "blocked-companies.json");
-  if (fs.existsSync(blockedCompaniesPath)) {
-    investmentBlockedCompanies = JSON.parse(fs.readFileSync(blockedCompaniesPath, "utf8"));
-  }
+  const aiSkillConfig = loadAiBriefingSkillConfig();
+  aiBriefingConfig = {
+    ...DEFAULT_AI_BRIEFING_CONFIG,
+    ...(aiSkillConfig.briefing ?? {}),
+  };
+  aiFocusCompanies = Array.isArray(aiSkillConfig.focusCompanies) ? aiSkillConfig.focusCompanies : [];
 } catch (error) {
-  console.warn("[validate-post] Failed to load investment blocked companies:", error);
+  console.warn("[validate-post] Failed to load AI briefing skill config:", error);
+}
+
+try {
+  const investmentSkillConfig = loadInvestmentBriefingSkillConfig();
+  investmentBriefingConfig = {
+    ...DEFAULT_INVESTMENT_BRIEFING_CONFIG,
+    ...(investmentSkillConfig.briefing ?? {}),
+  };
+  investmentBlockedCompanies = Array.isArray(investmentSkillConfig.blockedCompanies)
+    ? investmentSkillConfig.blockedCompanies
+    : [];
+} catch (error) {
+  console.warn("[validate-post] Failed to load investment briefing skill config:", error);
 }
 
 /**
@@ -101,6 +139,46 @@ function toPosixPath(value) {
  */
 function getLineNumber(content, index) {
   return content.slice(0, index).split(/\r?\n/).length;
+}
+
+/** @param {string} markdown */
+function toPlainBriefingText(markdown) {
+  return String(markdown)
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^>+\s?/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/(^|\s)#{1,6}\s+/gm, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/_([^_]+)_/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** @param {string} value */
+function normalizeComparableText(value) {
+  return toPlainBriefingText(value)
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\s\p{P}\p{S}]+/gu, "")
+    .trim();
+}
+
+/** @param {{ name: string; aliases?: string[] }[]} companies */
+function buildGenericHeadingSet(companies) {
+  return new Set(
+    companies
+      .flatMap((company) => [company.name, ...(Array.isArray(company.aliases) ? company.aliases : [])])
+      .filter((value) => typeof value === "string" && value.trim().length > 0)
+      .map((value) => normalizeComparableText(value)),
+  );
 }
 
 /**
@@ -535,6 +613,7 @@ function validateBriefingFile(file, slugs) {
   const relativeFile = toPosixPath(path.relative(ROOT, file));
   const content = fs.readFileSync(file, "utf-8");
   const parsed = parseFrontmatter(content);
+  const genericAiHeadingSet = buildGenericHeadingSet(aiFocusCompanies);
 
   if (!parsed) {
     addError("未找到 frontmatter（简报必须以 --- 开头并包含 frontmatter）", relativeFile, 1);
@@ -551,10 +630,11 @@ function validateBriefingFile(file, slugs) {
   }
 
   const date = extractField(parsed.raw, "date");
+  let dateClean = "";
   if (!date) {
     addError("frontmatter 缺少 date", relativeFile, 1);
   } else {
-    const dateClean = unquote(date);
+    dateClean = unquote(date);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateClean)) {
       addError(`date 格式不合法（应为 YYYY-MM-DD，当前：${dateClean}）`, relativeFile, 1);
     } else if (Number.isNaN(new Date(dateClean).getTime())) {
@@ -579,9 +659,40 @@ function validateBriefingFile(file, slugs) {
     addError("frontmatter 缺少 brief 或 brief 为空", relativeFile, 1);
   }
 
-  const chineseCharacters = countChineseCharacters(removeSections(parsed.body, ["来源"]));
-  if (chineseCharacters < 700 || chineseCharacters > 1100) {
-    addError(`AI 简报正文汉字数（不含来源章节）应为 700~1100（当前：${chineseCharacters}）`, relativeFile, 1);
+  const requiredSections = Array.isArray(aiBriefingConfig.requiredSections)
+    ? aiBriefingConfig.requiredSections
+    : DEFAULT_AI_BRIEFING_CONFIG.requiredSections;
+  for (const section of requiredSections) {
+    if (!findHeading(parsed.body, section)) {
+      addError(`AI 简报缺少 \`## ${section}\` 章节`, relativeFile, 1);
+    }
+  }
+
+  const sourceSectionHeading = aiBriefingConfig.sourceSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.sourceSectionHeading;
+  const sourceSectionContent = getSectionContent(parsed.body, sourceSectionHeading);
+  if (sourceSectionContent.length === 0 || !/https?:\/\//.test(sourceSectionContent)) {
+    addError("AI 简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
+  }
+
+  const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
+  if (chineseCharacters < aiBriefingConfig.bodyMin || chineseCharacters > aiBriefingConfig.bodyMax) {
+    addError(
+      `AI 简报正文汉字数（不含来源章节）应为 ${aiBriefingConfig.bodyMin}~${aiBriefingConfig.bodyMax}（当前：${chineseCharacters}）`,
+      relativeFile,
+      1,
+    );
+  }
+
+  if (dateClean) {
+    validateRecentBriefingDuplicates(
+      file,
+      dateClean,
+      BRIEFINGS_ROOT,
+      aiBriefingConfig.dedupeSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.dedupeSectionHeading,
+      aiBriefingConfig.dedupeLookbackIssues || DEFAULT_AI_BRIEFING_CONFIG.dedupeLookbackIssues,
+      "AI 简报",
+      genericAiHeadingSet,
+    );
   }
 
   validateLinksAndImages(parsed.body, file, slugs);
@@ -613,6 +724,207 @@ function getSectionContent(body, heading) {
 }
 
 /**
+ * @param {string} body
+ * @param {string} heading
+ */
+function getSectionRange(body, heading) {
+  const match = new RegExp(`^##\\s+${heading}\\s*$`, "m").exec(body);
+  if (!match || match.index === undefined) {
+    return null;
+  }
+
+  const start = match.index + match[0].length;
+  const remainder = body.slice(start);
+  const nextHeading = remainder.match(/^##\s+/m);
+  const end = nextHeading && nextHeading.index !== undefined ? start + nextHeading.index : body.length;
+  return {
+    start,
+    end,
+    content: body.slice(start, end).trim(),
+  };
+}
+
+/** @param {string} text */
+function buildTrigramSet(text) {
+  const normalized = normalizeComparableText(text);
+  if (normalized.length <= 3) {
+    return new Set(normalized ? [normalized] : []);
+  }
+
+  const trigrams = new Set();
+  for (let index = 0; index <= normalized.length - 3; index += 1) {
+    trigrams.add(normalized.slice(index, index + 3));
+  }
+  return trigrams;
+}
+
+/**
+ * @param {string} left
+ * @param {string} right
+ */
+function calculateDiceCoefficient(left, right) {
+  const leftSet = buildTrigramSet(left);
+  const rightSet = buildTrigramSet(right);
+
+  if (leftSet.size === 0 || rightSet.size === 0) {
+    return 0;
+  }
+
+  let intersectionSize = 0;
+  for (const item of leftSet) {
+    if (rightSet.has(item)) {
+      intersectionSize += 1;
+    }
+  }
+
+  return (2 * intersectionSize) / (leftSet.size + rightSet.size);
+}
+
+/**
+ * @param {string} body
+ * @param {string} heading
+ * @param {Set<string>} genericHeadingSet
+ */
+function extractDedupeEntries(body, heading, genericHeadingSet) {
+  const sectionRange = getSectionRange(body, heading);
+  if (!sectionRange || sectionRange.content.length === 0) {
+    return [];
+  }
+
+  const headingMatches = Array.from(sectionRange.content.matchAll(/^###\s+(.+)$/gm));
+  if (headingMatches.length === 0) {
+    return [];
+  }
+
+  return headingMatches
+    .map((match, index) => {
+      const sectionIndex = match.index ?? 0;
+      const nextIndex = headingMatches[index + 1]?.index ?? sectionRange.content.length;
+      const headingLine = match[0];
+      const entryHeading = match[1].trim();
+      const entryBody = sectionRange.content.slice(sectionIndex + headingLine.length, nextIndex).trim();
+      const normalizedHeading = normalizeComparableText(entryHeading);
+      const summaryText = toPlainBriefingText(entryBody).slice(0, 220);
+      const normalizedBody = normalizeComparableText(summaryText);
+      const combinedText = normalizeComparableText(`${entryHeading} ${summaryText}`);
+
+      return {
+        heading: entryHeading,
+        normalizedHeading,
+        normalizedBody,
+        combinedText,
+        isGenericHeading: genericHeadingSet.has(normalizedHeading) || normalizedHeading.length <= 8,
+        line: getLineNumber(body, sectionRange.start + sectionIndex),
+      };
+    })
+    .filter((entry) => entry.normalizedHeading.length > 0 && entry.normalizedBody.length > 0);
+}
+
+/**
+ * @param {{ heading: string; normalizedHeading: string; normalizedBody: string; combinedText: string; isGenericHeading: boolean }} currentEntry
+ * @param {{ heading: string; normalizedHeading: string; normalizedBody: string; combinedText: string; isGenericHeading: boolean }} previousEntry
+ */
+function isLikelyDuplicateEntry(currentEntry, previousEntry) {
+  const exactHeadingMatch = currentEntry.normalizedHeading === previousEntry.normalizedHeading;
+  const bodySimilarity = calculateDiceCoefficient(currentEntry.normalizedBody, previousEntry.normalizedBody);
+  const combinedSimilarity = calculateDiceCoefficient(currentEntry.combinedText, previousEntry.combinedText);
+  const [shorterBody, longerBody] = currentEntry.normalizedBody.length <= previousEntry.normalizedBody.length
+    ? [currentEntry.normalizedBody, previousEntry.normalizedBody]
+    : [previousEntry.normalizedBody, currentEntry.normalizedBody];
+  const containsShorterBody = shorterBody.length >= 24 && longerBody.includes(shorterBody);
+
+  if (exactHeadingMatch) {
+    const threshold = currentEntry.isGenericHeading || previousEntry.isGenericHeading ? 0.82 : 0.68;
+    return bodySimilarity >= threshold || combinedSimilarity >= Math.max(0.84, threshold) || containsShorterBody;
+  }
+
+  return combinedSimilarity >= 0.93 && bodySimilarity >= 0.88;
+}
+
+/**
+ * @param {string} file
+ */
+function readPublishedBriefingEntry(file) {
+  const content = fs.readFileSync(file, "utf-8");
+  const parsed = parseFrontmatter(content);
+  if (!parsed) {
+    return null;
+  }
+
+  const date = extractField(parsed.raw, "date");
+  if (!date) {
+    return null;
+  }
+
+  const publishedRaw = extractField(parsed.raw, "published");
+  if (publishedRaw !== null && unquote(publishedRaw) !== "true") {
+    return null;
+  }
+
+  return {
+    file,
+    date: unquote(date),
+    body: parsed.body,
+  };
+}
+
+/**
+ * @param {ReturnType<typeof readPublishedBriefingEntry>} entry
+ * @returns {entry is { file: string; date: string; body: string }}
+ */
+function isPublishedBriefingEntry(entry) {
+  return entry !== null;
+}
+
+/**
+ * @param {string} currentFile
+ * @param {string} currentDate
+ * @param {string} rootDir
+ * @param {string} sectionHeading
+ * @param {number} lookbackIssues
+ * @param {string} label
+ * @param {Set<string>} genericHeadingSet
+ */
+function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sectionHeading, lookbackIssues, label, genericHeadingSet) {
+  const currentContent = fs.readFileSync(currentFile, "utf-8");
+  const parsedCurrent = parseFrontmatter(currentContent);
+  if (!parsedCurrent) {
+    return;
+  }
+
+  const currentEntries = extractDedupeEntries(parsedCurrent.body, sectionHeading, genericHeadingSet);
+  if (currentEntries.length === 0) {
+    return;
+  }
+
+  const previousEntries = getMarkdownFiles(rootDir)
+    .filter((file) => BRIEFING_EXT_RE.test(file) && path.resolve(file) !== path.resolve(currentFile))
+    .map(readPublishedBriefingEntry)
+    .filter(isPublishedBriefingEntry)
+    .filter((entry) => entry.date < currentDate)
+    .sort((left, right) => right.date.localeCompare(left.date))
+    .slice(0, lookbackIssues)
+    .flatMap((entry) => extractDedupeEntries(entry.body, sectionHeading, genericHeadingSet).map((item) => ({
+      ...item,
+      file: entry.file,
+    })));
+
+  for (const currentEntry of currentEntries) {
+    const matchedEntry = previousEntries.find((previousEntry) => isLikelyDuplicateEntry(currentEntry, previousEntry));
+    if (!matchedEntry) {
+      continue;
+    }
+
+    addError(
+      `${label} 最近 ${lookbackIssues} 期存在疑似重复事件：\`${currentEntry.heading}\` 与 ${toPosixPath(path.relative(ROOT, matchedEntry.file))} 中的 \`${matchedEntry.heading}\` 高度重复；如确有新增增量，请在标题或正文中明确写出新的可核验变化点`,
+      toPosixPath(path.relative(ROOT, currentFile)),
+      currentEntry.line,
+    );
+    return;
+  }
+}
+
+/**
  * @param {string} file
  * @param {Set<string>} slugs
  */
@@ -621,6 +933,7 @@ function validateInvestmentBriefingFile(file, slugs) {
   const content = fs.readFileSync(file, "utf-8");
   const parsed = parseFrontmatter(content);
   const fileName = path.basename(file);
+  const genericInvestmentHeadingSet = new Set();
 
   if (!parsed) {
     addError("未找到 frontmatter（投资简报必须以 --- 开头并包含 frontmatter）", relativeFile, 1);
@@ -641,10 +954,11 @@ function validateInvestmentBriefingFile(file, slugs) {
   }
 
   const date = extractField(parsed.raw, "date");
+  let dateClean = "";
   if (!date) {
     addError("frontmatter 缺少 date", relativeFile, 1);
   } else {
-    const dateClean = unquote(date);
+    dateClean = unquote(date);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateClean)) {
       addError(`date 格式不合法（应为 YYYY-MM-DD，当前：${dateClean}）`, relativeFile, 1);
     } else if (Number.isNaN(new Date(dateClean).getTime())) {
@@ -675,32 +989,39 @@ function validateInvestmentBriefingFile(file, slugs) {
     addError("frontmatter 缺少 brief 或 brief 为空", relativeFile, 1);
   }
 
-  const chineseCharacters = countChineseCharacters(removeSections(parsed.body, ["来源"]));
-  if (chineseCharacters < 900 || chineseCharacters > 1500) {
-    addError(`投资简报正文汉字数（不含来源章节）应为 900~1500（当前：${chineseCharacters}）`, relativeFile, 1);
+  const sourceSectionHeading = investmentBriefingConfig.sourceSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.sourceSectionHeading;
+  const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
+  if (chineseCharacters < investmentBriefingConfig.shortBodyMin || chineseCharacters > investmentBriefingConfig.normalBodyMax) {
+    addError(
+      `投资简报正文汉字数（不含来源章节）应为 ${investmentBriefingConfig.shortBodyMin}~${investmentBriefingConfig.normalBodyMax}（当前：${chineseCharacters}）`,
+      relativeFile,
+      1,
+    );
   }
 
-  const confirmMatch = findHeading(parsed.body, "近 24 小时确认动态");
-  const watchMatch = findHeading(parsed.body, "未来重点观察");
-  const sourcesMatch = findHeading(parsed.body, "来源");
+  const confirmSectionHeading = investmentBriefingConfig.confirmSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.confirmSectionHeading;
+  const watchSectionHeading = investmentBriefingConfig.watchSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.watchSectionHeading;
+  const confirmMatch = findHeading(parsed.body, confirmSectionHeading);
+  const watchMatch = findHeading(parsed.body, watchSectionHeading);
+  const sourcesMatch = findHeading(parsed.body, sourceSectionHeading);
   const expectationMatch = findHeading(parsed.body, "预期观察");
 
   if (!confirmMatch) {
-    addError("投资简报缺少 `## 近 24 小时确认动态` 章节", relativeFile, 1);
+    addError(`投资简报缺少 \`## ${confirmSectionHeading}\` 章节`, relativeFile, 1);
   }
   if (!watchMatch) {
-    addError("投资简报缺少 `## 未来重点观察` 章节", relativeFile, 1);
+    addError(`投资简报缺少 \`## ${watchSectionHeading}\` 章节`, relativeFile, 1);
   }
   if (!sourcesMatch) {
-    addError("投资简报缺少 `## 来源` 章节", relativeFile, 1);
+    addError(`投资简报缺少 \`## ${sourceSectionHeading}\` 章节`, relativeFile, 1);
   }
 
   const bodyIndex = (match) => match?.index ?? -1;
   if (confirmMatch && watchMatch && bodyIndex(confirmMatch) > bodyIndex(watchMatch)) {
-    addError("`## 近 24 小时确认动态` 必须出现在 `## 未来重点观察` 之前", relativeFile, 1);
+    addError(`\`## ${confirmSectionHeading}\` 必须出现在 \`## ${watchSectionHeading}\` 之前`, relativeFile, 1);
   }
   if (watchMatch && sourcesMatch && bodyIndex(watchMatch) > bodyIndex(sourcesMatch)) {
-    addError("`## 未来重点观察` 必须出现在 `## 来源` 之前", relativeFile, 1);
+    addError(`\`## ${watchSectionHeading}\` 必须出现在 \`## ${sourceSectionHeading}\` 之前`, relativeFile, 1);
   }
 
   if (findHeading(parsed.body, "传闻观察")) {
@@ -718,12 +1039,12 @@ function validateInvestmentBriefingFile(file, slugs) {
     }
   }
 
-  const sourcesContent = getSectionContent(parsed.body, "来源");
+  const sourcesContent = getSectionContent(parsed.body, sourceSectionHeading);
   if (sourcesContent.length === 0 || !/https?:\/\//.test(sourcesContent)) {
     addError("投资简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
   }
 
-  const disclaimer = "**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**";
+  const disclaimer = investmentBriefingConfig.disclaimer || DEFAULT_INVESTMENT_BRIEFING_CONFIG.disclaimer;
   if (!parsed.body.includes(disclaimer)) {
     addError("投资简报缺少固定免责声明", relativeFile, 1);
   }
@@ -755,6 +1076,18 @@ function validateInvestmentBriefingFile(file, slugs) {
       `投资简报日期与星期不一致：${mismatch.text}（应为 ${mismatch.expectedWeekday}）`,
       relativeFile,
       mismatch.line,
+    );
+  }
+
+  if (dateClean) {
+    validateRecentBriefingDuplicates(
+      file,
+      dateClean,
+      INVESTMENT_BRIEFINGS_ROOT,
+      confirmSectionHeading,
+      investmentBriefingConfig.dedupeLookbackIssues || DEFAULT_INVESTMENT_BRIEFING_CONFIG.dedupeLookbackIssues,
+      "投资简报",
+      genericInvestmentHeadingSet,
     );
   }
 

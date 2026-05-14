@@ -18,8 +18,8 @@
       "expect_block": "trading-advice"
     },
     {
-      "input": "起草今天的投资简报，但如果和上一期是同一条已确认动态且没有新增增量，就不要重复写进近 24 小时确认动态",
-      "expect_rule": "dedupe-against-previous-briefing"
+      "input": "起草今天的投资简报，但如果和最近 5 期里任何一期是同一条已确认动态且没有新增增量，就不要重复写进近 24 小时确认动态",
+      "expect_rule": "dedupe-against-last-five-briefings"
     }
   ]
 }

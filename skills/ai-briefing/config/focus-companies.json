@@ -1,0 +1,62 @@
+[
+  {
+    "name": "OpenAI",
+    "aliases": ["ChatGPT"],
+    "priorityFocus": true
+  },
+  {
+    "name": "Anthropic",
+    "aliases": ["Claude"],
+    "priorityFocus": true
+  },
+  {
+    "name": "Google/DeepMind/Gemini",
+    "aliases": ["Google", "DeepMind", "Gemini", "Google DeepMind"],
+    "priorityFocus": true
+  },
+  {
+    "name": "xAI",
+    "aliases": ["Grok"],
+    "priorityFocus": true
+  },
+  {
+    "name": "Meta AI",
+    "aliases": ["Meta", "Llama"],
+    "priorityFocus": true
+  },
+  {
+    "name": "Perplexity",
+    "aliases": [],
+    "priorityFocus": true
+  },
+  {
+    "name": "Mistral",
+    "aliases": [],
+    "priorityFocus": true
+  },
+  {
+    "name": "月之暗面/Kimi",
+    "aliases": ["月之暗面", "Kimi"],
+    "priorityFocus": true
+  },
+  {
+    "name": "小米 MiMo",
+    "aliases": ["小米", "MiMo", "Xiaomi"],
+    "priorityFocus": true
+  },
+  {
+    "name": "DeepSeek",
+    "aliases": [],
+    "priorityFocus": true
+  },
+  {
+    "name": "智谱 AI",
+    "aliases": ["智谱", "Zhipu", "GLM"],
+    "priorityFocus": true
+  },
+  {
+    "name": "MiniMax",
+    "aliases": [],
+    "priorityFocus": false
+  }
+]

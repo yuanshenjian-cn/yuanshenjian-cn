@@ -522,6 +522,20 @@ function parseBriefingFile(filePath) {
   }
 }
 
+function buildBriefingsPayload() {
+  const briefings = getAllMarkdownFiles(BRIEFINGS_DIRECTORY)
+    .filter((filePath) => /\.md$/i.test(filePath))
+    .map(parseBriefingFile)
+    .filter((briefing) => briefing !== null)
+    .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
+
+  return {
+    generated: briefings[0]?.date ?? "",
+    items: briefings,
+    briefings,
+  };
+}
+
 function writeJson(filePath, payload) {
   fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
 }
@@ -531,11 +545,8 @@ function main() {
     .map(parsePostFile)
     .filter((post) => post !== null)
     .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
-  const briefings = getAllMarkdownFiles(BRIEFINGS_DIRECTORY)
-    .filter((filePath) => /\.md$/i.test(filePath))
-    .map(parseBriefingFile)
-    .filter((briefing) => briefing !== null)
-    .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
+  const briefingsPayload = buildBriefingsPayload();
+  const briefings = briefingsPayload.briefings;
 
   fs.mkdirSync(OUTPUT_DIRECTORY, { recursive: true });
   fs.rmSync(OUTPUT_ARTICLES_DIRECTORY, { recursive: true, force: true });
@@ -570,10 +581,7 @@ function main() {
 
   writeJson(
     OUTPUT_BRIEFINGS_FILE,
-    {
-      generated: briefings[0]?.date ?? "",
-      briefings,
-    },
+    briefingsPayload,
   );
 
   writeJson(OUTPUT_AUTHOR_FILE, buildAuthorPayload());
@@ -590,6 +598,7 @@ if (require.main === module) {
 
 module.exports = {
   buildAuthorPayload,
+  buildBriefingsPayload,
   extractArticleSections,
   main,
   parseBriefingFile,

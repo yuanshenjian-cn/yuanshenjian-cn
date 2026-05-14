@@ -2,7 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-let buildBriefingsPayload: () => { items: Array<{ slug: string; title: string; brief: string; url: string }> };
+let buildBriefingsPayload: () => {
+  items: Array<{ slug: string; title: string; brief: string; url: string }>;
+  briefings: Array<{ slug: string; title: string; brief: string; url: string }>;
+};
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
 const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
@@ -60,6 +63,7 @@ tags:
     const payload = buildBriefingsPayload();
     const target = payload.items.find((item: { slug: string }) => item.slug === "2099-01-03");
 
+    expect(payload.briefings).toEqual(payload.items);
     expect(target).toEqual(
       expect.objectContaining({
         slug: "2099-01-03",

@@ -3,113 +3,311 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
-const testFile = path.join(briefingsDir, "2099-01-04-investment-briefing.md");
-const relativeTestFile = "content/investment-briefings/2099-01-04-investment-briefing.md";
+const investmentBriefingsDir = path.join(process.cwd(), "content", "investment-briefings");
+const investmentTestFile = path.join(investmentBriefingsDir, "2099-01-04-investment-briefing.md");
+const relativeInvestmentTestFile = "content/investment-briefings/2099-01-04-investment-briefing.md";
+const previousInvestmentFiles = [
+  path.join(investmentBriefingsDir, "2099-01-03-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2099-01-02-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2099-01-01-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2098-12-31-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2098-12-30-investment-briefing.md"),
+];
 
-describe("validate-post investment briefing guards", () => {
-  beforeEach(() => {
-    fs.mkdirSync(briefingsDir, { recursive: true });
-    fs.writeFileSync(
-      testFile,
-      `---
-title: "投资简报 · 2099-01-04"
-date: "2099-01-04"
-brief: "测试元说明门禁"
+const aiBriefingsDir = path.join(process.cwd(), "content", "ai-briefings");
+const aiTestFile = path.join(aiBriefingsDir, "2099-01-06-ai-briefing.md");
+const relativeAiTestFile = "content/ai-briefings/2099-01-06-ai-briefing.md";
+const previousAiFiles = [
+  path.join(aiBriefingsDir, "2099-01-05-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099-01-04-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099-01-03-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099-01-02-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099-01-01-ai-briefing.md"),
+];
+
+function runValidate(relativePath: string): never {
+  try {
+    execFileSync("node", ["scripts/validate-post.js", relativePath], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      stdio: "pipe",
+    });
+    throw new Error("validate-post should have failed");
+  } catch (error) {
+    throw error;
+  }
+}
+
+function getStderr(error: unknown): string {
+  return error instanceof Error && "stderr" in error ? String(error.stderr) : String(error);
+}
+
+function writeInvestmentBriefing(filePath: string, date: string, body: string, brief = "测试投资简报") {
+  fs.writeFileSync(
+    filePath,
+    `---
+title: "投资简报 · ${date}"
+date: "${date}"
+brief: "${brief}"
 published: true
 tags:
-  - 投资
+  - 投资简报
   - 腾讯控股
   - 港股科技
 ---
 
-## 近 24 小时确认动态
+${body}`,
+  );
+}
 
-- 市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
-- 本期重点是把已经官宣的财报节点重新排序，而不是追逐零碎周末新闻。
-- 市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
-- 市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
+function writeAiBriefing(filePath: string, date: string, body: string, brief = "测试 AI 简报") {
+  fs.writeFileSync(
+    filePath,
+    `---
+title: "AI 简报 · ${date}"
+date: "${date}"
+brief: "${brief}"
+published: true
+tags:
+  - AI
+  - OpenAI
+---
+
+${body}`,
+  );
+}
+
+describe("validate-post investment briefing guards", () => {
+  beforeEach(() => {
+    fs.mkdirSync(investmentBriefingsDir, { recursive: true });
+    writeInvestmentBriefing(
+      investmentTestFile,
+      "2099-01-04",
+      `## 近 24 小时确认动态
+
+### 测试事件 A
+
+市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
+
+本期重点是把已经官宣的财报节点重新排序，而不是追逐零碎周末新闻。
+
+### 测试事件 B
+
+市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
 
 ## 未来重点观察
 
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+### 未来观察 A
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+
+### 未来观察 B
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
 
 ## 来源
 
 - https://example.com/2099-01-04
 
 **郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**`,
+      "测试元说明门禁",
     );
   });
 
   afterEach(() => {
-    fs.rmSync(testFile, { force: true });
+    fs.rmSync(investmentTestFile, { force: true });
+    for (const file of previousInvestmentFiles) {
+      fs.rmSync(file, { force: true });
+    }
   });
 
   it("rejects leaked editorial reasoning in published investment briefings", () => {
     try {
-      execFileSync("node", ["scripts/validate-post.js", relativeTestFile], {
-        cwd: process.cwd(),
-        encoding: "utf8",
-        stdio: "pipe",
-      });
-      throw new Error("validate-post should have failed");
+      runValidate(relativeInvestmentTestFile);
     } catch (error) {
-      const output = error instanceof Error && "stderr" in error ? String(error.stderr) : String(error);
+      const output = getStderr(error);
       expect(output).toContain("投资简报包含生成前思考/取舍说明，不得进入公开正文");
       expect(output).toContain("本期重点是把已经官宣的财报节点重新排序");
     }
   });
 
   it("rejects mismatched weekday labels in investment briefings", () => {
-    fs.writeFileSync(
-      testFile,
-      `---
-title: "投资简报 · 2099-01-04"
-date: "2099-01-04"
-brief: "测试日期与星期门禁"
-published: true
-tags:
-  - 投资
-  - 腾讯控股
-  - 港股科技
----
+    writeInvestmentBriefing(
+      investmentTestFile,
+      "2099-01-04",
+      `## 近 24 小时确认动态
 
-## 近 24 小时确认动态
+### 日期测试
 
-- 市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
-- 2099-01-04（周一）某事件确认落地。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
-- 1 月 6 日（周三）某财报节点临近。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
-- 市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
+2099-01-04（周一）某事件确认落地。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
+
+1 月 6 日（周三）某财报节点临近。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
+
+### 补充测试
+
+市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。市场数据测试。
 
 ## 未来重点观察
 
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
-- 未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+### 未来观察 A
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+
+### 未来观察 B
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
 
 ## 来源
 
 - https://example.com/2099-01-04
 
 **郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**`,
+      "测试日期与星期门禁",
     );
 
     try {
-      execFileSync("node", ["scripts/validate-post.js", relativeTestFile], {
-        cwd: process.cwd(),
-        encoding: "utf8",
-        stdio: "pipe",
-      });
-      throw new Error("validate-post should have failed");
+      runValidate(relativeInvestmentTestFile);
     } catch (error) {
-      const output = error instanceof Error && "stderr" in error ? String(error.stderr) : String(error);
+      const output = getStderr(error);
       expect(output).toContain("投资简报日期与星期不一致：2099-01-04（周一）（应为 周日）");
       expect(output).toContain("投资简报日期与星期不一致：1 月 6 日（周三）（应为 周二）");
+    }
+  });
+
+  it("rejects duplicate confirmed events from recent five investment briefings", () => {
+    const dates = ["2099-01-03", "2099-01-02", "2099-01-01", "2098-12-31", "2098-12-30"];
+    previousInvestmentFiles.forEach((file, index) => {
+      writeInvestmentBriefing(
+        file,
+        dates[index],
+        `## 近 24 小时确认动态
+
+### 英伟达财报看新利润口径
+
+英伟达将于 5 月 20 日召开 FY27 第一季度业绩说明会。公司前期指引一季度收入约 780 亿美元，FY27 起非 GAAP 财务指标不再排除股票薪酬费用，利润率口径对比方式将发生变化。
+
+## 未来重点观察
+
+### 其他观察
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+
+## 来源
+
+- https://example.com/${dates[index]}
+
+**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**`,
+      );
+    });
+
+    writeInvestmentBriefing(
+      investmentTestFile,
+      "2099-01-04",
+      `## 近 24 小时确认动态
+
+### 英伟达财报看新利润口径
+
+英伟达将于 5 月 20 日召开 FY27 第一季度业绩说明会。公司前期指引一季度收入约 780 亿美元，FY27 起非 GAAP 财务指标不再排除股票薪酬费用，利润率口径对比方式将发生变化。
+
+## 未来重点观察
+
+### 其他观察
+
+未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。未来观察测试。
+
+## 来源
+
+- https://example.com/2099-01-04
+
+**郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**`,
+      "测试最近 5 期去重",
+    );
+
+    try {
+      runValidate(relativeInvestmentTestFile);
+    } catch (error) {
+      const output = getStderr(error);
+      expect(output).toContain("投资简报 最近 5 期存在疑似重复事件");
+      expect(output).toContain("英伟达财报看新利润口径");
+      expect(output).toContain("content/investment-briefings/2099-01-03-investment-briefing.md");
+    }
+  });
+});
+
+describe("validate-post ai briefing guards", () => {
+  beforeEach(() => {
+    fs.mkdirSync(aiBriefingsDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    fs.rmSync(aiTestFile, { force: true });
+    for (const file of previousAiFiles) {
+      fs.rmSync(file, { force: true });
+    }
+  });
+
+  it("rejects duplicate events from recent five ai briefings", () => {
+    const dates = ["2099-01-05", "2099-01-04", "2099-01-03", "2099-01-02", "2099-01-01"];
+    previousAiFiles.forEach((file, index) => {
+      writeAiBriefing(
+        file,
+        dates[index],
+        `## 速览
+
+- OpenAI 推出 Realtime API 新语音矩阵。
+
+## 重点动态
+
+### OpenAI 推出 Realtime API 新语音矩阵
+
+OpenAI 在 1 月 5 日把 Realtime API 升级为完整的语音模型矩阵，覆盖实时对话、翻译与长时段流式转写，面向呼叫中心、车载语音与跨语言会议场景。
+
+## 为什么值得关注
+
+### 语音入口竞争加剧
+
+这意味着语音交互已经不再只是演示功能，而是直接进入平台级基础能力竞争。
+
+## 来源
+
+- https://example.com/${dates[index]}
+`,
+      );
+    });
+
+    writeAiBriefing(
+      aiTestFile,
+      "2099-01-06",
+      `## 速览
+
+- OpenAI 推出 Realtime API 新语音矩阵。
+
+## 重点动态
+
+### OpenAI 推出 Realtime API 新语音矩阵
+
+OpenAI 在 1 月 6 日把 Realtime API 升级为完整的语音模型矩阵，覆盖实时对话、翻译与长时段流式转写，面向呼叫中心、车载语音与跨语言会议场景。
+
+## 为什么值得关注
+
+### 语音入口竞争加剧
+
+这意味着语音交互已经不再只是演示功能，而是直接进入平台级基础能力竞争。
+
+## 来源
+
+- https://example.com/2099-01-06
+`,
+      "测试 AI 最近 5 期去重",
+    );
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      const output = getStderr(error);
+      expect(output).toContain("AI 简报 最近 5 期存在疑似重复事件");
+      expect(output).toContain("OpenAI 推出 Realtime API 新语音矩阵");
+      expect(output).toContain("content/ai-briefings/2099-01-05-ai-briefing.md");
     }
   });
 });

@@ -156,7 +156,7 @@ skill 会重点关注这些厂商：
 只有在**发布模式**下，skill 才会继续做这些事情：
 
 1. 事实核验
-2. 与前一天简报去重
+2. 与最近 5 期简报去重（不足 5 期按已有历史检查）
 3. 重点厂商覆盖检查
 4. 成稿质量审核
 5. `npm run validate-content`
@@ -210,6 +210,9 @@ skill 会重点关注这些厂商：
 ai-briefing/
 ├── SKILL.md                # 核心规则与工作流
 ├── README.md               # 新用户快速上手说明
+├── config/
+│   ├── briefing.json       # 时区、字数、去重窗口、章节门禁
+│   └── focus-companies.json # 默认跟踪厂商与重点补检名单
 ├── references/
 │   └── source-map.md       # 官方源 / 补检源地图
 └── evals/                  # skill 评估材料
@@ -223,7 +226,8 @@ ai-briefing/
 
 1. `README.md`：先理解三种模式和使用方法
 2. `SKILL.md`：再看详细规则、审核门禁、触发逻辑
-3. `references/source-map.md`：最后看来源地图和重点厂商官方源
+3. `config/*.json`：看默认厂商、去重窗口与章节门禁配置
+4. `references/source-map.md`：最后看来源地图和重点厂商官方源
 
 ---
 
