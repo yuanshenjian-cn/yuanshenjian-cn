@@ -1,0 +1,93 @@
+{
+  "skill_name": "llm-family-guard",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "更新 LLM 之家里 OpenAI 的最新模型档案，追加最新一代，不要删除旧记录。",
+      "expected_output": "在 OpenAI 厂商文章顶部总表和正文顶部追加一代新模型，旧代记录仍然保留。",
+      "files": [
+        "content/blog/swd/ai-coding/llm-family/openai-model-family-notes.md"
+      ],
+      "expectations": [
+        "只追加，不删除旧代",
+        "使用官方来源",
+        "新增记录包含发布时间、价格和来源"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "核对 Gemini 档案里的价格，如果官方没有缓存价就明确标出来，不要猜。",
+      "expected_output": "只修正 Gemini 档案里确定性错误字段；拿不到的字段保留官方缺口说明。",
+      "files": [
+        "content/blog/swd/ai-coding/llm-family/google-gemini-model-family-notes.md"
+      ],
+      "expectations": [
+        "不使用媒体或第三方价格表补空",
+        "官方拿不到的字段写官方未公布或同义说明",
+        "不整篇重写"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "把 xAI 加入 LLM 之家，至少覆盖最近两代，并沿用现有格式建一篇新档案。",
+      "expected_output": "新增厂商配置、官方来源地图条目和一篇独立厂商档案文章，首版覆盖最近 2~5 代，至少 2 代。",
+      "files": [],
+      "expectations": [
+        "先改配置再建档",
+        "文章路径位于 content/blog/swd/ai-coding/llm-family/",
+        "仍然遵守只追加和官方来源优先规则"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "更新 LLM 之家，先看看最近哪些厂商需要补，不要直接改文章。",
+      "expected_output": "只检查已启用厂商并返回候选更新建议，不直接批量落盘任何厂商文章。",
+      "files": [],
+      "expectations": [
+        "未指定厂商时默认只检查不落盘",
+        "不同时改多家文章",
+        "输出要说明候选更新项和建议下一步"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "修正 DeepSeek 档案里的旧代价格，先看历史发布公告，不要拿现价页反推旧价。",
+      "expected_output": "只修 DeepSeek 档案里对应的历史价格字段，优先使用历史官方发布页；若现价页无旧价但公告有价格，则按公告修正并补来源说明。",
+      "files": [
+        "content/blog/swd/ai-coding/llm-family/deepseek-model-family-notes.md"
+      ],
+      "expectations": [
+        "旧代价格核对要回看历史官方发布页",
+        "只改价格字段和最小相邻说明",
+        "不重写整篇文章"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "同时更新 OpenAI 和 Anthropic 的最新模型档案。",
+      "expected_output": "按厂商拆开顺序处理两篇文章，各自独立核实和落盘，不把两家混写进同一篇文章。",
+      "files": [
+        "content/blog/swd/ai-coding/llm-family/openai-model-family-notes.md",
+        "content/blog/swd/ai-coding/llm-family/anthropic-model-family-notes.md"
+      ],
+      "expectations": [
+        "多厂商请求要按厂商拆开处理",
+        "每家文章独立核实官方来源",
+        "不能把多家厂商混写进同一篇档案"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "修正 OpenAI 档案里一处旧价格字段，并把文章日期同步更新到今天。",
+      "expected_output": "只修正被点名的旧价格字段和最小相邻说明，同时把该文章 frontmatter 的 date 更新为本次落盘日期；模型官方发布日期保持不变。",
+      "files": [
+        "content/blog/swd/ai-coding/llm-family/openai-model-family-notes.md"
+      ],
+      "expectations": [
+        "落盘更新后 frontmatter date 要改成当天",
+        "模型官方发布日期不能跟着改成当天",
+        "只改字段本身和最小相邻说明"
+      ]
+    }
+  ]
+}

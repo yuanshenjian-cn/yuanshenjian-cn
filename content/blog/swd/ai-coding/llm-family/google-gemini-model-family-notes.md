@@ -1,0 +1,150 @@
+---
+title: "Google Gemini 模型谱系档案：从长上下文到 agentic era 的主线怎么走"
+date: '2026-05-14'
+tags:
+  - AI前沿
+  - LLM
+  - Google
+  - Gemini
+  - 模型评测
+published: true
+brief: >-
+  这是一份按代际持续维护的 Google Gemini 模型档案。首版覆盖 Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。
+---
+
+> Google 这条线最容易让人记住的两个词，一个是长上下文，一个是原生多模态。但如果你把最近几代串起来看，会发现它真正的主线是：先把“能吃下更多信息”做好，再把“能带工具去做事”推出来。
+
+Gemini 的代际叙事和 OpenAI、Anthropic 都不太一样。
+
+Google 不是每一代都把“编码最强”挂在最前面，它更像是在搭一个越来越完整的 agent 基座：长上下文、原生多模态、搜索、代码执行、浏览器与研究代理。
+
+这篇先覆盖从 Gemini 1.5 Pro 到 Gemini 2.5 Pro 的完整主线代际。
+
+如果后面 Gemini 再出新的主力代，我也会继续往上追加，不删旧代。
+
+## 我还是用同一套 5 个维度看 Gemini
+
+| 维度 | 我重点看什么 |
+|------|-------------|
+| 编码 | 代码基准和 Agent 编码是否进入前沿区 |
+| 推理与知识工作 | thinking model 的实际收益有多大 |
+| 多模态与电脑操作 | 图像、音频、视频、工具是否真正打通 |
+| 上下文与 Agent 续航 | 长上下文是不是主线能力，不只是宣传点 |
+| 成本透明度 | Gemini API 对输入、缓存、输出是否给清楚 |
+
+## Gemini 主线模型总表
+
+| 模型 | 官方发布日期 | 输入价格 | 缓存相关价格 | 输出价格 | 这一代最该记住的事 |
+|------|-------------|---------|-------------|---------|------------------|
+| Gemini 2.5 Pro | 2025-03-25 | $1.25 / 1M（200K 及以下）或 $2.50 / 1M（200K 以上） | Context caching $0.125 / 1M 或 $0.25 / 1M，storage $4.50 / 1M tokens / hour | $10 / 1M 或 $15 / 1M | Google 当前 thinking 主力，1M context，推理和代码一起冲顶 |
+| Gemini 2.5 Flash | 2025-05-20 | $0.30 / 1M | Context caching $0.03 / 1M，storage $1.00 / 1M tokens / hour | $2.50 / 1M | 可控制思考预算的混合推理模型，平衡质量、成本和延迟 |
+| Gemini 2.0 Flash | 2024-12-11 | $0.10 / 1M（text/image/video）或 $0.70 / 1M（audio） | Context caching $0.025 / 1M 或 $0.175 / 1M，storage $1.00 / 1M tokens / hour | $0.40 / 1M | 正式把 Gemini 推向 agentic era，原生工具调用和多模态输出上台面 |
+| Gemini 1.5 Pro | 2024-02-15 | 官方未公布 | 官方未公布 | 官方未公布 | 1M context 的分水岭，Google 长上下文路线真正成型 |
+
+<small>*数据来源：Google 官方 The Keyword 与 Gemini API Pricing 页面，查询日期 2026-05-14。Gemini 1.5 Pro 首发阶段官方只说明测试期与后续 pricing tiers，未给稳定模型级单价。*</small>
+
+## Gemini 2.5 Pro：Google 把 thinking model 正式扶正
+
+Gemini 2.5 Pro 发布于 2025 年 3 月 25 日。
+
+这代最关键的变化，是 Google 不再只是强调“原生多模态”或者“超长上下文”，而是开始明确把 thinking model 当成主力模型来讲。
+
+它在官方口径里几乎就是最强复杂任务模型，主打推理、代码和长上下文。
+
+这一代我最看重三件事：
+
+- 1M context 继续保留，而且是主打能力，不是边缘特性
+- thinking model 变成主线，不再只是特殊模式
+- Gemini 在编码和 Agent 化上开始真正接近头部竞争区
+
+如果你过去对 Google 模型的印象还是”会看很多内容、但工程味不够浓”，2.5 Pro 是很值得重看的那一代。
+
+## Gemini 2.5 Flash：可控制思考预算的混合推理中坚
+
+Gemini 2.5 Flash 发布于 2025 年 5 月 20 日。
+
+这代的价值在于它填补了 2.5 Pro 和 2.0 Flash 之间的空白：它既有 thinking 能力，又能让用户控制”思考预算”，在质量、成本和延迟之间做权衡。
+
+对于开发者来说，这非常重要。因为不是每个任务都需要 Pro 级别的深度推理，但也不是每个任务都能接受纯快模型的表面输出。2.5 Flash 的定位就是”需要推理，但不需要顶配”的场景。
+
+它的核心卖点：
+
+- 1M context 保留
+- 可控制的 thinking budget
+- 比 2.5 Pro 更快、更便宜
+- 支持 tool use 和 function calling
+
+如果你在做 Gemini 选型，2.5 Flash 很可能是实际用得最多的那款，因为它在能力和成本之间找到了一个更实用的平衡点。
+
+## Gemini 2.0 Flash：Google 真正喊出 agentic era 的那一代
+
+Gemini 2.0 Flash 是 2024 年 12 月 11 日发布的。
+
+如果要找 Google 路线里的一个标志性节点，这代比 2.5 Pro 还关键。
+
+因为“agentic era”这句话，就是在这里被正式喊出来的。
+
+Google 在这代里做了几件很重要的事：
+
+- 原生 image/audio output
+- 原生 tool use
+- Search、code execution、第三方函数一起进模型工作流
+- Project Astra、Project Mariner、Jules 这些研究原型开始和 Gemini 主线绑得更紧
+
+这说明 Gemini 不再只是一个更会理解多模态的大模型，而是在往“能调工具、能跨界面、能长期协作”的方向走。
+
+## Gemini 1.5 Pro：别低估它在历史里的位置
+
+很多人今天回看 Gemini 1.5 Pro，会先想到“1M context”。
+
+这没错，但还不够。
+
+它更重要的意义是，Google 在这一代真正把“长上下文”做成了自己的品牌性优势。
+
+当时不少模型也在谈长文本，但 Gemini 1.5 Pro 把 1M tokens、长视频、长音频、长代码仓和 NIAH 99% 这些概念一起打包，让“超长上下文”第一次显得真的能落地。
+
+如果没有 1.5 Pro，后面的 2.0 Flash 和 2.5 Pro 不会这么自然。
+
+因为 Google 后面几代的 Agent 叙事，本质上都建立在“模型能先吃下更多上下文”这件事上。
+
+## 我对 Google 这条线的实际判断
+
+Google 从 Gemini 1.5 Pro 到 2.5 Pro 的完整主线，我会概括成两步：
+
+- 先把超长上下文做成硬差异
+- 再把多模态和工具链组织成 Agent 能力
+
+这条路线和 OpenAI、Anthropic 都不一样。
+
+它不一定每一代都给你”最会写代码”的第一印象，但它很擅长把模型放进一个更完整的生态里：
+
+- Gemini API
+- Search
+- code execution
+- research assistant
+- browser / assistant 原型
+
+从谱系看，这条线的演进很清晰：
+
+- Gemini 1.5 Pro：把 1M context 做成品牌性优势
+- Gemini 2.0 Flash：正式喊出 agentic era，原生工具调用和多模态输出
+- Gemini 2.5 Flash：引入可控制思考预算的混合推理
+- Gemini 2.5 Pro：把 thinking model 扶正，编码和推理一起冲顶
+
+所以如果你的问题是”Gemini 最适合什么场景”，我会优先想到这些：
+
+- 长文档、长代码仓、长音视频理解
+- 需要多模态 + 搜索 + 工具一起配合的任务
+- 想在 Google 生态里搭 Agent 或研究工作流
+- 需要控制推理成本的中等复杂度任务（2.5 Flash）
+
+如果是极纯粹的终端编码 Agent 竞赛，Gemini 不一定是第一反应。
+
+但如果你要的是”信息量大、模态多、工具多、需要系统协同”的场景，Google 这条线一直很有自己的味道。
+
+## 官方来源
+
+- Gemini API Pricing: `https://ai.google.dev/gemini-api/docs/pricing`
+- Gemini 2.5: Our most intelligent AI model: `https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-model-thinking-updates-march-2025/`
+- Introducing Gemini 2.0: our new AI model for the agentic era: `https://blog.google/innovation-and-ai/models-and-research/google-deepmind/google-gemini-ai-update-december-2024/`
+- Our next-generation model: Gemini 1.5: `https://blog.google/innovation-and-ai/products/google-gemini-next-generation-model-february-2024/`

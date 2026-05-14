@@ -58,6 +58,31 @@ const AI_COLUMNS: ColumnConfig[] = [
     },
   },
   {
+    slug: "llm-family",
+    title: "LLM 之家",
+    description:
+      "按厂商持续梳理 OpenAI、Anthropic、Google、DeepSeek、Kimi、小米 MiMo、智谱 AI 的最近代际模型，集中记录发布时间、价格、能力侧重点与选型差异。",
+    contentDir: "swd/ai-coding/llm-family",
+    guide: {
+      intro:
+        "这个专栏不追单篇快讯，而是按厂商维护一份长期可追加的模型档案。第一次建档优先覆盖最近 2 到 5 代，后续只追加新代模型，旧记录和官方来源全部保留。",
+      paths: [
+        {
+          label: "想看某家最近几代怎么演进",
+          description: "直接进入对应厂商文章，按时间倒序读模型表格和代际变化",
+        },
+        {
+          label: "想做模型选型",
+          description: "重点看价格、上下文、Agent、编码和多模态这几组横向维度",
+        },
+        {
+          label: "想长期维护",
+          description: "后续新模型只追加到原文顶部，不删除历史记录，也不重写旧代结论",
+        },
+      ],
+    },
+  },
+  {
     slug: "claudecode",
     title: "Claude Code",
     description:

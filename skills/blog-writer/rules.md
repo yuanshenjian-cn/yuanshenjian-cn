@@ -60,6 +60,7 @@ content/blog/
     ├── xp/                    # 极限编程（含子目录 tdd/ simple-design/ testing/ refactoring/）
     └── ai-coding/             # AI 编程（含以下已注册专栏）
         ├── ai-frontier/       # AI 前沿专栏（大模型发布/评测/格局分析）
+        ├── llm-family/        # LLM 之家专栏（按厂商维护代际模型档案）
         ├── claudecode/        # Claude Code 专栏（Claude Code 使用技巧）
         ├── opencode/          # OpenCode 专栏（OpenCode 工具使用）
         └── codex/             # Codex 专栏（OpenAI Codex 工具）
@@ -73,11 +74,12 @@ content/blog/
 
 ---
 
-## 4 个 AI 专栏说明
+## AI 专栏说明
 
 | 专栏 | 路径 | 适合内容 |
 |------|------|---------|
 | AI 前沿 | `swd/ai-coding/ai-frontier/` | 大模型发布解读、评测分析、行业格局 |
+| LLM 之家 | `swd/ai-coding/llm-family/` | 某家 LLM 厂商最近 2~5 代模型的长期档案与持续追加维护 |
 | Claude Code | `swd/ai-coding/claudecode/` | Claude Code 功能教程、使用技巧、配置 |
 | OpenCode | `swd/ai-coding/opencode/` | OpenCode 工具使用、配置、技巧 |
 | Codex | `swd/ai-coding/codex/` | OpenAI Codex CLI 工具使用 |

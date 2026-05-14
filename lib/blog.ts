@@ -111,6 +111,24 @@ function buildExcerpt(brief: string | undefined, content: string): string {
   return content.slice(0, EXCERPT_LENGTH).replace(/[#*_]/g, "") + "...";
 }
 
+function comparePostsByRelativePath(a: Post, b: Post): number {
+  if (a.relativePath === b.relativePath) {
+    return 0;
+  }
+
+  return a.relativePath < b.relativePath ? -1 : 1;
+}
+
+function comparePostsByDateDescending(a: Post, b: Post): number {
+  const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+  return dateDiff !== 0 ? dateDiff : comparePostsByRelativePath(a, b);
+}
+
+function comparePostsByDateAscending(a: Post, b: Post): number {
+  const dateDiff = new Date(a.date).getTime() - new Date(b.date).getTime();
+  return dateDiff !== 0 ? dateDiff : comparePostsByRelativePath(a, b);
+}
+
 /**
  * 解析单个文章文件
  */
@@ -170,7 +188,7 @@ export function getAllPosts(): Post[] {
     () => getAllMarkdownFiles(postsDirectory)
       .map(parsePostFile)
       .filter((post): post is Post => post !== null && post.published)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+      .sort(comparePostsByDateDescending),
   );
 }
 
@@ -288,5 +306,6 @@ export function getPostsByDirectory(dir: string): Post[] {
   const prefix = dir.endsWith("/") ? dir : `${dir}/`;
   return getAllPosts()
     .filter((post) => post.relativePath.startsWith(prefix))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // 同一天批量发文时，用路径做稳定回退，避免顺序受文件系统遍历影响。
+    .sort(comparePostsByDateAscending);
 }

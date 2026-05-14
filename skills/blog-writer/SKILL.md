@@ -109,7 +109,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 
 ## 发布位置
 
-已注册目录和 AI 专栏说明见 `rules.md` 的"真实目录层级"和"4 个 AI 专栏说明"章节，此处不重复维护，以 `rules.md` 为唯一来源。
+已注册目录和 AI 专栏说明见 `rules.md` 的"真实目录层级"和"AI 专栏说明"章节，此处不重复维护，以 `rules.md` 为唯一来源。
 
 ### AI 专栏路由边界
 
@@ -120,6 +120,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 | Claude Code 某功能的使用教程 | `swd/ai-coding/claudecode/` | 主体是 Claude Code 工具本身 |
 | 用 Claude Code 做代码审查的经验复盘 | `swd/ai-coding/claudecode/` | 主体仍是 Claude Code 工具的具体用法 |
 | GPT-5 发布评测 | `swd/ai-coding/ai-frontier/` | 属于大模型发布/评测类 AI 前沿内容 |
+| OpenAI 最近 5 代模型档案 | `swd/ai-coding/llm-family/` | 主体是某家 LLM 厂商的代际演进与长期维护档案 |
 | 用 AI 工具之后对软件开发的感悟 | `career/` 或 `swd/agile/` | 主体是职业或开发实践，AI 只是背景 |
 | 健身受伤康复经历（提到用 AI 查资料） | `fitness/` | 主体是运动健康，AI 是辅助工具 |
 

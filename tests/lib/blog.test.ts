@@ -383,6 +383,23 @@ describe("Blog Module", () => {
       }
     });
 
+    it("should keep same-day posts in stable relativePath order", () => {
+      const posts = getPostsByDirectory("swd/ai-coding/llm-family");
+      const sameDayGroups = new Map<string, string[]>();
+
+      posts.forEach((post) => {
+        const dateKey = post.date.slice(0, 10);
+        const paths = sameDayGroups.get(dateKey) ?? [];
+        paths.push(post.relativePath);
+        sameDayGroups.set(dateKey, paths);
+      });
+
+      const duplicatePaths = Array.from(sameDayGroups.values()).find((paths) => paths.length > 1) ?? [];
+
+      expect(duplicatePaths.length).toBeGreaterThan(1);
+      expect(duplicatePaths).toStrictEqual([...duplicatePaths].sort());
+    });
+
     it("should only return published posts", () => {
       const posts = getPostsByDirectory("swd/ai-coding/claudecode");
       posts.forEach((post) => {

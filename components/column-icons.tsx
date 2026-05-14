@@ -63,6 +63,27 @@ export function AIFrontierIcon(props: IconProps) {
   );
 }
 
+export function LLMJianghuIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M4 18h16" />
+      <path d="M7 18V8l5-3 5 3v10" />
+      <path d="M9.5 10.5h5" />
+      <path d="M9.5 13.5h5" />
+      <path d="M12 5v13" />
+    </svg>
+  );
+}
+
 /**
  * 根据专栏 slug 获取对应的图标组件
  */
@@ -121,6 +142,8 @@ export function getColumnIconBySlug(
   switch (slug) {
     case "ai-frontier":
       return AIFrontierIcon;
+    case "llm-family":
+      return LLMJianghuIcon;
     case "claudecode":
       return ClaudeCodeIcon;
     case "opencode":

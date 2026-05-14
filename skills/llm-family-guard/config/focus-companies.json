@@ -1,0 +1,100 @@
+[
+  {
+    "slug": "openai",
+    "name": "OpenAI",
+    "aliases": ["GPT", "ChatGPT"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/openai-model-family-notes.md",
+    "officialSources": [
+      "https://openai.com/news/",
+      "https://openai.com/api/pricing/",
+      "https://developers.openai.com/api/docs/changelog"
+    ]
+  },
+  {
+    "slug": "anthropic",
+    "name": "Anthropic",
+    "aliases": ["Claude"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/anthropic-model-family-notes.md",
+    "officialSources": [
+      "https://www.anthropic.com/news",
+      "https://claude.com/pricing#api",
+      "https://platform.claude.com/docs/en/release-notes/overview"
+    ]
+  },
+  {
+    "slug": "google-gemini",
+    "name": "Google / Gemini",
+    "aliases": ["Google", "DeepMind", "Gemini"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/google-gemini-model-family-notes.md",
+    "officialSources": [
+      "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/",
+      "https://ai.google.dev/gemini-api/docs/pricing",
+      "https://ai.google.dev/gemini-api/docs/changelog"
+    ]
+  },
+  {
+    "slug": "deepseek",
+    "name": "DeepSeek",
+    "aliases": ["DeepSeek AI"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/deepseek-model-family-notes.md",
+    "officialSources": [
+      "https://api-docs.deepseek.com/news/",
+      "https://api-docs.deepseek.com/quick_start/pricing",
+      "https://huggingface.co/deepseek-ai"
+    ]
+  },
+  {
+    "slug": "kimi",
+    "name": "月之暗面 / Kimi",
+    "aliases": ["Moonshot", "Kimi"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/kimi-model-family-notes.md",
+    "officialSources": [
+      "https://www.kimi.com/blog/",
+      "https://platform.kimi.com/docs/models.md",
+      "https://platform.kimi.com/docs/pricing/"
+    ]
+  },
+  {
+    "slug": "mimo",
+    "name": "小米 MiMo",
+    "aliases": ["Xiaomi MiMo", "MiMo"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 4,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/mimo-model-family-notes.md",
+    "officialSources": [
+      "https://mimo.xiaomi.com/",
+      "https://huggingface.co/XiaomiMiMo",
+      "https://github.com/XiaomiMiMo"
+    ]
+  },
+  {
+    "slug": "glm",
+    "name": "智谱 AI / GLM",
+    "aliases": ["智谱", "Zhipu", "GLM"],
+    "enabled": true,
+    "minGenerations": 2,
+    "targetGenerations": 5,
+    "articlePath": "content/blog/swd/ai-coding/llm-family/glm-model-family-notes.md",
+    "officialSources": [
+      "https://docs.bigmodel.cn/cn/update/new-releases.md",
+      "https://docs.bigmodel.cn/cn/guide/models/text/",
+      "https://www.bigmodel.cn/pricing"
+    ]
+  }
+]

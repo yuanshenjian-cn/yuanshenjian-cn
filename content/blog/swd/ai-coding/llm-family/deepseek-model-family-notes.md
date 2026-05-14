@@ -1,0 +1,166 @@
+---
+title: "DeepSeek 模型谱系档案：从 V3 到 V4，这家最锋利的地方不只是便宜"
+date: '2026-05-14'
+tags:
+  - AI前沿
+  - LLM
+  - DeepSeek
+  - 模型评测
+  - 开源权重
+published: true
+brief: >-
+  这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。
+---
+
+> DeepSeek 这条线最容易被人记成“便宜”。但如果你只记住便宜，就会错过它真正锋利的地方：它是在用更低的价格，把前沿级别的 Agent 编码和推理工作负载硬生生压进更广的使用门槛里。
+
+DeepSeek 这几年更新很快，而且型号分支也不少。
+
+为了让这篇档案更稳，我首版只收官方资料能比较清晰确认的主线代际，不把一堆实验型号和平台更新混进来。
+
+## 我用同一套 5 个维度看 DeepSeek
+
+| 维度 | 我重点看什么 |
+|------|-------------|
+| 编码 | 真实 Agent 编码任务和仓库修复能力 |
+| 推理与知识工作 | reasoning 质量、数学与复杂问题能力 |
+| 多模态与电脑操作 | 这一家目前更偏文本和 Agent，视觉不是主卖点 |
+| 上下文与 Agent 续航 | 1M context、tool-use、长程工作是否扎实 |
+| 成本透明度 | 官方 API 是否把缓存命中和未命中都讲清楚 |
+
+## DeepSeek 最近几代主线总表
+
+| 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
+|------|-------------|---------|---------|---------|------------------|
+| DeepSeek-V4-Flash / V4-Pro | 2026-04-24 | Flash 未命中 $0.14 / 1M，Pro 未命中 $0.435 / 1M | Flash $0.0028 / 1M，Pro $0.003625 / 1M | Flash $0.28 / 1M，Pro $0.87 / 1M | 1M context 成为标准，Agentic coding 继续向前推 |
+| DeepSeek-V3.2 / V3.2-Speciale | 2025-12-01 | 官方现页未保留 | 官方现页未保留 | 官方现页未保留 | 把 thinking 直接并进 tool-use，明确往 agents 走 |
+| DeepSeek-V3.2-Exp | 2025-09-29 | 官方现页未保留 | 官方现页未保留 | 官方现页未保留 | 引入 Sparse Attention，长上下文效率实验 |
+| DeepSeek-V3.1 | 2025-08-21 | 官方现页未保留 | 官方现页未保留 | 官方现页未保留 | Hybrid Think/Non-Think 单模型架构，Agent 能力增强 |
+| DeepSeek-R1-0528 | 2025-05-28 | 官方现页未保留 | 官方现页未保留 | 官方现页未保留 | reasoning 线升级，前端能力和 function calling 明显增强 |
+| DeepSeek-R1 | 2025-01-20 | $0.55 / 1M | $0.14 / 1M | $2.19 / 1M | 推理线正式成型，是后来 R1-0528 的基线 |
+| DeepSeek-V3 | 2024-12-26 | $0.27 / 1M（2 月 8 日后） | $0.07 / 1M（2 月 8 日后） | $1.10 / 1M（2 月 8 日后） | 后续 V3.x 演进的起点 |
+
+<small>*数据来源：DeepSeek 官方 API News 与 Pricing 页面，查询日期 2026-05-14。DeepSeek-V4-Pro 当前公开价为官方标注的 75% 限时折扣价（延长至 2026-05-31 15:59 UTC）。DeepSeek-R1 与 DeepSeek-V3 的价格取自各自发布公告；其中 DeepSeek-V3 公告只明确给出 2025-02-08 起执行的价格。其余历史型号很多价格已不在当前定价页保留，因此按“官方未公布”或“官方现页未保留”处理。*</small>
+
+## DeepSeek-V4：这代最值得记的不是“更强”，而是“更像生产模型”
+
+V4 系列在 2026 年 4 月 24 日发布。
+
+它最大的变化，是 DeepSeek 开始把很多以前像“高性价比选项”的东西，做成了一个更完整的主模型体系。
+
+最直观的信号有三个：
+
+- 1M context 成为默认口径
+- Flash / Pro 分层更清楚
+- 官方把 Agentic Coding 直接写成主卖点
+
+V4-Pro 不是单纯堆参数感，它更强调复杂长任务和代理式编码。
+
+V4-Flash 则把很多团队最关心的事情说透了：如果你不是每次都需要顶格模型，成本可以压得非常低。
+
+这也是 DeepSeek 这家最有破坏力的地方。
+
+它不是只想做最强模型，而是想把“能部署得起的前沿能力”做出来。
+
+## DeepSeek-V3.2：thinking 开始和工具绑定在一起
+
+V3.2 在 2025 年 12 月 1 日发布。
+
+这代虽然官方现页已经不太容易查到完整价格，但从定位上很关键。
+
+它第一次非常明确地把 thinking 和 tool-use 直接整合在一起。
+
+这件事看起来像实现细节，实际上非常重要。
+
+因为很多模型的思考和工具调用还是两层逻辑，V3.2 开始试图把它们合成一个连续动作。这会直接影响 Agent 的使用体感：
+
+- 什么时候该想
+- 什么时候该调工具
+- 什么时候该继续往前做
+
+这比单一基准高几分，更像决定产品上限的变化。
+
+## DeepSeek-V3.2-Exp：Sparse Attention 和长上下文效率的实验
+
+V3.2-Exp 在 2025 年 9 月 29 日发布。
+
+这代是实验性质的，但它验证了一件很重要的事：**DeepSeek Sparse Attention** 可以在长上下文场景下显著降低计算开销。
+
+对于 DeepSeek 这样主打低成本策略的厂商来说，长上下文效率不只是技术细节，而是直接影响定价策略的核心变量。V3.2-Exp 的实验结果直接影响了后续 V3.2 正式版的设计方向。
+
+放在谱系里，V3.2-Exp 更像一次"技术预演"，而不是面向终端用户的正式发布。但它对理解 DeepSeek 的技术路线很有帮助。
+
+## DeepSeek-V3.1：Hybrid Think/Non-Think 的首次尝试
+
+V3.1 在 2025 年 8 月 21 日发布。
+
+这代最大的创新是 **Hybrid Think/Non-Think 架构**：同一个模型可以根据任务自动决定是否需要深度推理，而不需要用户手动选择。
+
+这个设计和后来 Anthropic Claude 3.7 Sonnet 的 hybrid reasoning 有相似的味道，但 DeepSeek 的实现路径不同：它更侧重于在单一模型内通过架构设计来切换推理模式，而不是靠外部控制。
+
+V3.1 还增强了 Agent 能力，SWE-bench Verified 达到 66.0%，并支持 Anthropic API 格式，降低了迁移成本。
+
+这代被跳过的原因往往是"它只是 V3 的一个更新"，但从谱系视角看，V3.1 是 V3.2"thinking + tool-use"整合路线的重要铺垫。
+
+## DeepSeek-R1-0528：这条 reasoning 线开始更像工程产品
+
+R1-0528 在 2025 年 5 月 28 日发布。
+
+我觉得这代最大的价值不只是“分数更好”，而是它开始把 reasoning 模型往实际工程能力上补：
+
+- 前端能力增强
+- 幻觉降低
+- 支持 JSON output
+- 支持 function calling
+
+这说明 DeepSeek 已经不满足于“做一个强推理模型”，而是要把推理线接进真实开发工作流里。
+
+如果你现在还把 R 系列理解成“只能拿来解题”的那种 reasoning model，认知已经有点旧了。
+
+## DeepSeek-R1 和 V3：一个立住推理线，一个立住通用线
+
+R1 是 2025 年 1 月 20 日的独立推理发布。
+
+V3 则是 2024 年 12 月 26 日通用线的重要起点。
+
+这两代单看今天可能都不再是最佳部署选项，但放在谱系里很重要：
+
+- V3 让后面的 V3.1、V3.2-Exp、V3.2、V4 有了主干
+- R1 让后面的 R1-0528 有了推理线基线
+
+也就是说，DeepSeek 后来的演进不是乱长的，而是明显拆成了两条互相补强的主线：
+
+- 通用 / Agent / 编码线
+- reasoning 线
+
+## 我对 DeepSeek 这条线的实际判断
+
+DeepSeek 这条线最大的变量，不只是模型能力，而是成本结构。
+
+这会带来一个非常现实的后果：很多以前只能在大厂内部或者高预算团队里跑的工作流，开始有机会被更便宜地复刻出来。
+
+所以我看 DeepSeek，不会只问“它是不是绝对最强”，我更关心的是：
+
+- 它是不是够强
+- 它是不是够便宜
+- 它是不是已经能把一些前沿工作负载从贵模型手里挪走
+
+在这三个问题上，DeepSeek 的答案往往都挺有冲击力。
+
+如果你做的是纯文本 Agent、批量代码处理、长链路自动化，DeepSeek 很值得进入候选名单。
+
+如果你要最顶格的多模态、最强世界知识新鲜度、或者极稳的商业产品边界，头部闭源模型依然更稳。
+
+但如果你问我哪家最像“显著改写前沿模型成本线”的玩家，DeepSeek 很难绕过去。
+
+## 官方来源
+
+- DeepSeek Pricing: `https://api-docs.deepseek.com/quick_start/pricing`
+- DeepSeek News: `https://api-docs.deepseek.com/news/news260424`
+- DeepSeek-V4 Release: `https://api-docs.deepseek.com/news/news260424`
+- DeepSeek-V3.2 Release: `https://api-docs.deepseek.com/news/news251201`
+- DeepSeek-V3.2-Exp Release: `https://api-docs.deepseek.com/news/news250929`
+- DeepSeek-V3.1 Release: `https://api-docs.deepseek.com/news/news250821`
+- DeepSeek-R1-0528 Release: `https://api-docs.deepseek.com/news/news250528`
+- DeepSeek-R1 Release: `https://api-docs.deepseek.com/news/news250120`
+- Introducing DeepSeek-V3: `https://api-docs.deepseek.com/news/news1226`

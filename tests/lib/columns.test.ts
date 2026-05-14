@@ -24,6 +24,7 @@ describe("Columns Module", () => {
     it("should include core AI columns", () => {
       const columns = getAIColumns();
       const slugs = columns.map((c) => c.slug);
+      expect(slugs).toContain("llm-family");
       expect(slugs).toContain("claudecode");
       expect(slugs).toContain("opencode");
       expect(slugs).toContain("deepseek");
@@ -63,6 +64,25 @@ describe("Columns Module", () => {
         const nextDate = new Date(column.posts[i + 1].date).getTime();
         expect(currentDate).toBeGreaterThanOrEqual(nextDate);
       }
+    });
+
+    it("should keep same-day llm family posts in deterministic order", () => {
+      const column = getAIColumnBySlug("llm-family");
+      if (!column) return;
+
+      const sameDayGroups = new Map<string, string[]>();
+
+      column.posts.forEach((post) => {
+        const dateKey = post.date.slice(0, 10);
+        const paths = sameDayGroups.get(dateKey) ?? [];
+        paths.push(post.relativePath);
+        sameDayGroups.set(dateKey, paths);
+      });
+
+      const duplicatePaths = Array.from(sameDayGroups.values()).find((paths) => paths.length > 1) ?? [];
+
+      expect(duplicatePaths.length).toBeGreaterThan(1);
+      expect(duplicatePaths).toStrictEqual([...duplicatePaths].sort().reverse());
     });
   });
 
