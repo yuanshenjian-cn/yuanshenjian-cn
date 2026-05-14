@@ -33,6 +33,7 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
   bodyMin: 700,
   bodyMax: 1100,
   dedupeLookbackIssues: 5,
+  dedupeEffectiveFrom: "2026-05-14",
   requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
   dedupeSectionHeading: "重点动态",
   sourceSectionHeading: "来源",
@@ -41,6 +42,7 @@ const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
   shortBodyMin: 900,
   normalBodyMax: 1500,
   dedupeLookbackIssues: 5,
+  dedupeEffectiveFrom: "2026-05-14",
   confirmSectionHeading: "近 24 小时确认动态",
   watchSectionHeading: "未来重点观察",
   sourceSectionHeading: "来源",
@@ -886,6 +888,14 @@ function isPublishedBriefingEntry(entry) {
  * @param {Set<string>} genericHeadingSet
  */
 function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sectionHeading, lookbackIssues, label, genericHeadingSet) {
+  const configSource = label === "AI 简报" ? aiBriefingConfig : investmentBriefingConfig;
+  const defaultConfig = label === "AI 简报" ? DEFAULT_AI_BRIEFING_CONFIG : DEFAULT_INVESTMENT_BRIEFING_CONFIG;
+  const dedupeEffectiveFrom = configSource.dedupeEffectiveFrom || defaultConfig.dedupeEffectiveFrom;
+
+  if (dedupeEffectiveFrom && currentDate < dedupeEffectiveFrom) {
+    return;
+  }
+
   const currentContent = fs.readFileSync(currentFile, "utf-8");
   const parsedCurrent = parseFrontmatter(currentContent);
   if (!parsedCurrent) {
@@ -902,6 +912,7 @@ function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sec
     .map(readPublishedBriefingEntry)
     .filter(isPublishedBriefingEntry)
     .filter((entry) => entry.date < currentDate)
+    .filter((entry) => !dedupeEffectiveFrom || entry.date >= dedupeEffectiveFrom)
     .sort((left, right) => right.date.localeCompare(left.date))
     .slice(0, lookbackIssues)
     .flatMap((entry) => extractDedupeEntries(entry.body, sectionHeading, genericHeadingSet).map((item) => ({

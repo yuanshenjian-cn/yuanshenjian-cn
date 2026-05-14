@@ -188,8 +188,15 @@
       "id": "十参考与延伸",
       "anchorId": "十参考与延伸",
       "heading": "十、参考与延伸",
-      "content": "飞书 CLI 仓库：github.com/larksuite/cli 安装指南：open.feishu.cn 的 mcp-archive 文档 能力变更日志（按业务域筛 Tool 类型）：open.feishu.cn/changelog 配套的 OpenAPI MCP：github.com/larksuite/lark-openapi-mcp 飞书项目（Meegle）独立 CLI：github.com/larksuite/meegle-cli Claude Code 自定义 Skill 入门，参见本系列第七篇、第八篇。 --- 写到这里其实可以下个判断：Agent 真正落地公司，\"动数据的接口\"比\"会写代码\"更关键。当组织里 80% 的协同事实都沉在某一个平台上时，给 Agent 一根接进这个平台的电源线，比让它在本地多读几个仓库要划算得多。飞书 CLI 现在的覆盖密度已经过了一个临界点，剩下的问题，是团队愿不愿意把流程改造到能让 Agent 接管。",
+      "content": "飞书 CLI 仓库：github.com/larksuite/cli 安装指南：open.feishu.cn 的 mcp-archive 文档 能力变更日志（按业务域筛 Tool 类型）：open.feishu.cn/changelog 配套的 OpenAPI MCP：github.com/larksuite/lark-openapi-mcp 飞书项目（Meegle）独立 CLI：github.com/larksuite/meegle-cli Claude Code 自定义 Skill 入门，参见本系列第七篇、第八篇。 ---",
       "excerpt": "飞书 CLI 仓库：github.com/larksuite/cli 安装指南：open.feishu.cn 的 mcp-archive 文档 能力变更日志（按业务域筛 Tool 类型）：open.feishu.cn/changelog 配套的 OpenAPI MCP：github.com/larksuite/lark..."
+    },
+    {
+      "id": "十一原文出处与本文核实说明",
+      "anchorId": "十一原文出处与本文核实说明",
+      "heading": "十一、原文出处与本文核实说明",
+      "content": "本文的五个场景与基本叙事，源自数字生命卡兹克与 tashi 在 2026-05-12 发表的微信公众号文章 《分享5个Claude Code + 飞书的超实用Agent办公玩法》。原作者分享了他们公司用飞书 CLI + Claude Code 跑通的真实案例，提供了非常好的起点。 在改写为本指南的过程中，我对照飞书 CLI 仓库与开放平台文档做了一轮核实，并对若干数字与操作步骤做了订正，便于读者直接照做： 维度 原文表述（2026-05-12） 本文按官方/实测订正后 ------ --------------------- -------------------- 业务域覆盖 15 个 17 个 能力总数 近 120 项 200+ 精选命令 + 2500+ Raw API 端点 AI Agent Skills 未单独提及 25 个（README 写 24，实测多出 lark-vc-agent） GitHub Stars \"快过万\" 9.9k+（仓库 larksuite/cli） 安装方式 给一段提示词让 Agent 自动安装 明确给出四步命令：npm install -g @larksuite/cli → npx skills add larksuite/cli -y -g → lark-cli config init → lark-cli auth login --recommend 许可证 未提及 MIT 风险与边界 偏向\"很爽，自动跑通了\" 补充人工确认环节、权限收敛、凭证存储、群聊机器人风险等官方明示的注意事项 此外，本文把五个原本独立的场景抽出了一个统一的「识别数据源 → 选 Skill → 抓取 → 合成 → 人工确认/分流」骨架，便于读者把自己的流程照模套用，而不只是复述别人公司的故事。 --- 写到这里其实可以下个判断：Agent 真正落地公司，\"动数据的接口\"比\"会写代码\"更关键。当组织里 80% 的协同事实都沉在某一个平台上时，给 Agent 一根接进这个平台的电源线，比让它在本地多读几个仓库要划算得多。飞书 CLI 现在的覆盖密度已经过了一个临界点，剩下的问题，是团队愿不愿意把流程改造到能让 Agent 接管。",
+      "excerpt": "本文的五个场景与基本叙事，源自数字生命卡兹克与 tashi 在 2026-05-12 发表的微信公众号文章 《分享5个Claude Code + 飞书的超实用Agent办公玩法》。原作者分享了他们公司用飞书 CLI + Claude Code 跑通的真实案例，提供了非常好的起点。 在改写为本指南的过程中，我对照飞书 C..."
     }
   ]
 }

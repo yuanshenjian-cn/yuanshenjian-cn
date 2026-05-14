@@ -3,7 +3,8 @@
     "allow": [
       "WebSearch",
       "Bash(ln -s ../../skills/investment-briefing /Users/ysj/Personal/blog/.opencode/skills/investment-briefing)",
-      "WebFetch(domain:opencode.ai)"
+      "WebFetch(domain:opencode.ai)",
+      "Bash(npm run *)"
     ]
   }
 }

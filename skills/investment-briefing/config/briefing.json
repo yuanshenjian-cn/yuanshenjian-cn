@@ -5,6 +5,7 @@
   "normalBodyMax": 1500,
   "shortBodyMin": 900,
   "dedupeLookbackIssues": 5,
+  "dedupeEffectiveFrom": "2026-05-14",
   "confirmSectionHeading": "近 24 小时确认动态",
   "watchSectionHeading": "未来重点观察",
   "sourceSectionHeading": "来源",

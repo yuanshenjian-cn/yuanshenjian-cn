@@ -11,7 +11,6 @@ import {
   parseBriefingDateParts,
   parseBriefingTags,
 } from "@/lib/briefing-core";
-import { config } from "@/lib/config";
 import { cleanContent } from "@/lib/utils";
 import type {
   InvestmentBriefing,

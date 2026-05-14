@@ -25,6 +25,7 @@
 3. 同步更新两个 skill 的 README 文案，以及 `investment-briefing/evals/evals.json` 的规则样例。
 4. 为 `ai-briefing/evals/evals.json` 新增去重评测样例，避免后续再次退回“只看上一期”的口径。
 5. 同步更新 `.opencode/skills/` 与 `.claude/skills/` 下的镜像副本，避免运行入口和仓库源码口径漂移。
+6. 给去重门禁增加 `dedupeEffectiveFrom` 生效日期，只拦截规则上线后的新简报，避免历史存量稿被新门禁回溯拦截 CI。
 
 ### 如何确认修复生效
 
@@ -35,6 +36,7 @@
    - `skills/investment-briefing/SKILL.md`
    - 对应 `.opencode/skills/` 与 `.claude/skills/` 镜像
 3. 后续起草简报时，如同一事件近 5 期内已经出现但没有新增可核验增量，应直接剔除，而不是仅与上一期比较。
+4. 若未来再次调整去重窗口或阈值，优先同步更新 `dedupeEffectiveFrom`，避免把新规则直接回溯应用到旧历史稿。
 
 ---
 
