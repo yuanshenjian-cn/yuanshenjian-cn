@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, Utensils, GlassWater } from "lucide-react";
 import type { Metadata } from "next";
 import { config } from "@/lib/config";
 import { getHealthColumns } from "@/lib/health-columns";
@@ -40,7 +40,11 @@ export default async function HealthPage() {
                   <div className="flex-1">
                     <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
                       <span className="rounded-full bg-primary/10 p-1.5 text-primary">
-                        <BookOpen className="h-4 w-4" />
+                        {column.slug === "eat-your-way-to-health" ? (
+                          <Utensils className="h-4 w-4" />
+                        ) : column.slug === "drink-your-way-to-health" ? (
+                          <GlassWater className="h-4 w-4" />
+                        ) : null}
                       </span>
                       <span>{column.title}</span>
                     </h2>
