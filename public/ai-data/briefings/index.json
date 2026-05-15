@@ -1,6 +1,20 @@
 {
-  "generated": "2026-05-14T00:00:00.000Z",
+  "generated": "2026-05-15T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-15",
+      "title": "AI 简报 · 2026-05-15",
+      "excerpt": "xAI 发布 Grok Build CLI 正面对标 Claude Code，Fiserv 与 OpenAI 联手推出 agentOS 切入银行核心系统，Musk 诉 OpenAI 案在奥克兰进入闭庭陈述，OpenAI 提议建立含中国的全球 AI 治理机构。",
+      "tags": [
+        "AI",
+        "xAI",
+        "OpenAI",
+        "Anthropic",
+        "Fiserv"
+      ],
+      "date": "2026-05-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-15"
+    },
     {
       "slug": "2026-05-14",
       "title": "AI 简报 · 2026-05-14",
@@ -562,6 +576,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-15",
+      "title": "AI 简报 · 2026-05-15",
+      "excerpt": "xAI 发布 Grok Build CLI 正面对标 Claude Code，Fiserv 与 OpenAI 联手推出 agentOS 切入银行核心系统，Musk 诉 OpenAI 案在奥克兰进入闭庭陈述，OpenAI 提议建立含中国的全球 AI 治理机构。",
+      "tags": [
+        "AI",
+        "xAI",
+        "OpenAI",
+        "Anthropic",
+        "Fiserv"
+      ],
+      "date": "2026-05-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-15"
+    },
     {
       "slug": "2026-05-14",
       "title": "AI 简报 · 2026-05-14",
