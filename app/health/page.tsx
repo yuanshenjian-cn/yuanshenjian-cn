@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Utensils, GlassWater } from "lucide-react";
+import { ArrowRight, BookOpen, Utensils, GlassWater } from "lucide-react";
 import type { Metadata } from "next";
 import { config } from "@/lib/config";
 import { getHealthColumns } from "@/lib/health-columns";
@@ -44,6 +44,8 @@ export default async function HealthPage() {
                           <Utensils className="h-4 w-4" />
                         ) : column.slug === "drink-your-way-to-health" ? (
                           <GlassWater className="h-4 w-4" />
+                        ) : column.slug === "diet-culture" ? (
+                          <BookOpen className="h-4 w-4" />
                         ) : null}
                       </span>
                       <span>{column.title}</span>

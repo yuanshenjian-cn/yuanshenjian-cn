@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { getAllHealthColumnConfigs } from "@/lib/health-columns";
 
 describe("health columns", () => {
-  it("包含喝出来的健康和吃出来的健康两个专栏", () => {
+  it("包含三个健康专栏", () => {
     const configs = getAllHealthColumnConfigs();
-    expect(configs).toHaveLength(2);
+    expect(configs).toHaveLength(3);
     expect(configs).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -14,6 +14,10 @@ describe("health columns", () => {
         expect.objectContaining({
           slug: "eat-your-way-to-health",
           title: "吃出来的健康",
+        }),
+        expect.objectContaining({
+          slug: "diet-culture",
+          title: "饮食文化",
         }),
       ]),
     );

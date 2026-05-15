@@ -28,6 +28,19 @@ const HEALTH_COLUMNS: HealthColumnConfig[] = [
       ],
     },
   },
+  {
+    slug: "diet-culture",
+    title: "饮食文化",
+    description: "追溯饮食传统、食材演变和餐桌习俗的文化脉络，从更长的历史尺度理解「怎么吃」这件事。",
+    contentDir: "health/diet-culture",
+    guide: {
+      intro: "不教你怎么吃，而是带你理解一种饮食方式从何而来、靠什么流传至今，以及它能给现代生活什么启发。",
+      paths: [
+        { label: "对饮食传统好奇", description: "从地中海饮食、传统饮食文化等角度了解饮食背后的历史与人文。" },
+        { label: "想理解饮食的底层逻辑", description: "关注饮食模式与健康的关系，不纠结单一营养素。" },
+      ],
+    },
+  },
 ];
 
 export function getHealthColumns(): HealthColumnWithPosts[] {
