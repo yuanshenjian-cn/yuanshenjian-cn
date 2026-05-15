@@ -38,10 +38,10 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 |------|-------------|---------|-------------|---------|------------------|
 | Claude Opus 4.7 | 2026-04-16 | $5 / 1M | $0.50 / 1M | $25 / 1M | 当前 Claude 主力旗舰，继续强化长程编码和高分辨率视觉 |
 | Claude Opus 4.6 | 2026-02-05 | $5 / 1M | $0.50 / 1M | $25 / 1M | 1M context + Adaptive Thinking + Agent Teams 预览 |
-| Claude Opus 4.5 | 2025-11-24 | $15 / 1M | $1.50 / 1M | $75 / 1M | 编码能力持续补强，SWE-bench Verified 接近 81% |
+| Claude Opus 4.5 | 2025-11-24 | $5 / 1M | $0.50 / 1M | $25 / 1M | Claude 旗舰价格首次直接砍到 1/3，编码能力同步补强 |
 | Claude Opus 4 | 2025-05-22 | $15 / 1M | $1.50 / 1M | $75 / 1M | 把 Claude 4 系列正式推上台面，主打世界最佳 coding model |
 | Claude 3.7 Sonnet | 2025-02-24 | $3 / 1M | 官方未公布 | $15 / 1M | 第一代 hybrid reasoning Claude，思考与快答合一 |
-| Claude 3.5 Sonnet | 2024-06-21 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
+| Claude 3.5 Sonnet | 2024-06-20 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
 | Claude 3 Opus | 2024-03-04 | $15 / 1M | 官方未公布 | $75 / 1M | Claude 3 家族旗舰，把长上下文和多模态能力打进前沿区 |
 
 <small>*数据来源：Anthropic 官方新闻页与官方 Pricing 页面，查询日期 2026-05-14。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.7 的缓存读价格沿用官方 pricing 当前页与“pricing remains the same as Opus 4.6”口径。*</small>
@@ -75,7 +75,7 @@ Claude Opus 4.6 是 2026 年 2 月 5 日发布的。
 
 以及 **Context Compaction**：当上下文接近上限时，自动进行服务端摘要。
 
-Opus 4.6 的价格从 Opus 4/4.5 的 $15/$75 降到了 $5/$25，这是一个非常激进的降价。这意味着 Anthropic 把旗舰能力的价格门槛明显拉低了。
+Opus 4.6 延续了 Opus 4.5 的 $5/$25 价格。这件事的真正分水岭其实发生在 Opus 4.5：Anthropic 把旗舰从 Opus 4 的 $15/$75 直接砍到 $5/$25，4.6 把这条更低的价格线稳了下来。
 
 ## Claude Opus 4.5：编码能力的持续补强
 
@@ -84,9 +84,9 @@ Claude Opus 4.5 是 2025 年 11 月 24 日发布的。
 这代看起来像一个”小版本”，但实际上有两个重要信号：
 
 - SWE-bench Verified 提升到接近 81%，编码能力继续往前推
-- 价格保持不变（$15/$75），说明 Anthropic 认为这代的价值增量值得维持旗舰定价
+- 价格直接从 Opus 4 的 $15/$75 砍到 $5/$25，是 Claude 4 系列最激进的一次降价
 
-放在谱系里看，Opus 4.5 是 Opus 4 到 Opus 4.6 之间的关键过渡。它验证了 Claude 4 系列的路线是正确的，并为后面的 1M 上下文和降价做了铺垫。
+放在谱系里看，Opus 4.5 不只是 Opus 4 到 Opus 4.6 之间的过渡，它就是真正把 Claude 旗舰价格门槛打下来的那一代。后面 Opus 4.6 的 1M context 能在同样价位推出来，前提就是 4.5 已经先把价格降到了 $5/$25。
 
 ## Claude Opus 4：Claude 4 系列的定调之作
 
@@ -165,8 +165,8 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 - Claude 3.5 Sonnet：用性价比打破”旗舰一定贵”的假设
 - Claude 3.7 Sonnet：把 hybrid reasoning 做成统一体验
 - Claude Opus 4：把 Agent、memory、long-running task 正式扶正
-- Claude Opus 4.5：编码能力持续补强，验证路线正确
-- Claude Opus 4.6：1M context + 自适应思考 + 激进降价
+- Claude Opus 4.5：编码能力补强 + 把旗舰价格砍到 $5/$25
+- Claude Opus 4.6：1M context + 自适应思考 + Agent Teams 预览
 - Claude Opus 4.7：继续推高长程编码和视觉分辨率
 
 所以如果你的问题是”Claude 这家最适合拿来干嘛”，我的答案会很集中：
