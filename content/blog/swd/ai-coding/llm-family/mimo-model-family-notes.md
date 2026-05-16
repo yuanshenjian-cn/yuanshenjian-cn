@@ -1,6 +1,6 @@
 ---
 title: "小米 MiMo 模型谱系档案：这条线值得关注，不只是因为国产新玩家"
-date: '2026-05-15'
+date: '2026-05-16'
 tags:
   - AI前沿
   - LLM
@@ -34,13 +34,13 @@ MiMo 的问题和 Kimi 有点像。
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
-| MiMo-V2.5-Pro | 2026-04-22 | 官方未公布 | 官方未公布 | 官方未公布 | 1M context、42B active、明显冲长程 Agent 与复杂软件工程 |
-| MiMo-V2.5 | 2026-04-22 | 官方未公布 | 官方未公布 | 官方未公布 | omnimodal 主线模型，1M context，往通用多模态 Agent 走 |
+| MiMo-V2.5-Pro | 2026-04-22 | ¥7.00 / 百万（≤256K）或 ¥14.00 / 百万（256K-1M） | ¥1.40 / 百万（≤256K）或 ¥2.80 / 百万（256K-1M） | ¥21.00 / 百万（≤256K）或 ¥42.00 / 百万（256K-1M） | 1M context、42B active、明显冲长程 Agent 与复杂软件工程 |
+| MiMo-V2.5 | 2026-04-22 | ¥2.80 / 百万（≤256K）或 ¥5.60 / 百万（256K-1M） | ¥0.56 / 百万（≤256K）或 ¥1.12 / 百万（256K-1M） | ¥14.00 / 百万（≤256K）或 ¥28.00 / 百万（256K-1M） | omnimodal 主线模型，1M context，往通用多模态 Agent 走 |
 | MiMo-V2 | 2026-03-18 | 官方未公布 | 官方未公布 | 官方未公布 | V2 系列通用主线，承上启下 |
-| MiMo-V2-Flash | 2025-12 | 官方未公布 | 官方未公布 | 官方未公布 | 309B 轻量 MoE，强调速度与 Agentic workflow |
+| MiMo-V2-Flash | 2025-12 | ¥0.70 / 百万 | ¥0.07 / 百万 | ¥2.10 / 百万 | 309B 轻量 MoE，强调速度与 Agentic workflow |
 | MiMo-7B 系列 | 2025-05-12（论文公开）/ 2025-05-30（RL-0530） | 官方未公布 | 官方未公布 | 官方未公布 | 7B 小模型 reasoning 线，适合看这家训练路线的早期风格 |
 
-<small>*数据来源：MiMo 官方站点、官方 Hugging Face、官方 GitHub 与官方论文页面，查询日期 2026-05-14。官方页面暂未公开稳定的模型级输入/缓存/输出单价，因此统一记为“官方未公布”。*</small>
+<small>*数据来源：Xiaomi MiMo 开放平台定价页、MiMo 官方站点、官方 Hugging Face、官方 GitHub 与官方论文页面，查询日期 2026-05-16。MiMo-V2 与 MiMo-7B 系列在当前官方定价页中未列出模型级输入/缓存/输出单价，因此按“官方未公布”处理。*</small>
 
 ## MiMo-V2.5-Pro：最值得记的是“长程工程执行”而不是参数数字
 
@@ -143,4 +143,5 @@ MiMo 现在还不算头部格局里最稳的那一档。
 - MiMo GitHub: `https://github.com/XiaomiMiMo/MiMo`
 - MiMo-7B-RL HF: `https://huggingface.co/XiaomiMiMo/MiMo-7B-RL`
 - MiMo-7B-RL-0530 HF: `https://huggingface.co/XiaomiMiMo/MiMo-7B-RL-0530`
+- MiMo 开放平台定价页: `https://platform.xiaomimimo.com/docs/zh-CN/pricing`
 - MiMo Paper: `https://arxiv.org/abs/2505.07608`
