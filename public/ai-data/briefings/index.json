@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-15T00:00:00.000Z",
+  "generated": "2026-05-16T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-16",
+      "title": "AI 简报 · 2026-05-16",
+      "excerpt": "OpenAI 同日推出 ChatGPT 个人理财工具并披露收购语音克隆公司 Weights.gg，同时与 Apple 的战略合作出现裂痕。OpenAI 还将 Codex 接入了 ChatGPT 移动应用。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Apple",
+        "Anthropic"
+      ],
+      "date": "2026-05-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-16"
+    },
     {
       "slug": "2026-05-15",
       "title": "AI 简报 · 2026-05-15",
@@ -576,6 +589,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-16",
+      "title": "AI 简报 · 2026-05-16",
+      "excerpt": "OpenAI 同日推出 ChatGPT 个人理财工具并披露收购语音克隆公司 Weights.gg，同时与 Apple 的战略合作出现裂痕。OpenAI 还将 Codex 接入了 ChatGPT 移动应用。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Apple",
+        "Anthropic"
+      ],
+      "date": "2026-05-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-16"
+    },
     {
       "slug": "2026-05-15",
       "title": "AI 简报 · 2026-05-15",
