@@ -44,6 +44,9 @@
 - 官方站点：`https://mimo.xiaomi.com/`
 - 官方 Hugging Face：`https://huggingface.co/XiaomiMiMo`
 - 官方 GitHub：`https://github.com/XiaomiMiMo`
+- 官方开放平台：`https://platform.xiaomimimo.com`
+- 官方模型定价：`https://platform.xiaomimimo.com/docs/zh-CN/pricing`
+- 官方开放平台文档：`https://platform.xiaomimimo.com/docs/zh-CN/welcome`
 
 ## 智谱 AI / GLM
 

@@ -47,6 +47,7 @@
 
 - 生成完整 Markdown 草稿
 - 返回内部审核摘要
+- 在内部审核摘要完成后，再调用项目级 `ai-briefing-reviewer` 做第二道复审
 - **本轮不会落盘**
 - 不 commit
 - 不 push
@@ -158,11 +159,12 @@ skill 会重点关注这些厂商：
 1. 事实核验
 2. 与最近 5 期简报去重（不足 5 期按已有历史检查）
 3. 重点厂商覆盖检查
-4. 成稿质量审核
-5. `npm run validate-content`
-6. `npm run build:ai-data`
-7. git 安全检查
-8. commit / push
+4. 项目级 `ai-briefing-reviewer` 二次复审
+5. 成稿质量审核
+6. `npm run validate-content`
+7. `npm run build:ai-data`
+8. git 安全检查
+9. commit / push
 
 任一检查失败：
 
@@ -201,6 +203,12 @@ skill 会重点关注这些厂商：
 - 不能进入 frontmatter
 - 不能进入正文
 - 不能进入 `## 来源`
+
+### 4. 自审通过后还会再走一轮 subagent 复审
+
+当前工程里已经有项目级 `ai-briefing-reviewer`。
+
+skill 在成稿和发布链路里，都会先完成自己的内部审核摘要，再把草稿交给 `ai-briefing-reviewer` 做第二道阻断式复审。
 
 ---
 

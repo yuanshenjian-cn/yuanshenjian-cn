@@ -4,6 +4,45 @@
 
 ---
 
+## 2026-05-16 简报 workflow 只靠 skill 自审不够稳，需补项目级 reviewer subagent 做第二道阻断式复审
+
+### 现象
+
+- AI 简报和投资简报此前都只在 skill 内完成自审与发布前检查。
+- 当草稿已经生成、但仍混有公开边界问题、来源映射遗漏、去重判断偏松或内部审核信息泄漏时，缺少一层独立视角做阻断式复核。
+- 同一套 workflow 又需要同时服务 Claude 和 OpenCode，两边如果各自临时写提示，后续很容易漂移。
+
+### 根因
+
+1. 审核链路只有一层 skill 自审，没有独立 reviewer subagent。
+2. Claude 和 OpenCode 的项目级 agent 定义方式不同，如果不分别落盘，很容易只在一个平台上生效。
+3. skill 文档没有明确要求“自审后必须再调用 reviewer”，导致二次复审只能靠人工记忆。
+
+### 修复
+
+1. 新增 4 个项目级 reviewer subagent：
+   - `.claude/agents/ai-briefing-reviewer.md`
+   - `.claude/agents/investment-briefing-reviewer.md`
+   - `.opencode/agents/ai-briefing-reviewer.md`
+   - `.opencode/agents/investment-briefing-reviewer.md`
+2. 统一 agent 名称为 `ai-briefing-reviewer` 与 `investment-briefing-reviewer`，方便 skill 在两个平台复用同名调用。
+3. 在 `skills/ai-briefing/SKILL.md` 与 `skills/investment-briefing/SKILL.md` 中补充硬规则：成稿/发布模式下，内部审核摘要完成后必须调用对应 reviewer subagent。
+4. 在两个 skill 的 `README.md` 中同步记录这条二次复审链路，避免后续维护者只改 prompt 不改说明。
+
+### 如何确认修复生效
+
+1. 确认以下 4 个 agent 文件存在且可被平台识别：
+   - `.claude/agents/ai-briefing-reviewer.md`
+   - `.claude/agents/investment-briefing-reviewer.md`
+   - `.opencode/agents/ai-briefing-reviewer.md`
+   - `.opencode/agents/investment-briefing-reviewer.md`
+2. 抽查 `skills/ai-briefing/SKILL.md` 与 `skills/investment-briefing/SKILL.md`，确认都明确写了“自审后必须调用对应 reviewer subagent”。
+3. 运行：
+   - `npm run test -- tests/skills/ai-skill-sync.test.ts tests/skills/investment-skill-sync.test.ts`
+4. 实际起草一次 AI 简报或投资简报时，确认输出中的内部审核摘要末尾包含 `subagent 复审结论`，且 reviewer 未通过时不会进入发布门禁。
+
+---
+
 ## 2026-05-14 简报去重范围只看上一期太窄，容易让同一事件在短周期内跨几期反复入稿
 
 ### 现象
