@@ -1,6 +1,20 @@
 {
-  "generated": "2026-05-16T00:00:00.000Z",
+  "generated": "2026-05-18T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-18",
+      "title": "AI 简报 · 2026-05-18",
+      "excerpt": "Brockman 接管 OpenAI 产品战略，Google Gemini 推出深度思考模式，Meta 大规模重组，PwC 与 Anthropic 扩大合作，Mythos 首次发现 macOS 内核漏洞。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-05-18T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-18"
+    },
     {
       "slug": "2026-05-16",
       "title": "AI 简报 · 2026-05-16",
@@ -589,6 +603,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-18",
+      "title": "AI 简报 · 2026-05-18",
+      "excerpt": "Brockman 接管 OpenAI 产品战略，Google Gemini 推出深度思考模式，Meta 大规模重组，PwC 与 Anthropic 扩大合作，Mythos 首次发现 macOS 内核漏洞。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-05-18T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-18"
+    },
     {
       "slug": "2026-05-16",
       "title": "AI 简报 · 2026-05-16",
