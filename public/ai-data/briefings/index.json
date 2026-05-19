@@ -1,6 +1,20 @@
 {
-  "generated": "2026-05-18T00:00:00.000Z",
+  "generated": "2026-05-19T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-19",
+      "title": "AI 简报 · 2026-05-19",
+      "excerpt": "Musk 诉 OpenAI 案因诉讼时效被陪审团驳回，Anthropic 超 3 亿美元收购 Stainless 并计划向 FSB 汇报 Mythos 漏洞，Google 确认 Gemini Intelligence 仅限 2026 旗舰机。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "xAI"
+      ],
+      "date": "2026-05-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-19"
+    },
     {
       "slug": "2026-05-18",
       "title": "AI 简报 · 2026-05-18",
@@ -603,6 +617,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-19",
+      "title": "AI 简报 · 2026-05-19",
+      "excerpt": "Musk 诉 OpenAI 案因诉讼时效被陪审团驳回，Anthropic 超 3 亿美元收购 Stainless 并计划向 FSB 汇报 Mythos 漏洞，Google 确认 Gemini Intelligence 仅限 2026 旗舰机。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "xAI"
+      ],
+      "date": "2026-05-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-19"
+    },
     {
       "slug": "2026-05-18",
       "title": "AI 简报 · 2026-05-18",
