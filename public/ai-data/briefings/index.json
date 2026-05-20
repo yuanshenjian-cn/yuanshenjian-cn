@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-19T00:00:00.000Z",
+  "generated": "2026-05-20T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-20",
+      "title": "AI 简报 · 2026-05-20",
+      "excerpt": "Google I/O 2026 一次性释放 Gemini 3.5 家族、世界模型 Omni 与通用 Agent Spark；OpenAI 推出 Guaranteed Capacity 算力锁定服务；Anthropic 与 Hitachi 达成 29 万人级战略合作。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic"
+      ],
+      "date": "2026-05-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-20"
+    },
     {
       "slug": "2026-05-19",
       "title": "AI 简报 · 2026-05-19",
@@ -617,6 +630,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-20",
+      "title": "AI 简报 · 2026-05-20",
+      "excerpt": "Google I/O 2026 一次性释放 Gemini 3.5 家族、世界模型 Omni 与通用 Agent Spark；OpenAI 推出 Guaranteed Capacity 算力锁定服务；Anthropic 与 Hitachi 达成 29 万人级战略合作。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic"
+      ],
+      "date": "2026-05-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-20"
+    },
     {
       "slug": "2026-05-19",
       "title": "AI 简报 · 2026-05-19",
