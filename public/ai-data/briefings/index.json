@@ -1,6 +1,20 @@
 {
-  "generated": "2026-05-22T00:00:00.000Z",
+  "generated": "2026-05-23T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-23",
+      "title": "AI 简报 · 2026-05-23",
+      "excerpt": "OpenAI 披露 Q1 近 60 亿美元营收并面临公众信任危机，Anthropic 进军米兰，智谱与 MiniMax 被纳入恒生科技指数。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "智谱 AI",
+        "MiniMax"
+      ],
+      "date": "2026-05-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-23"
+    },
     {
       "slug": "2026-05-22",
       "title": "AI 简报 · 2026-05-22",
@@ -658,6 +672,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-23",
+      "title": "AI 简报 · 2026-05-23",
+      "excerpt": "OpenAI 披露 Q1 近 60 亿美元营收并面临公众信任危机，Anthropic 进军米兰，智谱与 MiniMax 被纳入恒生科技指数。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "智谱 AI",
+        "MiniMax"
+      ],
+      "date": "2026-05-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-23"
+    },
     {
       "slug": "2026-05-22",
       "title": "AI 简报 · 2026-05-22",
