@@ -1,6 +1,18 @@
 {
-  "generated": "2026-05-23T00:00:00.000Z",
+  "generated": "2026-05-25T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-25",
+      "title": "AI 简报 · 2026-05-25",
+      "excerpt": "教皇利奥十四世首份通谕《Magnifica Humanitas》在梵蒂冈正式发布，Anthropic 联合创始人 Christopher Olah 以嘉宾身份出席，全球 14 亿天主教徒首次获得系统性的 AI 伦理指引。",
+      "tags": [
+        "AI",
+        "Vatican",
+        "Anthropic"
+      ],
+      "date": "2026-05-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-25"
+    },
     {
       "slug": "2026-05-23",
       "title": "AI 简报 · 2026-05-23",
@@ -672,6 +684,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-25",
+      "title": "AI 简报 · 2026-05-25",
+      "excerpt": "教皇利奥十四世首份通谕《Magnifica Humanitas》在梵蒂冈正式发布，Anthropic 联合创始人 Christopher Olah 以嘉宾身份出席，全球 14 亿天主教徒首次获得系统性的 AI 伦理指引。",
+      "tags": [
+        "AI",
+        "Vatican",
+        "Anthropic"
+      ],
+      "date": "2026-05-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-25"
+    },
     {
       "slug": "2026-05-23",
       "title": "AI 简报 · 2026-05-23",
