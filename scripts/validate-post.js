@@ -30,8 +30,11 @@ const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings"
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
+  legacyBodyMin: 700,
+  legacyBodyMax: 1100,
   bodyMin: 900,
   bodyMax: 1300,
+  bodyRuleEffectiveFrom: "2026-05-26",
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
@@ -39,9 +42,12 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
   sourceSectionHeading: "来源",
 };
 const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
+  legacyShortBodyMin: 900,
+  legacyNormalBodyMax: 1500,
   shortBodyMin: 1100,
   normalBodyMin: 1400,
   normalBodyMax: 1700,
+  bodyRuleEffectiveFrom: "2026-05-26",
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   confirmSectionHeading: "近 24 小时确认动态",
@@ -206,6 +212,26 @@ function getWeekdayNameForDate(dateText) {
  */
 function formatDateParts(year, month, day) {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+/**
+ * @param {string} dateText
+ * @param {{ currentMin: number; currentMax: number; legacyMin: number; legacyMax: number; effectiveFrom?: string }} options
+ */
+function resolveBodyLengthRange(dateText, options) {
+  const { currentMin, currentMax, legacyMin, legacyMax, effectiveFrom } = options;
+
+  if (effectiveFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateText) && dateText < effectiveFrom) {
+    return {
+      min: legacyMin,
+      max: legacyMax,
+    };
+  }
+
+  return {
+    min: currentMin,
+    max: currentMax,
+  };
 }
 
 /**
@@ -678,9 +704,17 @@ function validateBriefingFile(file, slugs) {
   }
 
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
-  if (chineseCharacters < aiBriefingConfig.bodyMin || chineseCharacters > aiBriefingConfig.bodyMax) {
+  const aiBodyRange = resolveBodyLengthRange(dateClean, {
+    currentMin: aiBriefingConfig.bodyMin,
+    currentMax: aiBriefingConfig.bodyMax,
+    legacyMin: aiBriefingConfig.legacyBodyMin || DEFAULT_AI_BRIEFING_CONFIG.legacyBodyMin,
+    legacyMax: aiBriefingConfig.legacyBodyMax || DEFAULT_AI_BRIEFING_CONFIG.legacyBodyMax,
+    effectiveFrom: aiBriefingConfig.bodyRuleEffectiveFrom || DEFAULT_AI_BRIEFING_CONFIG.bodyRuleEffectiveFrom,
+  });
+
+  if (chineseCharacters < aiBodyRange.min || chineseCharacters > aiBodyRange.max) {
     addError(
-      `AI 简报正文汉字数（不含来源章节）应为 ${aiBriefingConfig.bodyMin}~${aiBriefingConfig.bodyMax}（当前：${chineseCharacters}）`,
+      `AI 简报正文汉字数（不含来源章节）应为 ${aiBodyRange.min}~${aiBodyRange.max}（当前：${chineseCharacters}）`,
       relativeFile,
       1,
     );
@@ -1003,9 +1037,17 @@ function validateInvestmentBriefingFile(file, slugs) {
 
   const sourceSectionHeading = investmentBriefingConfig.sourceSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.sourceSectionHeading;
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
-  if (chineseCharacters < investmentBriefingConfig.shortBodyMin || chineseCharacters > investmentBriefingConfig.normalBodyMax) {
+  const investmentBodyRange = resolveBodyLengthRange(dateClean, {
+    currentMin: investmentBriefingConfig.shortBodyMin,
+    currentMax: investmentBriefingConfig.normalBodyMax,
+    legacyMin: investmentBriefingConfig.legacyShortBodyMin || DEFAULT_INVESTMENT_BRIEFING_CONFIG.legacyShortBodyMin,
+    legacyMax: investmentBriefingConfig.legacyNormalBodyMax || DEFAULT_INVESTMENT_BRIEFING_CONFIG.legacyNormalBodyMax,
+    effectiveFrom: investmentBriefingConfig.bodyRuleEffectiveFrom || DEFAULT_INVESTMENT_BRIEFING_CONFIG.bodyRuleEffectiveFrom,
+  });
+
+  if (chineseCharacters < investmentBodyRange.min || chineseCharacters > investmentBodyRange.max) {
     addError(
-      `投资简报正文汉字数（不含来源章节）应为 ${investmentBriefingConfig.shortBodyMin}~${investmentBriefingConfig.normalBodyMax}（当前：${chineseCharacters}）`,
+      `投资简报正文汉字数（不含来源章节）应为 ${investmentBodyRange.min}~${investmentBodyRange.max}（当前：${chineseCharacters}）`,
       relativeFile,
       1,
     );

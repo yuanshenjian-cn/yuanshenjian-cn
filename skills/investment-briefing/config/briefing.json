@@ -1,9 +1,12 @@
 {
   "timezone": "Asia/Shanghai",
   "cadence": "as-available",
+  "legacyShortBodyMin": 900,
+  "legacyNormalBodyMax": 1500,
   "normalBodyMin": 1400,
   "normalBodyMax": 1700,
   "shortBodyMin": 1100,
+  "bodyRuleEffectiveFrom": "2026-05-26",
   "dedupeLookbackIssues": 5,
   "dedupeEffectiveFrom": "2026-05-14",
   "confirmSectionHeading": "近 24 小时确认动态",
