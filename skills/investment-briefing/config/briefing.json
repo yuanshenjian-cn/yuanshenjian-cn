@@ -1,12 +1,22 @@
 {
   "timezone": "Asia/Shanghai",
   "cadence": "as-available",
-  "legacyShortBodyMin": 900,
-  "legacyNormalBodyMax": 1500,
-  "normalBodyMin": 1400,
-  "normalBodyMax": 1700,
-  "shortBodyMin": 1100,
-  "bodyRuleEffectiveFrom": "2026-05-26",
+  "bodyLengthRules": [
+    {
+      "effectiveFrom": "0000-01-01",
+      "shortMin": 900,
+      "normalMin": 1200,
+      "normalMax": 1500,
+      "label": "legacy"
+    },
+    {
+      "effectiveFrom": "2026-05-26",
+      "shortMin": 1100,
+      "normalMin": 1400,
+      "normalMax": 1700,
+      "label": "v2"
+    }
+  ],
   "dedupeLookbackIssues": 5,
   "dedupeEffectiveFrom": "2026-05-14",
   "confirmSectionHeading": "近 24 小时确认动态",

@@ -30,11 +30,20 @@ const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings"
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
-  legacyBodyMin: 700,
-  legacyBodyMax: 1100,
-  bodyMin: 900,
-  bodyMax: 1300,
-  bodyRuleEffectiveFrom: "2026-05-26",
+  bodyLengthRules: [
+    {
+      effectiveFrom: "0000-01-01",
+      min: 700,
+      max: 1100,
+      label: "legacy",
+    },
+    {
+      effectiveFrom: "2026-05-26",
+      min: 900,
+      max: 1300,
+      label: "v2",
+    },
+  ],
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
@@ -42,12 +51,22 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
   sourceSectionHeading: "来源",
 };
 const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
-  legacyShortBodyMin: 900,
-  legacyNormalBodyMax: 1500,
-  shortBodyMin: 1100,
-  normalBodyMin: 1400,
-  normalBodyMax: 1700,
-  bodyRuleEffectiveFrom: "2026-05-26",
+  bodyLengthRules: [
+    {
+      effectiveFrom: "0000-01-01",
+      shortMin: 900,
+      normalMin: 1200,
+      normalMax: 1500,
+      label: "legacy",
+    },
+    {
+      effectiveFrom: "2026-05-26",
+      shortMin: 1100,
+      normalMin: 1400,
+      normalMax: 1700,
+      label: "v2",
+    },
+  ],
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   confirmSectionHeading: "近 24 小时确认动态",
@@ -215,22 +234,91 @@ function formatDateParts(year, month, day) {
 }
 
 /**
+ * @template {{ effectiveFrom: string }} T
  * @param {string} dateText
- * @param {{ currentMin: number; currentMax: number; legacyMin: number; legacyMax: number; effectiveFrom?: string }} options
+ * @param {T[] | undefined} configuredRules
+ * @param {T[]} fallbackRules
  */
-function resolveBodyLengthRange(dateText, options) {
-  const { currentMin, currentMax, legacyMin, legacyMax, effectiveFrom } = options;
+function resolveEffectiveRule(dateText, configuredRules, fallbackRules) {
+  const candidateRules = Array.isArray(configuredRules) && configuredRules.length > 0
+    ? configuredRules
+    : fallbackRules;
 
-  if (effectiveFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateText) && dateText < effectiveFrom) {
-    return {
-      min: legacyMin,
-      max: legacyMax,
-    };
+  const sortedRules = candidateRules
+    .filter((rule) => rule && typeof rule.effectiveFrom === "string")
+    .sort((left, right) => left.effectiveFrom.localeCompare(right.effectiveFrom));
+
+  if (sortedRules.length === 0) {
+    return fallbackRules[fallbackRules.length - 1];
   }
 
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+    return sortedRules[sortedRules.length - 1];
+  }
+
+  let matchedRule = sortedRules[0];
+  for (const rule of sortedRules) {
+    if (rule.effectiveFrom <= dateText) {
+      matchedRule = rule;
+      continue;
+    }
+
+    break;
+  }
+
+  return matchedRule;
+}
+
+/**
+ * @param {string} dateText
+ */
+function resolveAiBodyLengthRule(dateText) {
+  return resolveEffectiveRule(
+    dateText,
+    aiBriefingConfig.bodyLengthRules,
+    DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules,
+  );
+}
+
+/**
+ * @param {string} dateText
+ */
+function resolveInvestmentBodyLengthRule(dateText) {
+  return resolveEffectiveRule(
+    dateText,
+    investmentBriefingConfig.bodyLengthRules,
+    DEFAULT_INVESTMENT_BRIEFING_CONFIG.bodyLengthRules,
+  );
+}
+
+/**
+ * @param {unknown} value
+ * @param {number} fallback
+ */
+function toNumberOr(value, fallback) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+/**
+ * @param {{ min?: number; max?: number }} rule
+ */
+function normalizeAiBodyLengthRule(rule) {
   return {
-    min: currentMin,
-    max: currentMax,
+    min: toNumberOr(rule.min, DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules[DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules.length - 1].min),
+    max: toNumberOr(rule.max, DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules[DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules.length - 1].max),
+  };
+}
+
+/**
+ * @param {{ shortMin?: number; normalMin?: number; normalMax?: number }} rule
+ */
+function normalizeInvestmentBodyLengthRule(rule) {
+  const fallbackRule = DEFAULT_INVESTMENT_BRIEFING_CONFIG.bodyLengthRules[DEFAULT_INVESTMENT_BRIEFING_CONFIG.bodyLengthRules.length - 1];
+
+  return {
+    shortMin: toNumberOr(rule.shortMin, fallbackRule.shortMin),
+    normalMin: toNumberOr(rule.normalMin, fallbackRule.normalMin),
+    normalMax: toNumberOr(rule.normalMax, fallbackRule.normalMax),
   };
 }
 
@@ -704,13 +792,7 @@ function validateBriefingFile(file, slugs) {
   }
 
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
-  const aiBodyRange = resolveBodyLengthRange(dateClean, {
-    currentMin: aiBriefingConfig.bodyMin,
-    currentMax: aiBriefingConfig.bodyMax,
-    legacyMin: aiBriefingConfig.legacyBodyMin || DEFAULT_AI_BRIEFING_CONFIG.legacyBodyMin,
-    legacyMax: aiBriefingConfig.legacyBodyMax || DEFAULT_AI_BRIEFING_CONFIG.legacyBodyMax,
-    effectiveFrom: aiBriefingConfig.bodyRuleEffectiveFrom || DEFAULT_AI_BRIEFING_CONFIG.bodyRuleEffectiveFrom,
-  });
+  const aiBodyRange = normalizeAiBodyLengthRule(resolveAiBodyLengthRule(dateClean));
 
   if (chineseCharacters < aiBodyRange.min || chineseCharacters > aiBodyRange.max) {
     addError(
@@ -1037,17 +1119,11 @@ function validateInvestmentBriefingFile(file, slugs) {
 
   const sourceSectionHeading = investmentBriefingConfig.sourceSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.sourceSectionHeading;
   const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
-  const investmentBodyRange = resolveBodyLengthRange(dateClean, {
-    currentMin: investmentBriefingConfig.shortBodyMin,
-    currentMax: investmentBriefingConfig.normalBodyMax,
-    legacyMin: investmentBriefingConfig.legacyShortBodyMin || DEFAULT_INVESTMENT_BRIEFING_CONFIG.legacyShortBodyMin,
-    legacyMax: investmentBriefingConfig.legacyNormalBodyMax || DEFAULT_INVESTMENT_BRIEFING_CONFIG.legacyNormalBodyMax,
-    effectiveFrom: investmentBriefingConfig.bodyRuleEffectiveFrom || DEFAULT_INVESTMENT_BRIEFING_CONFIG.bodyRuleEffectiveFrom,
-  });
+  const investmentBodyRange = normalizeInvestmentBodyLengthRule(resolveInvestmentBodyLengthRule(dateClean));
 
-  if (chineseCharacters < investmentBodyRange.min || chineseCharacters > investmentBodyRange.max) {
+  if (chineseCharacters < investmentBodyRange.shortMin || chineseCharacters > investmentBodyRange.normalMax) {
     addError(
-      `投资简报正文汉字数（不含来源章节）应为 ${investmentBodyRange.min}~${investmentBodyRange.max}（当前：${chineseCharacters}）`,
+      `投资简报正文汉字数（不含来源章节）应为 ${investmentBodyRange.shortMin}~${investmentBodyRange.normalMax}（当前：${chineseCharacters}）`,
       relativeFile,
       1,
     );

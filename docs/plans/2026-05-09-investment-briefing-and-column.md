@@ -88,9 +88,13 @@ export type InvestmentAreaType = "index" | "theme" | "sector" | "industry" | "st
 export interface InvestmentBriefingConfig {
   timezone: string;
   cadence: "cn-morning";
-  normalBodyMin: number;
-  normalBodyMax: number;
-  shortBodyMin: number;
+  bodyLengthRules: Array<{
+    effectiveFrom: string;
+    shortMin: number;
+    normalMin: number;
+    normalMax: number;
+    label?: string;
+  }>;
   disclaimer: string;
   coveragePageTitle: string;
 }
@@ -130,9 +134,22 @@ Create the five config files with at least one valid example each, using this sh
 {
   "timezone": "Asia/Shanghai",
   "cadence": "cn-morning",
-  "normalBodyMin": 1400,
-  "normalBodyMax": 1700,
-  "shortBodyMin": 1100,
+  "bodyLengthRules": [
+    {
+      "effectiveFrom": "0000-01-01",
+      "shortMin": 900,
+      "normalMin": 1200,
+      "normalMax": 1500,
+      "label": "legacy"
+    },
+    {
+      "effectiveFrom": "2026-05-26",
+      "shortMin": 1100,
+      "normalMin": 1400,
+      "normalMax": 1700,
+      "label": "v2"
+    }
+  ],
   "disclaimer": "本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。",
   "coveragePageTitle": "投资观察范围"
 }

@@ -33,12 +33,18 @@ export interface InvestmentBriefingArchiveItem {
   url: string;
 }
 
+export interface InvestmentBodyLengthRule {
+  effectiveFrom: string;
+  shortMin: number;
+  normalMin: number;
+  normalMax: number;
+  label?: string;
+}
+
 export interface InvestmentBriefingConfig {
   timezone: string;
-  cadence: "cn-morning";
-  normalBodyMin: number;
-  normalBodyMax: number;
-  shortBodyMin: number;
+  cadence: "cn-morning" | "as-available";
+  bodyLengthRules: InvestmentBodyLengthRule[];
   disclaimer: string;
   coveragePageTitle: string;
   coveragePageIntro: string;

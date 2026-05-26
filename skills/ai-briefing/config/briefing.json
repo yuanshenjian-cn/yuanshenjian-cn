@@ -1,11 +1,20 @@
 {
   "timezone": "Asia/Shanghai",
   "defaultWindowHours": 24,
-  "legacyBodyMin": 700,
-  "legacyBodyMax": 1100,
-  "bodyMin": 900,
-  "bodyMax": 1300,
-  "bodyRuleEffectiveFrom": "2026-05-26",
+  "bodyLengthRules": [
+    {
+      "effectiveFrom": "0000-01-01",
+      "min": 700,
+      "max": 1100,
+      "label": "legacy"
+    },
+    {
+      "effectiveFrom": "2026-05-26",
+      "min": 900,
+      "max": 1300,
+      "label": "v2"
+    }
+  ],
   "dedupeLookbackIssues": 5,
   "dedupeEffectiveFrom": "2026-05-14",
   "requiredSections": ["速览", "重点动态", "为什么值得关注", "来源"],
