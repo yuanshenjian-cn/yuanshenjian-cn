@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "生成今天的 AI 简报，默认厂商，发布到博客。",
-      "expected_output": "生成 content/ai-briefings 下的 .md 文件，published: true，正文 700~1100 汉字（不统计 ## 来源 章节），完成两轮审核并在通过后 commit/push。",
+      "expected_output": "生成 content/ai-briefings 下的 .md 文件，published: true，正文 900~1300 汉字（不统计 ## 来源 章节），完成两轮审核并在通过后 commit/push。",
       "files": [],
       "expectations": [
         "文件扩展名是 .md 而不是 .mdx",

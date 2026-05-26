@@ -30,8 +30,8 @@ const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings"
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
-  bodyMin: 700,
-  bodyMax: 1100,
+  bodyMin: 900,
+  bodyMax: 1300,
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
@@ -39,8 +39,9 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
   sourceSectionHeading: "来源",
 };
 const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
-  shortBodyMin: 900,
-  normalBodyMax: 1500,
+  shortBodyMin: 1100,
+  normalBodyMin: 1400,
+  normalBodyMax: 1700,
   dedupeLookbackIssues: 5,
   dedupeEffectiveFrom: "2026-05-14",
   confirmSectionHeading: "近 24 小时确认动态",

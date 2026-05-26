@@ -19,8 +19,8 @@ argument-hint: "[时间范围，如 今天/本周] [市场或公司，如 港股
 | 默认模式 | 查询 |
 | 默认节奏 | 按期发布 |
 | 时区 | Asia/Shanghai |
-| 正常版字数 | 1200~1500 个中文汉字 |
-| 短版字数 | 900~1199 个中文汉字 |
+| 正常版字数 | 1400~1700 个中文汉字 |
+| 短版字数 | 1100~1399 个中文汉字 |
 | 正式文件类型 | `.md` |
 | 正式输出目录 | `content/investment-briefings/` |
 | 发布动作 | 仅在发布模式且审核通过后自动 commit 并 push |
@@ -218,6 +218,8 @@ git add content/investment-briefings/YYYY-MM-DD-investment-briefing.md public/in
 git commit -m "add investment briefing for YYYY-MM-DD"
 git push
 ```
+
+`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `npm run purge:cloudflare -- --scope investment-briefing --date YYYY-MM-DD`。
 
 ## 输出给用户
 

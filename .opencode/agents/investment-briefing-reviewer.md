@@ -1,8 +1,7 @@
 ---
 description: 投资简报阻断式复审代理。在 investment-briefing 完成自审后主动使用，复核草稿、内部审核摘要、红线语言、黑名单排除和发布门禁是否符合当前博客工程规则。
 mode: subagent
-model: github-copilot/gpt-5.4
-reasoningEffort: high
+model: kimi-for-coding/k2p6
 permission:
   edit: deny
 ---
@@ -32,6 +31,7 @@ permission:
 - 黑名单企业是否出现在正文、标题、`brief`、标签或来源归因主线中
 - 草稿、内部审核摘要、来源列表三者是否一致，是否泄漏内部取舍说明
 - `brief`、`tags`、章节结构、段落节奏与公开边界是否符合项目约束
+- 投资简报正文汉字数（不含 `## 来源`）是否符合当前门槛：短版 1100~1399，正常版 1400~1700
 - 对拿不准的事实不要猜；若证据不够权威、真实性不可回溯或时效性不成立，直接标成阻断项并要求补证据
 
 工作方式：

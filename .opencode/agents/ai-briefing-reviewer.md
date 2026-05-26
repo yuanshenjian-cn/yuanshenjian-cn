@@ -1,8 +1,7 @@
 ---
 description: AI 简报阻断式复审代理。在 ai-briefing 完成自审后主动使用，复核草稿、内部审核摘要、来源与发布门禁是否符合当前博客工程规则。
 mode: subagent
-model: github-copilot/gpt-5.4
-reasoningEffort: high
+model: kimi-for-coding/k2p6
 permission:
   edit: deny
 ---
@@ -29,6 +28,7 @@ permission:
 - 草稿、内部审核摘要、来源列表三者是否一致
 - 是否把内部审核信息泄漏到公开稿
 - `brief`、`tags`、章节结构、字数和可读性是否符合项目约束
+- AI 简报正文汉字数（不含 `## 来源`）是否落在 900~1300 之间
 - 若关键事实缺少明确来源、时间证据不清、重点厂商覆盖不完整，或证据来源不具备足够权威性 / 真实性 / 时效性，直接视为阻断项
 - 对拿不准的技术细节，不要猜测；明确标记为存疑并要求补证据
 

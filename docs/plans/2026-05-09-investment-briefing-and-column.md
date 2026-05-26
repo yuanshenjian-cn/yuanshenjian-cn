@@ -130,9 +130,9 @@ Create the five config files with at least one valid example each, using this sh
 {
   "timezone": "Asia/Shanghai",
   "cadence": "cn-morning",
-  "normalBodyMin": 1200,
-  "normalBodyMax": 1500,
-  "shortBodyMin": 900,
+  "normalBodyMin": 1400,
+  "normalBodyMax": 1700,
+  "shortBodyMin": 1100,
   "disclaimer": "本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。",
   "coveragePageTitle": "投资观察范围"
 }
@@ -299,8 +299,8 @@ Implement a dedicated validation branch for investment briefings:
 
 ```js
 const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings");
-const INVESTMENT_MIN = 900;
-const INVESTMENT_MAX = 1500;
+const INVESTMENT_MIN = 1100;
+const INVESTMENT_MAX = 1700;
 ```
 
 Validate:
@@ -308,7 +308,7 @@ Validate:
 - `.md` extension only
 - required frontmatter: `title`, `date`, `brief`, `published`, `tags`
 - `published: true`
-- body length `900~1500`
+- body length `1100~1700`
 - required sections in order:
   - `## 今日确认动态`
   - `## 接下来重点观察`
@@ -517,7 +517,7 @@ The skill must encode the design decisions already approved:
 - query / draft / publish routing
 - manual publish only
 - CN morning briefing cadence
-- 1200~1500 normal body length and 900~1199 short edition fallback
+- 1400~1700 normal body length and 1100~1399 short edition fallback
 - no trading advice or stock picks
 - rumor never enters publish-mode public output
 - non-public audit file requirement

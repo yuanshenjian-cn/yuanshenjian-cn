@@ -147,12 +147,12 @@ and (http.request.method in {"GET" "HEAD"})
 
 ### TTL
 
-- Edge TTL: `6 hours`
-- Browser TTL: `1 hour`
+- Edge TTL: `12 hours`
+- Browser TTL: `2 hours`
 
 ### 说明
 
-- 你的简报更新频率明显低于分钟级，因此 `6 hours` 仍然能兼顾“新一期尽快可见”与“尽量少回源”
+- 你的简报更新频率明显低于分钟级，因此 `12 hours` 仍然能兼顾“新一期尽快可见”与“尽量少回源”
 - 如果当天发布后希望立刻全网生效，直接手动 purge 这几个 latest 路径即可
 
 ---
@@ -191,7 +191,7 @@ and (http.request.method in {"GET" "HEAD"})
 ### TTL
 
 - Edge TTL: `1 day`
-- Browser TTL: `6 hours`
+- Browser TTL: `12 hours`
 
 ### 说明
 

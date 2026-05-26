@@ -27,7 +27,7 @@ argument-hint: "[时间范围，如 今天/本周/2026-05-08] [厂商，如 Open
 | 时间窗口 | 以 Asia/Shanghai 为准，按当前执行时刻向前回溯 24 小时 |
 | 时区 | Asia/Shanghai |
 | 输出语言 | 中文 |
-| 成稿正文长度 | 700~1100 个中文汉字，不统计 `## 来源` 章节下的字数 |
+| 成稿正文长度 | 900~1300 个中文汉字，不统计 `## 来源` 章节下的字数 |
 | 正式文件类型 | `.md` |
 | 正式输出目录 | `content/ai-briefings/` |
 | published | `true` |
@@ -129,9 +129,9 @@ argument-hint: "[时间范围，如 今天/本周/2026-05-08] [厂商，如 Open
 
 ### 正文长度
 
-成稿/发布模式下，正文汉字数必须在 700~1100 之间，不统计 `## 来源` 章节下的字数；frontmatter 与内部审核摘要也不计入正文长度。
+成稿/发布模式下，正文汉字数必须在 900~1300 之间，不统计 `## 来源` 章节下的字数；frontmatter 与内部审核摘要也不计入正文长度。
 
-当当天可入稿的确定性新闻较多时，在不添加空话、不重复表述的前提下，正文长度应尽可能接近 1100 字上限，优先补充关键事实、技术细节、发布时间和影响判断。
+当当天可入稿的确定性新闻较多时，在不添加空话、不重复表述的前提下，正文长度应尽可能接近 1300 字上限，优先补充关键事实、技术细节、发布时间和影响判断。
 
 ### 写作可读性
 
@@ -291,7 +291,7 @@ tags:
 - 时间窗口：所有事件时间都已统一折算到 Asia/Shanghai，并且严格落在“本次执行时刻向前 24 小时”的统计窗口内，不存在旧事新报。
 - 去重检查：当前简报不得与最近 5 期已发布简报重复报道同一新闻事件；若正文引用前情，必须明确服务于当天新进展，且旧事实不能单独作为当天新闻条目出现。不足 5 期时，按已有全部已发布简报检查。
 - 重点厂商覆盖：OpenAI、Anthropic、Google/DeepMind/Gemini、xAI、Meta AI、Perplexity、Mistral、月之暗面/Kimi、小米 MiMo、DeepSeek、智谱 AI 已逐一完成搜索与补检，没有漏掉重大模型/API/平台发布。
-- 字数：正文汉字数（不含 `## 来源` 章节）为 700~1100。
+- 字数：正文汉字数（不含 `## 来源` 章节）为 900~1300。
 - 可读性：开篇和主体正文没有大段落；章节正文单段目标为 80~120 个中文汉字；主体章节使用有信息量的 `###` 子标题拆分，而不是依赖长列表。
 - frontmatter：`published: true`，文件扩展名为 `.md`。
 - subagent 复审：项目级 `ai-briefing-reviewer` 已基于草稿与内部审核摘要完成第二道审核，并明确给出“可进入发布门禁”结论。
@@ -354,6 +354,8 @@ git add content/ai-briefings/YYYY-MM-DD-ai-briefing.md public/ai-data/briefings/
 git commit -m "add ai briefing for YYYY-MM-DD"
 git push
 ```
+
+`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `npm run purge:cloudflare -- --scope ai-briefing --date YYYY-MM-DD`。
 
 ## 输出给用户
 
