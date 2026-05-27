@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-25T00:00:00.000Z",
+  "generated": "2026-05-27T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-27",
+      "title": "AI 简报 · 2026-05-27",
+      "excerpt": "OpenAI 和 Anthropic CEO 双双收回 AI 就业末日预言，Uber 四个月内烧完全年 AI 预算并公开质疑 ROI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-05-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-27"
+    },
     {
       "slug": "2026-05-25",
       "title": "AI 简报 · 2026-05-25",
@@ -684,6 +697,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-27",
+      "title": "AI 简报 · 2026-05-27",
+      "excerpt": "OpenAI 和 Anthropic CEO 双双收回 AI 就业末日预言，Uber 四个月内烧完全年 AI 预算并公开质疑 ROI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-05-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-27"
+    },
     {
       "slug": "2026-05-25",
       "title": "AI 简报 · 2026-05-25",
