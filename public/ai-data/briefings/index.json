@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-27T00:00:00.000Z",
+  "generated": "2026-05-28T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-28",
+      "title": "AI 简报 · 2026-05-28",
+      "excerpt": "Meta 首次对 AI 功能收费，订阅方案每月 7.99 美元起；Anthropic 发布自托管沙箱和代码安全审计插件；OpenAI 发布 2026 中期选举安全计划。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Anthropic",
+        "OpenAI"
+      ],
+      "date": "2026-05-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-28"
+    },
     {
       "slug": "2026-05-27",
       "title": "AI 简报 · 2026-05-27",
@@ -697,6 +710,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-28",
+      "title": "AI 简报 · 2026-05-28",
+      "excerpt": "Meta 首次对 AI 功能收费，订阅方案每月 7.99 美元起；Anthropic 发布自托管沙箱和代码安全审计插件；OpenAI 发布 2026 中期选举安全计划。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Anthropic",
+        "OpenAI"
+      ],
+      "date": "2026-05-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-28"
+    },
     {
       "slug": "2026-05-27",
       "title": "AI 简报 · 2026-05-27",
