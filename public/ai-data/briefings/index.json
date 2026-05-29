@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-28T00:00:00.000Z",
+  "generated": "2026-05-29T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-29",
+      "title": "AI 简报 · 2026-05-29",
+      "excerpt": "Anthropic 同日发布 Claude Opus 4.8 并完成 650 亿美元融资，CNN 起诉 Perplexity 开启电视网络 AI 版权战首例，Mistral 宣布 40 亿欧元投资计划建设数据中心。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Perplexity",
+        "Mistral"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-29"
+    },
     {
       "slug": "2026-05-28",
       "title": "AI 简报 · 2026-05-28",
@@ -710,6 +723,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-29",
+      "title": "AI 简报 · 2026-05-29",
+      "excerpt": "Anthropic 同日发布 Claude Opus 4.8 并完成 650 亿美元融资，CNN 起诉 Perplexity 开启电视网络 AI 版权战首例，Mistral 宣布 40 亿欧元投资计划建设数据中心。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Perplexity",
+        "Mistral"
+      ],
+      "date": "2026-05-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-29"
+    },
     {
       "slug": "2026-05-28",
       "title": "AI 简报 · 2026-05-28",
