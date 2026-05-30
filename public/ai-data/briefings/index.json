@@ -1,6 +1,20 @@
 {
-  "generated": "2026-05-29T00:00:00.000Z",
+  "generated": "2026-05-30T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-05-30",
+      "title": "AI 简报 · 2026-05-30",
+      "excerpt": "OpenAI 启动 Rosalind 生物防御计划扩大 GPT-Rosalind 政府访问，智谱 AI 市值突破 8800 亿港元，小米宣布 6 月停用 MiMo-V2 旧型号，MiniMax 正式启动 IPO 辅导。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "智谱 AI",
+        "小米",
+        "MiniMax"
+      ],
+      "date": "2026-05-30T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-30"
+    },
     {
       "slug": "2026-05-29",
       "title": "AI 简报 · 2026-05-29",
@@ -723,6 +737,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-05-30",
+      "title": "AI 简报 · 2026-05-30",
+      "excerpt": "OpenAI 启动 Rosalind 生物防御计划扩大 GPT-Rosalind 政府访问，智谱 AI 市值突破 8800 亿港元，小米宣布 6 月停用 MiMo-V2 旧型号，MiniMax 正式启动 IPO 辅导。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "智谱 AI",
+        "小米",
+        "MiniMax"
+      ],
+      "date": "2026-05-30T00:00:00.000Z",
+      "url": "/ai/briefings/2026-05-30"
+    },
     {
       "slug": "2026-05-29",
       "title": "AI 简报 · 2026-05-29",
