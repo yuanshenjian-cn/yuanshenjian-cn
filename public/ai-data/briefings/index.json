@@ -1,6 +1,19 @@
 {
-  "generated": "2026-05-30T00:00:00.000Z",
+  "generated": "2026-06-02T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-02",
+      "title": "AI 简报 · 2026-06-02",
+      "excerpt": "Anthropic 秘密向 SEC 提交 IPO 申请，Alphabet 计划融资 800 亿美元加码 AI，OpenAI 模型正式登陆 Amazon Bedrock。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-06-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-02"
+    },
     {
       "slug": "2026-05-30",
       "title": "AI 简报 · 2026-05-30",
@@ -737,6 +750,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-02",
+      "title": "AI 简报 · 2026-06-02",
+      "excerpt": "Anthropic 秘密向 SEC 提交 IPO 申请，Alphabet 计划融资 800 亿美元加码 AI，OpenAI 模型正式登陆 Amazon Bedrock。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-06-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-02"
+    },
     {
       "slug": "2026-05-30",
       "title": "AI 简报 · 2026-05-30",
