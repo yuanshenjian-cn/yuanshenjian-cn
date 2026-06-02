@@ -4,6 +4,42 @@
 
 ---
 
+## 2026-06-02 Next 构建缓存回退过宽会让 AI 固定页复用旧静态产物
+
+### 现象
+
+- 首页中的 AI 简报卡片已经显示最新一期 `2026-06-02`。
+- 但 `/ai`、`/ai/briefings`、`/ai/briefings/latest` 仍然显示 `2026-05-30`。
+- 同时，`/ai/briefings/2026-06-02` 和 `/ai-data/briefings/index.json` 在线上都已经是最新内容。
+
+### 根因
+
+1. AI 栏目首页、AI 简报列表页和首页卡片在代码里都使用同一个 `getLatestBriefing()`，不是两套数据源分叉。
+2. 部署 workflow 缓存了 `dist/cache`，但旧 key 只关注 `package-lock.json` 和 TS/JS 文件，没有把 `content/**/*.md`、`content/**/*.mdx` 纳入缓存键。
+3. 更关键的是，`restore-keys` 允许在内容发生变化后继续回退命中同一依赖版本下的旧 `dist/cache`。
+4. 这样会出现“新 slug 页面被重新导出，但固定路径页面继续复用旧 prerender 结果”的现象，典型表现就是 `/ai/briefings/2026-06-02` 已更新，而 `/ai` 和 `/ai/briefings/latest` 仍停在旧日期。
+
+### 修复
+
+1. 将 `.github/workflows/deploy.yml` 中 Next 构建缓存的 `key` 改为同时包含：
+   - `**/package-lock.json`
+   - `**/*.js`、`**/*.jsx`、`**/*.ts`、`**/*.tsx`
+   - `content/**/*.md`、`content/**/*.mdx`
+2. 删除该缓存步骤的 `restore-keys`，避免内容变化时再次恢复旧的 `dist/cache`。
+3. 保留 Cloudflare purge，但要明确：purge 只能清 CDN；如果部署产物本身还是旧 HTML，purge 不会自动修复页面内容。
+
+### 如何确认修复生效
+
+1. 提交新的 AI 简报或文章内容后，触发 GitHub Pages 部署。
+2. 部署完成后检查这些路径的 `Last-Modified` 是否同步刷新：
+   - `/ai`
+   - `/ai/briefings`
+   - `/ai/briefings/latest`
+   - `/ai-data/briefings/index.json`
+3. 确认 `/ai` 与首页 AI 简报卡片展示同一期日期，不再出现“详情页已更新、固定入口页仍停留旧日期”的分裂状态。
+
+---
+
 ## 2026-06-02 Cloudflare Turnstile 全局类型不要在多个入口重复声明
 
 ### 现象
