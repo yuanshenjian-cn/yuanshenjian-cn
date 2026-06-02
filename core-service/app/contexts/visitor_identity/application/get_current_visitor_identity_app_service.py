@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.contexts.visitor_identity.application.dto.get_current_visitor_identity_dto import GetCurrentVisitorIdentityResp
-from app.shared.security import Actor
+from app.shared.domain.actor import Actor
 
 
 class GetCurrentVisitorIdentityAppService:

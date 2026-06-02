@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 
 from app.contexts.visitor_identity.application.dto.get_current_visitor_identity_dto import GetCurrentVisitorIdentityResp
 from app.contexts.visitor_identity.application.get_current_visitor_identity_app_service import GetCurrentVisitorIdentityAppService
-from app.shared.security import get_actor
+from app.contexts.visitor_identity.infra.dao.visitor_identity_dao import VisitorIdentityDAO
+from app.contexts.visitor_identity.infra.sqlmodel_visitor_identity_repository import SQLModelVisitorIdentityRepository
+from app.contexts.visitor_identity.infra.visitor_actor_resolver import VisitorActorResolver
 from app.shared.infra.database import get_session
 
 router = APIRouter()
@@ -19,12 +21,20 @@ def get_get_current_visitor_identity_service() -> GetCurrentVisitorIdentityAppSe
     return build_get_current_visitor_identity_service()
 
 
+def build_visitor_actor_resolver(session: Session) -> VisitorActorResolver:
+    return VisitorActorResolver(SQLModelVisitorIdentityRepository(VisitorIdentityDAO(session)))
+
+
+def get_visitor_actor_resolver(session: Session = Depends(get_session)) -> VisitorActorResolver:
+    return build_visitor_actor_resolver(session)
+
+
 @router.get("/api/v1/me", response_model=GetCurrentVisitorIdentityResp)
 def get_current_visitor_identity(
     request: Request,
     response: Response,
-    session: Session = Depends(get_session),
+    actor_resolver: VisitorActorResolver = Depends(get_visitor_actor_resolver),
     service: GetCurrentVisitorIdentityAppService = Depends(get_get_current_visitor_identity_service),
 ) -> GetCurrentVisitorIdentityResp:
-    actor = get_actor(session, request, response)
+    actor = actor_resolver.resolve(request, response)
     return service.execute(actor)

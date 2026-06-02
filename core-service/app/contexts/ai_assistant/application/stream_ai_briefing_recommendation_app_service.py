@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator
 from datetime import datetime, timedelta
 
+from app.contexts.ai_assistant.application.answer_delta_sanitizer import AnswerDeltaSanitizer
 from app.contexts.ai_assistant.application.dto.stream_ai_briefing_recommendation_dto import (
     BriefingRange,
     StreamAiBriefingRecommendationReq,
     StreamAiBriefingRecommendationResp,
 )
-from app.contexts.ai_assistant.domain.vo.recommend_reference_vo import RecommendReferenceVO
-from app.contexts.ai_assistant.infra.answer_delta_sanitizer import AnswerDeltaSanitizer
-from app.contexts.ai_assistant.infra.ai_briefing_recommendation_prompt_builder import (
+from app.contexts.ai_assistant.application.stream_event_codec import encode_sse_event
+from app.contexts.ai_assistant.domain.briefing_recommendation_prompt import (
     AI_BRIEFING_RECOMMENDATION_REFERENCE_DELIMITER,
-    build_ai_briefing_recommendation_stream_system_prompt,
+    build_briefing_recommendation_stream_system_prompt,
 )
-from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
-from app.contexts.ai_assistant.infra.llm_profile_query_service import LLMProfileQueryService
-from app.contexts.ai_assistant.infra.providers.llm_provider import LLMProvider, LLMProviderChatRequest, LLMProviderMessage, LLMProviderProfile
-from app.contexts.ai_assistant.infra.providers.llm_provider_factory import create_llm_provider
-from app.contexts.ai_assistant.infra.sse_event_codec import encode_sse_event
+from app.contexts.ai_assistant.domain.llm_message_stream_gateway import LLMChatMessage, LLMChatStreamEvent, LLMMessageStreamGateway
+from app.contexts.ai_assistant.domain.llm_profile import LLMProfile
+from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
+from app.contexts.ai_assistant.domain.published_ai_asset_reader import PublishedAIAssetReader
+from app.contexts.ai_assistant.domain.vo.recommend_reference_vo import RecommendReferenceVO
 
 AI_BRIEFING_RECOMMENDATION_AI_ERROR_MESSAGE = "AI 服务刚刚开小差了，请稍后重试。"
 MAX_CONTEXT_BRIEFINGS = 10
@@ -30,35 +30,33 @@ QUERY_STOPWORDS = ["请", "推荐", "简报", "动态", "内容", "关于", "一
 class StreamAiBriefingRecommendationAppService:
     def __init__(
         self,
-        data_query_service: PublishedAIAssetQueryService,
-        profile_query_service: LLMProfileQueryService,
-        provider_factory: Callable[[LLMProviderProfile], LLMProvider] = create_llm_provider,
+        data_query_service: PublishedAIAssetReader,
+        profile_query_service: LLMProfileResolver,
+        llm_message_stream_gateway: LLMMessageStreamGateway,
     ) -> None:
         self._data_query_service = data_query_service
         self._profile_query_service = profile_query_service
-        self._provider_factory = provider_factory
+        self._llm_message_stream_gateway = llm_message_stream_gateway
 
     async def execute(self, req: StreamAiBriefingRecommendationReq) -> StreamAiBriefingRecommendationResp:
         briefings = [item for item in self._data_query_service.load_ai_briefing_recommendation_candidates() if self._is_in_range(item.date, req.range)]
         selected = self._select_context_briefings(briefings, req.message)
         profile = self._profile_query_service.resolve_active_profile("ai_briefing_recommendation")
-        provider = self._provider_factory(profile)
-        request = LLMProviderChatRequest(
+        stream = self._llm_message_stream_gateway.stream_chat(
+            profile,
             messages=[
-                LLMProviderMessage(role="system", content=build_ai_briefing_recommendation_stream_system_prompt(selected)),
-                LLMProviderMessage(role="user", content=req.message),
+                LLMChatMessage(role="system", content=build_briefing_recommendation_stream_system_prompt(selected)),
+                LLMChatMessage(role="user", content=req.message),
             ],
             max_tokens=700,
             temperature=0.3,
-            stream=True,
         )
-        return StreamAiBriefingRecommendationResp(stream=self._stream(provider, profile, request, selected))
+        return StreamAiBriefingRecommendationResp(stream=self._stream(profile, stream, selected))
 
     async def _stream(
         self,
-        provider: LLMProvider,
-        profile: LLMProviderProfile,
-        request: LLMProviderChatRequest,
+        profile: LLMProfile,
+        stream: AsyncIterator[LLMChatStreamEvent],
         briefings: list[RecommendReferenceVO],
     ) -> AsyncIterator[str]:
         if not profile.api_key or not profile.base_url or profile.model == "fallback":
@@ -70,7 +68,7 @@ class StreamAiBriefingRecommendationAppService:
         fallback_references = briefings[:MAX_REFERENCES]
 
         try:
-            async for event in provider.stream_chat(request):
+            async for event in stream:
                 full_text += event.delta
                 if event.usage is not None:
                     usage_payload = event.usage.as_dict()

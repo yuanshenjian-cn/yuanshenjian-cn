@@ -4,8 +4,9 @@ from datetime import datetime
 
 from app.contexts.comment.domain.comment import ArticleComment, CommentStatus
 from app.contexts.comment.domain.comment_repository import CommentRepository
+from app.contexts.comment.domain.exceptions import CommentNotFoundError
+from app.contexts.comment.infra.po.article_comment_po import ArticleCommentPO
 from app.contexts.comment.infra.dao.comment_dao import CommentDAO
-from app.shared.infra.persistence.models import Comment
 
 
 class SQLModelCommentRepository(CommentRepository):
@@ -17,7 +18,7 @@ class SQLModelCommentRepository(CommentRepository):
         return None if comment_po is None else self._to_domain(comment_po)
 
     def add(self, comment: ArticleComment) -> ArticleComment:
-        comment_po = Comment(
+        comment_po = ArticleCommentPO(
             article_slug=comment.article_slug,
             parent_id=comment.parent_id,
             actor_type=comment.actor_type,
@@ -43,7 +44,7 @@ class SQLModelCommentRepository(CommentRepository):
     def save(self, comment: ArticleComment) -> ArticleComment:
         comment_po = self._comment_dao.get_by_id(comment.id)
         if comment_po is None:
-            raise ValueError("comment_not_found")
+            raise CommentNotFoundError()
         comment_po.status = comment.status.value
         comment_po.reviewed_by = comment.reviewed_by
         comment_po.review_note = comment.review_note
@@ -58,7 +59,7 @@ class SQLModelCommentRepository(CommentRepository):
     def list_by_status(self, status: CommentStatus, limit: int) -> list[ArticleComment]:
         return [self._to_domain(item) for item in self._comment_dao.list_by_status(status.value, limit)]
 
-    def _to_domain(self, comment_po: Comment) -> ArticleComment:
+    def _to_domain(self, comment_po: ArticleCommentPO) -> ArticleComment:
         return ArticleComment(
             id=comment_po.id,
             article_slug=comment_po.article_slug,

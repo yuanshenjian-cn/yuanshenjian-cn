@@ -1,4 +1,9 @@
-from app.shared.infra.persistence.models import Base, Comment, KnowledgeChunk, KnowledgeDocument, RagSyncRun
+from app.contexts.comment.infra.po.article_comment_po import ArticleCommentPO
+from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
+from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
+from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
+from app.shared.infra.persistence.base import Base
+import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
 
 
 def test_v1_schema_contains_required_tables() -> None:
@@ -24,18 +29,18 @@ def test_v1_schema_contains_required_tables() -> None:
 
 
 def test_knowledge_upsert_constraints_exist() -> None:
-    doc_constraints = {constraint.name for constraint in KnowledgeDocument.__table__.constraints}
-    chunk_constraints = {constraint.name for constraint in KnowledgeChunk.__table__.constraints}
+    doc_constraints = {constraint.name for constraint in KnowledgeDocumentPO.__table__.constraints}
+    chunk_constraints = {constraint.name for constraint in KnowledgeChunkPO.__table__.constraints}
     assert "uq_knowledge_documents_source" in doc_constraints
     assert "uq_knowledge_chunks_document_index" in chunk_constraints
 
 
 def test_comment_review_and_ai_moderation_fields_exist() -> None:
-    columns = set(Comment.__table__.columns.keys())
+    columns = set(ArticleCommentPO.__table__.columns.keys())
     assert {"visitor_id", "user_id", "ip_hash", "user_agent_hash"}.issubset(columns)
     assert {"ai_moderation_recommended_status", "reviewed_by", "reviewed_at"}.issubset(columns)
 
 
 def test_rag_sync_run_tracks_result() -> None:
-    columns = set(RagSyncRun.__table__.columns.keys())
+    columns = set(RagSyncRunPO.__table__.columns.keys())
     assert {"status", "commit_sha", "documents_seen", "chunks_upserted", "error_message"}.issubset(columns)

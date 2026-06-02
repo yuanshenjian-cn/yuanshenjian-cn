@@ -14,7 +14,6 @@ from app.contexts.ai_assistant.infra.providers.llm_provider import (
 from app.contexts.ai_assistant.infra.providers.llm_provider_factory import create_llm_provider
 from app.contexts.ai_assistant.infra.providers.moonshot_cn_llm_provider import MoonshotCnLLMProvider
 from app.contexts.ai_assistant.infra.providers.openai_compatible_llm_provider import OpenAICompatibleLLMProvider
-from app.contexts.ai_assistant.infra.providers.tencent_tokenhub_llm_provider import TencentTokenHubLLMProvider
 
 
 def _profile(provider: str, model: str = "test-model") -> LLMProviderProfile:
@@ -24,14 +23,12 @@ def _profile(provider: str, model: str = "test-model") -> LLMProviderProfile:
         base_url="https://example.com/v1",
         model=model,
         api_key="test-key",
-        api_key_env="TEST_KEY_ENV",
     )
 
 
 def test_create_llm_provider_routes_to_expected_provider_class() -> None:
     assert isinstance(create_llm_provider(_profile("deepseek")), DeepSeekLLMProvider)
     assert isinstance(create_llm_provider(_profile("moonshot-cn")), MoonshotCnLLMProvider)
-    assert isinstance(create_llm_provider(_profile("tencent-tokenhub")), TencentTokenHubLLMProvider)
     assert isinstance(create_llm_provider(_profile("openai-compatible")), OpenAICompatibleLLMProvider)
 
 

@@ -1,24 +1,24 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
+from app.contexts.ai_assistant.application.answer_delta_sanitizer import AnswerDeltaSanitizer
 from app.contexts.ai_assistant.application.dto.stream_article_recommendation_dto import (
     StreamArticleRecommendationReq,
     StreamArticleRecommendationResp,
 )
-from app.contexts.ai_assistant.domain.vo.recommend_reference_vo import RecommendReferenceVO
-from app.contexts.ai_assistant.infra.answer_delta_sanitizer import AnswerDeltaSanitizer
-from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
-from app.contexts.ai_assistant.infra.llm_profile_query_service import LLMProfileQueryService
-from app.contexts.ai_assistant.infra.providers.llm_provider import LLMProvider, LLMProviderChatRequest, LLMProviderMessage, LLMProviderProfile
-from app.contexts.ai_assistant.infra.providers.llm_provider_factory import create_llm_provider
-from app.contexts.ai_assistant.infra.article_recommendation_prompt_builder import (
+from app.contexts.ai_assistant.application.stream_event_codec import encode_sse_event
+from app.contexts.ai_assistant.domain.article_recommendation_prompt import (
     ARTICLE_RECOMMENDATION_REFERENCE_DELIMITER,
     build_article_recommendation_stream_system_prompt,
 )
-from app.contexts.ai_assistant.infra.sse_event_codec import encode_sse_event
+from app.contexts.ai_assistant.domain.llm_message_stream_gateway import LLMChatMessage, LLMChatStreamEvent, LLMMessageStreamGateway
+from app.contexts.ai_assistant.domain.llm_profile import LLMProfile
+from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
+from app.contexts.ai_assistant.domain.published_ai_asset_reader import PublishedAIAssetReader
+from app.contexts.ai_assistant.domain.vo.recommend_reference_vo import RecommendReferenceVO
 
 ARTICLE_RECOMMENDATION_AI_ERROR_MESSAGE = "AI 服务刚刚开小差了，请稍后重试。"
 MAX_CONTEXT_POSTS = 8
@@ -35,35 +35,33 @@ class _SelectedPostsResult:
 class StreamArticleRecommendationAppService:
     def __init__(
         self,
-        data_query_service: PublishedAIAssetQueryService,
-        profile_query_service: LLMProfileQueryService,
-        provider_factory: Callable[[LLMProviderProfile], LLMProvider] = create_llm_provider,
+        data_query_service: PublishedAIAssetReader,
+        profile_query_service: LLMProfileResolver,
+        llm_message_stream_gateway: LLMMessageStreamGateway,
     ) -> None:
         self._data_query_service = data_query_service
         self._profile_query_service = profile_query_service
-        self._provider_factory = provider_factory
+        self._llm_message_stream_gateway = llm_message_stream_gateway
 
     async def execute(self, req: StreamArticleRecommendationReq) -> StreamArticleRecommendationResp:
         posts = self._data_query_service.load_article_recommendation_candidates()
         selection = self._select_context_posts(posts, req.message)
         profile = self._profile_query_service.resolve_active_profile("article_recommendation")
-        provider = self._provider_factory(profile)
-        request = LLMProviderChatRequest(
+        stream = self._llm_message_stream_gateway.stream_chat(
+            profile,
             messages=[
-                LLMProviderMessage(role="system", content=build_article_recommendation_stream_system_prompt(selection.posts)),
-                LLMProviderMessage(role="user", content=req.message),
+                LLMChatMessage(role="system", content=build_article_recommendation_stream_system_prompt(selection.posts)),
+                LLMChatMessage(role="user", content=req.message),
             ],
             max_tokens=800,
             temperature=0.4,
-            stream=True,
         )
-        return StreamArticleRecommendationResp(stream=self._stream(provider, profile, request, selection))
+        return StreamArticleRecommendationResp(stream=self._stream(profile, stream, selection))
 
     async def _stream(
         self,
-        provider: LLMProvider,
-        profile: LLMProviderProfile,
-        request: LLMProviderChatRequest,
+        profile: LLMProfile,
+        stream: AsyncIterator[LLMChatStreamEvent],
         selection: _SelectedPostsResult,
     ) -> AsyncIterator[str]:
         if not profile.api_key or not profile.base_url or profile.model == "fallback":
@@ -77,7 +75,7 @@ class StreamArticleRecommendationAppService:
         fallback_references = self._build_fallback_references(selection.posts)
 
         try:
-            async for event in provider.stream_chat(request):
+            async for event in stream:
                 if event.delta:
                     emitted_chunks = processor.push(event.delta)
                     for chunk in emitted_chunks:

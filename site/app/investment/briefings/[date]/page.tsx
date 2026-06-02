@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FloatingTocButton } from "@/components/floating-toc-button";
+import { ArticleViewTracker } from "@/components/article-view-tracker";
 import { ShareButtons } from "@/components/share-buttons";
 import { TableOfContents } from "@/components/table-of-contents";
 import { config } from "@/lib/config";
@@ -123,7 +124,11 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
               <h1 className="text-3xl font-medium tracking-tight leading-tight">{briefing.title}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <time dateTime={briefing.date}>{new Date(briefing.date).toLocaleDateString("zh-CN")}</time>
-                <span>{briefing.readingTime} 分钟阅读</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {briefing.readingTime} 分钟
+                </span>
+                <ArticleViewTracker slug={`investment-briefing-${briefing.slug}`} />
               </div>
               <p className="mt-5 rounded-2xl border bg-muted/30 px-4 py-3 text-sm leading-6 text-muted-foreground">
                 {briefing.excerpt}

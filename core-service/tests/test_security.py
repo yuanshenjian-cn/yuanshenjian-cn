@@ -1,5 +1,6 @@
-from app.shared.rate_limit import InMemoryRateLimiter
-from app.shared.security import create_secret_token, hash_with_pepper, verify_origin
+from app.shared.infra.in_memory_rate_limiter import InMemoryRateLimiter
+from app.shared.infra.request_security import verify_origin
+from app.shared.infra.secret_hash import create_secret_token, hash_with_pepper
 
 
 def test_hash_with_pepper_is_stable_and_not_plaintext() -> None:

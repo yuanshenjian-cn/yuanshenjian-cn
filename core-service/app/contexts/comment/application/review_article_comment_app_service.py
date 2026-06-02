@@ -30,5 +30,5 @@ class ReviewArticleCommentAppService:
     def _load(self, comment_id: str):
         comment = self._comment_repository.get_by_id(comment_id)
         if comment is None:
-            raise CommentNotFoundError("comment_not_found")
+            raise CommentNotFoundError()
         return comment

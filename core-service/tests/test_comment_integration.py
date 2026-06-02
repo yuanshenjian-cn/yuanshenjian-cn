@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.contexts.admin_console.infra import admin_session_authenticator
 from app.contexts.admin_console.interface import admin_auth_router
-from app.contexts.admin_console.application import login_admin_session_app_service
 from app.contexts.comment.interface import admin_comment_moderation_router, article_comment_router
 from app.main import app
 
@@ -19,7 +19,11 @@ def test_comment_submission_review_and_public_visibility(monkeypatch) -> None:
     monkeypatch.setattr(admin_auth_router, "verify_origin", lambda origin, allowed: None)
     monkeypatch.setattr(admin_auth_router.admin_login_limiter, "hit", lambda bucket: True)
     monkeypatch.setattr(admin_auth_router, "verify_turnstile", _verify_turnstile)
-    monkeypatch.setattr(login_admin_session_app_service, "verify_admin_password", lambda password: True)
+    monkeypatch.setattr(
+        admin_session_authenticator.RepositoryAdminSessionAuthenticator,
+        "verify_admin_password",
+        lambda self, password: True,
+    )
 
     monkeypatch.setattr(admin_comment_moderation_router, "verify_origin", lambda origin, allowed: None)
 

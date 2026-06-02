@@ -72,15 +72,6 @@ export default function Home() {
               quickTopics={config.ai.quickTopics}
             />
           </div>
-
-          <div className="max-w-2xl mx-auto mb-8 rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">AI 顾问</p>
-            <h2 className="mt-2 text-lg font-medium text-foreground">问问 AI 顾问</h2>
-            <p className="mt-2 text-sm leading-6 text-foreground/75">
-              可以咨询 AI 编程、研发效能、敏捷实践、职业成长和合作匹配问题。顾问会优先基于公开文章和作者资料回答。
-            </p>
-          </div>
-
           <div className="max-w-2xl mx-auto">
             <div className="grid gap-4 md:grid-cols-2">
               <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">

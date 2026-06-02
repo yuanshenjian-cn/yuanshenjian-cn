@@ -52,7 +52,6 @@ class LLMProviderProfile:
     base_url: str
     model: str
     api_key: str
-    api_key_env: str
     temperature: float = 0.2
     max_tokens: int = 1200
 

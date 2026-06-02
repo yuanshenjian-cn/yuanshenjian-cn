@@ -5,8 +5,9 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.shared.config import settings
-from app.shared.infra.persistence.models import Base
+from app.shared.infra.app_config import settings
+from app.shared.infra.persistence.base import Base
+import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

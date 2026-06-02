@@ -6,7 +6,7 @@ from app.contexts.article_analytics.domain.article_analytics_repository import A
 from app.contexts.article_analytics.domain.article_daily_stats import ArticleDailyStats
 from app.contexts.article_analytics.infra.dao.article_daily_stats_dao import ArticleDailyStatsDAO
 from app.contexts.article_analytics.infra.dao.article_view_event_dao import ArticleViewEventDAO
-from app.shared.infra.persistence.models import ArticleViewDailyStats
+from app.contexts.article_analytics.infra.po.article_view_daily_stats_po import ArticleViewDailyStatsPO
 
 
 class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
@@ -35,7 +35,7 @@ class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
     def save_daily_stats(self, stats: ArticleDailyStats) -> ArticleDailyStats:
         stats_po = self._stats_dao.get_by_id(stats.article_slug, stats.stat_date)
         if stats_po is None:
-            stats_po = ArticleViewDailyStats(
+            stats_po = ArticleViewDailyStatsPO(
                 article_slug=stats.article_slug,
                 stat_date=stats.stat_date,
                 pv_count=stats.pv_count,
@@ -52,7 +52,7 @@ class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
     def get_article_stats(self, article_slug: str) -> tuple[int, int]:
         return self._stats_dao.get_article_stats(article_slug)
 
-    def _to_domain(self, stats_po: ArticleViewDailyStats) -> ArticleDailyStats:
+    def _to_domain(self, stats_po: ArticleViewDailyStatsPO) -> ArticleDailyStats:
         return ArticleDailyStats(
             article_slug=stats_po.article_slug,
             stat_date=stats_po.stat_date,

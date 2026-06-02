@@ -70,7 +70,7 @@ npm run build:prod
 ## 部署
 
 - 主站：GitHub Pages + Cloudflare CDN
-- 管理后台：Cloudflare Pages
+- 管理后台：Vercel
 - 后端：Render
 
 ## 说明

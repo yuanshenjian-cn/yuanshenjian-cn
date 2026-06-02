@@ -134,7 +134,7 @@ export default async function PostPage({ params }: Props) {
 
   const articleContent = (
     <>
-      <ArticleHeader post={post} />
+      <ArticleHeader post={post} statsSlot={<ArticleViewTracker slug={post.slug} />} />
 
       {primaryAssistant}
 
@@ -165,7 +165,6 @@ export default async function PostPage({ params }: Props) {
   return (
     <>
       <ReadingProgress />
-      <ArticleViewTracker slug={post.slug} />
       <Script
         id="json-ld"
         type="application/ld+json"

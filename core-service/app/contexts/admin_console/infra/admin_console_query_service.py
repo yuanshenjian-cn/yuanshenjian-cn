@@ -5,7 +5,12 @@ from datetime import date
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.shared.infra.persistence.models import AIRequestEvent, ArticleViewDailyStats, Comment, KnowledgeChunk, KnowledgeDocument, RagSyncRun
+from app.contexts.ai_assistant.infra.po.ai_request_event_po import AIRequestEventPO
+from app.contexts.article_analytics.infra.po.article_view_daily_stats_po import ArticleViewDailyStatsPO
+from app.contexts.comment.infra.po.article_comment_po import ArticleCommentPO
+from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
+from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
+from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 
 
 class AdminConsoleQueryService:
@@ -14,10 +19,10 @@ class AdminConsoleQueryService:
 
     def get_dashboard_overview(self) -> dict[str, int]:
         today = date.today()
-        total_pv = self._session.scalar(select(func.coalesce(func.sum(ArticleViewDailyStats.pv_count), 0))) or 0
-        today_pv = self._session.scalar(select(func.coalesce(func.sum(ArticleViewDailyStats.pv_count), 0)).where(ArticleViewDailyStats.stat_date == today)) or 0
-        approved_comments = self._session.scalar(select(func.count()).select_from(Comment).where(Comment.status == "approved")) or 0
-        pending_comments = self._session.scalar(select(func.count()).select_from(Comment).where(Comment.status == "pending")) or 0
+        total_pv = self._session.scalar(select(func.coalesce(func.sum(ArticleViewDailyStatsPO.pv_count), 0))) or 0
+        today_pv = self._session.scalar(select(func.coalesce(func.sum(ArticleViewDailyStatsPO.pv_count), 0)).where(ArticleViewDailyStatsPO.stat_date == today)) or 0
+        approved_comments = self._session.scalar(select(func.count()).select_from(ArticleCommentPO).where(ArticleCommentPO.status == "approved")) or 0
+        pending_comments = self._session.scalar(select(func.count()).select_from(ArticleCommentPO).where(ArticleCommentPO.status == "pending")) or 0
         return {
             "total_pv": int(total_pv),
             "today_pv": int(today_pv),
@@ -28,24 +33,24 @@ class AdminConsoleQueryService:
     def list_article_analytics(self, limit: int = 20) -> list[dict[str, int | str]]:
         rows = self._session.execute(
             select(
-                ArticleViewDailyStats.article_slug,
-                func.coalesce(func.sum(ArticleViewDailyStats.pv_count), 0),
-                func.coalesce(func.sum(ArticleViewDailyStats.uv_count), 0),
+                ArticleViewDailyStatsPO.article_slug,
+                func.coalesce(func.sum(ArticleViewDailyStatsPO.pv_count), 0),
+                func.coalesce(func.sum(ArticleViewDailyStatsPO.uv_count), 0),
             )
-            .group_by(ArticleViewDailyStats.article_slug)
-            .order_by(func.sum(ArticleViewDailyStats.pv_count).desc())
+            .group_by(ArticleViewDailyStatsPO.article_slug)
+            .order_by(func.sum(ArticleViewDailyStatsPO.pv_count).desc())
             .limit(limit)
         )
         return [{"article_slug": str(slug), "pv": int(pv), "uv": int(uv)} for slug, pv, uv in rows]
 
     def get_ai_usage_overview(self) -> dict[str, object]:
-        total = self._session.scalar(select(func.count()).select_from(AIRequestEvent)) or 0
+        total = self._session.scalar(select(func.count()).select_from(AIRequestEventPO)) or 0
         return {"total_requests": int(total), "items": []}
 
     def get_system_status(self) -> dict[str, object]:
-        documents = self._session.scalar(select(func.count()).select_from(KnowledgeDocument)) or 0
-        chunks = self._session.scalar(select(func.count()).select_from(KnowledgeChunk)) or 0
-        last_sync = self._session.scalar(select(RagSyncRun).order_by(RagSyncRun.started_at.desc()).limit(1))
+        documents = self._session.scalar(select(func.count()).select_from(KnowledgeDocumentPO)) or 0
+        chunks = self._session.scalar(select(func.count()).select_from(KnowledgeChunkPO)) or 0
+        last_sync = self._session.scalar(select(RagSyncRunPO).order_by(RagSyncRunPO.started_at.desc()).limit(1))
         return {
             "api": "ok",
             "db": "ok",

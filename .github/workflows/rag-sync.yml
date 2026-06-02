@@ -46,9 +46,10 @@ jobs:
 
       - name: Sync public RAG content
         env:
+          APP_ENV: production
           DATABASE_URL: ${{ secrets.CORE_SERVICE_DATABASE_URL }}
           EMBEDDING_BASE_URL: ${{ secrets.EMBEDDING_BASE_URL }}
           EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
           EMBEDDING_MODEL_ID: ${{ vars.EMBEDDING_MODEL_ID }}
-        run: python -m app.services.ingestion --commit-sha "$GITHUB_SHA"
+        run: python -m app.contexts.knowledge_base.interface.published_content_sync_cli --repo-root .. --commit-sha "$GITHUB_SHA"
         working-directory: core-service

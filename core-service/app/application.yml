@@ -1,0 +1,55 @@
+default:
+  cors:
+    allowed_origins:
+      - https://yuanshenjian.cn
+      - https://www.yuanshenjian.cn
+      - https://admin.yuanshenjian.cn
+  security:
+    cookie_domain: .yuanshenjian.cn
+  ai:
+    active_profile: ${AI_ACTIVE_PROFILE:deepseek/deepseek-v4-flash}
+    profile_defaults:
+      temperature: 0.2
+      max_tokens: 1200
+    providers:
+      deepseek:
+        base_url: https://api.deepseek.com/v1
+        api_key: ${DEEPSEEK_API_KEY}
+        models:
+          deepseek-v4-pro: {}
+          deepseek-v4-flash: {}
+      moonshot-cn:
+        base_url: https://api.moonshot.cn/v1
+        api_key: ${MOONSHOT_API_KEY}
+        models:
+          kimi-k2.6: {}
+      openai-compatible:
+        base_url: https://api.openai.com/v1
+        api_key: ${OPENAI_COMPATIBLE_API_KEY}
+        models:
+          gpt-4o-mini: {}
+    scene_profiles:
+      default: deepseek/deepseek-v4-flash
+      article_recommendation: deepseek/deepseek-v4-flash
+      article: deepseek/deepseek-v4-flash
+      author: deepseek/deepseek-v4-flash
+      ai_briefing_recommendation: deepseek/deepseek-v4-flash
+      investment_briefing_recommendation: deepseek/deepseek-v4-flash
+      advisor: deepseek/deepseek-v4-pro
+    global_daily_token_limit: ${AI_GLOBAL_DAILY_TOKEN_LIMIT:200000}
+    chat_daily_request_limit: ${AI_CHAT_DAILY_REQUEST_LIMIT:50}
+    advisor_daily_request_limit: ${AI_ADVISOR_DAILY_REQUEST_LIMIT:30}
+    moderation_daily_request_limit: ${AI_MODERATION_DAILY_REQUEST_LIMIT:200}
+    embedding_daily_token_limit: ${AI_EMBEDDING_DAILY_TOKEN_LIMIT:100000}
+
+local:
+  cors:
+    allowed_origins:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+  security:
+    cookie_domain: ""
+
+production: {}

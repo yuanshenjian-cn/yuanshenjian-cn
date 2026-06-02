@@ -31,18 +31,23 @@ from app.contexts.ai_assistant.application.stream_investment_briefing_recommenda
     StreamInvestmentBriefingRecommendationAppService,
 )
 from app.contexts.ai_assistant.infra.knowledge_context_query_service import KnowledgeContextQueryService
+from app.contexts.ai_assistant.infra.llm_message_stream_gateway import ProviderBackedLLMMessageStreamGateway
 from app.contexts.ai_assistant.infra.llm_profile_query_service import LLMProfileQueryService
 from app.contexts.ai_assistant.infra.llm_stream_service import LLMStreamService
 from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
-from app.shared.config import settings
-from app.shared.rate_limit import public_ai_limiter
-from app.shared.security import hash_request_ip, turnstile_action_for_scene, verify_origin, verify_turnstile
+from app.shared.infra.app_config import settings
+from app.shared.infra.in_memory_rate_limiter import public_ai_limiter
+from app.shared.infra.request_security import hash_request_ip, turnstile_action_for_scene, verify_origin, verify_turnstile
 
 router = APIRouter()
 
 
 def build_stream_article_recommendation_service() -> StreamArticleRecommendationAppService:
-    return StreamArticleRecommendationAppService(PublishedAIAssetQueryService(), LLMProfileQueryService())
+    return StreamArticleRecommendationAppService(
+        PublishedAIAssetQueryService(),
+        LLMProfileQueryService(),
+        ProviderBackedLLMMessageStreamGateway(),
+    )
 
 
 def get_stream_article_recommendation_service() -> StreamArticleRecommendationAppService:
@@ -50,7 +55,11 @@ def get_stream_article_recommendation_service() -> StreamArticleRecommendationAp
 
 
 def build_stream_ai_briefing_recommendation_service() -> StreamAiBriefingRecommendationAppService:
-    return StreamAiBriefingRecommendationAppService(PublishedAIAssetQueryService(), LLMProfileQueryService())
+    return StreamAiBriefingRecommendationAppService(
+        PublishedAIAssetQueryService(),
+        LLMProfileQueryService(),
+        ProviderBackedLLMMessageStreamGateway(),
+    )
 
 
 def get_stream_ai_briefing_recommendation_service() -> StreamAiBriefingRecommendationAppService:
@@ -58,7 +67,11 @@ def get_stream_ai_briefing_recommendation_service() -> StreamAiBriefingRecommend
 
 
 def build_stream_investment_briefing_recommendation_service() -> StreamInvestmentBriefingRecommendationAppService:
-    return StreamInvestmentBriefingRecommendationAppService(PublishedAIAssetQueryService(), LLMProfileQueryService())
+    return StreamInvestmentBriefingRecommendationAppService(
+        PublishedAIAssetQueryService(),
+        LLMProfileQueryService(),
+        ProviderBackedLLMMessageStreamGateway(),
+    )
 
 
 def get_stream_investment_briefing_recommendation_service() -> StreamInvestmentBriefingRecommendationAppService:

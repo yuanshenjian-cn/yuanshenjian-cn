@@ -17,5 +17,3 @@ dev.db-*
 .env
 .env.*
 !.env.example
-!.env.development
-!.env.production.example

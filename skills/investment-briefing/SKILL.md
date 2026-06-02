@@ -219,7 +219,7 @@ git commit -m "add investment briefing for YYYY-MM-DD"
 git push
 ```
 
-`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `just purge-investment-briefing-cache YYYY-MM-DD`。
+`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/site-ci.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `just purge-investment-briefing-cache YYYY-MM-DD`。
 
 ## 输出给用户
 

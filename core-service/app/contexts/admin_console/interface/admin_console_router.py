@@ -11,8 +11,9 @@ from app.contexts.admin_console.application.dto.get_admin_dashboard_overview_dto
 from app.contexts.admin_console.application.dto.get_admin_system_status_dto import GetAdminSystemStatusResp
 from app.contexts.admin_console.application.dto.list_admin_article_analytics_dto import ListAdminArticleAnalyticsResp
 from app.contexts.admin_console.application.list_admin_article_analytics_app_service import ListAdminArticleAnalyticsAppService
+from app.contexts.admin_console.infra.admin_session_request_guard import AdminSessionRequestGuard
 from app.contexts.admin_console.infra.admin_console_query_service import AdminConsoleQueryService
-from app.shared.security import require_admin
+from app.contexts.admin_console.interface.admin_auth_router import get_admin_session_request_guard
 from app.shared.infra.database import get_session
 
 router = APIRouter(prefix="/api/v1/admin")
@@ -53,38 +54,38 @@ def get_get_admin_system_status_service(session: Session = Depends(get_session))
 @router.get("/analytics/overview", response_model=GetAdminDashboardOverviewResp)
 def get_admin_dashboard_overview(
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminDashboardOverviewAppService = Depends(get_get_admin_dashboard_overview_service),
 ) -> GetAdminDashboardOverviewResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute()
 
 
 @router.get("/analytics/articles", response_model=ListAdminArticleAnalyticsResp)
 def list_admin_article_analytics(
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ListAdminArticleAnalyticsAppService = Depends(get_list_admin_article_analytics_service),
 ) -> ListAdminArticleAnalyticsResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute()
 
 
 @router.get("/ai-usage/overview", response_model=GetAdminAIUsageOverviewResp)
 def get_admin_ai_usage_overview(
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminAIUsageOverviewAppService = Depends(get_get_admin_ai_usage_overview_service),
 ) -> GetAdminAIUsageOverviewResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute()
 
 
 @router.get("/system/status", response_model=GetAdminSystemStatusResp)
 def get_admin_system_status(
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminSystemStatusAppService = Depends(get_get_admin_system_status_service),
 ) -> GetAdminSystemStatusResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute()

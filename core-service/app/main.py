@@ -11,8 +11,9 @@ from app.contexts.comment.interface.admin_comment_moderation_router import route
 from app.contexts.comment.interface.article_comment_router import router as article_comment_router
 from app.contexts.visitor_identity.interface.visitor_identity_router import router as visitor_identity_router
 from app.shared.interface.health_router import router as health_router
-from app.shared.config import settings
-from app.shared.infra.persistence.models import Base
+from app.shared.infra.app_config import settings
+from app.shared.infra.persistence.base import Base
+import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
 from app.shared.infra.database import engine
 
 if settings.database_url.startswith("sqlite"):

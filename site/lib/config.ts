@@ -61,12 +61,6 @@ export const config = {
     twitter: "@yuanshenjian",
     sameAs: [] as string[],
   },
-  giscus: {
-    repo: process.env.NEXT_PUBLIC_GISCUS_REPO || "yuanshenjian-cn/yuanshenjian-cn",
-    repoId: process.env.NEXT_PUBLIC_GISCUS_REPO_ID || "R_kgDORINV5g",
-    category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY || "General",
-    categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || "DIC_kwDORINV5s4C19yc",
-  },
   ai: {
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
     coreServiceUrl,

@@ -4,9 +4,10 @@ import type { Post } from "@/types/blog";
 
 interface ArticleHeaderProps {
   post: Post;
+  statsSlot?: React.ReactNode;
 }
 
-export function ArticleHeader({ post }: ArticleHeaderProps) {
+export function ArticleHeader({ post, statsSlot }: ArticleHeaderProps) {
   return (
     <>
       <Link
@@ -33,6 +34,7 @@ export function ArticleHeader({ post }: ArticleHeaderProps) {
             <Clock className="w-4 h-4" />
             {post.readingTime} 分钟
           </span>
+          {statsSlot}
         </div>
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">

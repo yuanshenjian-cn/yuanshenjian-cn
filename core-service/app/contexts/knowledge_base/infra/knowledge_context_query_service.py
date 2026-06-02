@@ -3,7 +3,8 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.shared.infra.persistence.models import KnowledgeChunk, KnowledgeDocument
+from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
+from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
 
 
 class KnowledgeContextQueryService:
@@ -14,19 +15,19 @@ class KnowledgeContextQueryService:
         article_slug: str | None = None,
         top_k: int = 5,
     ) -> tuple[list[str], list[dict[str, str]]]:
-        statement = select(KnowledgeChunk, KnowledgeDocument).join(
-            KnowledgeDocument,
-            KnowledgeChunk.document_id == KnowledgeDocument.id,
+        statement = select(KnowledgeChunkPO, KnowledgeDocumentPO).join(
+            KnowledgeDocumentPO,
+            KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id,
         )
         if article_slug:
-            statement = statement.where(KnowledgeDocument.slug == article_slug)
+            statement = statement.where(KnowledgeDocumentPO.slug == article_slug)
         rows = list(session.execute(statement.limit(top_k)))
         if not rows and article_slug:
             rows = list(
                 session.execute(
-                    select(KnowledgeChunk, KnowledgeDocument).join(
-                        KnowledgeDocument,
-                        KnowledgeChunk.document_id == KnowledgeDocument.id,
+                    select(KnowledgeChunkPO, KnowledgeDocumentPO).join(
+                        KnowledgeDocumentPO,
+                        KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id,
                     ).limit(top_k)
                 )
             )

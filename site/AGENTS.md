@@ -118,10 +118,6 @@ cp .env.example .env.local
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://yuanshenjian.cn
-NEXT_PUBLIC_GISCUS_REPO=username/repo
-NEXT_PUBLIC_GISCUS_REPO_ID=R_xxxx
-NEXT_PUBLIC_GISCUS_CATEGORY=General
-NEXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_xxxx
+NEXT_PUBLIC_CORE_SERVICE_URL=https://api.yuanshenjian.cn
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
 ```
-
-Giscus 配置获取：https://giscus.app/zh-CN

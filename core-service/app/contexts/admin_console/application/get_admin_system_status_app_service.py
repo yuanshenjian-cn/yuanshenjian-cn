@@ -4,11 +4,11 @@ from app.contexts.admin_console.application.dto.get_admin_system_status_dto impo
     AdminSystemStatusLastRagSyncResp,
     GetAdminSystemStatusResp,
 )
-from app.contexts.admin_console.infra.admin_console_query_service import AdminConsoleQueryService
+from app.contexts.admin_console.domain.admin_console_query_reader import AdminConsoleQueryReader
 
 
 class GetAdminSystemStatusAppService:
-    def __init__(self, query_service: AdminConsoleQueryService) -> None:
+    def __init__(self, query_service: AdminConsoleQueryReader) -> None:
         self._query_service = query_service
 
     def execute(self) -> GetAdminSystemStatusResp:

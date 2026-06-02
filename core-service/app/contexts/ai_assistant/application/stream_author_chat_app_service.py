@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 from app.contexts.ai_assistant.application.dto.stream_author_chat_dto import StreamAuthorChatReq, StreamAuthorChatResp
-from app.contexts.ai_assistant.infra.llm_profile_query_service import LLMProfileQueryService
-from app.contexts.ai_assistant.infra.llm_stream_service import LLMStreamService
-from app.contexts.ai_assistant.infra.page_answer_prompt_builder import build_author_answer_stream_system_prompt
-from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
+from app.contexts.ai_assistant.domain.llm_answer_stream_gateway import LLMAnswerStreamGateway
+from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
+from app.contexts.ai_assistant.domain.page_answer_prompt import build_author_answer_stream_system_prompt
+from app.contexts.ai_assistant.domain.published_ai_asset_reader import PublishedAIAssetReader
 
 
 class StreamAuthorChatAppService:
     def __init__(
         self,
-        data_query_service: PublishedAIAssetQueryService,
-        profile_query_service: LLMProfileQueryService,
-        llm_stream_service: LLMStreamService,
+        data_query_service: PublishedAIAssetReader,
+        profile_query_service: LLMProfileResolver,
+        llm_stream_service: LLMAnswerStreamGateway,
     ) -> None:
         self._data_query_service = data_query_service
         self._profile_query_service = profile_query_service

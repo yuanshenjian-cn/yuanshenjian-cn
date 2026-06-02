@@ -5,7 +5,7 @@ from datetime import date
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.shared.infra.persistence.models import ArticleViewEvent
+from app.contexts.article_analytics.infra.po.article_view_event_po import ArticleViewEventPO
 
 
 class ArticleViewEventDAO:
@@ -14,10 +14,10 @@ class ArticleViewEventDAO:
 
     def has_viewed_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
         existing = self._session.scalar(
-            select(ArticleViewEvent).where(
-                ArticleViewEvent.article_slug == article_slug,
-                ArticleViewEvent.visitor_id == visitor_id,
-                func.date(ArticleViewEvent.viewed_at) == stat_date,
+            select(ArticleViewEventPO).where(
+                ArticleViewEventPO.article_slug == article_slug,
+                ArticleViewEventPO.visitor_id == visitor_id,
+                func.date(ArticleViewEventPO.viewed_at) == stat_date,
             )
         )
         return existing is not None
@@ -32,7 +32,7 @@ class ArticleViewEventDAO:
         referrer_origin: str | None,
     ) -> None:
         self._session.add(
-            ArticleViewEvent(
+            ArticleViewEventPO(
                 article_slug=article_slug,
                 visitor_id=visitor_id,
                 user_id=user_id,

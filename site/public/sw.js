@@ -79,8 +79,8 @@ self.addEventListener('fetch', (event) => {
   // 跳过非 GET 请求
   if (request.method !== 'GET') return;
   
-  // 跳过跨域请求（除了 Giscus）
-  if (url.origin !== self.location.origin && !url.hostname.includes('giscus.app')) {
+  // 跳过跨域请求
+  if (url.origin !== self.location.origin) {
     return;
   }
   

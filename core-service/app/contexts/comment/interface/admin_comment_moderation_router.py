@@ -3,6 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
+from app.contexts.admin_console.infra.admin_session_request_guard import AdminSessionRequestGuard
+from app.contexts.admin_console.interface.admin_auth_router import get_admin_session_request_guard
 from app.contexts.comment.application.dto.list_comment_moderation_queue_dto import ListCommentModerationQueueResp
 from app.contexts.comment.application.dto.review_article_comment_dto import (
     ReviewArticleCommentPayloadReq,
@@ -14,8 +16,8 @@ from app.contexts.comment.application.review_article_comment_app_service import 
 from app.contexts.comment.domain.exceptions import CommentNotFoundError
 from app.contexts.comment.infra.dao.comment_dao import CommentDAO
 from app.contexts.comment.infra.sqlmodel_comment_repository import SQLModelCommentRepository
-from app.shared.security import require_admin, require_csrf, verify_origin
-from app.shared.config import settings
+from app.shared.infra.app_config import settings
+from app.shared.infra.request_security import verify_origin
 from app.shared.infra.database import get_session
 
 router = APIRouter(prefix="/api/v1/admin/comments")
@@ -42,24 +44,24 @@ def list_comment_moderation_queue(
     request: Request,
     status: str = "pending",
     limit: int = 50,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ListCommentModerationQueueAppService = Depends(get_list_comment_moderation_queue_service),
 ) -> ListCommentModerationQueueResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute(status, limit)
 
 
 def _review(
     request: Request,
-    session: Session,
+    guard: AdminSessionRequestGuard,
     comment_id: str,
     payload: ReviewArticleCommentPayloadReq,
     review_method: str,
     service: ReviewArticleCommentAppService,
 ) -> ReviewArticleCommentResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    require_csrf(request)
+    guard.require_csrf(request)
     req = ReviewArticleCommentReq(comment_id=comment_id, review_note=payload.review_note, csrf_token=payload.csrf_token)
     try:
         if review_method == "approve":
@@ -76,10 +78,10 @@ def approve_article_comment(
     comment_id: str,
     payload: ReviewArticleCommentPayloadReq,
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ReviewArticleCommentAppService = Depends(get_review_article_comment_service),
 ) -> ReviewArticleCommentResp:
-    return _review(request, session, comment_id, payload, "approve", service)
+    return _review(request, guard, comment_id, payload, "approve", service)
 
 
 @router.post("/{comment_id}/reject", response_model=ReviewArticleCommentResp)
@@ -87,10 +89,10 @@ def reject_article_comment(
     comment_id: str,
     payload: ReviewArticleCommentPayloadReq,
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ReviewArticleCommentAppService = Depends(get_review_article_comment_service),
 ) -> ReviewArticleCommentResp:
-    return _review(request, session, comment_id, payload, "reject", service)
+    return _review(request, guard, comment_id, payload, "reject", service)
 
 
 @router.post("/{comment_id}/mark-spam", response_model=ReviewArticleCommentResp)
@@ -98,7 +100,7 @@ def mark_spam_article_comment(
     comment_id: str,
     payload: ReviewArticleCommentPayloadReq,
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ReviewArticleCommentAppService = Depends(get_review_article_comment_service),
 ) -> ReviewArticleCommentResp:
-    return _review(request, session, comment_id, payload, "mark-spam", service)
+    return _review(request, guard, comment_id, payload, "mark-spam", service)

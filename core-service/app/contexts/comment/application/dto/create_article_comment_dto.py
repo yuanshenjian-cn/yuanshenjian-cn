@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from app.shared.security import Actor
+from app.shared.domain.actor import Actor
 
 
 class SubmitArticleCommentReq(BaseModel):
@@ -17,7 +17,7 @@ class CreateArticleCommentReq(BaseModel):
     article_slug: str
     actor: Actor
     display_name: str = Field(min_length=1, max_length=80)
-    email: str | None = None
+    email_hash: str | None = None
     content_markdown: str = Field(min_length=1, max_length=4000)
     parent_id: str | None = None
     ip_hash: str | None = None

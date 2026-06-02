@@ -146,11 +146,11 @@ app/
 
 ## 配置与环境变量
 
-- 所有配置通过 `app/shared/config.py` 中的 `settings` 单例访问，禁止在其他文件直接读取 `os.environ`。
+- 所有配置通过 `app/shared/infra/app_config.py` 中的 `settings` 单例访问，禁止在其他文件直接读取 `os.environ`。
 - 环境变量加载顺序：`.env` → `.env.{APP_ENV}` → `.env.local` → `.env.{APP_ENV}.local` → 系统环境变量。
 - 不要提交 `.env.local` 或包含真实密钥的文件。
-- 应用级配置（CORS、限流参数、AI 配置）放在 `config/app.yaml`，按 `default` / `development` / `production` 分段。
-- LLM provider / profile 配置在 `config/ai/` 目录，不直接在代码中写 model ID 字符串。
+- 应用级配置（CORS、限流参数、AI provider/profile、限流参数）放在 `app/application.yml`，按 `default` / `local` / `test` / `production` 分段；常用字段可以通过环境变量覆盖。
+- LLM provider / profile 配置统一放在 `app/application.yml` 的 `ai.providers` 中，不直接在 provider 代码中写 model ID 字符串。
 
 ---
 

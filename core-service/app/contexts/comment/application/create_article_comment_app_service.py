@@ -2,19 +2,18 @@ from __future__ import annotations
 
 from app.contexts.comment.application.dto.create_article_comment_dto import CreateArticleCommentReq, CreateArticleCommentResp
 from app.contexts.comment.domain.comment import ArticleComment, CommentStatus
+from app.contexts.comment.domain.comment_content_renderer import CommentContentRenderer
+from app.contexts.comment.domain.comment_moderation_service import CommentModerationService
 from app.contexts.comment.domain.comment_repository import CommentRepository
 from app.contexts.comment.domain.exceptions import InvalidParentCommentError
-from app.contexts.comment.infra.comment_markdown_renderer import CommentMarkdownRenderer
-from app.contexts.comment.infra.simple_comment_moderation_service import SimpleCommentModerationService
-from app.shared.security import hash_with_pepper
 
 
 class CreateArticleCommentAppService:
     def __init__(
         self,
         comment_repository: CommentRepository,
-        markdown_renderer: CommentMarkdownRenderer,
-        moderation_service: SimpleCommentModerationService,
+        markdown_renderer: CommentContentRenderer,
+        moderation_service: CommentModerationService,
     ) -> None:
         self._comment_repository = comment_repository
         self._markdown_renderer = markdown_renderer
@@ -24,7 +23,7 @@ class CreateArticleCommentAppService:
         if req.parent_id:
             parent = self._comment_repository.get_by_id(req.parent_id)
             if parent is None or parent.article_slug != req.article_slug or not parent.can_accept_reply():
-                raise InvalidParentCommentError("invalid_parent_comment")
+                raise InvalidParentCommentError()
 
         moderation = self._moderation_service.evaluate(req.content_markdown)
         comment = ArticleComment(
@@ -35,7 +34,7 @@ class CreateArticleCommentAppService:
             visitor_id=req.actor.visitor_id,
             user_id=req.actor.user_id,
             display_name=req.display_name,
-            email_hash=hash_with_pepper(req.email, "email") if req.email else None,
+            email_hash=req.email_hash,
             content_markdown=req.content_markdown,
             content_html=self._markdown_renderer.render(req.content_markdown),
             status=CommentStatus.PENDING,

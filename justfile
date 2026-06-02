@@ -187,9 +187,11 @@ check: check-site test-workspace check-admin-console check-core-service
 
 # 触发 core-service 本地数据库迁移到最新版本。
 run-core-migrations: _ensure_core_venv
-    @APP_ENV=development \
+    @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head
 
@@ -202,23 +204,29 @@ start-site: _check_node
 
 # 启动 core-service 开发服务器，并在启动前自动执行迁移。
 start-core-service: run-core-migrations
-    @APP_ENV=development \
+    @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}}
 
 # 同时启动 site 和 core-service。
 start-site-and-core-service: _check_node _ensure_core_venv
     @trap 'kill 0' INT TERM EXIT; \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     NEXT_PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
@@ -230,14 +238,18 @@ start-site-and-core-service: _check_node _ensure_core_venv
 # 同时启动 admin-console 和 core-service。
 start-admin-console-and-core-service: _check_node _ensure_core_venv
     @trap 'kill 0' INT TERM EXIT; \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     VITE_CORE_SERVICE_URL="http://localhost:{{CORE_PORT}}" \
@@ -248,14 +260,18 @@ start-admin-console-and-core-service: _check_node _ensure_core_venv
 # 同时启动 site、admin-console 和 core-service。
 start-all-services: _check_node _ensure_core_venv
     @trap 'kill 0' INT TERM EXIT; \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
-    APP_ENV=development \
+    APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    SESSION_SECRET="dev-session-secret" \
+    ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
     core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     NEXT_PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \

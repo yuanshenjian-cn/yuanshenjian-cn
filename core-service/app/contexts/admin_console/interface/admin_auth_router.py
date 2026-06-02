@@ -7,20 +7,26 @@ from app.contexts.admin_console.application.dto.get_admin_session_profile_dto im
 from app.contexts.admin_console.application.dto.login_admin_session_dto import LoginAdminSessionReq, LoginAdminSessionResp
 from app.contexts.admin_console.application.get_admin_session_profile_app_service import GetAdminSessionProfileAppService
 from app.contexts.admin_console.application.login_admin_session_app_service import LoginAdminSessionAppService
-from app.shared.config import settings
-from app.shared.rate_limit import admin_login_limiter
-from app.shared.security import require_admin, require_csrf, turnstile_action_for_scene, verify_origin, verify_turnstile
+from app.contexts.admin_console.domain.exceptions import InvalidAdminPasswordError
+from app.contexts.admin_console.infra.admin_session_authenticator import RepositoryAdminSessionAuthenticator
+from app.contexts.admin_console.infra.admin_session_request_guard import AdminSessionRequestGuard
+from app.contexts.admin_console.infra.dao.admin_session_dao import AdminSessionDAO
+from app.contexts.admin_console.infra.sqlmodel_admin_session_repository import SQLModelAdminSessionRepository
+from app.shared.infra.app_config import settings
+from app.shared.infra.in_memory_rate_limiter import admin_login_limiter
+from app.shared.infra.request_security import turnstile_action_for_scene, verify_origin, verify_turnstile
 from app.shared.infra.database import get_session
 
 router = APIRouter(prefix="/api/v1/admin")
 
 
-def build_login_admin_session_service() -> LoginAdminSessionAppService:
-    return LoginAdminSessionAppService()
+def build_login_admin_session_service(session: Session) -> LoginAdminSessionAppService:
+    repository = SQLModelAdminSessionRepository(AdminSessionDAO(session))
+    return LoginAdminSessionAppService(RepositoryAdminSessionAuthenticator(repository))
 
 
-def get_login_admin_session_service() -> LoginAdminSessionAppService:
-    return build_login_admin_session_service()
+def get_login_admin_session_service(session: Session = Depends(get_session)) -> LoginAdminSessionAppService:
+    return build_login_admin_session_service(session)
 
 
 def build_get_admin_session_profile_service() -> GetAdminSessionProfileAppService:
@@ -31,12 +37,20 @@ def get_get_admin_session_profile_service() -> GetAdminSessionProfileAppService:
     return build_get_admin_session_profile_service()
 
 
+def build_admin_session_request_guard(session: Session) -> AdminSessionRequestGuard:
+    repository = SQLModelAdminSessionRepository(AdminSessionDAO(session))
+    return AdminSessionRequestGuard(repository, settings.session_secret)
+
+
+def get_admin_session_request_guard(session: Session = Depends(get_session)) -> AdminSessionRequestGuard:
+    return build_admin_session_request_guard(session)
+
+
 @router.post("/auth/login", response_model=LoginAdminSessionResp)
 async def login_admin_session(
     payload: LoginAdminSessionReq,
     request: Request,
     response: Response,
-    session: Session = Depends(get_session),
     service: LoginAdminSessionAppService = Depends(get_login_admin_session_service),
 ) -> LoginAdminSessionResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
@@ -47,15 +61,40 @@ async def login_admin_session(
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
     try:
-        return service.execute(payload, session, response)
-    except ValueError as error:
-        raise HTTPException(status_code=401, detail=str(error)) from error
+        result = service.execute(payload)
+        response.set_cookie(
+            "admin_session",
+            result.raw_session_token,
+            httponly=True,
+            secure=settings.app_env == "production",
+            samesite="lax",
+            domain=settings.cookie_domain if settings.app_env == "production" else None,
+            path="/api/v1/admin",
+            max_age=60 * 60 * 24 * 7,
+        )
+        response.set_cookie(
+            "csrf_token",
+            result.response.csrf_token,
+            httponly=False,
+            secure=settings.app_env == "production",
+            samesite="lax",
+            domain=settings.cookie_domain if settings.app_env == "production" else None,
+            path="/",
+            max_age=60 * 60 * 24 * 7,
+        )
+        return result.response
+    except InvalidAdminPasswordError as error:
+        raise HTTPException(status_code=401, detail=error.error_code) from error
 
 
 @router.post("/auth/logout")
-def logout_admin_session(request: Request, response: Response, session: Session = Depends(get_session)) -> dict[str, bool]:
-    require_admin(session, request)
-    require_csrf(request)
+def logout_admin_session(
+    request: Request,
+    response: Response,
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+) -> dict[str, bool]:
+    guard.require_admin(request)
+    guard.require_csrf(request)
     response.delete_cookie("admin_session", path="/api/v1/admin", domain=settings.cookie_domain if settings.app_env == "production" else None)
     response.delete_cookie("csrf_token", path="/", domain=settings.cookie_domain if settings.app_env == "production" else None)
     return {"ok": True}
@@ -64,8 +103,8 @@ def logout_admin_session(request: Request, response: Response, session: Session 
 @router.get("/me", response_model=GetAdminSessionProfileResp)
 def get_admin_session_profile(
     request: Request,
-    session: Session = Depends(get_session),
+    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminSessionProfileAppService = Depends(get_get_admin_session_profile_service),
 ) -> GetAdminSessionProfileResp:
-    require_admin(session, request)
+    guard.require_admin(request)
     return service.execute()

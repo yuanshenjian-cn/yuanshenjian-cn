@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from app.shared.security import Actor
+from app.shared.domain.actor import Actor
 
 
 class SubmitArticleViewReq(BaseModel):

@@ -10,9 +10,12 @@ from app.contexts.article_analytics.application.record_article_view_app_service 
 from app.contexts.article_analytics.infra.dao.article_daily_stats_dao import ArticleDailyStatsDAO
 from app.contexts.article_analytics.infra.dao.article_view_event_dao import ArticleViewEventDAO
 from app.contexts.article_analytics.infra.sqlmodel_article_analytics_repository import SQLModelArticleAnalyticsRepository
-from app.shared.security import get_actor, hash_request_ip, hash_user_agent, normalize_referrer_origin, verify_origin
-from app.shared.config import settings
+from app.contexts.visitor_identity.infra.dao.visitor_identity_dao import VisitorIdentityDAO
+from app.contexts.visitor_identity.infra.sqlmodel_visitor_identity_repository import SQLModelVisitorIdentityRepository
+from app.contexts.visitor_identity.infra.visitor_actor_resolver import VisitorActorResolver
+from app.shared.infra.app_config import settings
 from app.shared.infra.database import get_session
+from app.shared.infra.request_security import hash_request_ip, hash_user_agent, normalize_referrer_origin, verify_origin
 
 router = APIRouter()
 
@@ -35,17 +38,25 @@ def get_get_article_stats_service(session: Session = Depends(get_session)) -> Ge
     return build_get_article_stats_service(session)
 
 
+def build_visitor_actor_resolver(session: Session) -> VisitorActorResolver:
+    return VisitorActorResolver(SQLModelVisitorIdentityRepository(VisitorIdentityDAO(session)))
+
+
+def get_visitor_actor_resolver(session: Session = Depends(get_session)) -> VisitorActorResolver:
+    return build_visitor_actor_resolver(session)
+
+
 @router.post("/api/v1/articles/{article_slug}/view", response_model=RecordArticleViewResp)
 def record_article_view(
     article_slug: str,
     payload: SubmitArticleViewReq,
     request: Request,
     response: Response,
-    session: Session = Depends(get_session),
+    actor_resolver: VisitorActorResolver = Depends(get_visitor_actor_resolver),
     service: RecordArticleViewAppService = Depends(get_record_article_view_service),
 ) -> RecordArticleViewResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    actor = get_actor(session, request, response)
+    actor = actor_resolver.resolve(request, response)
     return service.execute(
         RecordArticleViewReq(
             article_slug=article_slug,
