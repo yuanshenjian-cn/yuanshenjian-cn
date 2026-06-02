@@ -26,10 +26,10 @@ const ARTICLE_SECTION_ROUTES = [
   { contentDir: "health/diet-culture", rootPath: "/health", columnPath: "/health/diet-culture" },
 ];
 const INVESTMENT_COVERAGE_RELATED_FILES = new Set([
-  "app/investment/coverage/page.tsx",
-  "components/investment/coverage-page-client.tsx",
-  "lib/investment-config.ts",
-  "public/investment-data/coverage.json",
+  "site/app/investment/coverage/page.tsx",
+  "site/components/investment/coverage-page-client.tsx",
+  "site/lib/investment-config.ts",
+  "site/public/investment-data/coverage.json",
   "scripts/build-investment-data.js",
   "skills/investment-briefing/config/briefing.json",
   "skills/investment-briefing/config/focus-areas.json",

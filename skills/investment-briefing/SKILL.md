@@ -183,9 +183,9 @@ frontmatter `tags` 规则：
 6. 黑名单企业排除检查
 7. 可读性检查：开篇和主体正文没有大段落；章节正文单段目标为 80~120 个中文汉字；主体章节使用有信息量的短 `###` 子标题拆分，而不是依赖长列表
 8. 项目级 `investment-briefing-reviewer` 已基于草稿与内部审核摘要完成第二道审核，并明确给出“可进入发布门禁”结论
-9. `npm run validate-content`
-10. `npm run build:investment-data`
-11. 确认 `public/investment-data/briefings/index.json` 已更新
+9. `just validate-content`
+10. `just build-site-investment-data`
+11. 确认 `site/public/investment-data/briefings/index.json` 已更新
 12. git 安全检查
 
 其中第 2 项至少要明确：
@@ -212,14 +212,14 @@ frontmatter `tags` 规则：
 默认发布命令：
 
 ```bash
-npm run validate-content
-npm run build:investment-data
-git add content/investment-briefings/YYYY-MM-DD-investment-briefing.md public/investment-data/briefings/index.json public/investment-data/coverage.json
+just validate-content
+just build-site-investment-data
+git add content/investment-briefings/YYYY-MM-DD-investment-briefing.md site/public/investment-data/briefings/index.json site/public/investment-data/coverage.json
 git commit -m "add investment briefing for YYYY-MM-DD"
 git push
 ```
 
-`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `npm run purge:cloudflare -- --scope investment-briefing --date YYYY-MM-DD`。
+`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `just purge-investment-briefing-cache YYYY-MM-DD`。
 
 ## 输出给用户
 

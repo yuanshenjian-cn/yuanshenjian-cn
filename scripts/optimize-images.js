@@ -15,18 +15,20 @@
 
 const fs = require('fs');
 const path = require('path');
+const { siteRequire } = require('./site-require.js');
+const { siteImagesDir } = require('../config/workspace-paths.js');
 
 // 尝试导入 sharp，如果未安装则给出友好提示
 let sharp;
 try {
-  sharp = require('sharp');
+  sharp = siteRequire('sharp');
 } catch (e) {
-  console.error('❌ sharp is required for image optimization. Run: npm install --save-dev sharp');
+  console.error('❌ sharp is required for image optimization. Run: just install-site');
   process.exit(1);
 }
 
 const QUALITY = 85;
-const INPUT_DIR = path.join(process.cwd(), 'public/images');
+const INPUT_DIR = siteImagesDir;
 
 // 支持的图片格式（需要转换的）
 const CONVERT_FORMATS = ['.jpg', '.jpeg', '.png'];

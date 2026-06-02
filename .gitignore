@@ -30,6 +30,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# Local config overrides
+*.local.json
+*.local.jsonc
 # Vercel
 .vercel
 
@@ -62,8 +65,17 @@ tmp/
 .brainstorm/
 .draft/
 blog-ai-worker/node_modules/
+site/node_modules/
+admin-console/node_modules/
+admin-console/dist/
+core-service/.venv/
+core-service/dev.db
+core-service/dev.db-*
+core-service/**/__pycache__/
+core-service/**/*.pyc
 blog-ai-worker/.wrangler/
 blog-ai-worker/.dev.vars
 blog-ai-worker/llm-profiles.local.jsonc
 blog-ai-worker/.llm-active-profile
 public/ai-data/*.json
+.mypy_cache/

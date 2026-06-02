@@ -6,19 +6,19 @@
 
 const fs = require('fs');
 const path = require('path');
+const { siteRequire } = require('./site-require.js');
+const { siteScreenshotsDir } = require('../config/workspace-paths.js');
 
 let sharp;
 try {
-  sharp = require('sharp');
+  sharp = siteRequire('sharp');
 } catch (e) {
-  console.log('正在安装 sharp...');
-  const { execSync } = require('child_process');
-  execSync('npm install sharp --save-dev', { stdio: 'inherit' });
-  sharp = require('sharp');
+  console.error('❌ sharp 未安装，请先执行 just install-site');
+  process.exit(1);
 }
 
 async function convertScreenshots() {
-  const screenshotsDir = path.join(process.cwd(), 'public/screenshots');
+  const screenshotsDir = siteScreenshotsDir;
   
   const files = ['home.png', 'article.png'];
   

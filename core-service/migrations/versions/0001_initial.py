@@ -1,0 +1,52 @@
+"""initial schema
+
+Revision ID: 0001_initial
+Revises:
+Create Date: 2026-06-01
+"""
+
+from __future__ import annotations
+
+from alembic import op
+import sqlalchemy as sa
+
+revision = "0001_initial"
+down_revision = None
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+
+    op.create_table(
+        "visitors",
+        sa.Column("id", sa.String(36), primary_key=True),
+        sa.Column("visitor_key_hash", sa.String(128), nullable=False, unique=True),
+        sa.Column("first_seen_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column("last_seen_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column("risk_score", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+    )
+    op.create_table("users", sa.Column("id", sa.String(36), primary_key=True), sa.Column("display_name", sa.String(120), nullable=False), sa.Column("avatar_url", sa.Text()), sa.Column("status", sa.String(32), nullable=False, server_default="active"), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("auth_identities", sa.Column("id", sa.String(36), primary_key=True), sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id"), nullable=False), sa.Column("provider", sa.String(64), nullable=False), sa.Column("provider_subject", sa.String(256), nullable=False), sa.Column("provider_unionid", sa.String(256)), sa.Column("raw_profile", sa.JSON(), nullable=False), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.UniqueConstraint("provider", "provider_subject", name="uq_auth_identity_provider_subject"))
+    op.create_table("admin_sessions", sa.Column("id", sa.String(36), primary_key=True), sa.Column("session_hash", sa.String(128), nullable=False, unique=True), sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("last_seen_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("knowledge_documents", sa.Column("id", sa.String(36), primary_key=True), sa.Column("source_type", sa.String(64), nullable=False), sa.Column("source_id", sa.String(256), nullable=False), sa.Column("slug", sa.String(256)), sa.Column("title", sa.String(512), nullable=False), sa.Column("url", sa.Text()), sa.Column("summary", sa.Text()), sa.Column("visibility", sa.String(32), nullable=False, server_default="public"), sa.Column("content_hash", sa.String(64), nullable=False), sa.Column("published_at", sa.DateTime(timezone=True)), sa.Column("metadata", sa.JSON(), nullable=False), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.UniqueConstraint("source_type", "source_id", name="uq_knowledge_documents_source"))
+    op.create_table("knowledge_chunks", sa.Column("id", sa.String(36), primary_key=True), sa.Column("document_id", sa.String(36), sa.ForeignKey("knowledge_documents.id"), nullable=False), sa.Column("chunk_index", sa.Integer(), nullable=False), sa.Column("heading", sa.String(512)), sa.Column("content", sa.Text(), nullable=False), sa.Column("token_count", sa.Integer(), nullable=False, server_default="0"), sa.Column("content_hash", sa.String(64), nullable=False), sa.Column("embedding", sa.JSON()), sa.Column("embedding_model", sa.String(128)), sa.Column("metadata", sa.JSON(), nullable=False), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.UniqueConstraint("document_id", "chunk_index", name="uq_knowledge_chunks_document_index"))
+    op.create_table("rag_sync_runs", sa.Column("id", sa.String(36), primary_key=True), sa.Column("status", sa.String(32), nullable=False), sa.Column("commit_sha", sa.String(64)), sa.Column("started_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("finished_at", sa.DateTime(timezone=True)), sa.Column("documents_seen", sa.Integer(), nullable=False, server_default="0"), sa.Column("documents_upserted", sa.Integer(), nullable=False, server_default="0"), sa.Column("chunks_upserted", sa.Integer(), nullable=False, server_default="0"), sa.Column("chunks_deleted", sa.Integer(), nullable=False, server_default="0"), sa.Column("embeddings_generated", sa.Integer(), nullable=False, server_default="0"), sa.Column("error_message", sa.Text()), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("comments", sa.Column("id", sa.String(36), primary_key=True), sa.Column("article_slug", sa.String(256), nullable=False), sa.Column("parent_id", sa.String(36), sa.ForeignKey("comments.id")), sa.Column("actor_type", sa.String(32), nullable=False), sa.Column("visitor_id", sa.String(36), sa.ForeignKey("visitors.id")), sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id")), sa.Column("display_name", sa.String(80), nullable=False), sa.Column("email_hash", sa.String(128)), sa.Column("content_markdown", sa.Text(), nullable=False), sa.Column("content_html", sa.Text(), nullable=False), sa.Column("status", sa.String(32), nullable=False, server_default="pending"), sa.Column("ai_moderation_recommended_status", sa.String(32)), sa.Column("ai_moderation_score", sa.Numeric(5, 2)), sa.Column("ai_moderation_labels", sa.JSON(), nullable=False), sa.Column("ai_moderation_reason", sa.Text()), sa.Column("ip_hash", sa.String(128)), sa.Column("user_agent_hash", sa.String(128)), sa.Column("reviewed_by", sa.String(128)), sa.Column("review_note", sa.Text()), sa.Column("reviewed_at", sa.DateTime(timezone=True)), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("article_view_events", sa.Column("id", sa.String(36), primary_key=True), sa.Column("article_slug", sa.String(256), nullable=False), sa.Column("visitor_id", sa.String(36), sa.ForeignKey("visitors.id")), sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id")), sa.Column("ip_hash", sa.String(128)), sa.Column("user_agent_hash", sa.String(128)), sa.Column("referrer_origin", sa.Text()), sa.Column("viewed_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("article_view_daily_stats", sa.Column("article_slug", sa.String(256), primary_key=True), sa.Column("stat_date", sa.Date(), primary_key=True), sa.Column("pv_count", sa.Integer(), nullable=False, server_default="0"), sa.Column("uv_count", sa.Integer(), nullable=False, server_default="0"), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("ai_conversations", sa.Column("id", sa.String(36), primary_key=True), sa.Column("scene", sa.String(64), nullable=False), sa.Column("actor_type", sa.String(32), nullable=False), sa.Column("visitor_id", sa.String(36)), sa.Column("user_id", sa.String(36)), sa.Column("article_slug", sa.String(256)), sa.Column("title", sa.String(512)), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("ai_messages", sa.Column("id", sa.String(36), primary_key=True), sa.Column("conversation_id", sa.String(36), sa.ForeignKey("ai_conversations.id"), nullable=False), sa.Column("role", sa.String(32), nullable=False), sa.Column("content", sa.Text(), nullable=False), sa.Column("references", sa.JSON(), nullable=False), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("ai_request_events", sa.Column("id", sa.String(36), primary_key=True), sa.Column("scene", sa.String(64), nullable=False), sa.Column("actor_type", sa.String(32), nullable=False), sa.Column("visitor_id", sa.String(36)), sa.Column("user_id", sa.String(36)), sa.Column("conversation_id", sa.String(36)), sa.Column("provider", sa.String(128)), sa.Column("model", sa.String(128)), sa.Column("input_chars", sa.Integer(), nullable=False, server_default="0"), sa.Column("output_chars", sa.Integer(), nullable=False, server_default="0"), sa.Column("prompt_tokens", sa.Integer()), sa.Column("completion_tokens", sa.Integer()), sa.Column("latency_ms", sa.Integer(), nullable=False, server_default="0"), sa.Column("status", sa.String(32), nullable=False), sa.Column("error_code", sa.String(128)), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("rag_query_events", sa.Column("id", sa.String(36), primary_key=True), sa.Column("ai_request_event_id", sa.String(36)), sa.Column("query", sa.Text(), nullable=False), sa.Column("top_k", sa.Integer(), nullable=False, server_default="5"), sa.Column("matched_chunk_ids", sa.JSON(), nullable=False), sa.Column("max_score", sa.Numeric(8, 4)), sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("rate_limit_buckets", sa.Column("bucket_key", sa.String(256), primary_key=True), sa.Column("count", sa.Integer(), nullable=False, server_default="0"), sa.Column("reset_at", sa.DateTime(timezone=True), nullable=False), sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()))
+    op.create_table("daily_budget_usage", sa.Column("usage_date", sa.Date(), primary_key=True), sa.Column("scene", sa.String(64), primary_key=True), sa.Column("request_count", sa.Integer(), nullable=False, server_default="0"), sa.Column("estimated_tokens", sa.Integer(), nullable=False, server_default="0"))
+
+
+def downgrade() -> None:
+    for table_name in ["daily_budget_usage", "rate_limit_buckets", "rag_query_events", "ai_request_events", "ai_messages", "ai_conversations", "article_view_daily_stats", "article_view_events", "comments", "rag_sync_runs", "knowledge_chunks", "knowledge_documents", "admin_sessions", "auth_identities", "users", "visitors"]:
+        op.drop_table(table_name)

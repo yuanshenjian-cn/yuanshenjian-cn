@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const matter = require('gray-matter');
+const { siteRequire } = require('./site-require.js');
+const matter = siteRequire('gray-matter');
+const { blogContentDir } = require('../config/workspace-paths.js');
 
-const postsDirectory = path.join(process.cwd(), 'content/blog');
+const postsDirectory = blogContentDir;
 
 // 递归获取所有 markdown 文件
 function getAllMarkdownFiles(dir) {

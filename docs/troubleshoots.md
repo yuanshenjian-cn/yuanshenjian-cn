@@ -4,6 +4,260 @@
 
 ---
 
+## 2026-06-02 主站迁到 `site/` 后，仓库根目录统一改用 just，根 npm 入口不再作为日常开发方式
+
+### 现象
+
+- 仓库已经不是单一前端项目，而是 `site/`、`admin-console/`、`core-service/` 三个工程并存。
+- 如果继续默认在根目录执行 `npm run dev/build/test`，容易把主站工程、根脚本和 workspace 测试混在一起。
+- 目录迁移后，主站自己的配置和脚手架已经收口到 `site/`，再把根目录当成主站 npm 入口会持续制造歧义。
+
+### 根因
+
+1. `site/` 现在持有自己的 `package.json`、Next/Vitest/ESLint/Tailwind/PostCSS 配置和构建产物目录。
+2. 根目录同时承载内容、脚本、skills、文档、workflows 和多服务联调编排，更适合作为 workspace，而不是某个工程的 npm 根。
+3. 根目录保留 npm 入口会让人和 agent 都难以判断“这条命令到底在操作哪个工程”。
+
+### 修复
+
+1. 主站相关配置和脚手架统一收口到 `site/`。
+2. 仓库根目录统一通过 `justfile` 暴露动作语义明确的命令，例如：
+   - `just start-site`
+   - `just start-admin-console`
+   - `just start-core-service`
+   - `just build-site-prod`
+   - `just run-core-migrations`
+   - `just check`
+3. `AGENTS.md`、`README.md`、`deploy.yml` 同步改为面向 `site/` 结构。
+
+### 如何确认修复生效
+
+1. 在仓库根目录执行：
+   - `just check-site`
+   - `just check-admin-console`
+   - `just check-core-service`
+   - `just build-site-prod`
+2. 直接进入 `site/` 执行：
+   - `npm run typecheck`
+   - `npm run test`
+   - `npm run build:prod`
+3. 确认日常开发优先使用 `just`，而不是继续在根目录依赖 npm 脚本。
+
+### 补充修复（根目录彻底去 npm 化后的必要收尾）
+
+1. 删除仓库根 `package.json` 和 `package-lock.json`，避免继续把根目录误当作主站 npm 工程。
+2. `.husky/pre-commit` / `.husky/pre-push` 改为调用 `just`：
+   - `just check-site && just test-workspace`
+   - `just build-site-prod`
+3. 为仍需从仓库根触发的常见动作补充 `just` 命令包装：
+   - `just validate-content-path`
+   - `just validate-content-strict`
+   - `just purge-ai-briefing-cache`
+   - `just purge-investment-briefing-cache`
+   - `just install-git-hooks`
+4. `skills/`、`.opencode/commands/`、workflow 与本地权限配置同步改为新结构：
+   - 根入口改用 `just`
+   - 主站静态资源路径改用 `site/public/...`
+   - 主站代码路径改用 `site/app/...`、`site/components/...`、`site/lib/...`
+5. `site/package-lock.json` 必须显式落盘，供 CI 的 `npm ci` 和缓存键使用。
+
+### 额外根因
+
+1. 仓库根的 `scripts/*.js` 中有一批脚本依赖 `gray-matter`、`github-slugger`、`sharp` 等包。
+2. 主站迁走后，这些依赖实际已经属于 `site/package.json`，但脚本仍在仓库根通过普通 `require(...)` 解析。
+3. 如果直接删除根 `package.json/node_modules` 而不改脚本依赖解析，`build-ai-data`、`build-investment-data`、图片优化等命令会在运行时找不到包。
+
+### 补充修复措施
+
+1. 新增 `scripts/site-require.js`，统一通过 `createRequire(site/package.json)` 从 `site` 工程解析前端依赖。
+2. 所有仍在仓库根执行、但依赖前端包的脚本，统一改用 `siteRequire(...)`。
+3. 需要 `sharp` 的脚本不再尝试在仓库根自动 `npm install`，统一提示先执行 `just install-site`。
+
+### 如何确认补充修复生效
+
+1. 确认仓库根已不存在 `package.json` 和 `package-lock.json`。
+2. 运行：
+   - `just validate-content`
+   - `just build-site-ai-data`
+   - `just build-site-investment-data`
+   - `just build-site-prod`
+3. 确认以上命令在根目录可执行，且不会再因为缺少根 `node_modules` 而报 `Cannot find module 'gray-matter' / 'sharp' / 'github-slugger'`。
+4. 检查 hooks / workflows / skills 文案，确认默认入口都已切到 `just` 或显式的子工程目录。
+
+### 继续收尾（根目录残留迁移到子工程后暴露的问题）
+
+1. 主站自用 hook `use-active-heading.ts` 迁到 `site/hooks/`，不再继续留在仓库根 `hooks/`。
+2. 新增 `site/public/CNAME`，并验证 `just build-site` 后 `site/dist/CNAME` 会正确生成。
+3. 为了降低 GitHub Pages 自定义域名切换风险，当前保留根 `CNAME` 作为保险副本；实际构建产物来源已经切到 `site/public/CNAME`。
+4. 删除根目录明确不该继续保留的构建残留：
+   - `.next/`
+   - `dist/`
+   - 根 `node_modules/`
+   - `tsconfig.tsbuildinfo`
+   - 已无引用的 `tests/setup.ts`
+   - 已无引用的 `config/focus-companies.json`
+   - 空目录 `hooks/`、`lib/`
+
+### 新暴露的根因
+
+1. 迁移前虽然目录结构已经拆成 `site/`、`admin-console/`、`core-service/`，但本地环境里仍有一部分命令偷偷依赖仓库根安装出来的依赖。
+2. 删除根 `node_modules` 后，`site` 会暴露出 `tsc: command not found`，说明主站此前并没有真正完成独立安装。
+3. `admin-console` 也暴露出同类问题：它自己的 `package.json` 没有声明 `@types/react` / `@types/react-dom`，此前是被根依赖兜住了。
+4. workspace 级测试配置如果继续留在仓库根，也会因为 `vitest/config` 从根解析而再次隐式依赖根 `node_modules`。
+
+### 修复措施
+
+1. 在 `site/` 重新执行独立安装，确保 `site/node_modules` 完整可用。
+2. 给 `admin-console/package.json` 补上：
+   - `@types/react`
+   - `@types/react-dom`
+3. 将 workspace 级 Vitest 配置从仓库根迁到 `site/vitest.workspace.config.ts`，统一从主站子工程解析 `vitest/config`。
+4. 重新执行全仓回归，确认在没有根 `node_modules` 的前提下仍然通过。
+
+### 如何确认这轮收尾生效
+
+1. 根目录不再存在 `.next/`、`dist/`、根 `node_modules/`。
+2. `site/public/CNAME` 存在，且执行 `just build-site` 后 `site/dist/CNAME` 也存在。
+3. 运行 `just check` 通过，且不再因为缺少根依赖而报：
+   - `tsc: command not found`
+   - `Cannot find module 'vitest/config'`
+   - `Could not find a declaration file for module 'react'`
+
+### 补充修复（workspace 测试的并发文件读取脆弱点）
+
+1. `tests/scripts/build-investment-data.test.ts` 与 `tests/scripts/validate-post.test.ts` 都会在 `content/investment-briefings/` 下创建和删除 `2099-*` 测试文件。
+2. 当 workspace 测试并行执行时，`validate-post.js` 可能先扫到某个文件路径，但在真正 `readFileSync` 前该文件已被另一条测试清理。
+3. 原表现是 `validate-post` 先抛出 `ENOENT`，从而掩盖本应出现的正文校验错误。
+
+### 修复措施
+
+1. `scripts/validate-post.js` 中的 `readPublishedBriefingEntry()` 对 `ENOENT` 做了显式容错：
+   - 文件在扫描后瞬时消失时，直接按 `null` 忽略
+   - 其他异常仍然继续抛出
+2. 这样既能稳定 workspace 测试，也更符合真实场景下目录扫描与文件读取之间可能存在并发变更的事实。
+
+### 如何确认这条修复生效
+
+1. 运行 `just test-workspace`。
+2. 确认 `tests/scripts/validate-post.test.ts` 不再因为 `ENOENT: no such file or directory` 失败。
+
+## 2026-06-02 core-service 切换到分环境 `.env` + YAML + JSONC 配置体系
+
+### 背景
+
+1. `core-service` 之前主要依赖扁平环境变量，AI 配置使用 `LLM_PROFILES_JSON` / `AI_SCENE_PROFILE_MAP` 这类大块 JSON 字符串。
+2. 这种方式对多 provider / 多 model 不友好，可读性差，也不利于后续承接 `blog-ai-worker` 的 profile/provider 配置能力。
+
+### 现在的分层方案
+
+1. `.env.*`
+   - 按环境区分地址、数据库、secret、provider API key
+   - 加载顺序：`.env` -> `.env.<APP_ENV>` -> `.env.local` -> `.env.<APP_ENV>.local` -> 真实进程环境变量
+2. `core-service/config/app.yaml`
+   - 放 CORS、cookie、AI 限流、配置文件路径等结构化配置
+3. `core-service/config/ai/*.jsonc`
+   - `llm-profiles.jsonc`：provider / model 定义
+   - `scene-profile-map.jsonc`：scene -> profile selector 映射
+   - `supported-llm-providers.json`：provider 白名单
+
+### 关键经验
+
+1. LLM profile 文件不要再写真实 `apiKey`，统一写 `apiKeyEnv`，让 secret 只留在 `.env.*` 或线上环境变量里。
+2. `scene-profile-map.jsonc` 里建议保留 `default` 条目，代码里也要优先读取它，而不是只依赖硬编码 fallback。
+3. 本地默认值可以提交 `core-service/.env.development`，但个人覆盖要写到 `core-service/.env.development.local`。
+
+### 新暴露的问题
+
+1. 在 `core-service/` 根目录新增 `config/` 后，`pip install -e "./core-service[dev]"` 会因为 setuptools 自动发现到多个顶层包而失败：
+   - `error: Multiple top-level packages discovered in a flat-layout: ['app', 'config']`
+
+### 修复措施
+
+1. 在 `core-service/pyproject.toml` 中显式声明：
+   - `build-system`
+   - `[tool.setuptools.packages.find] include = ["app*"]`
+2. 这样 editable install 只把 `app` 当成 Python 包，`config/` 则继续作为运行时配置目录存在。
+
+### 如何确认这轮配置迁移生效
+
+1. 运行 `just install-core-service`，确认 editable install 不再报多个顶层包。
+2. 运行 `just run-core-migrations`，确认新的 `.env + YAML` 配置链路能驱动 Alembic。
+3. 运行 `just check-core-service` 或 `just check`，确认：
+   - 不再依赖 `LLM_PROFILES_JSON`
+   - 不再依赖 `CHAT_*`
+   - `core-service` 测试通过
+
+## 2026-06-02 评论与 admin-console 模块迁入 DDD 结构后的注意点
+
+### 这轮结构调整
+
+1. 评论相关能力迁入 `core-service/app/contexts/comment/`：
+   - 文章评论创建 / 查询
+   - 后台评论审核队列 / 审核动作
+2. admin-console 相关能力迁入 `core-service/app/contexts/admin_console/`：
+   - 管理员登录 / 登出 / 当前身份
+   - 概览、文章统计、AI 用量、系统状态
+3. 新增 `app/shared/infra/database.py` 作为新代码的事务边界入口。
+
+### 真实踩到的问题
+
+1. 评论审核链路在 SQLite 下会触发 `admin_session.expires_at` 的 naive / aware datetime 比较错误。
+2. 原因是 `issue_admin_session()` 写入的是带时区时间，但 SQLite 读回后可能变成 naive datetime；`require_admin()` 又直接拿它和 `datetime.now(UTC)` 比较。
+3. 表现为后台评论审核接口在测试或本地环境下报：
+   - `TypeError: can't compare offset-naive and offset-aware datetimes`
+
+### 修复措施
+
+1. 在 `app/shared/security.py` 中新增 `_coerce_utc_datetime()`。
+
+## 2026-06-02 core-service 顶层收口后，Alembic migration 放回工程根目录更合理
+
+### 结论
+
+1. Alembic migration 是数据库 schema 演进历史，不属于运行时业务包。
+2. 它们放在 `core-service/migrations/` 比放在 `app/shared/infra/persistence/migrations/` 更合理。
+
+### 原因
+
+1. `app/shared/infra/` 现在用于运行时基础设施（配置、数据库会话、事务边界、安全等）。
+2. `migrations/versions/*.py` 是部署/演进工件，不应混入运行时 import 树。
+3. 根目录更符合 Alembic 默认习惯，也更利于 CI、运维和本地排查。
+
+### 修复措施
+
+1. 将 migration 目录迁到 `core-service/migrations/`。
+2. `alembic.ini` 的 `script_location` 改为 `core-service/migrations`。
+3. 运行时代码继续从 `app/shared/infra/persistence/models.py` 导入 `Base`，迁移脚本只负责 schema 历史。
+
+### 如何确认这条调整生效
+
+1. 运行 `just run-core-migrations`。
+2. 确认 Alembic 能正常找到 `core-service/migrations/env.py` 并执行升级。
+3. 运行 `just check-core-service`，确认新的 shared 路径和 migration 路径没有打断后端校验。
+2. `require_admin()` 比较过期时间前，先把数据库读出的时间统一归一化为 UTC。
+
+### 评论功能如何验证前后端集成
+
+1. 后端新增了完整链路测试：
+   - `core-service/tests/test_comment_integration.py`
+2. 测试路径覆盖：
+   - 访客提交评论
+   - 评论在未审核前不会出现在公开列表
+   - 管理员登录后台
+   - 管理员审核通过评论
+   - 评论随后出现在公开列表中
+3. 前端新增了 `site/tests/lib/core-service-client.test.ts`，验证：
+   - `fetchComments()` 请求路径正确
+   - `submitComment()` 请求路径和 body 字段正确
+
+### 如何确认这轮评论/admin 重构生效
+
+1. 运行 `just check-core-service`，确认评论闭环集成测试通过。
+2. 运行 `just check-site`，确认评论客户端请求测试通过。
+3. 运行 `just check`，确认 `site`、`admin-console`、`core-service` 全部通过。
+
+---
+
 ## 2026-06-02 部署失败后按 push diff 做 Cloudflare purge，会漏掉 AI 固定入口页缓存
 
 ### 现象

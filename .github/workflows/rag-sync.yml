@@ -1,0 +1,54 @@
+name: RAG Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+      - "site/lib/author-profile-data.js"
+      - "scripts/build-ai-data.js"
+      - "site/package-lock.json"
+
+concurrency:
+  group: rag-sync-production
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install site dependencies
+        run: npm ci
+        working-directory: site
+
+      - name: Validate content
+        run: node scripts/validate-post.js
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install core-service dependencies
+        run: pip install -r core-service/requirements.txt
+
+      - name: Sync public RAG content
+        env:
+          DATABASE_URL: ${{ secrets.CORE_SERVICE_DATABASE_URL }}
+          EMBEDDING_BASE_URL: ${{ secrets.EMBEDDING_BASE_URL }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+          EMBEDDING_MODEL_ID: ${{ vars.EMBEDDING_MODEL_ID }}
+        run: python -m app.services.ingestion --commit-sha "$GITHUB_SHA"
+        working-directory: core-service

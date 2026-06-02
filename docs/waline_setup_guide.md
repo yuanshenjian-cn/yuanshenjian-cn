@@ -47,6 +47,8 @@
    - `robots.txt` - 搜索引擎配置
    - `.gitignore` - Git 忽略文件
 
+   如果你想看本仓库保留的历史示例，可参考 `docs/examples/waline/index.cjs`，但当前博客生产链路已经不再使用 Waline。
+
 #### 步骤 2：创建 GitHub 仓库
 
 1. 登录 GitHub，点击右上角 **+** → **New repository**

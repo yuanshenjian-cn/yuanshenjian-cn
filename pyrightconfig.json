@@ -1,0 +1,26 @@
+{
+  "include": ["core-service/app", "core-service/tests"],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "core-service/.venv",
+    "core-service/.pytest_cache",
+    "core-service/.ruff_cache",
+    "core-service/.mypy_cache",
+    "core-service/app/db/migrations/versions",
+    "site",
+    "admin-console",
+    ".next",
+    ".mypy_cache",
+    ".ruff_cache"
+  ],
+  "venvPath": "core-service",
+  "venv": ".venv",
+  "pythonVersion": "3.12",
+  "executionEnvironments": [
+    {
+      "root": "core-service",
+      "extraPaths": ["core-service"]
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const { blogContentDir, siteImagesDir, oldBlogsDir } = require('../config/workspace-paths.js');
 
-const CONTENT_DIR = path.join(process.cwd(), 'content/blog');
-const PUBLIC_IMAGES_DIR = path.join(process.cwd(), 'public/images');
-const OLD_BLOGS_IMAGES_DIR = path.join(process.cwd(), 'old-blogs/assets/images');
+const CONTENT_DIR = blogContentDir;
+const PUBLIC_IMAGES_DIR = siteImagesDir;
+const OLD_BLOGS_IMAGES_DIR = path.join(oldBlogsDir, 'assets/images');
 
 // 获取所有 markdown 文件
 function getAllMarkdownFiles(dir) {

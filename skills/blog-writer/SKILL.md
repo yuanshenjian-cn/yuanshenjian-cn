@@ -42,7 +42,7 @@ argument-hint: "[文章主题、素材或写作想法]"
 ### 成功标准
 
 一篇完成稿必须同时满足：
-- 能通过 `npm run validate-post -- --strict-writing "content/blog/.../slug.md"`。
+- 能通过 `just validate-content-strict "content/blog/.../slug.md"`。
 - 位于已存在目录，文件名为英文 kebab-case，slug 全仓唯一。
 - frontmatter 包含 `title`、`date`、`tags`、`published`、`brief`。
 - 正文无一级标题 `#`，不使用 `.mdx` 或 JSX。
@@ -81,12 +81,12 @@ argument-hint: "[文章主题、素材或写作想法]"
 4. 生成标题、slug、目录和 tags。
 5. 运行路径预检：
    ```bash
-   npm run validate-post -- --check-path "content/blog/{目录}/{slug}.md"
+   just validate-content-path "content/blog/{目录}/{slug}.md"
    ```
 6. 预检通过后写入 `.md` 文件，默认 `published: false`。
 7. 运行严格全文校验：
    ```bash
-   npm run validate-post -- --strict-writing "content/blog/{目录}/{slug}.md"
+   just validate-content-strict "content/blog/{目录}/{slug}.md"
    ```
 8. 执行校审协议（含语言润色），直接修复确定性问题。
 9. 再运行一次严格全文校验。
@@ -129,8 +129,8 @@ argument-hint: "[文章主题、素材或写作想法]"
 ### 新增专栏（必须暂停确认）
 
 只有用户明确说"新建一个 XX 专栏"或等价表达时，才走新增流程。新增 AI 专栏需同步更新：
-- `lib/columns.ts`
-- `components/column-icons.tsx`
+- `site/lib/columns.ts`
+- `site/components/column-icons.tsx`
 
 普通内容目录不等于 AI 专栏，不要误改上述文件。
 
@@ -290,13 +290,13 @@ brief: >-
 ```
 
 校审完成后：
-1. 如果有自动修复，重新运行 `npm run validate-post -- --strict-writing "content/blog/{目录}/{slug}.md"`。
+1. 如果有自动修复，重新运行 `just validate-content-strict "content/blog/{目录}/{slug}.md"`。
 2. 告知用户文章路径、报告路径、发布状态和校验结果。
 3. 只展示需要用户决策的问题；没有就明确说无待决策项。
 
 ## 构建与预览
 
-- 默认不运行 `npm run build`。
-- 用户明确要求最终验证时运行 `npm run build`。
-- 完整生产构建是 `npm run build:prod`，会先运行图片优化，可能修改 `public/images/`。
-- 本地预览使用 `npm run dev`。
+- 默认不运行 `just build-site`。
+- 用户明确要求最终验证时运行 `just build-site`。
+- 完整生产构建是 `just build-site-prod`，会先运行图片优化，可能修改 `site/public/images/`。
+- 本地预览使用 `just start-site`，或进入 `site/` 后运行 `npm run dev`。

@@ -7,9 +7,9 @@ model: zhipuai-coding-plan/glm-4.7
 ## 你的任务
 
 1. 分析 `content/blog/` 目录下的文章分类结构
-2. 分析 `public/images/` 目录下的图片目录结构
+2. 分析 `site/public/images/` 目录下的图片目录结构
 3. 确保图片目录结构与文章目录结构保持一致
-4. 清理 `public/images/` 下未被引用的图片文件
+4. 清理 `site/public/images/` 下未被引用的图片文件
 5. 删除空的子目录
 
 ## 执行流程
@@ -19,7 +19,7 @@ model: zhipuai-coding-plan/glm-4.7
 使用 `Glob` 和 `Bash` 工具扫描：
 
 - 扫描 `content/blog/` 下的文章文件（`.mdx`）
-- 扫描 `public/images/` 下的所有图片文件
+- 扫描 `site/public/images/` 下的所有图片文件
 - 扫描所有代码文件中的图片引用（`.mdx`, `.tsx`, `.ts`, `.jsx`, `.js`）
 
 ### 2. 分析目录映射关系
@@ -27,13 +27,13 @@ model: zhipuai-coding-plan/glm-4.7
 分析文章目录与图片目录的对应关系：
 
 ```
-content/blog/xp/tdd/           → public/images/xp/tdd/
-content/blog/xp/testing/        → public/images/xp/testing/
-content/blog/xp/simple-design/  → public/images/xp/simple-design/
-content/blog/agile/coaching/    → public/images/agile/coaching/
-content/blog/agile/             → public/images/agile/
-content/blog/career/           → public/images/career/
-content/blog/oo/               → public/images/oo/
+content/blog/xp/tdd/           → site/public/images/xp/tdd/
+content/blog/xp/testing/       → site/public/images/xp/testing/
+content/blog/xp/simple-design/ → site/public/images/xp/simple-design/
+content/blog/agile/coaching/   → site/public/images/agile/coaching/
+content/blog/agile/            → site/public/images/agile/
+content/blog/career/           → site/public/images/career/
+content/blog/oo/               → site/public/images/oo/
 ```
 
 ### 3. 调整图片目录结构
@@ -43,13 +43,13 @@ content/blog/oo/               → public/images/oo/
 #### 3.1 移动图片目录
 
 - 使用 `mv` 命令移动图片到正确的位置
-- 例如：`mv public/images/tdd/* public/images/xp/tdd/`
+- 例如：`mv site/public/images/tdd/* site/public/images/xp/tdd/`
 
 #### 3.2 复制被多个分类引用的图片
 
 如果图片被多个分类的文章引用：
 - 使用 `cp` 命令复制图片到各个分类的目录
-- 例如：`cp public/images/career/image.webp public/images/agile/coaching/`
+- 例如：`cp site/public/images/career/image.webp site/public/images/agile/coaching/`
 
 #### 3.3 更新文章中的图片引用
 
@@ -61,7 +61,7 @@ content/blog/oo/               → public/images/oo/
 #### 4.1 扫描所有图片文件
 
 ```bash
-find public/images -type f \( -name "*.webp" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" \) | sort
+find site/public/images -type f \( -name "*.webp" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" \) | sort
 ```
 
 #### 4.2 扫描所有图片引用
@@ -95,7 +95,7 @@ grep -rhE "(backgroundImage|background).*['\"]?/images/" --include="*.tsx" --inc
 
 ```bash
 # 生成所有图片的相对路径列表
-cd public/images && find . -type f ... | sed 's|^\./||' | sort > tmp/all_images.txt
+cd site/public/images && find . -type f ... | sed 's|^\./||' | sort > tmp/all_images.txt
 
 # 生成被引用图片的相对路径列表
 cat referenced_images.txt | sed 's|^/images/||' | sort > tmp/referenced_relative_images.txt
@@ -107,7 +107,7 @@ comm -23 tmp/all_images.txt tmp/referenced_relative_images.txt > tmp/unreference
 #### 4.4 删除未引用的图片
 
 ```bash
-cd public/images
+cd site/public/images
 while IFS= read -r img; do
     rm "$img"
     echo "✓ 已删除: $img"
@@ -119,19 +119,19 @@ done < tmp/unreferenced_images.txt
 #### 5.1 查找空目录
 
 ```bash
-find public/images -type d -empty
+find site/public/images -type d -empty
 ```
 
 #### 5.2 删除空目录
 
 ```bash
-find public/images -type d -empty -delete
+find site/public/images -type d -empty -delete
 ```
 
 或者使用 rmdir：
 
 ```bash
-for dir in $(find public/images -type d -empty); do
+for dir in $(find site/public/images -type d -empty); do
     rmdir "$dir"
     echo "✓ 已删除空目录: $dir"
 done
@@ -159,7 +159,7 @@ done
 
 ```bash
 for img in $(list_of_images); do
-    if [ -f "public/$img" ]; then
+    if [ -f "site/public/$img" ]; then
         echo "✓ $img"
     else
         echo "✗ $img (缺失)"
@@ -171,10 +171,10 @@ done
 
 ```bash
 # 统计剩余图片数量
-find public/images -type f \( -name "*.webp" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" \) | wc -l
+find site/public/images -type f \( -name "*.webp" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" \) | wc -l
 
 # 查看最终目录结构
-find public/images -type d | sort
+find site/public/images -type d | sort
 ```
 
 ## 使用示例
@@ -185,8 +185,8 @@ find public/images -type d | sort
 
 - **扫描范围**：必须扫描所有可能包含图片引用的文件：
   - `content/` 下的所有 `.mdx` 文件
-  - `app/` 下的所有 `.tsx`, `.ts`, `.jsx`, `.js` 文件
-  - `components/` 下的所有 `.tsx`, `.ts`, `.jsx`, `.js` 文件
+  - `site/app/` 下的所有 `.tsx`, `.ts`, `.jsx`, `.js` 文件
+  - `site/components/` 下的所有 `.tsx`, `.ts`, `.jsx`, `.js` 文件
   - 所有 `.css`, `.scss`, `.module.css` 样式文件
   - 配置文件（`.json`, `.js`, `.ts`）
   
@@ -200,14 +200,14 @@ find public/images -type d | sort
 
 - **谨慎删除**：在删除任何图片之前，必须确认它确实没有被以下位置引用：
   - 文章文件（`content/blog/`）
-  - 页面组件（`app/`）
-  - UI 组件（`components/`）
+  - 页面组件（`site/app/`）
+  - UI 组件（`site/components/`）
   - 样式文件（`.css`, `.scss`, `.module.css`）
   - 配置文件
 
 - **测试验证**：执行删除前，建议先运行构建命令测试：
   ```bash
-  npm run build
+  just build-site
   ```
   检查是否有图片缺失的错误
 
@@ -217,33 +217,33 @@ find public/images -type d | sort
 
 如果 `content/blog/xp/tdd/` 下的文章引用 `/images/tdd/` 的图片：
 
-1. 移动图片目录：`mv public/images/tdd/* public/images/xp/tdd/`
-2. 删除空目录：`rmdir public/images/tdd`
+1. 移动图片目录：`mv site/public/images/tdd/* site/public/images/xp/tdd/`
+2. 删除空目录：`rmdir site/public/images/tdd`
 3. 更新文章引用：`sed -i '' 's|/images/tdd/|/images/xp/tdd/|g' content/blog/xp/tdd/*.mdx`
 
 ### 场景2：图片被多个分类引用
 
 如果图片 `/images/career/4d-cycle.webp` 被 `agile/coaching/` 和 `career/` 的文章同时引用：
 
-1. 复制图片：`cp public/images/career/4d-cycle.webp public/images/agile/coaching/`
+1. 复制图片：`cp site/public/images/career/4d-cycle.webp site/public/images/agile/coaching/`
 2. 只更新 `agile/coaching/` 文章中的引用：`sed -i '' 's|/images/career/4d-cycle.webp|/images/agile/coaching/4d-cycle.webp|g' content/blog/agile/coaching/*.mdx`
 
 ### 场景3：目录命名不一致
 
 如果图片目录是 `career` 但文章目录是 `career`：
 
-1. 重命名目录：`mv public/images/career public/images/career`
+1. 重命名目录：`mv site/public/images/career site/public/images/career`
 2. 更新文章引用：`sed -i '' 's|/images/career/|/images/career/|g' content/blog/career/*.mdx`
 
 ## 注意事项
 
 - **不要删除 favicon.ico**：即使未被代码引用，浏览器会自动查找这个文件
 - **不要删除 .DS_Store**：这是 macOS 系统文件，删除后系统会自动重新生成
-- **备份重要数据**：在执行删除操作前，建议先备份整个 `public/images/` 目录
-- **构建测试**：删除图片后运行 `npm run build` 验证是否有构建错误
+- **备份重要数据**：在执行删除操作前，建议先备份整个 `site/public/images/` 目录
+- **构建测试**：删除图片后运行 `just build-site` 验证是否有构建错误
 - **全面扫描**：必须扫描所有代码文件和样式文件中的图片引用，包括：
   - `content/blog/` 下的 `.mdx` 文件
-  - `app/` 下的所有组件和页面文件
-  - `components/` 下的所有 UI 组件
+  - `site/app/` 下的所有组件和页面文件
+  - `site/components/` 下的所有 UI 组件
   - 所有 `.css`、`.scss`、`.module.css` 样式文件
   - 可能包含图片路径的配置文件

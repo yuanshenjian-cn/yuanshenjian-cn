@@ -2,13 +2,14 @@
 
 const fs = require("fs");
 const path = require("path");
-const matter = require("gray-matter");
+const { siteRequire } = require("./site-require.js");
+const matter = siteRequire("gray-matter");
 const { INVESTMENT_BRIEFING_SKILL_CONFIG_ROOT } = require("./briefing-skill-config.js");
+const { investmentBriefingsDir, siteInvestmentDataDir, repoRoot } = require("../config/workspace-paths.js");
 
-const ROOT = path.resolve(__dirname, "..");
 const CONFIG_DIRECTORY = INVESTMENT_BRIEFING_SKILL_CONFIG_ROOT;
-const BRIEFINGS_DIRECTORY = path.join(ROOT, "content", "investment-briefings");
-const OUTPUT_DIRECTORY = path.join(ROOT, "public", "investment-data");
+const BRIEFINGS_DIRECTORY = investmentBriefingsDir;
+const OUTPUT_DIRECTORY = siteInvestmentDataDir;
 const OUTPUT_BRIEFINGS_DIRECTORY = path.join(OUTPUT_DIRECTORY, "briefings");
 const OUTPUT_COVERAGE_FILE = path.join(OUTPUT_DIRECTORY, "coverage.json");
 const OUTPUT_BRIEFINGS_FILE = path.join(OUTPUT_BRIEFINGS_DIRECTORY, "index.json");
@@ -177,7 +178,7 @@ function parseBriefingFile(filePath) {
     const { data, content } = matter(fileContents);
 
     if (typeof data.title !== "string" || typeof data.date !== "string" || typeof data.brief !== "string") {
-      console.warn(`Skipping invalid investment briefing: ${path.relative(process.cwd(), filePath)}`);
+      console.warn(`Skipping invalid investment briefing: ${path.relative(repoRoot, filePath)}`);
       return null;
     }
 
@@ -199,7 +200,7 @@ function parseBriefingFile(filePath) {
       url: `/investment/briefings/${slug}`,
     };
   } catch (error) {
-    console.error(`Error parsing investment briefing file ${path.relative(process.cwd(), filePath)}:`, error);
+    console.error(`Error parsing investment briefing file ${path.relative(repoRoot, filePath)}:`, error);
     return null;
   }
 }
@@ -228,8 +229,8 @@ function main() {
   writeJson(OUTPUT_COVERAGE_FILE, coverage);
   writeJson(OUTPUT_BRIEFINGS_FILE, briefings);
 
-  console.log(`Generated investment coverage payload at ${path.relative(process.cwd(), OUTPUT_COVERAGE_FILE)}`);
-  console.log(`Generated ${briefings.items.length} investment briefing index entries at ${path.relative(process.cwd(), OUTPUT_BRIEFINGS_FILE)}`);
+  console.log(`Generated investment coverage payload at ${path.relative(repoRoot, OUTPUT_COVERAGE_FILE)}`);
+  console.log(`Generated ${briefings.items.length} investment briefing index entries at ${path.relative(repoRoot, OUTPUT_BRIEFINGS_FILE)}`);
 }
 
 if (require.main === module) {

@@ -1,6 +1,8 @@
-const sharp = require('sharp');
+const { siteRequire } = require('./site-require.js');
+const sharp = siteRequire('sharp');
 const fs = require('fs');
 const path = require('path');
+const { siteImagesDir } = require('../config/workspace-paths.js');
 
 // 创建 1200x630 的名片图 - 所有内容居中，适配微信正方形裁剪
 const width = 1200;
@@ -80,7 +82,7 @@ const svg = `
 `;
 
 // 输出路径
-const outputDir = path.join(__dirname, '..', 'public', 'images');
+const outputDir = siteImagesDir;
 const outputPath = path.join(outputDir, 'og-default.webp');
 
 // 确保目录存在

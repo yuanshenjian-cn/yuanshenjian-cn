@@ -1,0 +1,40 @@
+{
+  // Secrets stay in .env.* or Render env vars via apiKeyEnv.
+  // baseUrl must stop at /v1 and must not include /chat/completions.
+  "version": 1,
+  "providers": {
+    "deepseek": {
+      "label": "DeepSeek Official",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "models": {
+        "deepseek-v4-flash": {
+          "modelId": "deepseek-v4-flash",
+        },
+        "deepseek-v4-pro": {
+          "modelId": "deepseek-v4-pro",
+        },
+      },
+    },
+    "moonshot-cn": {
+      "label": "Moonshot CN Official",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "apiKeyEnv": "MOONSHOT_API_KEY",
+      "models": {
+        "kimi-k2.6": {
+          "modelId": "kimi-k2.6",
+        },
+      },
+    },
+    "openai-compatible": {
+      "label": "OpenAI Compatible",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKeyEnv": "OPENAI_COMPATIBLE_API_KEY",
+      "models": {
+        "gpt-4.1-mini": {
+          "modelId": "gpt-4.1-mini",
+        },
+      },
+    },
+  },
+}

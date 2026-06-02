@@ -6,22 +6,22 @@
 
 const fs = require('fs');
 const path = require('path');
+const { siteRequire } = require('../site-require.js');
+const { siteFaviconPath, siteIconsDir } = require('../../config/workspace-paths.js');
 
 let sharp;
 try {
-  sharp = require('sharp');
+  sharp = siteRequire('sharp');
 } catch (e) {
-  console.log('正在安装 sharp...');
-  const { execSync } = require('child_process');
-  execSync('npm install sharp --save-dev', { stdio: 'inherit' });
-  sharp = require('sharp');
+  console.error('❌ sharp 未安装，请先执行 just install-site');
+  process.exit(1);
 }
 
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
 
 async function generateIconsFromFavicon() {
-  const icoPath = path.join(process.cwd(), 'public/favicon.ico');
-  const outputDir = path.join(process.cwd(), 'public/icons');
+  const icoPath = siteFaviconPath;
+  const outputDir = siteIconsDir;
   
   if (!fs.existsSync(icoPath)) {
     console.error('❌ favicon.ico 不存在');

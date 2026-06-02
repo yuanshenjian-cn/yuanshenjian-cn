@@ -1,0 +1,41 @@
+default:
+  cors:
+    allowed_origins:
+      - https://yuanshenjian.cn
+      - https://www.yuanshenjian.cn
+      - https://admin.yuanshenjian.cn
+  security:
+    cookie_domain: .yuanshenjian.cn
+  ai:
+    supported_providers_file: config/ai/supported-llm-providers.json
+    llm_profiles_file: config/ai/llm-profiles.jsonc
+    scene_profile_map_file: config/ai/scene-profile-map.jsonc
+    legacy_public_data_dir: ../site/public
+    default_active_profile: deepseek/deepseek-v4-flash
+    global_daily_token_limit: 200000
+    chat_daily_request_limit: 50
+    advisor_daily_request_limit: 30
+    moderation_daily_request_limit: 200
+    embedding_daily_token_limit: 100000
+
+development:
+  cors:
+    allowed_origins:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+  security:
+    cookie_domain: ""
+
+test:
+  cors:
+    allowed_origins:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+  security:
+    cookie_domain: ""
+
+production: {}

@@ -2,14 +2,16 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const matter = require("gray-matter");
-const GitHubSlugger = require("github-slugger").default;
+const { siteRequire } = require("./site-require.js");
+const matter = siteRequire("gray-matter");
+const GitHubSlugger = siteRequire("github-slugger").default;
+const { blogContentDir, aiBriefingsDir, siteAiDataDir, repoRoot } = require("../config/workspace-paths.js");
 
-const { authorProfileData } = require("../lib/author-profile-data.js");
+const { authorProfileData } = require("../site/lib/author-profile-data.js");
 
-const POSTS_DIRECTORY = path.join(process.cwd(), "content", "blog");
-const BRIEFINGS_DIRECTORY = path.join(process.cwd(), "content", "ai-briefings");
-const OUTPUT_DIRECTORY = path.join(process.cwd(), "public", "ai-data");
+const POSTS_DIRECTORY = blogContentDir;
+const BRIEFINGS_DIRECTORY = aiBriefingsDir;
+const OUTPUT_DIRECTORY = siteAiDataDir;
 const OUTPUT_FILE = path.join(OUTPUT_DIRECTORY, "index.json");
 const OUTPUT_ARTICLES_DIRECTORY = path.join(OUTPUT_DIRECTORY, "articles");
 const OUTPUT_BRIEFINGS_DIRECTORY = path.join(OUTPUT_DIRECTORY, "briefings");
@@ -460,7 +462,7 @@ function parsePostFile(filePath) {
     const { data, content } = matter(fileContents);
 
     if (typeof data.title !== "string" || typeof data.date !== "string") {
-      console.warn(`Skipping invalid post: ${path.relative(process.cwd(), filePath)}`);
+      console.warn(`Skipping invalid post: ${path.relative(repoRoot, filePath)}`);
       return null;
     }
 
@@ -480,7 +482,7 @@ function parsePostFile(filePath) {
       sections,
     };
   } catch (error) {
-    console.error(`Error parsing post file ${path.relative(process.cwd(), filePath)}:`, error);
+    console.error(`Error parsing post file ${path.relative(repoRoot, filePath)}:`, error);
     return null;
   }
 }
@@ -495,7 +497,7 @@ function parseBriefingFile(filePath) {
     const { data, content } = matter(fileContents);
 
     if (typeof data.title !== "string" || typeof data.date !== "string") {
-      console.warn(`Skipping invalid briefing: ${path.relative(process.cwd(), filePath)}`);
+      console.warn(`Skipping invalid briefing: ${path.relative(repoRoot, filePath)}`);
       return null;
     }
 
@@ -517,7 +519,7 @@ function parseBriefingFile(filePath) {
       url: `/ai/briefings/${slug}`,
     };
   } catch (error) {
-    console.error(`Error parsing briefing file ${path.relative(process.cwd(), filePath)}:`, error);
+    console.error(`Error parsing briefing file ${path.relative(repoRoot, filePath)}:`, error);
     return null;
   }
 }
@@ -586,10 +588,10 @@ function main() {
 
   writeJson(OUTPUT_AUTHOR_FILE, buildAuthorPayload());
 
-  console.log(`Generated ${posts.length} AI index entries at ${path.relative(process.cwd(), OUTPUT_FILE)}`);
-  console.log(`Generated ${posts.length} page AI article payloads at ${path.relative(process.cwd(), OUTPUT_ARTICLES_DIRECTORY)}`);
-  console.log(`Generated ${briefings.length} briefing AI index entries at ${path.relative(process.cwd(), OUTPUT_BRIEFINGS_FILE)}`);
-  console.log(`Generated author AI payload at ${path.relative(process.cwd(), OUTPUT_AUTHOR_FILE)}`);
+  console.log(`Generated ${posts.length} AI index entries at ${path.relative(repoRoot, OUTPUT_FILE)}`);
+  console.log(`Generated ${posts.length} page AI article payloads at ${path.relative(repoRoot, OUTPUT_ARTICLES_DIRECTORY)}`);
+  console.log(`Generated ${briefings.length} briefing AI index entries at ${path.relative(repoRoot, OUTPUT_BRIEFINGS_FILE)}`);
+  console.log(`Generated author AI payload at ${path.relative(repoRoot, OUTPUT_AUTHOR_FILE)}`);
 }
 
 if (require.main === module) {

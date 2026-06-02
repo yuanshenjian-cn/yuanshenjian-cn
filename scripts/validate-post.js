@@ -22,11 +22,12 @@
 const fs = require("fs");
 const path = require("path");
 const { loadAiBriefingSkillConfig, loadInvestmentBriefingSkillConfig } = require("./briefing-skill-config.js");
+const { repoRoot, contentDir, blogContentDir, aiBriefingsDir, investmentBriefingsDir, sitePublicDir } = require("../config/workspace-paths.js");
 
-const ROOT = path.resolve(__dirname, "..");
-const CONTENT_ROOT = path.join(ROOT, "content/blog");
-const BRIEFINGS_ROOT = path.join(ROOT, "content/ai-briefings");
-const INVESTMENT_BRIEFINGS_ROOT = path.join(ROOT, "content/investment-briefings");
+const ROOT = repoRoot;
+const CONTENT_ROOT = blogContentDir;
+const BRIEFINGS_ROOT = aiBriefingsDir;
+const INVESTMENT_BRIEFINGS_ROOT = investmentBriefingsDir;
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
@@ -513,7 +514,7 @@ function resolveLocalImagePath(href, articlePath) {
   if (!cleanHref) return null;
 
   if (cleanHref.startsWith("/")) {
-    return path.join(ROOT, "public", cleanHref);
+    return path.join(sitePublicDir, cleanHref);
   }
 
   return path.resolve(path.dirname(articlePath), cleanHref);
@@ -964,7 +965,18 @@ function isLikelyDuplicateEntry(currentEntry, previousEntry) {
  * @param {string} file
  */
 function readPublishedBriefingEntry(file) {
-  const content = fs.readFileSync(file, "utf-8");
+  let content;
+
+  try {
+    content = fs.readFileSync(file, "utf-8");
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+      return null;
+    }
+
+    throw error;
+  }
+
   const parsed = parseFrontmatter(content);
   if (!parsed) {
     return null;

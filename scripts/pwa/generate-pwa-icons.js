@@ -10,6 +10,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const { siteRequire } = require('../site-require.js');
+const { siteIconsDir, repoRoot, siteLogoGeneratorPath } = require('../../config/workspace-paths.js');
 
 // 图标尺寸
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
@@ -52,7 +54,7 @@ async function main() {
   console.log(`背景色: ${COLORS.background}`);
   console.log(`文字色: ${COLORS.text}\n`);
   
-  const outputDir = path.join(process.cwd(), 'public/icons');
+  const outputDir = siteIconsDir;
   
   // 确保输出目录存在
   if (!fs.existsSync(outputDir)) {
@@ -62,9 +64,10 @@ async function main() {
   
   // 生成每个尺寸的 SVG（可选，供手动调整）
   console.log('生成 SVG 源文件...');
-  const svgOutput = path.join(process.cwd(), 'tmp/ysj-logo.svg');
-  if (!fs.existsSync('tmp')) {
-    fs.mkdirSync('tmp', { recursive: true });
+  const tmpDir = path.join(repoRoot, 'tmp');
+  const svgOutput = path.join(tmpDir, 'ysj-logo.svg');
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true });
   }
   fs.writeFileSync(svgOutput, createSVG(512));
   console.log(`✓ SVG 源文件: ${svgOutput}\n`);
@@ -72,12 +75,12 @@ async function main() {
   // 检查 sharp 是否可用
   let sharp;
   try {
-    sharp = require('sharp');
+    sharp = siteRequire('sharp');
   } catch (e) {
-    console.log('📦 需要安装 sharp 依赖来生成 PNG...');
-    console.log('请运行: npm install sharp --save-dev\n');
+    console.log('📦 需要先安装 site 依赖来生成 PNG...');
+    console.log('请运行: just install-site\n');
     console.log('或者使用浏览器版生成器:');
-    console.log(`file://${path.join(process.cwd(), 'scripts/logo-generator.html')}\n`);
+    console.log(`file://${siteLogoGeneratorPath}\n`);
     process.exit(0);
   }
   

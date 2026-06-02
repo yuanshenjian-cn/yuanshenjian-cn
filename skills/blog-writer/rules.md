@@ -41,7 +41,7 @@ brief: >-                  # 必填，字符串，200字左右摘要（可折行
 
 - **slug = 文件名（不含扩展名）**，例如 `tdd-introduction`
 - slug 必须在整个仓库唯一（跨目录检查），因为文章详情页只按 slug 查找
-- 新文章写作前必须用 `npm run validate-post -- --check-path` 验证 slug 不冲突
+- 新文章写作前必须用 `just validate-content-path` 验证 slug 不冲突
 
 ---
 
@@ -68,7 +68,7 @@ content/blog/
 
 **重要**：
 - 上述目录是已存在的目录，写作前无需创建
-- 只有用户明确要求新增专栏时，才走新增专栏流程（需同步更新 `lib/columns.ts` 和 `components/column-icons.tsx`）
+- 只有用户明确要求新增专栏时，才走新增专栏流程（需同步更新 `site/lib/columns.ts` 和 `site/components/column-icons.tsx`）
 - 不存在"AI 软开"作为独立顶层目录，正确路径是 `swd/ai-coding/`
 - 早期真实文章可能包含章节分割线、`## 总结` 等旧格式；新文章必须遵守 `anti-patterns.md`，不要照搬旧格式
 
@@ -86,27 +86,27 @@ content/blog/
 
 ---
 
-## npm run build 说明
+## `just build-site` 说明
 
-`npm run build` 现在只执行 `next build`，**不再触发图片优化**。
+`just build-site` 现在只执行主站 `next build`，**不再触发图片优化**。
 
-如需完整生产构建（含图片优化），请使用 `npm run build:prod`：
-1. 运行图片优化脚本，**可能修改 `public/images/` 下的文件**
-2. 构建输出到 `/dist` 目录
+如需完整生产构建（含图片优化），请使用 `just build-site-prod`：
+1. 运行图片优化脚本，**可能修改 `site/public/images/` 下的文件**
+2. 构建输出到 `site/dist/` 目录
 
 **因此**：
-- 写完文章后，**默认只运行 `npm run validate-post` 做轻量校验**
-- `npm run build` 仅作为用户明确要求时的最终验证，且需提前告知副作用
-- 本地预览用 `npm run dev`，不触发图片优化
+- 写完文章后，**默认只运行 `just validate-content-file` 或严格校验命令做轻量校验**
+- `just build-site` 仅作为用户明确要求时的最终验证，且需提前告知副作用
+- 本地预览优先用 `just start-site`，不触发图片优化
 
 ## validate-post 说明
 
 项目已提供 `scripts/validate-post.js`，命令为：
 
 ```bash
-npm run validate-post -- --check-path "content/blog/.../slug.md"
-npm run validate-post -- "content/blog/.../slug.md"
-npm run validate-post -- --strict-writing "content/blog/.../slug.md"
+just validate-content-path "content/blog/.../slug.md"
+just validate-content-file "content/blog/.../slug.md"
+just validate-content-strict "content/blog/.../slug.md"
 ```
 
 校验内容包括：

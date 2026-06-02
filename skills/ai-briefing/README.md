@@ -161,8 +161,8 @@ skill 会重点关注这些厂商：
 3. 重点厂商覆盖检查
 4. 项目级 `ai-briefing-reviewer` 二次复审
 5. 成稿质量审核
-6. `npm run validate-content`
-7. `npm run build:ai-data`
+6. `just validate-content`
+7. `just build-site-ai-data`
 8. git 安全检查
 9. commit / push
 

@@ -1,0 +1,63 @@
+name: Core Service CI
+
+on:
+  pull_request:
+    paths:
+      - "core-service/**"
+      - ".github/workflows/core-service-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "core-service/**"
+      - ".github/workflows/core-service-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r core-service/requirements.txt
+
+      - name: Ruff
+        run: ruff check core-service/app core-service/tests
+
+      - name: Mypy
+        run: mypy core-service/app
+
+      - name: Test
+        run: pytest core-service/tests -q
+
+      - name: Migration smoke
+        run: alembic -c core-service/alembic.ini upgrade head
+
+      - name: Trigger Render deploy
+        if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL is missing; skip Render deploy."
+            exit 0
+          fi
+          curl -fsS "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Render health smoke
+        if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          CORE_SERVICE_HEALTH_URL: ${{ vars.CORE_SERVICE_HEALTH_URL }}
+        run: |
+          if [ -z "$CORE_SERVICE_HEALTH_URL" ]; then
+            echo "CORE_SERVICE_HEALTH_URL is missing; skip health smoke."
+            exit 0
+          fi
+          curl -fsS "$CORE_SERVICE_HEALTH_URL"

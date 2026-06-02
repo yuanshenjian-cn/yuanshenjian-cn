@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: blog-core-service
+    runtime: python
+    rootDir: core-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PUBLIC_SITE_URL
+        value: https://yuanshenjian.cn
+      - key: API_PUBLIC_BASE_URL
+        value: https://api.yuanshenjian.cn
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: ADMIN_SECRET_HASH
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: EMBEDDING_BASE_URL
+        value: https://api.openai.com/v1
+      - key: EMBEDDING_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL_ID
+        value: text-embedding-3-small
+      - key: EMBEDDING_DIMENSIONS
+        value: "1536"
+      - key: EMERGENCY_DISABLE_AI
+        value: "false"
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: MOONSHOT_API_KEY
+        sync: false
+      - key: TENCENT_TOKENHUB_API_KEY
+        sync: false
+      - key: OPENAI_COMPATIBLE_API_KEY
+        sync: false

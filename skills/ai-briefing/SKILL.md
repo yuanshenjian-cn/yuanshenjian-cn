@@ -327,9 +327,9 @@ tags:
 
 最终审核与 `ai-briefing-reviewer` 复审均通过后，执行本地发布门禁：
 
-1. `npm run validate-content`
-2. `npm run build:ai-data`
-3. 确认 `public/ai-data/briefings/index.json` 已包含当天简报。
+1. `just validate-content`
+2. `just build-site-ai-data`
+3. 确认 `site/public/ai-data/briefings/index.json` 已包含当天简报。
 
 任一命令失败或索引未更新：停止发布，不得 commit 或 push。
 
@@ -348,14 +348,14 @@ tags:
 默认执行：
 
 ```bash
-npm run validate-content
-npm run build:ai-data
-git add content/ai-briefings/YYYY-MM-DD-ai-briefing.md public/ai-data/briefings/index.json
+just validate-content
+just build-site-ai-data
+git add content/ai-briefings/YYYY-MM-DD-ai-briefing.md site/public/ai-data/briefings/index.json
 git commit -m "add ai briefing for YYYY-MM-DD"
 git push
 ```
 
-`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `npm run purge:cloudflare -- --scope ai-briefing --date YYYY-MM-DD`。
+`git push` 后不要立刻手动 purge Cloudflare 缓存，避免 GitHub Pages 还未部署完成时又把旧 HTML 回填进 CDN。默认由 `.github/workflows/deploy.yml` 在 Pages 部署成功后执行定向 purge；只有用户明确要求手动补刷时，才执行 `just purge-ai-briefing-cache YYYY-MM-DD`。
 
 ## 输出给用户
 

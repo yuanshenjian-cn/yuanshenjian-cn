@@ -1,0 +1,1265 @@
+{
+  "slug": "author",
+  "title": "袁慎建",
+  "summary": "AI 效率工程师 | 研发效能专家 | 敏捷开发教练",
+  "entities": {
+    "profile": {
+      "id": "hero",
+      "heading": "个人简介",
+      "name": "袁慎建",
+      "roles": [
+        "AI 效率工程师",
+        "研发效能专家",
+        "敏捷开发教练"
+      ],
+      "phone": "18192235667",
+      "email": "yuanshenjian@foxmail.com",
+      "summary": [
+        "在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目，长期关注 AI 软件工程、研发效能提升与敏捷实践落地",
+        "擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升代码开发、测试、重构和知识沉淀效率，同时具备扎实的软件架构设计与服务端开发能力",
+        "具备良好的业务 Sense 和产品思维，有代码洁癖"
+      ]
+    },
+    "skills": [
+      {
+        "id": "skill-敏捷开发",
+        "title": "敏捷开发",
+        "level": "master",
+        "icon": "敏",
+        "description": "精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计"
+      },
+      {
+        "id": "skill-软件设计",
+        "title": "软件设计",
+        "level": "master",
+        "icon": "软",
+        "description": "精通面向对象、设计模式、整洁软件设计"
+      },
+      {
+        "id": "skill-测试策略",
+        "title": "测试策略",
+        "level": "master",
+        "icon": "测",
+        "description": "精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建"
+      },
+      {
+        "id": "skill-架构设计",
+        "title": "架构设计",
+        "level": "proficient",
+        "icon": "架",
+        "description": "熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计"
+      },
+      {
+        "id": "skill-ai-效率工程",
+        "title": "AI 效率工程",
+        "level": "proficient",
+        "icon": "AI",
+        "description": "熟练使用AI提效工具，如：OpenCode、Claude Code、Codex、Agent Skills、SDD框架。熟练设计 Agent工作流提升研发效率"
+      },
+      {
+        "id": "skill-ai-agent",
+        "title": "AI Agent",
+        "level": "proficient",
+        "icon": "AI",
+        "description": "熟练使用Spring AI、LangGraph开发AI Agent应用，熟练运用提示词工程、MCP、RAG"
+      },
+      {
+        "id": "skill-java技术栈",
+        "title": "Java技术栈",
+        "level": "proficient",
+        "icon": "J",
+        "description": "熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术"
+      },
+      {
+        "id": "skill-业务分析",
+        "title": "业务分析",
+        "level": "familiar",
+        "icon": "业",
+        "description": "熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图"
+      },
+      {
+        "id": "skill-python",
+        "title": "Python",
+        "level": "familiar",
+        "icon": "P",
+        "description": "熟悉 Python、FastAPI、Pydantic-ai、LangChain"
+      }
+    ],
+    "certificates": [
+      {
+        "id": "certificate-csm-2020年",
+        "title": "CSM（2020年）"
+      },
+      {
+        "id": "certificate-cac敏捷教练-2021年",
+        "title": "CAC敏捷教练（2021年）"
+      },
+      {
+        "id": "certificate-atd培训师-2023年",
+        "title": "ATD培训师（2023年）"
+      },
+      {
+        "id": "certificate-cbba高级健身教练-2025年",
+        "title": "CBBA高级健身教练（2025年）"
+      }
+    ],
+    "education": {
+      "id": "education",
+      "heading": "教育背景",
+      "school": "长安大学（统招本科 211）",
+      "major": "软件工程（转）",
+      "period": "2009.09 ~ 2013.07",
+      "href": "https://www.chd.edu.cn/"
+    },
+    "experiences": [
+      {
+        "id": "experience-locammend-智能顾问-技术负责人",
+        "title": "Locammend 智能顾问 - 技术负责人",
+        "period": "2025.05 ~ 2025.12",
+        "description": "聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+        "list": [],
+        "organization": "Locammend 智能顾问",
+        "role": "技术负责人"
+      },
+      {
+        "id": "experience-保时捷super-app-tech-leader-and-架构师",
+        "title": "保时捷Super App - Tech Leader & 架构师",
+        "period": "2023.02 ~ 2025.02",
+        "description": "在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
+        "list": [],
+        "organization": "保时捷Super App",
+        "role": "Tech Leader & 架构师"
+      },
+      {
+        "id": "experience-thoughtworks-技术教练-and-咨询顾问",
+        "title": "Thoughtworks - 技术教练 & 咨询顾问",
+        "period": "2019.06 ~ 2023.01",
+        "list": [
+          "推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率",
+          "主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员"
+        ],
+        "organization": "Thoughtworks",
+        "role": "技术教练 & 咨询顾问"
+      },
+      {
+        "id": "experience-thoughtworks-服务端开发",
+        "title": "Thoughtworks - 服务端开发",
+        "period": "2015.03 ~ 2019.05",
+        "description": "经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+        "list": [],
+        "organization": "Thoughtworks",
+        "role": "服务端开发"
+      },
+      {
+        "id": "experience-早期职业生涯",
+        "title": "早期职业生涯",
+        "period": "2013.06 ~ 2015.02",
+        "list": [
+          "2014.10 ~ 2015.02：软件开发工作室（自由创业）",
+          "2013.06 ~ 2014.09：西安美林数据股份有限公司"
+        ],
+        "organization": "早期职业生涯"
+      }
+    ],
+    "projects": [
+      {
+        "id": "project-locammend-智能顾问-研发交付",
+        "period": "2025.05 ~ 2025.12",
+        "name": "Locammend 智能顾问 研发交付",
+        "role": "技术负责人 | 架构师 | 后端开发",
+        "description": "这是一个小团队创业项目，涉及服务端、iOS、Android端。作为技术负责人，负责整体应用架构设计、以及服务端交付和部署运维。",
+        "achievements": [
+          {
+            "metric": "Chat Memory",
+            "text": "企业级"
+          },
+          {
+            "metric": "AWS云原生",
+            "text": "架构设计与落地"
+          },
+          {
+            "text": "集成Google Search、Exa动态RAG"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "深度参用户体验的梳理，引入用户旅程和用户故事提升协作效率"
+          },
+          {
+            "text": "负责架构设计，采用DDD分层架构，RESTFul API、Redis缓存中间件"
+          },
+          {
+            "text": "设计和落地AWS云原生部署架构，引入ALB、配置中心，服务注册和发现等微服务技术，降低服务治理和运维复杂度"
+          },
+          {
+            "text": "基于提示词工程，集成Google Search、Exa服务实现动态RAG，提升用户检索的精准度和可靠的推荐"
+          },
+          {
+            "text": "基于Cursor和Claude Code，采用Openspec框架提升AI辅助研发的质量规范"
+          },
+          {
+            "text": "实现企业级Chat Memory能力，使模型在多轮对话中仍能记忆用户有效信息，从全局层面理解用户意图"
+          }
+        ],
+        "techs": [
+          "Spring Boot",
+          "Spring AI",
+          "Spring Cloud",
+          "MySQL",
+          "Redis",
+          "GitHub CI/CD",
+          "AWS Cloud Native",
+          "ECS",
+          "ALB",
+          "WAF",
+          "Cloud Front",
+          "S3",
+          "RDS"
+        ],
+        "organization": "Locammend 智能顾问 研发交付"
+      },
+      {
+        "id": "project-保时捷-super-app-研发交付",
+        "period": "2023.02 ~ 2025.02",
+        "name": "保时捷 - Super App 研发交付",
+        "role": "Tech Leader | 架构师",
+        "description": "这是一个基于SAFe 6.0框架运作的大型敏捷IT组织研发的保时捷（10万+车主）Super App，该组织包含三个ART共计约17个Scrum Team。所在的Platform团队由来自多家不同公司、分布在多个城市的成员组成。",
+        "achievements": [
+          {
+            "metric": "17",
+            "text": "个Scrum Team顺畅交付"
+          },
+          {
+            "text": "平台组件架构设计评审"
+          },
+          {
+            "text": "冷启动性能优化显著改善体验"
+          },
+          {
+            "text": "知识管理规范获团队一致好评"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "深入到业务方梳理对齐业务问题和用户体验，主导App平台公共能力和组件（收银台、分享、勋章、客服，B25等）的架构方案设计和评审"
+          },
+          {
+            "text": "主导跨端（iOS、Android、Server、H5）架构方案的设计和评审，并推动方案在多个垂直交付团队落地"
+          },
+          {
+            "text": "赋能团队日常敏捷交付实践的落地执行和优化，推动质量内建在团队和组织中的落地，显著提升团队交付的质量，得到架构组和垂直业务团队的高度好评"
+          },
+          {
+            "text": "主导Super App冷启动性能诊断和分析，设计前后端缓存方案，并推动在相关垂直业务团队落地实施，大大缩短了全网广播后因突发流量的响应延迟时间，显著改善用户体验"
+          },
+          {
+            "text": "设计App端Pre-Prod环境的集成测试方案，推动该方案在业务团队落地，打通Pre-Prod端到端的集成测试能力，有效利用Pre-Prod做好生产环境质量把控"
+          },
+          {
+            "text": "积极推动知识管理，制定日常交付的质量规范包括业务建模、架构、API文档规范、代码规范以及测试策略，在组织内广泛传播，收到兄弟团队的技术人员的一致好评"
+          }
+        ],
+        "techs": [
+          "SAFe 6.0",
+          "Spring Boot",
+          "Spring Cloud",
+          "Nacos",
+          "Config Center",
+          "Feign Client",
+          "GitLab CI/CD",
+          "MySQL",
+          "Redis",
+          "Kafka",
+          "MQ",
+          "AWS Cloud"
+        ],
+        "organization": "保时捷"
+      },
+      {
+        "id": "project-人保-devops-研发效能提升",
+        "period": "2022.02 ~ 2023.01",
+        "name": "人保 - DevOps 研发效能提升",
+        "role": "DevOps研发效能教练 | 架构师",
+        "description": "作为驻场DevOps研发效能教练，深入中国人保核心交付团队，主导研发流程瓶颈诊断和效能提升。",
+        "achievements": [
+          {
+            "metric": "30%+",
+            "text": "需求交付前置时间缩短"
+          },
+          {
+            "metric": "60%",
+            "text": "测试覆盖率从15%提升至"
+          },
+          {
+            "metric": "约50%",
+            "text": "Bug返工率降低"
+          },
+          {
+            "metric": "4个交付组",
+            "text": "辅导"
+          },
+          {
+            "metric": "超50名技术人员",
+            "text": "辅导"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "主导研发流程瓶颈诊断，采用VSM调研走访10来个核心交付组，识别出需求共识效率低、变更失败率高、交付前置时间长等核心瓶颈"
+          },
+          {
+            "text": "辅导核心系统4个交付组超过50名技术人员改善研发过程，引入高效能工程实践框架，优化需求管理、任务分解、CI/CD Pipeline等实践"
+          },
+          {
+            "text": "辅导8个组的Tech Leader和BA采用事件风暴、用户旅程、用户故事、DDD进行核心业务流程梳理和建模，显著提升业务共识效率"
+          },
+          {
+            "text": "指导团队引入DDD分层架构改造核心模块，制定分层测试策略，测试覆盖率从15%提升到60%，Bug返工率降低约50%"
+          }
+        ],
+        "techs": [],
+        "organization": "人保"
+      },
+      {
+        "id": "project-thoughtworks-技术人员培养",
+        "period": "2019.06 ~ 2022.01",
+        "name": "Thoughtworks - 技术人员培养",
+        "role": "技术内训师 | 学习项目设计师",
+        "description": "作为Thoughtworks内训师，设计并交付高质量技术学习项目，帮助中高级技术人员提升工程实践能力和架构设计能力。",
+        "achievements": [
+          {
+            "metric": "6+",
+            "text": "实战训练营"
+          },
+          {
+            "metric": "500+",
+            "text": "覆盖"
+          },
+          {
+            "metric": "明星项目",
+            "text": "面向对象训练营成"
+          },
+          {
+            "text": "培养技术骨干和技术Leader"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "高阶项目：微服务设计，技术领导力、大规模高效能工程实践"
+          },
+          {
+            "text": "中阶项目：重构实战、TDD实战、面向对象训练营（明星项目，口碑极佳）"
+          },
+          {
+            "text": "实战训练营涵盖500+中高级技术人员，显著提升团队技术能力和工程实践水平"
+          }
+        ],
+        "techs": [],
+        "organization": "Thoughtworks"
+      },
+      {
+        "id": "project-戴姆勒-otr-研发交付",
+        "period": "2017.06 ~ 2019.05",
+        "name": "戴姆勒 - OTR 研发交付",
+        "role": "Tech Lead 2Tier",
+        "description": "这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。",
+        "achievements": [
+          {
+            "metric": "50%",
+            "text": "CI/CD Pipeline提速约"
+          },
+          {
+            "metric": "约40%",
+            "text": "需求Bug返工率降低"
+          },
+          {
+            "text": "设计微服务技术工作坊"
+          },
+          {
+            "text": "深度实践 Spring Cloud 微服务架构"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "完成日常需求开发，推动团队敏捷工程实践的落地优化，比如Code Review、Tasking、TDD、测试策略"
+          },
+          {
+            "text": "推动技术债管理，带领技术栈小组优化系统的自动化测试策略，引入有效的进程内API功能测试和契约测试，大大提升了测试的有效性"
+          },
+          {
+            "text": "CI/CD Pipeline测试阶段从30~50分钟缩短至10分钟以内，需求Bug返工率降低约40%"
+          },
+          {
+            "text": "主导设计微服务技术工作坊，通过业务场景驱动从0到1搭建微服务架构，深度学习Spring Cloud原理和实战，包括服务注册和发现、负载均衡、配置中心、限流和熔断，服务运维监控"
+          }
+        ],
+        "techs": [
+          "Java 8",
+          "Spring Cloud",
+          "Consul",
+          "Hystrix",
+          "MongoDB",
+          "MySQL",
+          "GoCD",
+          "Docker",
+          "Redis",
+          "React Native",
+          "ELK",
+          "K8S"
+        ],
+        "organization": "戴姆勒"
+      }
+    ],
+    "extras": [
+      {
+        "id": "extra-著作发表",
+        "title": "著作发表",
+        "items": [
+          {
+            "type": "link",
+            "label": "整洁软件设计",
+            "href": "https://www.yuque.com/yuanshenjian/agile-software-design"
+          },
+          {
+            "type": "link",
+            "label": "敏捷那些事儿",
+            "href": "https://www.yuque.com/yuanshenjian/agile-things"
+          },
+          {
+            "type": "link",
+            "label": "我敏捷了吗？",
+            "href": "https://www.yuque.com/yuanshenjian/my-tw-10-years"
+          }
+        ]
+      },
+      {
+        "id": "extra-运动健身",
+        "title": "运动健身",
+        "items": [
+          {
+            "type": "text",
+            "label": "CBBA高级健身教练"
+          },
+          {
+            "type": "text",
+            "label": "极限健身实践者"
+          },
+          {
+            "type": "text",
+            "label": "擅长心肺体能训练"
+          }
+        ]
+      },
+      {
+        "id": "extra-理财投资",
+        "title": "理财投资",
+        "items": [
+          {
+            "type": "text",
+            "label": "长线主义"
+          },
+          {
+            "type": "text",
+            "label": "逆向投资者"
+          },
+          {
+            "type": "text",
+            "label": "聚焦中国优质资产"
+          }
+        ]
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "id": "hero",
+      "anchorId": "hero",
+      "heading": "个人简介",
+      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目，长期关注 AI 软件工程、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升代码开发、测试、重构和知识沉淀效率，同时具备扎实的软件架构设计与服务端开发能力 具备良好的业务 Sense 和产品思维，有代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目，长期关注 AI 软件工程、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升代码开发、测试、重构和知识沉淀效率，同时具备扎实...",
+      "sectionType": "hero",
+      "entityType": "profile",
+      "entityId": "hero",
+      "keywords": [
+        "AI 效率工程师",
+        "研发效能专家",
+        "敏捷开发教练",
+        "软件架构",
+        "服务端开发",
+        "研发效能",
+        "敏捷实践"
+      ]
+    },
+    {
+      "id": "skill-敏捷开发",
+      "anchorId": "skills",
+      "heading": "技能｜敏捷开发",
+      "content": "技能等级：精通 精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计",
+      "excerpt": "技能等级：精通 精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-敏捷开发",
+      "keywords": [
+        "敏捷开发",
+        "精通",
+        "XP",
+        "Scrum",
+        "DevOps敏捷软件工程实践",
+        "如CI/CD",
+        "TDD",
+        "重构",
+        "简单设计"
+      ]
+    },
+    {
+      "id": "skill-软件设计",
+      "anchorId": "skills",
+      "heading": "技能｜软件设计",
+      "content": "技能等级：精通 精通面向对象、设计模式、整洁软件设计",
+      "excerpt": "技能等级：精通 精通面向对象、设计模式、整洁软件设计",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-软件设计",
+      "keywords": [
+        "软件设计",
+        "精通",
+        "面向对象",
+        "设计模式",
+        "整洁软件设计"
+      ]
+    },
+    {
+      "id": "skill-测试策略",
+      "anchorId": "skills",
+      "heading": "技能｜测试策略",
+      "content": "技能等级：精通 精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建",
+      "excerpt": "技能等级：精通 精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-测试策略",
+      "keywords": [
+        "测试策略",
+        "精通",
+        "自动化分层测试策略和最佳实践",
+        "软件交付质量内建体系搭建"
+      ]
+    },
+    {
+      "id": "skill-架构设计",
+      "anchorId": "skills",
+      "heading": "技能｜架构设计",
+      "content": "技能等级：熟练 熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计",
+      "excerpt": "技能等级：熟练 熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-架构设计",
+      "keywords": [
+        "架构设计",
+        "熟练",
+        "掌握高可用整洁架构设计",
+        "以及DDD实践",
+        "微服务设计",
+        "AI Agent 架构设计"
+      ]
+    },
+    {
+      "id": "skill-ai-效率工程",
+      "anchorId": "skills",
+      "heading": "技能｜AI 效率工程",
+      "content": "技能等级：熟练 熟练使用AI提效工具，如：OpenCode、Claude Code、Codex、Agent Skills、SDD框架。熟练设计 Agent工作流提升研发效率",
+      "excerpt": "技能等级：熟练 熟练使用AI提效工具，如：OpenCode、Claude Code、Codex、Agent Skills、SDD框架。熟练设计 Agent工作流提升研发效率",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-ai-效率工程",
+      "keywords": [
+        "AI 效率工程",
+        "熟练",
+        "使用AI提效工具",
+        "OpenCode",
+        "Claude Code",
+        "Codex",
+        "Agent Skills"
+      ]
+    },
+    {
+      "id": "skill-ai-agent",
+      "anchorId": "skills",
+      "heading": "技能｜AI Agent",
+      "content": "技能等级：熟练 熟练使用Spring AI、LangGraph开发AI Agent应用，熟练运用提示词工程、MCP、RAG",
+      "excerpt": "技能等级：熟练 熟练使用Spring AI、LangGraph开发AI Agent应用，熟练运用提示词工程、MCP、RAG",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-ai-agent",
+      "keywords": [
+        "AI Agent",
+        "熟练",
+        "使用Spring AI",
+        "LangGraph开发AI Agent应用",
+        "运用提示词工程",
+        "MCP",
+        "RAG"
+      ]
+    },
+    {
+      "id": "skill-java技术栈",
+      "anchorId": "skills",
+      "heading": "技能｜Java技术栈",
+      "content": "技能等级：熟练 熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术",
+      "excerpt": "技能等级：熟练 熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-java技术栈",
+      "keywords": [
+        "Java技术栈",
+        "熟练",
+        "Java",
+        "Spring Boot",
+        "Spring Cloud",
+        "MySQL",
+        "Redis",
+        "Kafka",
+        "RabbitMQ等服务器端技术"
+      ]
+    },
+    {
+      "id": "skill-业务分析",
+      "anchorId": "skills",
+      "heading": "技能｜业务分析",
+      "content": "技能等级：熟悉 熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
+      "excerpt": "技能等级：熟悉 熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-业务分析",
+      "keywords": [
+        "业务分析",
+        "熟悉",
+        "业务分析方法",
+        "如用户路程",
+        "用户故事地图",
+        "用户故事",
+        "服务蓝图"
+      ]
+    },
+    {
+      "id": "skill-python",
+      "anchorId": "skills",
+      "heading": "技能｜Python",
+      "content": "技能等级：熟悉 熟悉 Python、FastAPI、Pydantic-ai、LangChain",
+      "excerpt": "技能等级：熟悉 熟悉 Python、FastAPI、Pydantic-ai、LangChain",
+      "sectionType": "skills",
+      "entityType": "skill",
+      "entityId": "skill-python",
+      "keywords": [
+        "Python",
+        "熟悉",
+        "FastAPI",
+        "Pydantic-ai",
+        "LangChain"
+      ]
+    },
+    {
+      "id": "certificate-csm-2020年",
+      "anchorId": "skills",
+      "heading": "证书｜CSM（2020年）",
+      "content": "专业认证：CSM（2020年）",
+      "excerpt": "专业认证：CSM（2020年）",
+      "sectionType": "skills",
+      "entityType": "certificate",
+      "entityId": "certificate-csm-2020年",
+      "keywords": [
+        "CSM（2020年）",
+        "CSM(2020年"
+      ]
+    },
+    {
+      "id": "certificate-cac敏捷教练-2021年",
+      "anchorId": "skills",
+      "heading": "证书｜CAC敏捷教练（2021年）",
+      "content": "专业认证：CAC敏捷教练（2021年）",
+      "excerpt": "专业认证：CAC敏捷教练（2021年）",
+      "sectionType": "skills",
+      "entityType": "certificate",
+      "entityId": "certificate-cac敏捷教练-2021年",
+      "keywords": [
+        "CAC敏捷教练（2021年）",
+        "CAC敏捷教练(2021年"
+      ]
+    },
+    {
+      "id": "certificate-atd培训师-2023年",
+      "anchorId": "skills",
+      "heading": "证书｜ATD培训师（2023年）",
+      "content": "专业认证：ATD培训师（2023年）",
+      "excerpt": "专业认证：ATD培训师（2023年）",
+      "sectionType": "skills",
+      "entityType": "certificate",
+      "entityId": "certificate-atd培训师-2023年",
+      "keywords": [
+        "ATD培训师（2023年）",
+        "ATD培训师(2023年"
+      ]
+    },
+    {
+      "id": "certificate-cbba高级健身教练-2025年",
+      "anchorId": "skills",
+      "heading": "证书｜CBBA高级健身教练（2025年）",
+      "content": "专业认证：CBBA高级健身教练（2025年）",
+      "excerpt": "专业认证：CBBA高级健身教练（2025年）",
+      "sectionType": "skills",
+      "entityType": "certificate",
+      "entityId": "certificate-cbba高级健身教练-2025年",
+      "keywords": [
+        "CBBA高级健身教练（2025年）",
+        "CBBA高级健身教练(2025年"
+      ]
+    },
+    {
+      "id": "education",
+      "anchorId": "education",
+      "heading": "教育背景",
+      "content": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/",
+      "excerpt": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/",
+      "sectionType": "education",
+      "entityType": "education",
+      "entityId": "education",
+      "period": "2009.09 ~ 2013.07",
+      "keywords": [
+        "长安大学（统招本科 211）",
+        "软件工程（转）",
+        "长安大学(统招本科 211",
+        "软件工程(转"
+      ]
+    },
+    {
+      "id": "experience-locammend-智能顾问-技术负责人",
+      "anchorId": "experience",
+      "heading": "经历｜Locammend 智能顾问 - 技术负责人",
+      "content": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "excerpt": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-locammend-智能顾问-技术负责人",
+      "organization": "Locammend 智能顾问",
+      "role": "技术负责人",
+      "period": "2025.05 ~ 2025.12",
+      "keywords": [
+        "Locammend 智能顾问",
+        "技术负责人",
+        "AI辅助效能提升和AI应用开发。作为技术负责人",
+        "在Locammend负责系统架构设计和落地",
+        "SDD开发框架提升AI辅助研发的质量",
+        "AWS云原生架构进行部署。"
+      ]
+    },
+    {
+      "id": "experience-保时捷super-app-tech-leader-and-架构师",
+      "anchorId": "experience",
+      "heading": "经历｜保时捷Super App - Tech Leader & 架构师",
+      "content": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
+      "excerpt": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-保时捷super-app-tech-leader-and-架构师",
+      "organization": "保时捷Super App",
+      "role": "Tech Leader & 架构师",
+      "period": "2023.02 ~ 2025.02",
+      "keywords": [
+        "保时捷Super App",
+        "Tech Leader & 架构师",
+        "Tech Leader",
+        "架构师",
+        "研发效能提升",
+        "支撑10多个垂直业务团队顺畅完成业务目标。"
+      ]
+    },
+    {
+      "id": "experience-thoughtworks-技术教练-and-咨询顾问",
+      "anchorId": "experience",
+      "heading": "经历｜Thoughtworks - 技术教练 & 咨询顾问",
+      "content": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
+      "excerpt": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-thoughtworks-技术教练-and-咨询顾问",
+      "organization": "Thoughtworks",
+      "role": "技术教练 & 咨询顾问",
+      "period": "2019.06 ~ 2023.01",
+      "keywords": [
+        "Thoughtworks",
+        "技术教练 & 咨询顾问",
+        "技术教练",
+        "咨询顾问",
+        "客户研发效能提升",
+        "显著缩短交付前置时间以及降低需求返工率",
+        "设计6+个技术学习项目",
+        "交付60+场技术训练营"
+      ]
+    },
+    {
+      "id": "experience-thoughtworks-服务端开发",
+      "anchorId": "experience",
+      "heading": "经历｜Thoughtworks - 服务端开发",
+      "content": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "excerpt": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-thoughtworks-服务端开发",
+      "organization": "Thoughtworks",
+      "role": "服务端开发",
+      "period": "2015.03 ~ 2019.05",
+      "keywords": [
+        "Thoughtworks",
+        "服务端开发",
+        "经历了多个交付项目",
+        "项目涉及金融",
+        "物流",
+        "IT",
+        "汽车等领域。项目均采用敏捷交付方式",
+        "前后作为核心开发人员"
+      ]
+    },
+    {
+      "id": "experience-早期职业生涯",
+      "anchorId": "experience",
+      "heading": "经历｜早期职业生涯",
+      "content": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
+      "excerpt": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-早期职业生涯",
+      "organization": "早期职业生涯",
+      "period": "2013.06 ~ 2015.02",
+      "keywords": [
+        "早期职业生涯",
+        "2014.10 ~ 2015.02",
+        "软件开发工作室(自由创业",
+        "2013.06 ~ 2014.09",
+        "西安美林数据股份有限公司"
+      ]
+    },
+    {
+      "id": "project-locammend-智能顾问-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜Locammend 智能顾问 研发交付",
+      "content": "时间：2025.05 ~ 2025.12 角色：技术负责人 架构师 后端开发 这是一个小团队创业项目，涉及服务端、iOS、Android端。作为技术负责人，负责整体应用架构设计、以及服务端交付和部署运维。 核心成果：Chat Memory 企业级；AWS云原生 架构设计与落地；集成Google Search、Exa动态RAG 主要职责和贡献：深度参用户体验的梳理，引入用户旅程和用户故事提升协作效率；负责架构设计，采用DDD分层架构，RESTFul API、Redis缓存中间件；设计和落地AWS云原生部署架构，引入ALB、配置中心，服务注册和发现等微服务技术，降低服务治理和运维复杂度；基于提示词工程，集成Google Search、Exa服务实现动态RAG，提升用户检索的精准度和可靠的推荐；基于Cursor和Claude Code，采用Openspec框架提升AI辅助研发的质量规范；实现企业级Chat Memory能力，使模型在多轮对话中仍能记忆用户有效信息，从全局层面理解用户意图 技术栈：Spring Boot、Spring AI、Spring Cloud、MySQL、Redis、GitHub CI/CD、AWS Cloud Native、ECS、ALB、WAF、Cloud Front、S3、RDS",
+      "excerpt": "时间：2025.05 ~ 2025.12 角色：技术负责人 架构师 后端开发 这是一个小团队创业项目，涉及服务端、iOS、Android端。作为技术负责人，负责整体应用架构设计、以及服务端交付和部署运维。 核心成果：Chat Memory 企业级；AWS云原生 架构设计与落地；集成Google Search、Exa动态...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-locammend-智能顾问-研发交付",
+      "organization": "Locammend 智能顾问 研发交付",
+      "role": "技术负责人 | 架构师 | 后端开发",
+      "period": "2025.05 ~ 2025.12",
+      "keywords": [
+        "Locammend 智能顾问 研发交付",
+        "技术负责人 | 架构师 | 后端开发",
+        "Spring Boot",
+        "Spring AI",
+        "Spring Cloud",
+        "MySQL",
+        "Redis",
+        "GitHub CI/CD",
+        "AWS Cloud Native",
+        "ECS",
+        "ALB",
+        "WAF"
+      ],
+      "techs": [
+        "Spring Boot",
+        "Spring AI",
+        "Spring Cloud",
+        "MySQL",
+        "Redis",
+        "GitHub CI/CD",
+        "AWS Cloud Native",
+        "ECS",
+        "ALB",
+        "WAF",
+        "Cloud Front",
+        "S3",
+        "RDS"
+      ]
+    },
+    {
+      "id": "project-保时捷-super-app-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜保时捷 - Super App 研发交付",
+      "content": "时间：2023.02 ~ 2025.02 角色：Tech Leader 架构师 这是一个基于SAFe 6.0框架运作的大型敏捷IT组织研发的保时捷（10万+车主）Super App，该组织包含三个ART共计约17个Scrum Team。所在的Platform团队由来自多家不同公司、分布在多个城市的成员组成。 核心成果：17 个Scrum Team顺畅交付；平台组件架构设计评审；冷启动性能优化显著改善体验；知识管理规范获团队一致好评 主要职责和贡献：深入到业务方梳理对齐业务问题和用户体验，主导App平台公共能力和组件（收银台、分享、勋章、客服，B25等）的架构方案设计和评审；主导跨端（iOS、Android、Server、H5）架构方案的设计和评审，并推动方案在多个垂直交付团队落地；赋能团队日常敏捷交付实践的落地执行和优化，推动质量内建在团队和组织中的落地，显著提升团队交付的质量，得到架构组和垂直业务团队的高度好评；主导Super App冷启动性能诊断和分析，设计前后端缓存方案，并推动在相关垂直业务团队落地实施，大大缩短了全网广播后因突发流量的响应延迟时间，显著改善用户体验；设计App端Pre-Prod环境的集成测试方案，推动该方案在业务团队落地，打通Pre-Prod端到端的集成测试能力，有效利用Pre-Prod做好生产环境质量把控；积极推动知识管理，制定日常交付的质量规范包括业务建模、架构、API文档规范、代码规范以及测试策略，在组织内广泛传播，收到兄弟团队的技术人员的一致好评 技术栈：SAFe 6.0、Spring Boot、Spring Cloud、Nacos、Config Center、Feign Client、GitLab CI/CD、MySQL、Redis、Kafka、MQ、AWS Cloud",
+      "excerpt": "时间：2023.02 ~ 2025.02 角色：Tech Leader 架构师 这是一个基于SAFe 6.0框架运作的大型敏捷IT组织研发的保时捷（10万+车主）Super App，该组织包含三个ART共计约17个Scrum Team。所在的Platform团队由来自多家不同公司、分布在多个城市的成员组成。 核心成果：...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-保时捷-super-app-研发交付",
+      "organization": "保时捷",
+      "role": "Tech Leader | 架构师",
+      "period": "2023.02 ~ 2025.02",
+      "keywords": [
+        "保时捷",
+        "Tech Leader | 架构师",
+        "SAFe 6.0",
+        "Spring Boot",
+        "Spring Cloud",
+        "Nacos",
+        "Config Center",
+        "Feign Client",
+        "GitLab CI/CD",
+        "MySQL",
+        "Redis",
+        "Kafka"
+      ],
+      "techs": [
+        "SAFe 6.0",
+        "Spring Boot",
+        "Spring Cloud",
+        "Nacos",
+        "Config Center",
+        "Feign Client",
+        "GitLab CI/CD",
+        "MySQL",
+        "Redis",
+        "Kafka",
+        "MQ",
+        "AWS Cloud"
+      ]
+    },
+    {
+      "id": "project-人保-devops-研发效能提升",
+      "anchorId": "projects",
+      "heading": "项目｜人保 - DevOps 研发效能提升",
+      "content": "时间：2022.02 ~ 2023.01 角色：DevOps研发效能教练 架构师 作为驻场DevOps研发效能教练，深入中国人保核心交付团队，主导研发流程瓶颈诊断和效能提升。 核心成果：30%+ 需求交付前置时间缩短；60% 测试覆盖率从15%提升至；约50% Bug返工率降低；4个交付组 辅导；超50名技术人员 辅导 主要职责和贡献：主导研发流程瓶颈诊断，采用VSM调研走访10来个核心交付组，识别出需求共识效率低、变更失败率高、交付前置时间长等核心瓶颈；辅导核心系统4个交付组超过50名技术人员改善研发过程，引入高效能工程实践框架，优化需求管理、任务分解、CI/CD Pipeline等实践；辅导8个组的Tech Leader和BA采用事件风暴、用户旅程、用户故事、DDD进行核心业务流程梳理和建模，显著提升业务共识效率；指导团队引入DDD分层架构改造核心模块，制定分层测试策略，测试覆盖率从15%提升到60%，Bug返工率降低约50%",
+      "excerpt": "时间：2022.02 ~ 2023.01 角色：DevOps研发效能教练 架构师 作为驻场DevOps研发效能教练，深入中国人保核心交付团队，主导研发流程瓶颈诊断和效能提升。 核心成果：30%+ 需求交付前置时间缩短；60% 测试覆盖率从15%提升至；约50% Bug返工率降低；4个交付组 辅导；超50名技术人员 辅导...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-人保-devops-研发效能提升",
+      "organization": "人保",
+      "role": "DevOps研发效能教练 | 架构师",
+      "period": "2022.02 ~ 2023.01",
+      "keywords": [
+        "人保",
+        "DevOps研发效能教练 | 架构师",
+        "30%+",
+        "60%",
+        "约50%",
+        "4个交付组",
+        "超50名技术人员",
+        "DevOps 研发效能提升",
+        "研发流程瓶颈诊断",
+        "VSM调研走访10来个核心交付组",
+        "识别出需求共识效率低",
+        "变更失败率高"
+      ]
+    },
+    {
+      "id": "project-thoughtworks-技术人员培养",
+      "anchorId": "projects",
+      "heading": "项目｜Thoughtworks - 技术人员培养",
+      "content": "时间：2019.06 ~ 2022.01 角色：技术内训师 学习项目设计师 作为Thoughtworks内训师，设计并交付高质量技术学习项目，帮助中高级技术人员提升工程实践能力和架构设计能力。 核心成果：6+ 实战训练营；500+ 覆盖；明星项目 面向对象训练营成；培养技术骨干和技术Leader 主要职责和贡献：高阶项目：微服务设计，技术领导力、大规模高效能工程实践；中阶项目：重构实战、TDD实战、面向对象训练营（明星项目，口碑极佳）；实战训练营涵盖500+中高级技术人员，显著提升团队技术能力和工程实践水平",
+      "excerpt": "时间：2019.06 ~ 2022.01 角色：技术内训师 学习项目设计师 作为Thoughtworks内训师，设计并交付高质量技术学习项目，帮助中高级技术人员提升工程实践能力和架构设计能力。 核心成果：6+ 实战训练营；500+ 覆盖；明星项目 面向对象训练营成；培养技术骨干和技术Leader 主要职责和贡献：高阶项...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-thoughtworks-技术人员培养",
+      "organization": "Thoughtworks",
+      "role": "技术内训师 | 学习项目设计师",
+      "period": "2019.06 ~ 2022.01",
+      "keywords": [
+        "Thoughtworks",
+        "技术内训师 | 学习项目设计师",
+        "6+",
+        "500+",
+        "明星项目",
+        "技术人员培养",
+        "高阶项目",
+        "微服务设计",
+        "技术领导力",
+        "大规模高效能工程实践",
+        "中阶项目",
+        "重构实战"
+      ]
+    },
+    {
+      "id": "project-戴姆勒-otr-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜戴姆勒 - OTR 研发交付",
+      "content": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要职责和贡献：完成日常需求开发，推动团队敏捷工程实践的落地优化，比如Code Review、Tasking、TDD、测试策略；推动技术债管理，带领技术栈小组优化系统的自动化测试策略，引入有效的进程内API功能测试和契约测试，大大提升了测试的有效性；CI/CD Pipeline测试阶段从30~50分钟缩短至10分钟以内，需求Bug返工率降低约40%；主导设计微服务技术工作坊，通过业务场景驱动从0到1搭建微服务架构，深度学习Spring Cloud原理和实战，包括服务注册和发现、负载均衡、配置中心、限流和熔断，服务运维监控 技术栈：Java 8、Spring Cloud、Consul、Hystrix、MongoDB、MySQL、GoCD、Docker、Redis、React Native、ELK、K8S",
+      "excerpt": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-戴姆勒-otr-研发交付",
+      "organization": "戴姆勒",
+      "role": "Tech Lead 2Tier",
+      "period": "2017.06 ~ 2019.05",
+      "keywords": [
+        "戴姆勒",
+        "Tech Lead 2Tier",
+        "Java 8",
+        "Spring Cloud",
+        "Consul",
+        "Hystrix",
+        "MongoDB",
+        "MySQL",
+        "GoCD",
+        "Docker",
+        "Redis",
+        "React Native"
+      ],
+      "techs": [
+        "Java 8",
+        "Spring Cloud",
+        "Consul",
+        "Hystrix",
+        "MongoDB",
+        "MySQL",
+        "GoCD",
+        "Docker",
+        "Redis",
+        "React Native",
+        "ELK",
+        "K8S"
+      ]
+    },
+    {
+      "id": "extra-著作发表",
+      "anchorId": "extras",
+      "heading": "兴趣｜著作发表",
+      "content": "著作发表： 整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design 敏捷那些事儿：https://www.yuque.com/yuanshenjian/agile-things 我敏捷了吗？：https://www.yuque.com/yuanshenjian/my-tw-10-years",
+      "excerpt": "著作发表： 整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design 敏捷那些事儿：https://www.yuque.com/yuanshenjian/agile-things 我敏捷了吗？：https://www.yuque.com/yuansh...",
+      "sectionType": "extras",
+      "entityType": "extra",
+      "entityId": "extra-著作发表",
+      "keywords": [
+        "著作发表",
+        "整洁软件设计",
+        "敏捷那些事儿",
+        "我敏捷了吗？"
+      ]
+    },
+    {
+      "id": "extra-运动健身",
+      "anchorId": "extras",
+      "heading": "兴趣｜运动健身",
+      "content": "运动健身： CBBA高级健身教练 极限健身实践者 擅长心肺体能训练",
+      "excerpt": "运动健身： CBBA高级健身教练 极限健身实践者 擅长心肺体能训练",
+      "sectionType": "extras",
+      "entityType": "extra",
+      "entityId": "extra-运动健身",
+      "keywords": [
+        "运动健身",
+        "CBBA高级健身教练",
+        "极限健身实践者",
+        "擅长心肺体能训练"
+      ]
+    },
+    {
+      "id": "extra-理财投资",
+      "anchorId": "extras",
+      "heading": "兴趣｜理财投资",
+      "content": "理财投资： 长线主义 逆向投资者 聚焦中国优质资产",
+      "excerpt": "理财投资： 长线主义 逆向投资者 聚焦中国优质资产",
+      "sectionType": "extras",
+      "entityType": "extra",
+      "entityId": "extra-理财投资",
+      "keywords": [
+        "理财投资",
+        "长线主义",
+        "逆向投资者",
+        "聚焦中国优质资产"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "hero",
+      "anchorId": "hero",
+      "heading": "个人简介",
+      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目，长期关注 AI 软件工程、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升代码开发、测试、重构和知识沉淀效率，同时具备扎实的软件架构设计与服务端开发能力 具备良好的业务 Sense 和产品思维，有代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目，长期关注 AI 软件工程、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升代码开发、测试、重构和知识沉淀效率，同时具备扎实..."
+    },
+    {
+      "id": "skill-敏捷开发",
+      "anchorId": "skills",
+      "heading": "技能｜敏捷开发",
+      "content": "技能等级：精通 精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计",
+      "excerpt": "技能等级：精通 精通XP、Scrum、DevOps敏捷软件工程实践，如CI/CD、TDD、重构、简单设计"
+    },
+    {
+      "id": "skill-软件设计",
+      "anchorId": "skills",
+      "heading": "技能｜软件设计",
+      "content": "技能等级：精通 精通面向对象、设计模式、整洁软件设计",
+      "excerpt": "技能等级：精通 精通面向对象、设计模式、整洁软件设计"
+    },
+    {
+      "id": "skill-测试策略",
+      "anchorId": "skills",
+      "heading": "技能｜测试策略",
+      "content": "技能等级：精通 精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建",
+      "excerpt": "技能等级：精通 精通自动化分层测试策略和最佳实践，擅长软件交付质量内建体系搭建"
+    },
+    {
+      "id": "skill-架构设计",
+      "anchorId": "skills",
+      "heading": "技能｜架构设计",
+      "content": "技能等级：熟练 熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计",
+      "excerpt": "技能等级：熟练 熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计"
+    },
+    {
+      "id": "skill-ai-效率工程",
+      "anchorId": "skills",
+      "heading": "技能｜AI 效率工程",
+      "content": "技能等级：熟练 熟练使用AI提效工具，如：OpenCode、Claude Code、Codex、Agent Skills、SDD框架。熟练设计 Agent工作流提升研发效率",
+      "excerpt": "技能等级：熟练 熟练使用AI提效工具，如：OpenCode、Claude Code、Codex、Agent Skills、SDD框架。熟练设计 Agent工作流提升研发效率"
+    },
+    {
+      "id": "skill-ai-agent",
+      "anchorId": "skills",
+      "heading": "技能｜AI Agent",
+      "content": "技能等级：熟练 熟练使用Spring AI、LangGraph开发AI Agent应用，熟练运用提示词工程、MCP、RAG",
+      "excerpt": "技能等级：熟练 熟练使用Spring AI、LangGraph开发AI Agent应用，熟练运用提示词工程、MCP、RAG"
+    },
+    {
+      "id": "skill-java技术栈",
+      "anchorId": "skills",
+      "heading": "技能｜Java技术栈",
+      "content": "技能等级：熟练 熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术",
+      "excerpt": "技能等级：熟练 熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术"
+    },
+    {
+      "id": "skill-业务分析",
+      "anchorId": "skills",
+      "heading": "技能｜业务分析",
+      "content": "技能等级：熟悉 熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图",
+      "excerpt": "技能等级：熟悉 熟悉业务分析方法，如用户路程、用户故事地图、用户故事、服务蓝图"
+    },
+    {
+      "id": "skill-python",
+      "anchorId": "skills",
+      "heading": "技能｜Python",
+      "content": "技能等级：熟悉 熟悉 Python、FastAPI、Pydantic-ai、LangChain",
+      "excerpt": "技能等级：熟悉 熟悉 Python、FastAPI、Pydantic-ai、LangChain"
+    },
+    {
+      "id": "certificate-csm-2020年",
+      "anchorId": "skills",
+      "heading": "证书｜CSM（2020年）",
+      "content": "专业认证：CSM（2020年）",
+      "excerpt": "专业认证：CSM（2020年）"
+    },
+    {
+      "id": "certificate-cac敏捷教练-2021年",
+      "anchorId": "skills",
+      "heading": "证书｜CAC敏捷教练（2021年）",
+      "content": "专业认证：CAC敏捷教练（2021年）",
+      "excerpt": "专业认证：CAC敏捷教练（2021年）"
+    },
+    {
+      "id": "certificate-atd培训师-2023年",
+      "anchorId": "skills",
+      "heading": "证书｜ATD培训师（2023年）",
+      "content": "专业认证：ATD培训师（2023年）",
+      "excerpt": "专业认证：ATD培训师（2023年）"
+    },
+    {
+      "id": "certificate-cbba高级健身教练-2025年",
+      "anchorId": "skills",
+      "heading": "证书｜CBBA高级健身教练（2025年）",
+      "content": "专业认证：CBBA高级健身教练（2025年）",
+      "excerpt": "专业认证：CBBA高级健身教练（2025年）"
+    },
+    {
+      "id": "education",
+      "anchorId": "education",
+      "heading": "教育背景",
+      "content": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/",
+      "excerpt": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/"
+    },
+    {
+      "id": "experience-locammend-智能顾问-技术负责人",
+      "anchorId": "experience",
+      "heading": "经历｜Locammend 智能顾问 - 技术负责人",
+      "content": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "excerpt": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。"
+    },
+    {
+      "id": "experience-保时捷super-app-tech-leader-and-架构师",
+      "anchorId": "experience",
+      "heading": "经历｜保时捷Super App - Tech Leader & 架构师",
+      "content": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
+      "excerpt": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。"
+    },
+    {
+      "id": "experience-thoughtworks-技术教练-and-咨询顾问",
+      "anchorId": "experience",
+      "heading": "经历｜Thoughtworks - 技术教练 & 咨询顾问",
+      "content": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
+      "excerpt": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员"
+    },
+    {
+      "id": "experience-thoughtworks-服务端开发",
+      "anchorId": "experience",
+      "heading": "经历｜Thoughtworks - 服务端开发",
+      "content": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "excerpt": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。"
+    },
+    {
+      "id": "experience-早期职业生涯",
+      "anchorId": "experience",
+      "heading": "经历｜早期职业生涯",
+      "content": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
+      "excerpt": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司"
+    },
+    {
+      "id": "project-locammend-智能顾问-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜Locammend 智能顾问 研发交付",
+      "content": "时间：2025.05 ~ 2025.12 角色：技术负责人 架构师 后端开发 这是一个小团队创业项目，涉及服务端、iOS、Android端。作为技术负责人，负责整体应用架构设计、以及服务端交付和部署运维。 核心成果：Chat Memory 企业级；AWS云原生 架构设计与落地；集成Google Search、Exa动态RAG 主要职责和贡献：深度参用户体验的梳理，引入用户旅程和用户故事提升协作效率；负责架构设计，采用DDD分层架构，RESTFul API、Redis缓存中间件；设计和落地AWS云原生部署架构，引入ALB、配置中心，服务注册和发现等微服务技术，降低服务治理和运维复杂度；基于提示词工程，集成Google Search、Exa服务实现动态RAG，提升用户检索的精准度和可靠的推荐；基于Cursor和Claude Code，采用Openspec框架提升AI辅助研发的质量规范；实现企业级Chat Memory能力，使模型在多轮对话中仍能记忆用户有效信息，从全局层面理解用户意图 技术栈：Spring Boot、Spring AI、Spring Cloud、MySQL、Redis、GitHub CI/CD、AWS Cloud Native、ECS、ALB、WAF、Cloud Front、S3、RDS",
+      "excerpt": "时间：2025.05 ~ 2025.12 角色：技术负责人 架构师 后端开发 这是一个小团队创业项目，涉及服务端、iOS、Android端。作为技术负责人，负责整体应用架构设计、以及服务端交付和部署运维。 核心成果：Chat Memory 企业级；AWS云原生 架构设计与落地；集成Google Search、Exa动态..."
+    },
+    {
+      "id": "project-保时捷-super-app-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜保时捷 - Super App 研发交付",
+      "content": "时间：2023.02 ~ 2025.02 角色：Tech Leader 架构师 这是一个基于SAFe 6.0框架运作的大型敏捷IT组织研发的保时捷（10万+车主）Super App，该组织包含三个ART共计约17个Scrum Team。所在的Platform团队由来自多家不同公司、分布在多个城市的成员组成。 核心成果：17 个Scrum Team顺畅交付；平台组件架构设计评审；冷启动性能优化显著改善体验；知识管理规范获团队一致好评 主要职责和贡献：深入到业务方梳理对齐业务问题和用户体验，主导App平台公共能力和组件（收银台、分享、勋章、客服，B25等）的架构方案设计和评审；主导跨端（iOS、Android、Server、H5）架构方案的设计和评审，并推动方案在多个垂直交付团队落地；赋能团队日常敏捷交付实践的落地执行和优化，推动质量内建在团队和组织中的落地，显著提升团队交付的质量，得到架构组和垂直业务团队的高度好评；主导Super App冷启动性能诊断和分析，设计前后端缓存方案，并推动在相关垂直业务团队落地实施，大大缩短了全网广播后因突发流量的响应延迟时间，显著改善用户体验；设计App端Pre-Prod环境的集成测试方案，推动该方案在业务团队落地，打通Pre-Prod端到端的集成测试能力，有效利用Pre-Prod做好生产环境质量把控；积极推动知识管理，制定日常交付的质量规范包括业务建模、架构、API文档规范、代码规范以及测试策略，在组织内广泛传播，收到兄弟团队的技术人员的一致好评 技术栈：SAFe 6.0、Spring Boot、Spring Cloud、Nacos、Config Center、Feign Client、GitLab CI/CD、MySQL、Redis、Kafka、MQ、AWS Cloud",
+      "excerpt": "时间：2023.02 ~ 2025.02 角色：Tech Leader 架构师 这是一个基于SAFe 6.0框架运作的大型敏捷IT组织研发的保时捷（10万+车主）Super App，该组织包含三个ART共计约17个Scrum Team。所在的Platform团队由来自多家不同公司、分布在多个城市的成员组成。 核心成果：..."
+    },
+    {
+      "id": "project-人保-devops-研发效能提升",
+      "anchorId": "projects",
+      "heading": "项目｜人保 - DevOps 研发效能提升",
+      "content": "时间：2022.02 ~ 2023.01 角色：DevOps研发效能教练 架构师 作为驻场DevOps研发效能教练，深入中国人保核心交付团队，主导研发流程瓶颈诊断和效能提升。 核心成果：30%+ 需求交付前置时间缩短；60% 测试覆盖率从15%提升至；约50% Bug返工率降低；4个交付组 辅导；超50名技术人员 辅导 主要职责和贡献：主导研发流程瓶颈诊断，采用VSM调研走访10来个核心交付组，识别出需求共识效率低、变更失败率高、交付前置时间长等核心瓶颈；辅导核心系统4个交付组超过50名技术人员改善研发过程，引入高效能工程实践框架，优化需求管理、任务分解、CI/CD Pipeline等实践；辅导8个组的Tech Leader和BA采用事件风暴、用户旅程、用户故事、DDD进行核心业务流程梳理和建模，显著提升业务共识效率；指导团队引入DDD分层架构改造核心模块，制定分层测试策略，测试覆盖率从15%提升到60%，Bug返工率降低约50%",
+      "excerpt": "时间：2022.02 ~ 2023.01 角色：DevOps研发效能教练 架构师 作为驻场DevOps研发效能教练，深入中国人保核心交付团队，主导研发流程瓶颈诊断和效能提升。 核心成果：30%+ 需求交付前置时间缩短；60% 测试覆盖率从15%提升至；约50% Bug返工率降低；4个交付组 辅导；超50名技术人员 辅导..."
+    },
+    {
+      "id": "project-thoughtworks-技术人员培养",
+      "anchorId": "projects",
+      "heading": "项目｜Thoughtworks - 技术人员培养",
+      "content": "时间：2019.06 ~ 2022.01 角色：技术内训师 学习项目设计师 作为Thoughtworks内训师，设计并交付高质量技术学习项目，帮助中高级技术人员提升工程实践能力和架构设计能力。 核心成果：6+ 实战训练营；500+ 覆盖；明星项目 面向对象训练营成；培养技术骨干和技术Leader 主要职责和贡献：高阶项目：微服务设计，技术领导力、大规模高效能工程实践；中阶项目：重构实战、TDD实战、面向对象训练营（明星项目，口碑极佳）；实战训练营涵盖500+中高级技术人员，显著提升团队技术能力和工程实践水平",
+      "excerpt": "时间：2019.06 ~ 2022.01 角色：技术内训师 学习项目设计师 作为Thoughtworks内训师，设计并交付高质量技术学习项目，帮助中高级技术人员提升工程实践能力和架构设计能力。 核心成果：6+ 实战训练营；500+ 覆盖；明星项目 面向对象训练营成；培养技术骨干和技术Leader 主要职责和贡献：高阶项..."
+    },
+    {
+      "id": "project-戴姆勒-otr-研发交付",
+      "anchorId": "projects",
+      "heading": "项目｜戴姆勒 - OTR 研发交付",
+      "content": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要职责和贡献：完成日常需求开发，推动团队敏捷工程实践的落地优化，比如Code Review、Tasking、TDD、测试策略；推动技术债管理，带领技术栈小组优化系统的自动化测试策略，引入有效的进程内API功能测试和契约测试，大大提升了测试的有效性；CI/CD Pipeline测试阶段从30~50分钟缩短至10分钟以内，需求Bug返工率降低约40%；主导设计微服务技术工作坊，通过业务场景驱动从0到1搭建微服务架构，深度学习Spring Cloud原理和实战，包括服务注册和发现、负载均衡、配置中心、限流和熔断，服务运维监控 技术栈：Java 8、Spring Cloud、Consul、Hystrix、MongoDB、MySQL、GoCD、Docker、Redis、React Native、ELK、K8S",
+      "excerpt": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要..."
+    },
+    {
+      "id": "extra-著作发表",
+      "anchorId": "extras",
+      "heading": "兴趣｜著作发表",
+      "content": "著作发表： 整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design 敏捷那些事儿：https://www.yuque.com/yuanshenjian/agile-things 我敏捷了吗？：https://www.yuque.com/yuanshenjian/my-tw-10-years",
+      "excerpt": "著作发表： 整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design 敏捷那些事儿：https://www.yuque.com/yuanshenjian/agile-things 我敏捷了吗？：https://www.yuque.com/yuansh..."
+    },
+    {
+      "id": "extra-运动健身",
+      "anchorId": "extras",
+      "heading": "兴趣｜运动健身",
+      "content": "运动健身： CBBA高级健身教练 极限健身实践者 擅长心肺体能训练",
+      "excerpt": "运动健身： CBBA高级健身教练 极限健身实践者 擅长心肺体能训练"
+    },
+    {
+      "id": "extra-理财投资",
+      "anchorId": "extras",
+      "heading": "兴趣｜理财投资",
+      "content": "理财投资： 长线主义 逆向投资者 聚焦中国优质资产",
+      "excerpt": "理财投资： 长线主义 逆向投资者 聚焦中国优质资产"
+    }
+  ]
+}

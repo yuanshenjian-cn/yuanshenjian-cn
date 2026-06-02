@@ -1,12 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const matter = require('gray-matter');
+const { siteRequire } = require('./site-require.js');
+const matter = siteRequire('gray-matter');
+const { oldBlogsDir, blogContentDir, siteImagesDir, repoRoot } = require('../config/workspace-paths.js');
 
-const OLD_BLOGS_DIR = path.join(process.cwd(), 'old-blogs');
+const OLD_BLOGS_DIR = oldBlogsDir;
 const POSTS_DIR = path.join(OLD_BLOGS_DIR, '_posts');
 const IMAGES_DIR = path.join(OLD_BLOGS_DIR, 'assets', 'images');
-const NEW_POSTS_DIR = path.join(process.cwd(), 'content', 'blog');
-const NEW_IMAGES_DIR = path.join(process.cwd(), 'public', 'images');
+const NEW_POSTS_DIR = blogContentDir;
+const NEW_IMAGES_DIR = siteImagesDir;
 
 // 确保目标目录存在
 function ensureDir(dir) {
@@ -227,7 +229,7 @@ function migrate() {
 
       // 写入文件
       fs.writeFileSync(targetPath, newFrontmatter);
-      console.log(`   ✅ 已迁移: ${path.relative(process.cwd(), targetPath)}`);
+      console.log(`   ✅ 已迁移: ${path.relative(repoRoot, targetPath)}`);
 
       // 复制相关图片
       copyImages(file.subDir);
