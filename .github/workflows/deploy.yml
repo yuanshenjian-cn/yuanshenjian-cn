@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -107,16 +108,40 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Resolve Cloudflare purge diff base
+        if: ${{ steps.prereq.outputs.ready == 'true' }}
+        id: purge-base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          before="$GITHUB_EVENT_BEFORE"
+          last_successful_sha="$(gh api "/repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?branch=$GITHUB_REF_NAME&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""')"
+
+          if [ -n "$last_successful_sha" ] && git cat-file -e "$last_successful_sha^{commit}" 2>/dev/null; then
+            before="$last_successful_sha"
+            echo "Using last successful deploy SHA as purge diff base: $before"
+          elif [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
+            echo "Falling back to push before SHA as purge diff base: $before"
+          else
+            before=""
+            echo "No prior deploy SHA available; purge will fall back to current commit file list."
+          fi
+
+          echo "compare_base=$before" >> "$GITHUB_OUTPUT"
+
       - name: Purge Cloudflare cache
         if: ${{ steps.prereq.outputs.ready == 'true' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          COMPARE_BASE: ${{ steps.purge-base.outputs.compare_base }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
-          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
-          before="$GITHUB_EVENT_BEFORE"
+          before="$COMPARE_BASE"
           if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
             mapfile -t changed_files < <(git diff --name-only "$before" "$GITHUB_SHA")
           else

@@ -4,7 +4,7 @@
 
 ---
 
-## 2026-06-02 Next 构建缓存回退过宽会让 AI 固定页复用旧静态产物
+## 2026-06-02 部署失败后按 push diff 做 Cloudflare purge，会漏掉 AI 固定入口页缓存
 
 ### 现象
 
@@ -15,28 +15,35 @@
 ### 根因
 
 1. AI 栏目首页、AI 简报列表页和首页卡片在代码里都使用同一个 `getLatestBriefing()`，不是两套数据源分叉。
-2. 部署 workflow 缓存了 `dist/cache`，但旧 key 只关注 `package-lock.json` 和 TS/JS 文件，没有把 `content/**/*.md`、`content/**/*.mdx` 纳入缓存键。
-3. 更关键的是，`restore-keys` 允许在内容发生变化后继续回退命中同一依赖版本下的旧 `dist/cache`。
-4. 这样会出现“新 slug 页面被重新导出，但固定路径页面继续复用旧 prerender 结果”的现象，典型表现就是 `/ai/briefings/2026-06-02` 已更新，而 `/ai` 和 `/ai/briefings/latest` 仍停在旧日期。
+2. `2026-06-02` 的 AI 简报首个 deploy run 曾失败，导致这次内容虽然已经进入 `main`，但没有真正发布到线上。
+3. 随后的成功 deploy run 主要修的是投资简报问题；Pages 构建产物其实已经带上了新的 `ai.html`、`ai/briefings.html` 和 `ai/briefings/latest.html`。
+4. 但 `purge-cache` job 只按 `github.event.before..github.sha` 的 push diff 推导 Cloudflare purge 路径，因此只清掉了首页和投资路径，没有清 `/ai`、`/ai/briefings`、`/ai/briefings/latest`。
+5. 最终形成了“源站 HTML 已更新，但 Cloudflare 仍回旧缓存”的分裂状态。带查询参数访问同一路径会立即命中新版本，这是判断问题在 CDN 缓存而不是构建产物的关键证据。
 
 ### 修复
 
-1. 将 `.github/workflows/deploy.yml` 中 Next 构建缓存的 `key` 改为同时包含：
-   - `**/package-lock.json`
-   - `**/*.js`、`**/*.jsx`、`**/*.ts`、`**/*.tsx`
-   - `content/**/*.md`、`content/**/*.mdx`
-2. 删除该缓存步骤的 `restore-keys`，避免内容变化时再次恢复旧的 `dist/cache`。
-3. 保留 Cloudflare purge，但要明确：purge 只能清 CDN；如果部署产物本身还是旧 HTML，purge 不会自动修复页面内容。
-
-### 如何确认修复生效
-
-1. 提交新的 AI 简报或文章内容后，触发 GitHub Pages 部署。
-2. 部署完成后检查这些路径的 `Last-Modified` 是否同步刷新：
+1. 手动执行一次 Cloudflare purge，立即清掉以下 AI 入口页缓存：
    - `/ai`
    - `/ai/briefings`
    - `/ai/briefings/latest`
    - `/ai-data/briefings/index.json`
-3. 确认 `/ai` 与首页 AI 简报卡片展示同一期日期，不再出现“详情页已更新、固定入口页仍停留旧日期”的分裂状态。
+2. 将 `.github/workflows/deploy.yml` 的 purge 基线从“当前 push 的前一个 commit”升级为“上一次成功的 GitHub Pages deploy SHA”。
+3. 在 workflow 顶层补充 `actions: read` 权限，允许 purge job 用 `gh api` 查询最近一次成功的 `Deploy to GitHub Pages` run。
+4. 在 `Resolve Cloudflare purge diff base` 步骤中：
+   - 优先读取最近一次成功 deploy 的 `head_sha`
+   - 只有当这个 SHA 不可用时，才回退到 `github.event.before`
+   - 如果两者都不可用，再退回到当前 commit 文件列表
+5. 保留 Next 构建缓存 key 对 `content/**/*.md`、`content/**/*.mdx` 的纳入，以及移除过宽 `restore-keys` 的改动，作为独立的构建稳定性加固，但这不是本次线上显示陈旧的直接原因。
+
+### 如何确认修复生效
+
+1. 先手动访问以下无查询参数路径，确认都已显示最新一期：
+   - `/ai`
+   - `/ai/briefings`
+   - `/ai/briefings/latest`
+2. 后续如果再次出现“某次 deploy 失败，下一次 deploy 才真正发布”的场景，检查成功 run 的 purge 日志，确认它的 diff 基线是“上一次成功 deploy SHA”，而不是单纯的 `github.event.before`。
+3. 在这种补发场景下，确认 purge 目标里会同时包含前一次失败 deploy 遗留的 `/ai` 或 `/investment` 入口页，而不是只包含当前 push 直接改动的内容路径。
+4. 线上检查 `Last-Modified`：AI 固定入口页与对应详情页、数据文件应在同一轮成功 deploy 后同步刷新，不再需要靠附带查询参数才能看到新内容。
 
 ---
 
