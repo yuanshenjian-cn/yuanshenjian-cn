@@ -276,3 +276,49 @@ config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"
 ### 结论
 
 URL encode 是正确的，`%23` 可以被数据库驱动还原成 `#`；问题在 Alembic configparser 需要额外转义 `%`。生产后端和 Alembic 都走 async SQLAlchemy，所以 Render 上必须使用 `asyncpg` 连接串。
+
+## 2026-06-03 FastAPI `TestClient` 未触发 lifespan 时，SQLite fresh DB 会缺表
+
+### 现象
+
+GitHub Actions 的 `core-service` pytest 在评论集成测试失败：
+
+```text
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: visitors
+```
+
+### 根因
+
+`core-service` 切到 async SQLAlchemy 后，SQLite 开发/测试库的自动建表逻辑从模块导入期移动到了 FastAPI lifespan：
+
+```python
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    if settings.database_url.startswith("sqlite"):
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+    yield
+```
+
+但测试里直接写：
+
+```python
+client = TestClient(app)
+```
+
+这种用法不会保证进入 lifespan 上下文。开发机上如果 `test.db` 曾被旧测试或迁移创建过表，测试可能侥幸通过；CI 使用 fresh SQLite 文件时，就会在第一次查询 `visitors` 表时报缺表。
+
+### 修复
+
+所有依赖 app lifespan 的 FastAPI 测试都应使用上下文管理器：
+
+```python
+with TestClient(app) as client:
+    response = client.get("/healthz")
+```
+
+这样测试请求前会先执行 lifespan，SQLite 表结构也会先创建。
+
+### 结论
+
+迁移到 FastAPI lifespan 后，测试不能再依赖 `TestClient(app)` 的裸实例化；凡是依赖 startup/lifespan 初始化的测试，都必须使用 `with TestClient(app) as client:`。
