@@ -453,6 +453,37 @@ GitHub Secrets / Variables：
 | Secret | `EMBEDDING_API_KEY` | embedding provider key |
 | Variable | `EMBEDDING_MODEL_ID` | embedding model id |
 
+这些值当前都按“可选”处理：
+
+- 如果你还没启用生产 RAG sync，不配置它们也没关系
+- `rag-sync.yml` 现在会在缺少任一必要 secret / variable 时自动跳过，不再把整次 push 标红
+- 一旦你准备启用生产 RAG sync，再把这 4 个值补齐即可
+
+为什么 `CORE_SERVICE_DATABASE_URL` 要配在 GitHub Secret：
+
+- `rag-sync.yml` 不是调用 Render 上的后端接口，而是直接在 GitHub Actions runner 里执行 `published_content_sync_cli`
+- 这条 CLI 会直接连接生产数据库写入 RAG 文档和 chunk，因此谁执行，谁就必须拿到数据库凭证
+- Render 环境变量只对 Render 上运行的后端服务可见，GitHub Actions 读不到 Render 的 `DATABASE_URL`
+- 因为连接串包含数据库账号密码，所以必须放 GitHub Secret，而不是 GitHub Variable
+
+当前项目建议：
+
+1. 如果还没启用生产 RAG sync，不需要先配置这些 GitHub secrets
+2. 先把主站 GitHub Pages 和 Render 后端部署跑通
+3. 后续决定启用生产 RAG sync 时，再补齐 `CORE_SERVICE_DATABASE_URL` 和 embedding 相关配置
+
+其中 `CORE_SERVICE_DATABASE_URL` 必须与 `core-service` 运行时使用的同步 SQLAlchemy 驱动保持一致，推荐格式：
+
+```text
+postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+```
+
+注意：
+
+- 不要写成 `postgresql+asyncpg://...`，当前 `core-service` 与 `rag-sync` 都使用同步 `create_engine()`
+- 不要写成 `?ssl=require`，这里应使用 `?sslmode=require`
+- 如果密码里包含 `#`、`@`、`%`、`:` 等特殊字符，必须先做 URL encode，例如 `# -> %23`
+
 当前同步服务会先写入文档与 chunk；embedding 生成能力后续可以继续增强。
 
 ## GitHub Actions 当前状态
