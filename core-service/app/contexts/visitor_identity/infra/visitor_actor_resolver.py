@@ -17,12 +17,12 @@ class VisitorActorResolver:
     def __init__(self, repository: VisitorIdentityRepository) -> None:
         self._repository = repository
 
-    def resolve(self, request: Request, response: Response) -> Actor:
+    async def resolve(self, request: Request, response: Response) -> Actor:
         visitor_token = request.cookies.get(VISITOR_COOKIE) or create_secret_token()
         visitor_key_hash = hash_with_pepper(visitor_token, settings.session_secret)
-        visitor = self._repository.get_by_visitor_key_hash(visitor_key_hash)
+        visitor = await self._repository.get_by_visitor_key_hash(visitor_key_hash)
         if visitor is None:
-            visitor = self._repository.add(
+            visitor = await self._repository.add(
                 VisitorIdentity(
                     id="",
                     visitor_key_hash=visitor_key_hash,
@@ -34,7 +34,7 @@ class VisitorActorResolver:
             )
         else:
             visitor.mark_seen(datetime.now(UTC))
-            visitor = self._repository.save(visitor)
+            visitor = await self._repository.save(visitor)
 
         if request.cookies.get(VISITOR_COOKIE) is None:
             response.set_cookie(

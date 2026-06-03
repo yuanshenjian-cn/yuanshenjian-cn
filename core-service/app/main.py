@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,10 +19,16 @@ from app.shared.infra.persistence.base import Base
 import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
 from app.shared.infra.database import engine
 
-if settings.database_url.startswith("sqlite"):
-    Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Blog Core Service")
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    if settings.database_url.startswith("sqlite"):
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+    yield
+
+
+app = FastAPI(title="Blog Core Service", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

@@ -96,21 +96,21 @@ site/dist/CNAME
 1. 创建 Supabase Project。
 2. 在 `Database -> Extensions` 启用 `vector`。
 3. 获取 Postgres 连接串。
-4. 将连接串改为 SQLAlchemy psycopg 格式。
+4. 将连接串改为 SQLAlchemy asyncpg 格式。
 
 示例：
 
 ```text
-postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 ```
 
 注意：
 
 | 项 | 说明 |
 |---|---|
-| SQLAlchemy driver | 当前后端使用同步 `create_engine()`，生产必须用 `postgresql+psycopg://`，不要用 `postgresql+asyncpg://` |
+| SQLAlchemy driver | 当前后端使用 async SQLAlchemy，生产必须用 `postgresql+asyncpg://` |
 | 密码特殊字符 | `@`、`#`、`%`、`:` 等字符需要 URL encode |
-| SSL 参数 | 当前 psycopg 连接串使用 `sslmode=require`，不要写 `ssl=require` |
+| SSL 参数 | 当前 asyncpg 连接串使用 `sslmode=require`，不要写 `ssl=require` |
 | Supabase anon key | 后端直连 Postgres，不需要配置 anon key |
 | Supabase service role key | 后端直连 Postgres，不需要配置 service role key |
 | 数据迁移 | Render 启动命令会执行 Alembic migration |
@@ -288,7 +288,7 @@ Render 环境变量：
 | `API_PUBLIC_BASE_URL` | `https://api.yuanshenjian.cn` | 后端公网地址 |
 | `COOKIE_DOMAIN` | `.yuanshenjian.cn` | 生产 cookie domain |
 | `AI_ACTIVE_PROFILE` | `deepseek/deepseek-v4-flash` | 可选，覆盖当前激活的 LLM profile |
-| `DATABASE_URL` | `postgresql+psycopg://...?...sslmode=require` | 必填，Supabase 连接串 |
+| `DATABASE_URL` | `postgresql+asyncpg://...?...sslmode=require` | 必填，Supabase 连接串 |
 | `SESSION_SECRET` | 长随机字符串 | 必填 |
 | `ADMIN_SECRET_HASH` | 管理员密码哈希 | 必填 |
 | `TURNSTILE_SECRET_KEY` | Turnstile Secret Key | 必填 |
@@ -474,19 +474,19 @@ GitHub Secrets / Variables：
 2. 先把主站 GitHub Pages 和 Render 后端部署跑通
 3. 后续决定启用生产 RAG sync 时，再补齐 `CORE_SERVICE_DATABASE_URL` 和 embedding 相关配置
 
-其中 `CORE_SERVICE_DATABASE_URL` 必须与 `core-service` 运行时使用的同步 SQLAlchemy 驱动保持一致，推荐格式：
+其中 `CORE_SERVICE_DATABASE_URL` 必须与 `core-service` 运行时使用的 async SQLAlchemy 驱动保持一致，推荐格式：
 
 ```text
-postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 ```
 
 注意：
 
-- 不要写成 `postgresql+asyncpg://...`，当前 `core-service` 与 `rag-sync` 都使用同步 `create_engine()`
+- 不要写成 `postgresql+psycopg://...` 或 `postgresql://...`，当前 `core-service` 与 `rag-sync` 都使用 async SQLAlchemy
 - 不要写成 `?ssl=require`，这里应使用 `?sslmode=require`
 - 如果密码里包含 `#`、`@`、`%`、`:` 等特殊字符，必须先做 URL encode，例如 `# -> %23`
 
-当前同步服务会先写入文档与 chunk；embedding 生成能力后续可以继续增强。
+当前 RAG sync 服务会先写入文档与 chunk；embedding 生成能力后续可以继续增强。
 
 ## GitHub Actions 当前状态
 

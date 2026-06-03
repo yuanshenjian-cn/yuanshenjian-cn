@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
 
 
 class KnowledgeContextQueryService:
-    def query_contexts(
+    async def query_contexts(
         self,
-        session: Session,
+        session: AsyncSession,
         query: str,
         article_slug: str | None = None,
         top_k: int = 5,
@@ -21,10 +21,10 @@ class KnowledgeContextQueryService:
         )
         if article_slug:
             statement = statement.where(KnowledgeDocumentPO.slug == article_slug)
-        rows = list(session.execute(statement.limit(top_k)))
+        rows = list(await session.execute(statement.limit(top_k)))
         if not rows and article_slug:
             rows = list(
-                session.execute(
+                await session.execute(
                     select(KnowledgeChunkPO, KnowledgeDocumentPO).join(
                         KnowledgeDocumentPO,
                         KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id,

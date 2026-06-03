@@ -11,8 +11,8 @@ class GetAdminSystemStatusAppService:
     def __init__(self, query_service: AdminConsoleQueryReader) -> None:
         self._query_service = query_service
 
-    def execute(self) -> GetAdminSystemStatusResp:
-        payload = self._query_service.get_system_status()
+    async def execute(self) -> GetAdminSystemStatusResp:
+        payload = await self._query_service.get_system_status()
         raw_last_sync = payload.get("last_rag_sync")
         raw_rag_documents = payload.get("rag_documents")
         raw_rag_chunks = payload.get("rag_chunks")

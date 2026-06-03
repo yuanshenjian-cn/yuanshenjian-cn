@@ -39,9 +39,17 @@ def test_site_public_dir_is_derived_from_repo_root() -> None:
     assert settings.site_public_dir == settings.repo_root / "site" / "public"
 
 
-def test_settings_rejects_asyncpg_database_url() -> None:
+def test_settings_rejects_sync_postgresql_database_url() -> None:
     settings_data = app_config.build_settings().model_dump()
-    settings_data["database_url"] = "postgresql+asyncpg://user:password@example.com/postgres"
+    settings_data["database_url"] = "postgresql+psycopg://user:password@example.com/postgres"
 
-    with pytest.raises(ValidationError, match=r"postgresql\+psycopg"):
+    with pytest.raises(ValidationError, match=r"postgresql\+asyncpg"):
+        app_config.Settings.model_validate(settings_data)
+
+
+def test_settings_rejects_sync_sqlite_database_url() -> None:
+    settings_data = app_config.build_settings().model_dump()
+    settings_data["database_url"] = "sqlite+pysqlite:///./test.db"
+
+    with pytest.raises(ValidationError, match=r"sqlite\+aiosqlite"):
         app_config.Settings.model_validate(settings_data)

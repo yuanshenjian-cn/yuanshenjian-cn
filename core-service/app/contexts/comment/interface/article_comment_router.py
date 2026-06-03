@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.comment.application.create_article_comment_app_service import CreateArticleCommentAppService
 from app.contexts.comment.application.dto.create_article_comment_dto import (
@@ -28,39 +28,39 @@ from app.shared.infra.secret_hash import hash_with_pepper
 router = APIRouter()
 
 
-def build_create_article_comment_service(session: Session) -> CreateArticleCommentAppService:
+def build_create_article_comment_service(session: AsyncSession) -> CreateArticleCommentAppService:
     repository = SQLModelCommentRepository(CommentDAO(session))
     return CreateArticleCommentAppService(repository, CommentMarkdownRenderer(), SimpleCommentModerationService())
 
 
-def get_create_article_comment_service(session: Session = Depends(get_session)) -> CreateArticleCommentAppService:
+def get_create_article_comment_service(session: AsyncSession = Depends(get_session)) -> CreateArticleCommentAppService:
     return build_create_article_comment_service(session)
 
 
-def build_list_article_comments_service(session: Session) -> ListArticleCommentsAppService:
+def build_list_article_comments_service(session: AsyncSession) -> ListArticleCommentsAppService:
     repository = SQLModelCommentRepository(CommentDAO(session))
     return ListArticleCommentsAppService(repository)
 
 
-def get_list_article_comments_service(session: Session = Depends(get_session)) -> ListArticleCommentsAppService:
+def get_list_article_comments_service(session: AsyncSession = Depends(get_session)) -> ListArticleCommentsAppService:
     return build_list_article_comments_service(session)
 
 
-def build_visitor_actor_resolver(session: Session) -> VisitorActorResolver:
+def build_visitor_actor_resolver(session: AsyncSession) -> VisitorActorResolver:
     return VisitorActorResolver(SQLModelVisitorIdentityRepository(VisitorIdentityDAO(session)))
 
 
-def get_visitor_actor_resolver(session: Session = Depends(get_session)) -> VisitorActorResolver:
+def get_visitor_actor_resolver(session: AsyncSession = Depends(get_session)) -> VisitorActorResolver:
     return build_visitor_actor_resolver(session)
 
 
 @router.get("/api/v1/articles/{article_slug}/comments", response_model=ListArticleCommentsResp)
-def list_article_comments(
+async def list_article_comments(
     article_slug: str,
     limit: int = 50,
     service: ListArticleCommentsAppService = Depends(get_list_article_comments_service),
 ) -> ListArticleCommentsResp:
-    return service.execute(article_slug, limit)
+    return await service.execute(article_slug, limit)
 
 
 @router.post("/api/v1/articles/{article_slug}/comments", response_model=CreateArticleCommentResp)
@@ -73,14 +73,14 @@ async def create_article_comment(
     service: CreateArticleCommentAppService = Depends(get_create_article_comment_service),
 ) -> CreateArticleCommentResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    actor = actor_resolver.resolve(request, response)
+    actor = await actor_resolver.resolve(request, response)
     if not comment_limiter.hit(actor.visitor_id or hash_request_ip(request)):
         raise HTTPException(status_code=429, detail="comment_rate_limited")
     verified = await verify_turnstile(payload.turnstile_token, "comment_submit", request.client.host if request.client else None)
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
     try:
-        return service.execute(
+        return await service.execute(
             CreateArticleCommentReq(
                 article_slug=article_slug,
                 actor=actor,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.admin_console.application.get_admin_ai_usage_overview_app_service import GetAdminAIUsageOverviewAppService
 from app.contexts.admin_console.application.get_admin_dashboard_overview_app_service import GetAdminDashboardOverviewAppService
@@ -19,73 +19,73 @@ from app.shared.infra.database import get_session
 router = APIRouter(prefix="/api/v1/admin")
 
 
-def build_get_admin_dashboard_overview_service(session: Session) -> GetAdminDashboardOverviewAppService:
+def build_get_admin_dashboard_overview_service(session: AsyncSession) -> GetAdminDashboardOverviewAppService:
     return GetAdminDashboardOverviewAppService(AdminConsoleQueryService(session))
 
 
-def get_get_admin_dashboard_overview_service(session: Session = Depends(get_session)) -> GetAdminDashboardOverviewAppService:
+def get_get_admin_dashboard_overview_service(session: AsyncSession = Depends(get_session)) -> GetAdminDashboardOverviewAppService:
     return build_get_admin_dashboard_overview_service(session)
 
 
-def build_list_admin_article_analytics_service(session: Session) -> ListAdminArticleAnalyticsAppService:
+def build_list_admin_article_analytics_service(session: AsyncSession) -> ListAdminArticleAnalyticsAppService:
     return ListAdminArticleAnalyticsAppService(AdminConsoleQueryService(session))
 
 
-def get_list_admin_article_analytics_service(session: Session = Depends(get_session)) -> ListAdminArticleAnalyticsAppService:
+def get_list_admin_article_analytics_service(session: AsyncSession = Depends(get_session)) -> ListAdminArticleAnalyticsAppService:
     return build_list_admin_article_analytics_service(session)
 
 
-def build_get_admin_ai_usage_overview_service(session: Session) -> GetAdminAIUsageOverviewAppService:
+def build_get_admin_ai_usage_overview_service(session: AsyncSession) -> GetAdminAIUsageOverviewAppService:
     return GetAdminAIUsageOverviewAppService(AdminConsoleQueryService(session))
 
 
-def get_get_admin_ai_usage_overview_service(session: Session = Depends(get_session)) -> GetAdminAIUsageOverviewAppService:
+def get_get_admin_ai_usage_overview_service(session: AsyncSession = Depends(get_session)) -> GetAdminAIUsageOverviewAppService:
     return build_get_admin_ai_usage_overview_service(session)
 
 
-def build_get_admin_system_status_service(session: Session) -> GetAdminSystemStatusAppService:
+def build_get_admin_system_status_service(session: AsyncSession) -> GetAdminSystemStatusAppService:
     return GetAdminSystemStatusAppService(AdminConsoleQueryService(session))
 
 
-def get_get_admin_system_status_service(session: Session = Depends(get_session)) -> GetAdminSystemStatusAppService:
+def get_get_admin_system_status_service(session: AsyncSession = Depends(get_session)) -> GetAdminSystemStatusAppService:
     return build_get_admin_system_status_service(session)
 
 
 @router.get("/analytics/overview", response_model=GetAdminDashboardOverviewResp)
-def get_admin_dashboard_overview(
+async def get_admin_dashboard_overview(
     request: Request,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminDashboardOverviewAppService = Depends(get_get_admin_dashboard_overview_service),
 ) -> GetAdminDashboardOverviewResp:
-    guard.require_admin(request)
-    return service.execute()
+    await guard.require_admin(request)
+    return await service.execute()
 
 
 @router.get("/analytics/articles", response_model=ListAdminArticleAnalyticsResp)
-def list_admin_article_analytics(
+async def list_admin_article_analytics(
     request: Request,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: ListAdminArticleAnalyticsAppService = Depends(get_list_admin_article_analytics_service),
 ) -> ListAdminArticleAnalyticsResp:
-    guard.require_admin(request)
-    return service.execute()
+    await guard.require_admin(request)
+    return await service.execute()
 
 
 @router.get("/ai-usage/overview", response_model=GetAdminAIUsageOverviewResp)
-def get_admin_ai_usage_overview(
+async def get_admin_ai_usage_overview(
     request: Request,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminAIUsageOverviewAppService = Depends(get_get_admin_ai_usage_overview_service),
 ) -> GetAdminAIUsageOverviewResp:
-    guard.require_admin(request)
-    return service.execute()
+    await guard.require_admin(request)
+    return await service.execute()
 
 
 @router.get("/system/status", response_model=GetAdminSystemStatusResp)
-def get_admin_system_status(
+async def get_admin_system_status(
     request: Request,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminSystemStatusAppService = Depends(get_get_admin_system_status_service),
 ) -> GetAdminSystemStatusResp:
-    guard.require_admin(request)
-    return service.execute()
+    await guard.require_admin(request)
+    return await service.execute()

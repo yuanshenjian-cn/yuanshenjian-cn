@@ -8,8 +8,8 @@ class GetAdminAIUsageOverviewAppService:
     def __init__(self, query_service: AdminConsoleQueryReader) -> None:
         self._query_service = query_service
 
-    def execute(self) -> GetAdminAIUsageOverviewResp:
-        payload = self._query_service.get_ai_usage_overview()
+    async def execute(self) -> GetAdminAIUsageOverviewResp:
+        payload = await self._query_service.get_ai_usage_overview()
         items = payload.get("items")
         raw_total_requests = payload.get("total_requests")
         return GetAdminAIUsageOverviewResp(

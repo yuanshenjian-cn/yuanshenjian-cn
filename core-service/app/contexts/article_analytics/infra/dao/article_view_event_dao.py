@@ -3,17 +3,17 @@ from __future__ import annotations
 from datetime import date
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.article_analytics.infra.po.article_view_event_po import ArticleViewEventPO
 
 
 class ArticleViewEventDAO:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    def has_viewed_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
-        existing = self._session.scalar(
+    async def has_viewed_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
+        existing = await self._session.scalar(
             select(ArticleViewEventPO).where(
                 ArticleViewEventPO.article_slug == article_slug,
                 ArticleViewEventPO.visitor_id == visitor_id,

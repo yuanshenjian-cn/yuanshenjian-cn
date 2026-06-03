@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.visitor_identity.application.dto.get_current_visitor_identity_dto import GetCurrentVisitorIdentityResp
 from app.contexts.visitor_identity.application.get_current_visitor_identity_app_service import GetCurrentVisitorIdentityAppService
@@ -21,20 +21,20 @@ def get_get_current_visitor_identity_service() -> GetCurrentVisitorIdentityAppSe
     return build_get_current_visitor_identity_service()
 
 
-def build_visitor_actor_resolver(session: Session) -> VisitorActorResolver:
+def build_visitor_actor_resolver(session: AsyncSession) -> VisitorActorResolver:
     return VisitorActorResolver(SQLModelVisitorIdentityRepository(VisitorIdentityDAO(session)))
 
 
-def get_visitor_actor_resolver(session: Session = Depends(get_session)) -> VisitorActorResolver:
+def get_visitor_actor_resolver(session: AsyncSession = Depends(get_session)) -> VisitorActorResolver:
     return build_visitor_actor_resolver(session)
 
 
 @router.get("/api/v1/me", response_model=GetCurrentVisitorIdentityResp)
-def get_current_visitor_identity(
+async def get_current_visitor_identity(
     request: Request,
     response: Response,
     actor_resolver: VisitorActorResolver = Depends(get_visitor_actor_resolver),
     service: GetCurrentVisitorIdentityAppService = Depends(get_get_current_visitor_identity_service),
 ) -> GetCurrentVisitorIdentityResp:
-    actor = actor_resolver.resolve(request, response)
+    actor = await actor_resolver.resolve(request, response)
     return service.execute(actor)

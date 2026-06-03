@@ -14,5 +14,5 @@ class AdminSessionAuthenticator(Protocol):
     def verify_admin_password(self, password: str) -> bool:
         ...
 
-    def issue_admin_session(self) -> IssuedAdminSession:
+    async def issue_admin_session(self) -> IssuedAdminSession:
         ...

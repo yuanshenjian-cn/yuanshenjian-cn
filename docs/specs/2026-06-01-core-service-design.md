@@ -992,7 +992,7 @@ Render 到 Supabase Postgres 使用连接池模式，避免免费实例连接数
 
 第一版建议：
 
-- 使用 SQLAlchemy 2 + psycopg 3。
+- 使用 SQLAlchemy 2 async + asyncpg。
 - Web 请求使用小型连接池。
 - GitHub Actions 迁移使用 direct connection 或 Supabase 推荐的迁移连接串。
 - 在线服务不运行长事务。

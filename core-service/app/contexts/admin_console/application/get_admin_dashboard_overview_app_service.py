@@ -8,5 +8,5 @@ class GetAdminDashboardOverviewAppService:
     def __init__(self, query_service: AdminConsoleQueryReader) -> None:
         self._query_service = query_service
 
-    def execute(self) -> GetAdminDashboardOverviewResp:
-        return GetAdminDashboardOverviewResp(**self._query_service.get_dashboard_overview())
+    async def execute(self) -> GetAdminDashboardOverviewResp:
+        return GetAdminDashboardOverviewResp(**await self._query_service.get_dashboard_overview())

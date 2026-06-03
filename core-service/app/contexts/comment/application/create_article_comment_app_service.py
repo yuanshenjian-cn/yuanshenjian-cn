@@ -19,9 +19,9 @@ class CreateArticleCommentAppService:
         self._markdown_renderer = markdown_renderer
         self._moderation_service = moderation_service
 
-    def execute(self, req: CreateArticleCommentReq) -> CreateArticleCommentResp:
+    async def execute(self, req: CreateArticleCommentReq) -> CreateArticleCommentResp:
         if req.parent_id:
-            parent = self._comment_repository.get_by_id(req.parent_id)
+            parent = await self._comment_repository.get_by_id(req.parent_id)
             if parent is None or parent.article_slug != req.article_slug or not parent.can_accept_reply():
                 raise InvalidParentCommentError()
 
@@ -50,5 +50,5 @@ class CreateArticleCommentAppService:
             created_at=self._markdown_renderer.now(),
             updated_at=None,
         )
-        saved = self._comment_repository.add(comment)
+        saved = await self._comment_repository.add(comment)
         return CreateArticleCommentResp(id=saved.id, status=saved.status.value, message="评论已提交，审核后展示。")

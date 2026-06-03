@@ -1,38 +1,37 @@
 from __future__ import annotations
 
-from collections.abc import Generator, Iterator
-from contextlib import contextmanager
+from collections.abc import AsyncGenerator, AsyncIterator
+from contextlib import asynccontextmanager
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.shared.infra.app_config import settings
 
 connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-engine = create_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+engine = create_async_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
+SessionLocal = async_sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
 
 
-def get_session() -> Generator[Session, None, None]:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     session = SessionLocal()
     try:
         yield session
-        session.commit()
+        await session.commit()
     except Exception:
-        session.rollback()
+        await session.rollback()
         raise
     finally:
-        session.close()
+        await session.close()
 
 
-@contextmanager
-def transactional_session() -> Iterator[Session]:
+@asynccontextmanager
+async def transactional_session() -> AsyncIterator[AsyncSession]:
     session = SessionLocal()
     try:
         yield session
-        session.commit()
+        await session.commit()
     except Exception:
-        session.rollback()
+        await session.rollback()
         raise
     finally:
-        session.close()
+        await session.close()

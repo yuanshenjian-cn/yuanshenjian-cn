@@ -10,25 +10,25 @@ class SQLModelVisitorIdentityRepository(VisitorIdentityRepository):
     def __init__(self, visitor_dao: VisitorIdentityDAO) -> None:
         self._visitor_dao = visitor_dao
 
-    def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorIdentity | None:
-        visitor_po = self._visitor_dao.get_by_visitor_key_hash(visitor_key_hash)
+    async def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorIdentity | None:
+        visitor_po = await self._visitor_dao.get_by_visitor_key_hash(visitor_key_hash)
         return None if visitor_po is None else self._to_domain(visitor_po)
 
-    def add(self, visitor: VisitorIdentity) -> VisitorIdentity:
+    async def add(self, visitor: VisitorIdentity) -> VisitorIdentity:
         visitor_po = VisitorPO(visitor_key_hash=visitor.visitor_key_hash)
         self._visitor_dao.add(visitor_po)
-        self._visitor_dao.flush()
-        self._visitor_dao.refresh(visitor_po)
+        await self._visitor_dao.flush()
+        await self._visitor_dao.refresh(visitor_po)
         return self._to_domain(visitor_po)
 
-    def save(self, visitor: VisitorIdentity) -> VisitorIdentity:
-        visitor_po = self._visitor_dao.get_by_visitor_key_hash(visitor.visitor_key_hash)
+    async def save(self, visitor: VisitorIdentity) -> VisitorIdentity:
+        visitor_po = await self._visitor_dao.get_by_visitor_key_hash(visitor.visitor_key_hash)
         if visitor_po is None:
             raise ValueError("visitor_not_found")
         visitor_po.last_seen_at = visitor.last_seen_at
         visitor_po.risk_score = visitor.risk_score
-        self._visitor_dao.flush()
-        self._visitor_dao.refresh(visitor_po)
+        await self._visitor_dao.flush()
+        await self._visitor_dao.refresh(visitor_po)
         return self._to_domain(visitor_po)
 
     def _to_domain(self, visitor_po: VisitorPO) -> VisitorIdentity:

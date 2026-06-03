@@ -11,13 +11,13 @@ class ListAdminArticleAnalyticsAppService:
     def __init__(self, query_service: AdminConsoleQueryReader) -> None:
         self._query_service = query_service
 
-    def execute(self) -> ListAdminArticleAnalyticsResp:
+    async def execute(self) -> ListAdminArticleAnalyticsResp:
         items = [
             ListAdminArticleAnalyticsItemResp(
                 article_slug=str(item["article_slug"]),
                 pv=int(item["pv"]),
                 uv=int(item["uv"]),
             )
-            for item in self._query_service.list_article_analytics()
+            for item in await self._query_service.list_article_analytics()
         ]
         return ListAdminArticleAnalyticsResp(items=items)

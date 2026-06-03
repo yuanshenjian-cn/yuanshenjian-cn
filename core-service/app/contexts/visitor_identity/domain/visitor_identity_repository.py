@@ -6,11 +6,11 @@ from app.contexts.visitor_identity.domain.visitor_identity import VisitorIdentit
 
 
 class VisitorIdentityRepository(Protocol):
-    def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorIdentity | None:
+    async def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorIdentity | None:
         ...
 
-    def add(self, visitor: VisitorIdentity) -> VisitorIdentity:
+    async def add(self, visitor: VisitorIdentity) -> VisitorIdentity:
         ...
 
-    def save(self, visitor: VisitorIdentity) -> VisitorIdentity:
+    async def save(self, visitor: VisitorIdentity) -> VisitorIdentity:
         ...

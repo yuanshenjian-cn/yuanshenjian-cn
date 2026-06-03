@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -14,13 +15,13 @@ def _default_repo_root() -> Path:
     return current.parent if current.name == "core-service" else current
 
 
-def main() -> None:
+async def async_main() -> None:
     parser = ArgumentParser(description="同步公开内容到知识库。")
     parser.add_argument("--repo-root", default=str(_default_repo_root()))
     parser.add_argument("--commit-sha", default="")
     args = parser.parse_args()
 
-    sync_run = SyncPublishedContentIntoKnowledgeBaseAppService(PublishedContentSyncService()).execute(
+    sync_run = await SyncPublishedContentIntoKnowledgeBaseAppService(PublishedContentSyncService()).execute(
         Path(args.repo_root).resolve(),
         args.commit_sha,
     )
@@ -32,6 +33,10 @@ def main() -> None:
         f"chunks_upserted={sync_run.chunks_upserted}, "
         f"chunks_deleted={sync_run.chunks_deleted}"
     )
+
+
+def main() -> None:
+    asyncio.run(async_main())
 
 
 if __name__ == "__main__":

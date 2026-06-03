@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.admin_console.application.dto.get_admin_session_profile_dto import GetAdminSessionProfileResp
 from app.contexts.admin_console.application.dto.login_admin_session_dto import LoginAdminSessionReq, LoginAdminSessionResp
@@ -20,12 +20,12 @@ from app.shared.infra.database import get_session
 router = APIRouter(prefix="/api/v1/admin")
 
 
-def build_login_admin_session_service(session: Session) -> LoginAdminSessionAppService:
+def build_login_admin_session_service(session: AsyncSession) -> LoginAdminSessionAppService:
     repository = SQLModelAdminSessionRepository(AdminSessionDAO(session))
     return LoginAdminSessionAppService(RepositoryAdminSessionAuthenticator(repository))
 
 
-def get_login_admin_session_service(session: Session = Depends(get_session)) -> LoginAdminSessionAppService:
+def get_login_admin_session_service(session: AsyncSession = Depends(get_session)) -> LoginAdminSessionAppService:
     return build_login_admin_session_service(session)
 
 
@@ -37,12 +37,12 @@ def get_get_admin_session_profile_service() -> GetAdminSessionProfileAppService:
     return build_get_admin_session_profile_service()
 
 
-def build_admin_session_request_guard(session: Session) -> AdminSessionRequestGuard:
+def build_admin_session_request_guard(session: AsyncSession) -> AdminSessionRequestGuard:
     repository = SQLModelAdminSessionRepository(AdminSessionDAO(session))
     return AdminSessionRequestGuard(repository, settings.session_secret)
 
 
-def get_admin_session_request_guard(session: Session = Depends(get_session)) -> AdminSessionRequestGuard:
+def get_admin_session_request_guard(session: AsyncSession = Depends(get_session)) -> AdminSessionRequestGuard:
     return build_admin_session_request_guard(session)
 
 
@@ -61,7 +61,7 @@ async def login_admin_session(
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
     try:
-        result = service.execute(payload)
+        result = await service.execute(payload)
         response.set_cookie(
             "admin_session",
             result.raw_session_token,
@@ -88,12 +88,12 @@ async def login_admin_session(
 
 
 @router.post("/auth/logout")
-def logout_admin_session(
+async def logout_admin_session(
     request: Request,
     response: Response,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
 ) -> dict[str, bool]:
-    guard.require_admin(request)
+    await guard.require_admin(request)
     guard.require_csrf(request)
     response.delete_cookie("admin_session", path="/api/v1/admin", domain=settings.cookie_domain if settings.app_env == "production" else None)
     response.delete_cookie("csrf_token", path="/", domain=settings.cookie_domain if settings.app_env == "production" else None)
@@ -101,10 +101,10 @@ def logout_admin_session(
 
 
 @router.get("/me", response_model=GetAdminSessionProfileResp)
-def get_admin_session_profile(
+async def get_admin_session_profile(
     request: Request,
     guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
     service: GetAdminSessionProfileAppService = Depends(get_get_admin_session_profile_service),
 ) -> GetAdminSessionProfileResp:
-    guard.require_admin(request)
+    await guard.require_admin(request)
     return service.execute()

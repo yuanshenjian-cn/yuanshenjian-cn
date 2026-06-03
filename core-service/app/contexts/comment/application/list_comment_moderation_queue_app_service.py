@@ -12,8 +12,8 @@ class ListCommentModerationQueueAppService:
     def __init__(self, comment_repository: CommentRepository) -> None:
         self._comment_repository = comment_repository
 
-    def execute(self, status: str, limit: int) -> ListCommentModerationQueueResp:
-        comments = self._comment_repository.list_by_status(CommentStatus(status), limit)
+    async def execute(self, status: str, limit: int) -> ListCommentModerationQueueResp:
+        comments = await self._comment_repository.list_by_status(CommentStatus(status), limit)
         return ListCommentModerationQueueResp(
             items=[
                 ListCommentModerationQueueItemResp(

@@ -17,16 +17,16 @@ class AdminSessionRequestGuard:
         self._repository = repository
         self._session_secret = session_secret
 
-    def require_admin(self, request: Request) -> None:
+    async def require_admin(self, request: Request) -> None:
         raw_token = request.cookies.get(ADMIN_COOKIE)
         if not raw_token:
             raise HTTPException(status_code=401, detail="admin_session_required")
         session_hash = hash_with_pepper(raw_token, self._session_secret)
-        admin_session = self._repository.get_by_session_hash(session_hash)
+        admin_session = await self._repository.get_by_session_hash(session_hash)
         if admin_session is None or self._coerce_utc_datetime(admin_session.expires_at) < datetime.now(UTC):
             raise HTTPException(status_code=401, detail="admin_session_invalid")
         admin_session.touch(datetime.now(UTC))
-        self._repository.save(admin_session)
+        await self._repository.save(admin_session)
 
     def require_csrf(self, request: Request) -> None:
         cookie_token = request.cookies.get(CSRF_COOKIE)

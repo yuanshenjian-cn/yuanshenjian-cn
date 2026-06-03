@@ -10,5 +10,5 @@ class SyncPublishedContentIntoKnowledgeBaseAppService:
     def __init__(self, sync_service: PublishedContentSyncService) -> None:
         self._sync_service = sync_service
 
-    def execute(self, repo_root: Path, commit_sha: str = "") -> RagSyncRunPO:
-        return self._sync_service.sync_public_content(repo_root, commit_sha)
+    async def execute(self, repo_root: Path, commit_sha: str = "") -> RagSyncRunPO:
+        return await self._sync_service.sync_public_content(repo_root, commit_sha)

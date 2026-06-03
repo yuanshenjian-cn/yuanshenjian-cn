@@ -1,24 +1,26 @@
 from __future__ import annotations
 
+from typing import cast
+
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.visitor_identity.infra.po.visitor_po import VisitorPO
 
 
 class VisitorIdentityDAO:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorPO | None:
+    async def get_by_visitor_key_hash(self, visitor_key_hash: str) -> VisitorPO | None:
         statement = select(VisitorPO).where(VisitorPO.visitor_key_hash == visitor_key_hash)
-        return self._session.scalar(statement)
+        return cast(VisitorPO | None, await self._session.scalar(statement))
 
     def add(self, visitor_po: VisitorPO) -> None:
         self._session.add(visitor_po)
 
-    def flush(self) -> None:
-        self._session.flush()
+    async def flush(self) -> None:
+        await self._session.flush()
 
-    def refresh(self, visitor_po: VisitorPO) -> None:
-        self._session.refresh(visitor_po)
+    async def refresh(self, visitor_po: VisitorPO) -> None:
+        await self._session.refresh(visitor_po)

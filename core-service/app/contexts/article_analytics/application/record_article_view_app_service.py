@@ -11,10 +11,10 @@ class RecordArticleViewAppService:
     def __init__(self, repository: ArticleAnalyticsRepository) -> None:
         self._repository = repository
 
-    def execute(self, req: RecordArticleViewReq) -> RecordArticleViewResp:
+    async def execute(self, req: RecordArticleViewReq) -> RecordArticleViewResp:
         today = datetime.now(UTC).date()
-        existing = self._repository.has_viewed_article_on_date(req.article_slug, req.actor.visitor_id, today)
-        self._repository.add_view_event(
+        existing = await self._repository.has_viewed_article_on_date(req.article_slug, req.actor.visitor_id, today)
+        await self._repository.add_view_event(
             article_slug=req.article_slug,
             visitor_id=req.actor.visitor_id,
             user_id=req.actor.user_id,
@@ -22,9 +22,9 @@ class RecordArticleViewAppService:
             user_agent_hash=req.user_agent_hash,
             referrer_origin=req.referrer_origin,
         )
-        stats = self._repository.get_daily_stats(req.article_slug, today)
+        stats = await self._repository.get_daily_stats(req.article_slug, today)
         if stats is None:
             stats = ArticleDailyStats(article_slug=req.article_slug, stat_date=today, pv_count=0, uv_count=0)
         stats.record_view(is_unique_visitor=not existing)
-        saved = self._repository.save_daily_stats(stats)
+        saved = await self._repository.save_daily_stats(stats)
         return RecordArticleViewResp(article_slug=saved.article_slug, pv=saved.pv_count, uv=saved.uv_count)

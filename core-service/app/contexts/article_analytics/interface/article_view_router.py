@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.article_analytics.application.dto.get_article_stats_dto import GetArticleStatsResp
 from app.contexts.article_analytics.application.dto.record_article_view_dto import RecordArticleViewReq, RecordArticleViewResp, SubmitArticleViewReq
@@ -20,34 +20,34 @@ from app.shared.infra.request_security import hash_request_ip, hash_user_agent, 
 router = APIRouter()
 
 
-def build_record_article_view_service(session: Session) -> RecordArticleViewAppService:
+def build_record_article_view_service(session: AsyncSession) -> RecordArticleViewAppService:
     repository = SQLModelArticleAnalyticsRepository(ArticleViewEventDAO(session), ArticleDailyStatsDAO(session))
     return RecordArticleViewAppService(repository)
 
 
-def get_record_article_view_service(session: Session = Depends(get_session)) -> RecordArticleViewAppService:
+def get_record_article_view_service(session: AsyncSession = Depends(get_session)) -> RecordArticleViewAppService:
     return build_record_article_view_service(session)
 
 
-def build_get_article_stats_service(session: Session) -> GetArticleStatsAppService:
+def build_get_article_stats_service(session: AsyncSession) -> GetArticleStatsAppService:
     repository = SQLModelArticleAnalyticsRepository(ArticleViewEventDAO(session), ArticleDailyStatsDAO(session))
     return GetArticleStatsAppService(repository)
 
 
-def get_get_article_stats_service(session: Session = Depends(get_session)) -> GetArticleStatsAppService:
+def get_get_article_stats_service(session: AsyncSession = Depends(get_session)) -> GetArticleStatsAppService:
     return build_get_article_stats_service(session)
 
 
-def build_visitor_actor_resolver(session: Session) -> VisitorActorResolver:
+def build_visitor_actor_resolver(session: AsyncSession) -> VisitorActorResolver:
     return VisitorActorResolver(SQLModelVisitorIdentityRepository(VisitorIdentityDAO(session)))
 
 
-def get_visitor_actor_resolver(session: Session = Depends(get_session)) -> VisitorActorResolver:
+def get_visitor_actor_resolver(session: AsyncSession = Depends(get_session)) -> VisitorActorResolver:
     return build_visitor_actor_resolver(session)
 
 
 @router.post("/api/v1/articles/{article_slug}/view", response_model=RecordArticleViewResp)
-def record_article_view(
+async def record_article_view(
     article_slug: str,
     payload: SubmitArticleViewReq,
     request: Request,
@@ -56,8 +56,8 @@ def record_article_view(
     service: RecordArticleViewAppService = Depends(get_record_article_view_service),
 ) -> RecordArticleViewResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    actor = actor_resolver.resolve(request, response)
-    return service.execute(
+    actor = await actor_resolver.resolve(request, response)
+    return await service.execute(
         RecordArticleViewReq(
             article_slug=article_slug,
             actor=actor,
@@ -69,8 +69,8 @@ def record_article_view(
 
 
 @router.get("/api/v1/articles/{article_slug}/stats", response_model=GetArticleStatsResp)
-def get_article_stats(
+async def get_article_stats(
     article_slug: str,
     service: GetArticleStatsAppService = Depends(get_get_article_stats_service),
 ) -> GetArticleStatsResp:
-    return service.execute(article_slug)
+    return await service.execute(article_slug)

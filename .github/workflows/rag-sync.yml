@@ -74,9 +74,9 @@ jobs:
           url = os.environ.get("DATABASE_URL", "").strip()
           if not url:
               raise SystemExit("CORE_SERVICE_DATABASE_URL is missing")
-          if not url.startswith("postgresql+psycopg://"):
+          if not url.startswith("postgresql+asyncpg://"):
               raise SystemExit(
-                  "CORE_SERVICE_DATABASE_URL must use postgresql+psycopg:// and sslmode=require"
+                  "CORE_SERVICE_DATABASE_URL must use postgresql+asyncpg:// and sslmode=require"
               )
           if "#" in url:
               raise SystemExit(

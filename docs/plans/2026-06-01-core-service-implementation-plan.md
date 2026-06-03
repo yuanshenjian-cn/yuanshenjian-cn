@@ -128,7 +128,8 @@ dependencies = [
   "uvicorn[standard]>=0.30.0",
   "pydantic-settings>=2.4.0",
   "sqlalchemy>=2.0.0",
-  "psycopg[binary]>=3.2.0",
+  "asyncpg>=0.30.0",
+  "aiosqlite>=0.20.0",
   "alembic>=1.13.0",
   "httpx>=0.27.0",
   "python-frontmatter>=1.1.0",
@@ -159,7 +160,7 @@ class Settings(BaseSettings):
 
     public_site_url: str = "https://yuanshenjian.cn"
     allowed_origins_raw: str = Field(default="https://yuanshenjian.cn,http://localhost:3000")
-    database_url: str = "sqlite+pysqlite:///:memory:"
+    database_url: str = "sqlite+aiosqlite:///:memory:"
     session_secret: str = "dev-session-secret"
     turnstile_secret_key: str = ""
     llm_profiles_json: str = "[]"

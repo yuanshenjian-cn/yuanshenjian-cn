@@ -9,8 +9,8 @@ class ListArticleCommentsAppService:
     def __init__(self, comment_repository: CommentRepository) -> None:
         self._comment_repository = comment_repository
 
-    def execute(self, article_slug: str, limit: int) -> ListArticleCommentsResp:
-        comments = self._comment_repository.list_public_by_article(article_slug, limit)
+    async def execute(self, article_slug: str, limit: int) -> ListArticleCommentsResp:
+        comments = await self._comment_repository.list_public_by_article(article_slug, limit)
         top_level = [self._to_item(comment) for comment in comments if comment.parent_id is None]
         by_id = {item.id: item for item in top_level}
         for comment in comments:

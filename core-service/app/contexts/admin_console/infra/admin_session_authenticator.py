@@ -20,10 +20,10 @@ class RepositoryAdminSessionAuthenticator(AdminSessionAuthenticator):
         password_hash = hash_with_pepper(password, settings.session_secret)
         return hmac.compare_digest(password_hash, settings.admin_secret_hash)
 
-    def issue_admin_session(self) -> IssuedAdminSession:
+    async def issue_admin_session(self) -> IssuedAdminSession:
         raw_session_token = create_secret_token()
         session_hash = hash_with_pepper(raw_session_token, settings.session_secret)
-        self._repository.add(
+        await self._repository.add(
             AdminSession(
                 id="",
                 session_hash=session_hash,

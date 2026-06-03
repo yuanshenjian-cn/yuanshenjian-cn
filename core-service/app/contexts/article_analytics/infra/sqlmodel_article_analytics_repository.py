@@ -14,10 +14,10 @@ class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
         self._event_dao = event_dao
         self._stats_dao = stats_dao
 
-    def has_viewed_article_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
-        return self._event_dao.has_viewed_on_date(article_slug, visitor_id, stat_date)
+    async def has_viewed_article_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
+        return await self._event_dao.has_viewed_on_date(article_slug, visitor_id, stat_date)
 
-    def add_view_event(
+    async def add_view_event(
         self,
         article_slug: str,
         visitor_id: str | None,
@@ -28,12 +28,12 @@ class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
     ) -> None:
         self._event_dao.add(article_slug, visitor_id, user_id, ip_hash, user_agent_hash, referrer_origin)
 
-    def get_daily_stats(self, article_slug: str, stat_date: date) -> ArticleDailyStats | None:
-        stats_po = self._stats_dao.get_by_id(article_slug, stat_date)
+    async def get_daily_stats(self, article_slug: str, stat_date: date) -> ArticleDailyStats | None:
+        stats_po = await self._stats_dao.get_by_id(article_slug, stat_date)
         return None if stats_po is None else self._to_domain(stats_po)
 
-    def save_daily_stats(self, stats: ArticleDailyStats) -> ArticleDailyStats:
-        stats_po = self._stats_dao.get_by_id(stats.article_slug, stats.stat_date)
+    async def save_daily_stats(self, stats: ArticleDailyStats) -> ArticleDailyStats:
+        stats_po = await self._stats_dao.get_by_id(stats.article_slug, stats.stat_date)
         if stats_po is None:
             stats_po = ArticleViewDailyStatsPO(
                 article_slug=stats.article_slug,
@@ -45,12 +45,12 @@ class SQLModelArticleAnalyticsRepository(ArticleAnalyticsRepository):
         else:
             stats_po.pv_count = stats.pv_count
             stats_po.uv_count = stats.uv_count
-        self._stats_dao.flush()
-        self._stats_dao.refresh(stats_po)
+        await self._stats_dao.flush()
+        await self._stats_dao.refresh(stats_po)
         return self._to_domain(stats_po)
 
-    def get_article_stats(self, article_slug: str) -> tuple[int, int]:
-        return self._stats_dao.get_article_stats(article_slug)
+    async def get_article_stats(self, article_slug: str) -> tuple[int, int]:
+        return await self._stats_dao.get_article_stats(article_slug)
 
     def _to_domain(self, stats_po: ArticleViewDailyStatsPO) -> ArticleDailyStats:
         return ArticleDailyStats(

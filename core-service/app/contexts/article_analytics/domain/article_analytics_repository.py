@@ -8,11 +8,11 @@ from app.contexts.article_analytics.domain.article_daily_stats import ArticleDai
 
 class ArticleAnalyticsRepository(ABC):
     @abstractmethod
-    def has_viewed_article_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
+    async def has_viewed_article_on_date(self, article_slug: str, visitor_id: str | None, stat_date: date) -> bool:
         raise NotImplementedError
 
     @abstractmethod
-    def add_view_event(
+    async def add_view_event(
         self,
         article_slug: str,
         visitor_id: str | None,
@@ -24,13 +24,13 @@ class ArticleAnalyticsRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_daily_stats(self, article_slug: str, stat_date: date) -> ArticleDailyStats | None:
+    async def get_daily_stats(self, article_slug: str, stat_date: date) -> ArticleDailyStats | None:
         raise NotImplementedError
 
     @abstractmethod
-    def save_daily_stats(self, stats: ArticleDailyStats) -> ArticleDailyStats:
+    async def save_daily_stats(self, stats: ArticleDailyStats) -> ArticleDailyStats:
         raise NotImplementedError
 
     @abstractmethod
-    def get_article_stats(self, article_slug: str) -> tuple[int, int]:
+    async def get_article_stats(self, article_slug: str) -> tuple[int, int]:
         raise NotImplementedError

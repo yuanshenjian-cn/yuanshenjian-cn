@@ -61,10 +61,10 @@ sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL stri
 注入到 `core-service` 的 CLI。未配置时，GitHub Actions 会把对应值展开成空字符串，而不是完全不传；后端在导入数据库层时执行：
 
 ```python
-create_engine(settings.database_url, ...)
+create_async_engine(settings.database_url, ...)
 ```
 
-最终等价于 `create_engine("")`，于是 URL 解析直接失败。
+最终等价于 `create_async_engine("")`，于是 URL 解析直接失败。
 
 ### 修复
 
@@ -78,7 +78,7 @@ create_engine(settings.database_url, ...)
 
 `RAG Sync` 在当前项目里应视为“按需启用”的生产能力，而不是主站/后端基础部署的阻断项。没配 RAG 所需 secrets 时，workflow 应跳过而不是失败。
 
-## 2026-06-03 `rag-sync` 的 `CORE_SERVICE_DATABASE_URL` 不能直接复用 `asyncpg` 风格 URL
+## 2026-06-03 `rag-sync` 的 `CORE_SERVICE_DATABASE_URL` 必须使用 asyncpg 风格 URL
 
 ### 现象
 
@@ -90,15 +90,15 @@ sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL stri
 
 ### 根因
 
-`rag-sync` 会导入 `core-service/app/shared/infra/database.py`，其中使用的是同步 SQLAlchemy：
+`rag-sync` 会导入 `core-service/app/shared/infra/database.py`，当前项目已统一使用 async SQLAlchemy：
 
 ```python
-create_engine(settings.database_url, ...)
+create_async_engine(settings.database_url, ...)
 ```
 
-因此 `CORE_SERVICE_DATABASE_URL` 必须使用同步 SQLAlchemy 可识别的连接串。常见错误有两类：
+因此 `CORE_SERVICE_DATABASE_URL` 必须使用 async SQLAlchemy 可识别的连接串。常见错误有两类：
 
-1. 误填成 `postgresql+asyncpg://...`
+1. 误填成旧同步驱动 `postgresql+psycopg://...` 或裸 `postgresql://...`
 2. 密码里包含原始 `#`，没有编码成 `%23`
 
 另外，当前项目的连接串查询参数应写成：
@@ -112,7 +112,7 @@ create_engine(settings.database_url, ...)
 ### 正确示例
 
 ```text
-postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 ```
 
 如果密码里有 `#`，例如：
@@ -129,7 +129,7 @@ abc%23123
 
 ### 修复
 
-1. 将 GitHub Secret `CORE_SERVICE_DATABASE_URL` 改成 `postgresql+psycopg://...?...sslmode=require`
+1. 将 GitHub Secret `CORE_SERVICE_DATABASE_URL` 改成 `postgresql+asyncpg://...?...sslmode=require`
 2. 如果 Render 里的 `DATABASE_URL` 也用了同一条旧值，一并修正
 3. 对密码中的特殊字符做 URL encode，尤其是 `# -> %23`
 
@@ -138,7 +138,7 @@ abc%23123
 `rag-sync.yml` 已新增前置校验步骤，会明确阻断以下问题：
 
 - Secret 为空
-- 驱动不是 `postgresql+psycopg://`
+- 驱动不是 `postgresql+asyncpg://`
 - URL 中仍包含原始 `#`
 
 ## 2026-06-03 `site-ci` 的根级 Vitest 不能在 `site/` 目录下执行
@@ -219,8 +219,8 @@ table visitors already exists
 给两个步骤使用不同数据库文件：
 
 ```text
-pytest           -> sqlite+pysqlite:///./test.db
-migration smoke  -> sqlite+pysqlite:///./migration-smoke.db
+pytest           -> sqlite+aiosqlite:///./test.db
+migration smoke  -> sqlite+aiosqlite:///./migration-smoke.db
 ```
 
 同时显式设置：
@@ -248,18 +248,18 @@ ValueError: invalid interpolation syntax in 'postgresql+asyncpg://...Ysj%23blog2
 这里有两个问题：
 
 1. Alembic 的 config 底层是 Python `configparser`，它会把 `%` 当成插值语法。数据库密码里的 `#` 被正确 URL encode 成 `%23` 后，`configparser` 会因为裸 `%` 抛 `invalid interpolation syntax`。
-2. 当前 `core-service` 使用同步 SQLAlchemy `create_engine()` 和同步 `Session`，生产 `DATABASE_URL` 不能使用 `postgresql+asyncpg://`。
+2. 当前 `core-service` 已使用 async SQLAlchemy `create_async_engine()` 和 `AsyncSession`，生产 `DATABASE_URL` 必须使用 `postgresql+asyncpg://`。
 
 ### 当前项目的正确连接串
 
 ```text
-postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 ```
 
 说明：
 
 - `asyncpg` 适用于 async SQLAlchemy 链路，需要 `create_async_engine()` 和 `AsyncSession`
-- 当前项目没有走 async SQLAlchemy，所以不能只把 URL 写成 `postgresql+asyncpg://`
+- 当前项目已经走 async SQLAlchemy，所以不能继续使用 `postgresql+psycopg://` 或裸 `postgresql://`
 - 密码里的 `#` 仍然必须 URL encode 成 `%23`
 
 ### 修复
@@ -270,9 +270,9 @@ postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))
 ```
 
-2. `Settings` 增加数据库 URL 校验，发现 `postgresql+asyncpg://` 时直接报错，避免同步引擎误用 async driver。
-3. Render 的 `DATABASE_URL` 必须同步改成 `postgresql+psycopg://...?...sslmode=require`。
+2. `Settings` 增加数据库 URL 校验，发现 `postgresql+psycopg://`、裸 `postgresql://`、`sqlite+pysqlite://` 或裸 `sqlite://` 时直接报错，避免 async engine 误用同步 driver。
+3. Render 的 `DATABASE_URL` 必须同步改成 `postgresql+asyncpg://...?...sslmode=require`。
 
 ### 结论
 
-URL encode 是正确的，`%23` 可以被数据库驱动还原成 `#`；问题在 Alembic configparser 需要额外转义 `%`。生产后端和 Alembic 都走同步 SQLAlchemy，所以 Render 上不要使用 `asyncpg` 连接串。
+URL encode 是正确的，`%23` 可以被数据库驱动还原成 `#`；问题在 Alembic configparser 需要额外转义 `%`。生产后端和 Alembic 都走 async SQLAlchemy，所以 Render 上必须使用 `asyncpg` 连接串。

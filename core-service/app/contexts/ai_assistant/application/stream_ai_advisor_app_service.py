@@ -26,7 +26,7 @@ class StreamAIAdvisorAppService:
 
     async def execute(self, req: StreamAIAdvisorReq) -> AsyncIterator[str]:
         profile = self._profile_query_service.resolve_active_profile("advisor")
-        contexts, db_references = self._knowledge_query_service.query(req.message, req.article_slug)
+        contexts, db_references = await self._knowledge_query_service.query(req.message, req.article_slug)
         references: list[dict[str, str]] = db_references
         if req.article_slug and not contexts:
             article = self._published_ai_asset_query_service.load_article_payload(req.article_slug)

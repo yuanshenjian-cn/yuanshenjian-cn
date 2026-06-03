@@ -13,11 +13,11 @@ class SQLModelCommentRepository(CommentRepository):
     def __init__(self, comment_dao: CommentDAO) -> None:
         self._comment_dao = comment_dao
 
-    def get_by_id(self, comment_id: str) -> ArticleComment | None:
-        comment_po = self._comment_dao.get_by_id(comment_id)
+    async def get_by_id(self, comment_id: str) -> ArticleComment | None:
+        comment_po = await self._comment_dao.get_by_id(comment_id)
         return None if comment_po is None else self._to_domain(comment_po)
 
-    def add(self, comment: ArticleComment) -> ArticleComment:
+    async def add(self, comment: ArticleComment) -> ArticleComment:
         comment_po = ArticleCommentPO(
             article_slug=comment.article_slug,
             parent_id=comment.parent_id,
@@ -37,27 +37,27 @@ class SQLModelCommentRepository(CommentRepository):
             user_agent_hash=comment.user_agent_hash,
         )
         self._comment_dao.add(comment_po)
-        self._comment_dao.flush()
-        self._comment_dao.refresh(comment_po)
+        await self._comment_dao.flush()
+        await self._comment_dao.refresh(comment_po)
         return self._to_domain(comment_po)
 
-    def save(self, comment: ArticleComment) -> ArticleComment:
-        comment_po = self._comment_dao.get_by_id(comment.id)
+    async def save(self, comment: ArticleComment) -> ArticleComment:
+        comment_po = await self._comment_dao.get_by_id(comment.id)
         if comment_po is None:
             raise CommentNotFoundError()
         comment_po.status = comment.status.value
         comment_po.reviewed_by = comment.reviewed_by
         comment_po.review_note = comment.review_note
         comment_po.reviewed_at = comment.reviewed_at
-        self._comment_dao.flush()
-        self._comment_dao.refresh(comment_po)
+        await self._comment_dao.flush()
+        await self._comment_dao.refresh(comment_po)
         return self._to_domain(comment_po)
 
-    def list_public_by_article(self, article_slug: str, limit: int) -> list[ArticleComment]:
-        return [self._to_domain(item) for item in self._comment_dao.list_public_by_article(article_slug, limit)]
+    async def list_public_by_article(self, article_slug: str, limit: int) -> list[ArticleComment]:
+        return [self._to_domain(item) for item in await self._comment_dao.list_public_by_article(article_slug, limit)]
 
-    def list_by_status(self, status: CommentStatus, limit: int) -> list[ArticleComment]:
-        return [self._to_domain(item) for item in self._comment_dao.list_by_status(status.value, limit)]
+    async def list_by_status(self, status: CommentStatus, limit: int) -> list[ArticleComment]:
+        return [self._to_domain(item) for item in await self._comment_dao.list_by_status(status.value, limit)]
 
     def _to_domain(self, comment_po: ArticleCommentPO) -> ArticleComment:
         return ArticleComment(

@@ -161,7 +161,7 @@ typecheck-core-service: _ensure_core_venv
 # 运行 core-service 测试。
 test-core-service: _ensure_core_venv
     @APP_ENV=test \
-    DATABASE_URL="sqlite+pysqlite:///./test.db" \
+    DATABASE_URL="sqlite+aiosqlite:///./test.db" \
     uv --directory core-service run --no-sync pytest tests -q
 
 # 查看当前 Alembic 迁移版本。
@@ -190,7 +190,7 @@ run-core-migrations: _ensure_core_venv
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head
@@ -207,7 +207,7 @@ start-core-service: run-core-migrations
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}}
@@ -218,14 +218,14 @@ start-site-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
@@ -241,14 +241,14 @@ start-admin-console-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
@@ -263,14 +263,14 @@ start-all-services: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
