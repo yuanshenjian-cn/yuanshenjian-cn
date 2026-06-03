@@ -157,11 +157,10 @@ ENOENT: no such file or directory, open 'skills/ai-briefing/SKILL.md'
 根因有两层：
 
 1. `npm exec vitest ...` 在 CI 的 npm 版本下需要显式 `--`
-2. 更关键的是，`site/vitest.workspace.config.ts` 会加载仓库根目录下的测试：
+2. 更关键的是，`site/vitest.workspace.config.ts` 会加载仓库级测试：
 
-- `tests/scripts/**`
-- `tests/skills/**`
-- `tests/blog-ai-worker/**`
+- `scripts/tests/**`
+- `skills/tests/**`
 
 这些测试依赖的相对路径是按仓库根目录设计的。如果在 `working-directory: site` 下执行，就会错误地去找：
 
@@ -182,7 +181,7 @@ npm run test
 其中：
 
 - `npm run test` 在 `site/` 目录执行，负责主站自身测试
-- workspace tests 在仓库根目录执行，负责 `tests/scripts`、`tests/skills`、`tests/blog-ai-worker`
+- workspace tests 在仓库根目录执行，负责 `scripts/tests`、`skills/tests`
 
 ### 结论
 

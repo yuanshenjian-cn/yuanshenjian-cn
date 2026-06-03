@@ -64,7 +64,7 @@ export const config = {
   ai: {
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
     coreServiceUrl,
-    workerUrl: coreServiceUrl ? `${coreServiceUrl}/api/v1/ai-assistant` : process.env.NEXT_PUBLIC_AI_WORKER_URL || "/api/v1/ai-assistant",
+    workerUrl: coreServiceUrl ? `${coreServiceUrl}/api/v1/ai-assistant` : "/api/v1/ai-assistant",
     turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
     turnstile: {
       timeoutMs: {

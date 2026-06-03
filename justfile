@@ -93,7 +93,7 @@ test-site: _check_node
 test-site-watch: _check_node
     @npm --prefix {{SITE_DIR}} run test:watch
 
-# 运行 workspace 级测试（scripts / skills / blog-ai-worker）。
+# 运行 workspace 级测试（scripts / skills）。
 test-workspace: _check_node
     @./{{SITE_DIR}}/node_modules/.bin/vitest run -c {{SITE_DIR}}/vitest.workspace.config.ts
 

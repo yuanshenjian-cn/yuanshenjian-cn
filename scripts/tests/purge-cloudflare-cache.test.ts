@@ -27,7 +27,7 @@ describe("purge-cloudflare-cache script", () => {
       buildTargetUrls,
       derivePurgePathsFromChangedFiles,
       getArticleSectionPaths,
-    } = await import("../../scripts/purge-cloudflare-cache.js"));
+    } = await import("../purge-cloudflare-cache.js"));
   });
 
   it("builds AI briefing purge paths with latest, archive and detail routes", () => {

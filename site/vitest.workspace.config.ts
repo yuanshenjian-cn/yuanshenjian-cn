@@ -7,9 +7,8 @@ export default defineConfig({
     environment: "node",
     globals: true,
     include: [
-      path.resolve(__dirname, "../tests/scripts/**/*.{test,spec}.{ts,tsx}"),
-      path.resolve(__dirname, "../tests/skills/**/*.{test,spec}.{ts,tsx}"),
-      path.resolve(__dirname, "../tests/blog-ai-worker/**/*.{test,spec}.{ts,tsx}"),
+      path.resolve(__dirname, "../scripts/tests/**/*.{test,spec}.{ts,tsx}"),
+      path.resolve(__dirname, "../skills/tests/**/*.{test,spec}.{ts,tsx}"),
     ],
   },
 });

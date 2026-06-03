@@ -13,7 +13,7 @@ const testFile = path.join(briefingsDir, "2099-01-03-investment-briefing.md");
 
 describe("build-investment-data script", () => {
   beforeAll(async () => {
-    ({ buildBriefingsPayload, buildCoveragePayload } = await import("../../scripts/build-investment-data.js"));
+    ({ buildBriefingsPayload, buildCoveragePayload } = await import("../build-investment-data.js"));
   });
 
   beforeEach(() => {
