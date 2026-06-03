@@ -8,10 +8,10 @@ AI 效率工程师 / 研发效能专家 / 敏捷开发教练。
 
 ## 我正在关注
 
-- AI 效率工程，通过AI workflow提升研发效率
+- 通过设计 AI agent workflow 提升研发效率
 - Claude Code / OpenCode / Codex 等 AI Coding 工具的工程化使用
 - 简单设计、DDD、测试策略与持续交付
-- 个人知识系统、长期写作和高质量内容沉淀
+- 有效的知识管理
 
 ## 我擅长
 
