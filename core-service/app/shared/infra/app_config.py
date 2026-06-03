@@ -11,7 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 CORE_SERVICE_ROOT = Path(__file__).resolve().parents[3]
 REPO_ROOT = CORE_SERVICE_ROOT.parent
-APP_CONFIG_PATH = CORE_SERVICE_ROOT / "app" / "application.yml"
+APP_CONFIG_PATH = CORE_SERVICE_ROOT / "app" / "config.yml"
+DEFAULT_DATABASE_URL = f"sqlite+pysqlite:///{(CORE_SERVICE_ROOT / 'dev.db').resolve()}"
 ENV_PLACEHOLDER_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::([^}]*))?\}")
 
 
@@ -146,10 +147,6 @@ def _load_app_file_config(app_env: str, env_map: dict[str, str]) -> AppFileConfi
 def _apply_app_file_env_overrides(file_config: AppFileConfig, env_map: dict[str, str]) -> AppFileConfig:
     data = file_config.model_dump()
 
-    allowed_origins = env_map.get("ALLOWED_ORIGINS_RAW") or env_map.get("ALLOWED_ORIGINS")
-    if allowed_origins:
-        data["cors"]["allowed_origins"] = _parse_csv(allowed_origins)
-
     cookie_domain = env_map.get("COOKIE_DOMAIN")
     if cookie_domain is not None:
         data["security"]["cookie_domain"] = cookie_domain
@@ -177,9 +174,8 @@ class Settings(BaseModel):
     app_env: str = "local"
     public_site_url: str = "https://yuanshenjian.cn"
     api_public_base_url: str = "http://localhost:8000"
-    allowed_origins_raw: str = ""
     cookie_domain_override: str = ""
-    database_url: str = "sqlite+pysqlite:///./core-service/dev.db"
+    database_url: str = DEFAULT_DATABASE_URL
     session_secret: str = "dev-session-secret"
     admin_secret_hash: str = ""
     turnstile_secret_key: str = ""
@@ -195,8 +191,6 @@ class Settings(BaseModel):
 
     @property
     def allowed_origins(self) -> list[str]:
-        if self.allowed_origins_raw.strip():
-            return [origin.strip() for origin in self.allowed_origins_raw.split(",") if origin.strip()]
         return self.file_config.cors.allowed_origins
 
     @property
@@ -241,9 +235,8 @@ def build_settings() -> Settings:
             "app_env": env_map.get("APP_ENV", app_env),
             "public_site_url": env_map.get("PUBLIC_SITE_URL", "https://yuanshenjian.cn"),
             "api_public_base_url": env_map.get("API_PUBLIC_BASE_URL", "http://localhost:8000"),
-            "allowed_origins_raw": env_map.get("ALLOWED_ORIGINS_RAW", env_map.get("ALLOWED_ORIGINS", "")),
             "cookie_domain_override": env_map.get("COOKIE_DOMAIN", ""),
-            "database_url": env_map.get("DATABASE_URL", "sqlite+pysqlite:///./core-service/dev.db"),
+            "database_url": env_map.get("DATABASE_URL", DEFAULT_DATABASE_URL),
             "session_secret": env_map.get("SESSION_SECRET", "dev-session-secret"),
             "admin_secret_hash": env_map.get("ADMIN_SECRET_HASH", ""),
             "turnstile_secret_key": env_map.get("TURNSTILE_SECRET_KEY", ""),

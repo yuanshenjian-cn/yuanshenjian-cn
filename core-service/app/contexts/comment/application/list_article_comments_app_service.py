@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.contexts.comment.application.dto.list_article_comments_dto import ListArticleCommentItemResp, ListArticleCommentsResp
+from app.contexts.comment.domain.comment import ArticleComment
 from app.contexts.comment.domain.comment_repository import CommentRepository
 
 
@@ -17,7 +18,7 @@ class ListArticleCommentsAppService:
                 by_id[comment.parent_id].replies.append(self._to_item(comment))
         return ListArticleCommentsResp(items=top_level, next_cursor=None)
 
-    def _to_item(self, comment) -> ListArticleCommentItemResp:
+    def _to_item(self, comment: ArticleComment) -> ListArticleCommentItemResp:
         return ListArticleCommentItemResp(
             id=comment.id,
             article_slug=comment.article_slug,

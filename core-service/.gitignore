@@ -12,6 +12,8 @@ build/
 *.egg-info/
 dev.db
 dev.db-*
+test.db
+test.db-*
 .DS_Store
 *.local.jsonc
 .env

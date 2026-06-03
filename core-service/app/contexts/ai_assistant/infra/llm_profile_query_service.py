@@ -5,7 +5,7 @@ from app.shared.infra.app_config import AIConfig, settings
 
 
 class LLMProfileQueryService:
-    def load_scene_llm_profile_mapping(self) -> dict[str, str]:
+    def load_scene_profiles(self) -> dict[str, str]:
         return {str(key): str(value) for key, value in settings.file_config.ai.scene_profiles.items() if str(value).strip()}
 
     def flatten_profiles_config(self, ai_config: AIConfig) -> dict[str, LLMProviderProfile]:
@@ -42,7 +42,7 @@ class LLMProfileQueryService:
         return scene_map.get(scene) or scene_map.get("default", default)
 
     def resolve_active_profile(self, scene: str) -> LLMProviderProfile:
-        scene_map = self.load_scene_llm_profile_mapping()
+        scene_map = self.load_scene_profiles()
         profiles = self.parse_profiles()
         selector = self.resolve_scene_profile(scene, scene_map, default=settings.active_ai_profile)
         profile = profiles.get(selector) or profiles.get(settings.active_ai_profile)

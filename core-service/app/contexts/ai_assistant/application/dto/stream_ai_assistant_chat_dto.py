@@ -14,5 +14,5 @@ class StreamAIAssistantChatReq(BaseModel):
         "author",
     ]
     message: str = Field(min_length=1, max_length=4000)
-    context: dict | None = None
+    context: dict[str, object] | None = None
     cf_turnstile_response: str = ""

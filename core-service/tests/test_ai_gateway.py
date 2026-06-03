@@ -16,7 +16,7 @@ def test_encode_sse_outputs_event_and_json_data() -> None:
     assert encode_sse_event("done", {"ok": True}) == 'event: done\ndata: {"ok":true}\n\n'
 
 
-def test_ai_config_uses_application_yml_profiles() -> None:
+def test_ai_config_uses_config_yml_profiles() -> None:
     assert settings.core_service_root.name == "core-service"
     assert "deepseek" in settings.file_config.ai.providers
     assert settings.file_config.ai.scene_profiles["advisor"] == "deepseek/deepseek-v4-pro"

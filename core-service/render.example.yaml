@@ -2,9 +2,9 @@ services:
   - type: web
     name: blog-core-service
     runtime: python
-    rootDir: .
-    buildCommand: pip install -r core-service/requirements.txt
-    startCommand: alembic -c core-service/alembic.ini upgrade head && uvicorn app.main:app --app-dir core-service --host 0.0.0.0 --port $PORT
+    rootDir: core-service
+    buildCommand: uv sync --frozen
+    startCommand: uv run --frozen --no-sync alembic -c alembic.ini upgrade head && uv run --frozen --no-sync uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
     autoDeployTrigger: off
     envVars:
@@ -14,8 +14,6 @@ services:
         value: https://yuanshenjian.cn
       - key: API_PUBLIC_BASE_URL
         value: https://api.yuanshenjian.cn
-      - key: ALLOWED_ORIGINS_RAW
-        value: https://yuanshenjian.cn,https://www.yuanshenjian.cn,https://admin.yuanshenjian.cn
       - key: COOKIE_DOMAIN
         value: .yuanshenjian.cn
       - key: AI_ACTIVE_PROFILE

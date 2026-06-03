@@ -27,13 +27,16 @@ _check_python:
         exit 1; \
     fi
 
-# 如果 core-service venv 不存在，则自动创建并安装依赖。
-_ensure_core_venv: _check_python
-    @if [ ! -x core-service/.venv/bin/python ]; then \
-        python3 -m venv core-service/.venv; \
-        core-service/.venv/bin/python -m pip install --upgrade pip; \
-        core-service/.venv/bin/python -m pip install -e "./core-service[dev]"; \
+# 检查 uv 是否可用。
+_check_uv:
+    @if ! command -v uv >/dev/null; then \
+        printf "未找到 uv，请先安装 uv。\n"; \
+        exit 1; \
     fi
+
+# 同步 core-service 本地 uv 环境依赖。
+_ensure_core_venv: _check_uv
+    @uv --directory core-service sync --frozen --extra dev
 
 # 打印本地开发地址与默认调试口令。
 urls:
@@ -52,13 +55,8 @@ install-site: _check_node
 install-admin-console: _check_node
     @npm --prefix admin-console install
 
-# 安装或更新 core-service 虚拟环境依赖。
-install-core-service: _check_python
-    @if [ ! -d core-service/.venv ]; then \
-        python3 -m venv core-service/.venv; \
-    fi
-    @core-service/.venv/bin/python -m pip install --upgrade pip
-    @core-service/.venv/bin/python -m pip install -e "./core-service[dev]"
+# 安装或更新 core-service 本地 uv 环境依赖。
+install-core-service: _ensure_core_venv
 
 # 一次性安装三套本地开发依赖。
 setup: install-site install-admin-console install-core-service
@@ -154,27 +152,29 @@ start-admin-console: _check_node
 
 # 运行 core-service Ruff 检查。
 lint-core-service: _ensure_core_venv
-    @core-service/.venv/bin/python -m ruff check core-service/app core-service/tests
+    @uv --directory core-service run --no-sync ruff check app tests
 
 # 运行 core-service mypy 检查。
 typecheck-core-service: _ensure_core_venv
-    @core-service/.venv/bin/python -m mypy core-service/app
+    @uv --directory core-service run --no-sync mypy app
 
 # 运行 core-service 测试。
 test-core-service: _ensure_core_venv
-    @core-service/.venv/bin/python -m pytest core-service/tests -q
+    @APP_ENV=test \
+    DATABASE_URL="sqlite+pysqlite:///./test.db" \
+    uv --directory core-service run --no-sync pytest tests -q
 
 # 查看当前 Alembic 迁移版本。
 show-core-migration-current: _ensure_core_venv
-    @core-service/.venv/bin/python -m alembic -c core-service/alembic.ini current
+    @uv --directory core-service run --no-sync alembic -c alembic.ini current
 
 # 查看 Alembic 迁移历史。
 show-core-migration-history: _ensure_core_venv
-    @core-service/.venv/bin/python -m alembic -c core-service/alembic.ini history --verbose
+    @uv --directory core-service run --no-sync alembic -c alembic.ini history --verbose
 
 # 创建新的 Alembic migration。
 create-core-migration message: _ensure_core_venv
-    @core-service/.venv/bin/python -m alembic -c core-service/alembic.ini revision --autogenerate -m "{{message}}"
+    @uv --directory core-service run --no-sync alembic -c alembic.ini revision --autogenerate -m "{{message}}"
 
 # 运行 admin-console 全部常用校验。
 check-admin-console: typecheck-admin-console build-admin-console
@@ -190,10 +190,10 @@ run-core-migrations: _ensure_core_venv
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head
+    uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head
 
 # 启动 site 开发服务器。
 start-site: _check_node
@@ -207,10 +207,10 @@ start-core-service: run-core-migrations
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}}
+    uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}}
 
 # 同时启动 site 和 core-service。
 start-site-and-core-service: _check_node _ensure_core_venv
@@ -218,17 +218,17 @@ start-site-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
+    uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
+    uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     NEXT_PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     NEXT_PUBLIC_CORE_SERVICE_URL="http://localhost:{{CORE_PORT}}" \
     NEXT_PUBLIC_TURNSTILE_SITE_KEY="{{TURNSTILE_SITE_KEY}}" \
@@ -241,17 +241,17 @@ start-admin-console-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
+    uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
+    uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     VITE_CORE_SERVICE_URL="http://localhost:{{CORE_PORT}}" \
     VITE_TURNSTILE_SITE_KEY="{{TURNSTILE_SITE_KEY}}" \
     npm --prefix admin-console run dev -- --host {{ADMIN_HOST}} --port {{ADMIN_PORT}} --strictPort & \
@@ -263,17 +263,17 @@ start-all-services: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m alembic -c core-service/alembic.ini upgrade head && \
+    uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
+    DATABASE_URL="${DATABASE_URL:-sqlite+pysqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
-    ALLOWED_ORIGINS_RAW="http://localhost:{{SITE_PORT}},http://127.0.0.1:{{SITE_PORT}},http://localhost:{{ADMIN_PORT}},http://127.0.0.1:{{ADMIN_PORT}}" \
-    core-service/.venv/bin/python -m uvicorn app.main:app --app-dir core-service --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
+    uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
     NEXT_PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     NEXT_PUBLIC_CORE_SERVICE_URL="http://localhost:{{CORE_PORT}}" \
     NEXT_PUBLIC_TURNSTILE_SITE_KEY="{{TURNSTILE_SITE_KEY}}" \

@@ -17,7 +17,7 @@
 
 | 环境 | `APP_ENV` | 配置来源 |
 |---|---|---|
-| 本地 | `local` | `core-service/.env.local`、`core-service/app/application.yml` |
+| 本地 | `local` | `core-service/.env.local`、`core-service/app/config.yml` |
 | 生产 | `production` | Render Env、Vercel Env、GitHub Actions Variables / Secrets |
 
 本地不要再使用 `development`。如果需要本地私有变量，复制：
@@ -53,6 +53,30 @@ GitHub Actions Secrets：
 |---|---|
 | `CLOUDFLARE_API_TOKEN` | 可选，用于部署后清理 Cloudflare 缓存 |
 | `RENDER_DEPLOY_HOOK_URL` | 可选，用于 core-service CI 通过后触发 Render 部署 |
+
+`RENDER_DEPLOY_HOOK_URL` 获取方式：
+
+1. 打开 Render Dashboard
+2. 进入你的后端 Web Service
+3. 打开 `Settings`
+4. 找到 `Deploy Hook` 或 `Deploy Hook URL`
+5. 复制这条 URL，保存到 GitHub 仓库：
+
+```text
+Settings -> Secrets and variables -> Actions -> New repository secret
+```
+
+Secret 名称使用：
+
+```text
+RENDER_DEPLOY_HOOK_URL
+```
+
+注意：
+
+- 这条 URL 是敏感信息，拿到的人都可以触发 Render 重新部署
+- 如果怀疑泄露，可以在 Render 页面重新生成 `Deploy Hook`
+- 当前仓库的 `core-service` workflow 会在 `main` 分支校验通过后调用它
 
 主站当前验证方式：
 
@@ -97,12 +121,161 @@ Render Web Service 建议配置：
 |---|---|
 | Repository | 当前 GitHub 仓库 |
 | Branch | `main` |
-| Root Directory | `.` |
+| Root Directory | `core-service` |
 | Runtime | Python |
-| Build Command | `pip install -r core-service/requirements.txt` |
-| Start Command | `alembic -c core-service/alembic.ini upgrade head && uvicorn app.main:app --app-dir core-service --host 0.0.0.0 --port $PORT` |
+| Build Command | `uv sync --frozen` |
+| Start Command | `uv run --frozen --no-sync alembic -c alembic.ini upgrade head && uv run --frozen --no-sync uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
 | Health Check Path | `/healthz` |
 | Auto Deploy | 建议关闭，使用 GitHub Action Deploy Hook 触发 |
+
+说明：这里让 Render 直接以 `core-service/pyproject.toml` + `core-service/uv.lock` 作为依赖入口，避免生产环境继续依赖并行维护的 `requirements.txt`。
+
+### Render 自定义域名与 Cloudflare DNS
+
+如果前端和管理后台都使用：
+
+```text
+https://api.yuanshenjian.cn
+```
+
+那么除了配置 `NEXT_PUBLIC_CORE_SERVICE_URL` / `VITE_CORE_SERVICE_URL` 之外，还需要把 `api.yuanshenjian.cn` 这个域名真正接到 Render Web Service。
+
+推荐步骤：
+
+1. 在 Render 后端服务的 `Settings -> Custom Domains` 中添加 `api.yuanshenjian.cn`
+2. 记下 Render 页面提示的目标域名，通常是 `xxx.onrender.com`
+3. 到 Cloudflare DNS 新增一条记录：
+
+```text
+Type: CNAME
+Name: api
+Target: xxx.onrender.com
+Proxy status: DNS only
+```
+
+4. 删除 `api` 子域名上已有的冲突记录，尤其是旧的 `A` / `AAAA` / `CNAME`
+5. 回 Render 点击 `Verify`
+6. 验证通过后访问：
+
+```text
+https://api.yuanshenjian.cn/healthz
+```
+
+确认后端已经通过自定义域名正常提供服务。
+
+注意：
+
+- 验证阶段建议先使用 Cloudflare 灰云 `DNS only`
+- Render 官方建议在配置时移除相关 `AAAA` 记录，避免 IPv6 干扰验证
+- 如果域名配置了 `CAA`，需要允许 `letsencrypt.org` 和 `pki.goog`
+
+### Cloudflare 灰云与橙云
+
+灰云 `DNS only`：
+
+- Cloudflare 只负责域名解析
+- 客户端直接访问 Render
+- 配置更简单，适合初次接入和排障阶段
+- 不能使用 Cloudflare 代理层的 WAF、Rate Limiting、Bot 防护等能力
+
+橙云 `Proxied`：
+
+- 客户端先访问 Cloudflare，再由 Cloudflare 转发到 Render
+- 可以使用 Cloudflare 的 WAF、Rate Limiting、Bot 管理等代理能力
+- 但链路更复杂，排障时要同时排查 Render、DNS、Cloudflare SSL/TLS 和代理规则
+
+当前项目建议：
+
+1. 先用灰云 `DNS only` 跑通 Render 自定义域名验证
+2. 确认 `https://api.yuanshenjian.cn/healthz` 正常
+3. 确认主站、评论、管理后台、AI 接口都能正常访问 API
+4. 如果后续需要 Cloudflare 代理防护，再切橙云 `Proxied`
+
+### `api.yuanshenjian.cn` 是否值得切橙云
+
+结论：值得，但不建议作为首发前置条件。
+
+原因：
+
+- 当前 API 不只是只读接口，还包含评论提交、管理员登录、AI 对话等更容易被刷的动态入口
+- 后端虽然已经有应用层限流和 Turnstile，但 Cloudflare 代理层可以补充 WAF、Rate Limiting、Bot 管理，形成第二层防护
+- 对公开 API 来说，这些能力在上线后有真实价值，尤其是评论和 AI 接口开始被搜索引擎、脚本或恶意流量碰撞之后
+
+不建议首发就切橙云的原因：
+
+- 当前还处于基础设施刚接通阶段，优先目标是确认 Render、自定义域名、TLS、Supabase、前后端联调都稳定
+- 橙云会把问题面扩大到 Cloudflare 规则、缓存、SSL/TLS、代理行为，排障成本明显上升
+- 这个项目包含流式 AI 响应，代理层一旦配置不当，比普通 JSON API 更容易出现边缘问题
+
+推荐决策：
+
+1. 首次上线阶段：保持灰云 `DNS only`
+2. 主站、评论、管理后台、AI 接口稳定运行一段时间后，再评估是否切橙云
+3. 如果开始出现探测流量、评论刷接口、AI 滥用或异常爬虫，再切橙云通常是值得的
+
+如果后续切橙云，额外检查：
+
+- Cloudflare SSL/TLS 模式建议使用 `Full (strict)`
+- 不要给 API 路径错误开启缓存
+- 确认流式响应、长连接或 SSE 没有被代理层干扰
+- 确认后端对 `api.yuanshenjian.cn` 的跨域和 cookie 行为仍然正确
+
+### 切橙云后，这个项目要重点检查的 Cloudflare 配置
+
+建议优先检查：
+
+1. SSL/TLS
+
+- 模式使用 `Full (strict)`
+- 确认 Render 自定义域名已经 `Verified`，证书已经签发完成，再打开代理
+
+2. Cache Rules
+
+- `api.yuanshenjian.cn/*` 默认不要缓存
+- 不要给 `/api/*`、评论接口、管理员接口、AI 接口错误配置 `Cache Everything`
+- 健康检查 `/healthz` 也建议保持直连语义，不依赖边缘缓存结果
+
+3. WAF / Security Rules
+
+- 可以先对明显敏感路径做更严格规则，例如评论提交、管理员登录、AI 对话入口
+- 不要一开始就对整站 API 上挑战或拦截规则，先从高风险写接口开始
+- 如果开启更激进的人机验证，注意不要和站内 Turnstile 重复叠加到影响正常用户提交
+
+4. Rate Limiting
+
+- 优先保护高成本或可滥用接口：评论提交、管理员认证、AI chat/stream、AI 推荐类接口
+- Cloudflare 限流适合做外层粗限流，应用内限流继续保留做业务语义控制
+- 不建议只依赖 Cloudflare 限流替代应用层限流
+
+5. 流式响应与 SSE
+
+- 重点回归测试 AI 流式接口
+- 确认前端可以持续收到分段响应，而不是被代理层缓冲到最后一次性返回
+- 如果未来增加 WebSocket 或更长连接能力，也要单独验证代理行为
+
+6. 实际来源 IP
+
+- 如果后续要做更精细的审计、限流或封禁，需要明确后端读取真实客户端 IP 的策略
+- 橙云后，请求到 Render 时源地址会先经过 Cloudflare，后端应优先信任 `CF-Connecting-IP` 或标准转发头，而不是只看直连源 IP
+
+7. CORS 与 Cookie
+
+- 当前允许的 origin 维护在 `core-service/app/config.yml`，切橙云不应改变这份白名单
+- 登录、评论、管理后台等需要再次验证跨域请求和 cookie domain 是否仍符合预期
+- 当前 `COOKIE_DOMAIN=.yuanshenjian.cn` 时，要验证主站与后台对子域 cookie 的读写和发送是否正常
+
+8. Cloudflare 额外功能
+
+- 不要把 Cloudflare Access 之类交互式保护直接套到公开 API 上，否则主站和管理后台的正常 AJAX 请求可能被拦住
+- 开启 Bot Fight Mode、Super Bot Fight Mode 或托管挑战时，要重新验证评论、AI、后台接口是否仍可正常访问
+
+建议的切换后验收顺序：
+
+1. `https://api.yuanshenjian.cn/healthz`
+2. 主站文章页加载与评论列表
+3. 评论提交
+4. AI 推荐与 AI 流式问答
+5. 管理后台登录与受保护接口
 
 Render 环境变量：
 
@@ -111,7 +284,6 @@ Render 环境变量：
 | `APP_ENV` | `production` | 必填 |
 | `PUBLIC_SITE_URL` | `https://yuanshenjian.cn` | 主站地址 |
 | `API_PUBLIC_BASE_URL` | `https://api.yuanshenjian.cn` | 后端公网地址 |
-| `ALLOWED_ORIGINS_RAW` | `https://yuanshenjian.cn,https://www.yuanshenjian.cn,https://admin.yuanshenjian.cn` | CORS 与 Turnstile hostname 校验 |
 | `COOKIE_DOMAIN` | `.yuanshenjian.cn` | 生产 cookie domain |
 | `AI_ACTIVE_PROFILE` | `deepseek/deepseek-v4-flash` | 可选，覆盖当前激活的 LLM profile |
 | `DATABASE_URL` | Supabase 连接串 | 必填 |
@@ -141,9 +313,9 @@ print("ADMIN_SECRET_HASH=" + hmac.new(session_secret.encode(), password.encode()
 PY
 ```
 
-## `application.yml` 环境变量覆盖
+## `config.yml` 环境变量覆盖
 
-`core-service/app/application.yml` 提供默认值。生产或本地可以通过环境变量覆盖。LLM provider 列表统一由 `ai.providers` 定义，不再单独维护 JSONC 配置文件。
+`core-service/app/config.yml` 提供默认值。生产或本地可以通过环境变量覆盖常用运行参数。CORS origin 列表直接维护在 `cors.allowed_origins`，不再额外提供环境变量覆盖。
 
 核心结构：
 
@@ -166,7 +338,6 @@ ai:
 
 | 环境变量 | 覆盖字段 |
 |---|---|
-| `ALLOWED_ORIGINS_RAW` / `ALLOWED_ORIGINS` | `cors.allowed_origins` |
 | `COOKIE_DOMAIN` | `security.cookie_domain` |
 | `AI_ACTIVE_PROFILE` | `ai.active_profile` |
 | `AI_GLOBAL_DAILY_TOKEN_LIMIT` | `ai.global_daily_token_limit` |
@@ -178,7 +349,7 @@ ai:
 | `MOONSHOT_API_KEY` | `ai.providers.moonshot-cn.api_key` |
 | `OPENAI_COMPATIBLE_API_KEY` | `ai.providers.openai-compatible.api_key` |
 
-没有配置环境变量时，继续使用 `application.yml` 默认值。
+没有配置环境变量时，继续使用 `config.yml` 默认值。
 
 生产环境的后端不会读取 Render 本机的 `site/public` 快照。文章 AI、简报推荐等公开 JSON 数据通过 `PUBLIC_SITE_URL` 从 GitHub Pages 拉取，例如：
 
@@ -194,7 +365,7 @@ https://yuanshenjian.cn/investment-data/briefings/index.json
 生产环境使用：
 
 ```text
-core-service/app/application.yml
+core-service/app/config.yml
 ```
 
 该文件只保存 provider、base URL、model、scene 映射和 `${ENV}` 占位符，不保存真实 key。真实 key 只放在 Render 环境变量中。

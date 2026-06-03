@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.contexts.comment.application.dto.review_article_comment_dto import ReviewArticleCommentReq, ReviewArticleCommentResp
+from app.contexts.comment.domain.comment import ArticleComment
 from app.contexts.comment.domain.comment_repository import CommentRepository
 from app.contexts.comment.domain.exceptions import CommentNotFoundError
 
@@ -27,7 +28,7 @@ class ReviewArticleCommentAppService:
         saved = self._comment_repository.save(comment)
         return ReviewArticleCommentResp(id=saved.id, status=saved.status.value)
 
-    def _load(self, comment_id: str):
+    def _load(self, comment_id: str) -> ArticleComment:
         comment = self._comment_repository.get_by_id(comment_id)
         if comment is None:
             raise CommentNotFoundError()

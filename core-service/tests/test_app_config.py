@@ -20,14 +20,12 @@ def test_app_file_env_overrides_only_dynamic_runtime_values() -> None:
     resolved = app_config._apply_app_file_env_overrides(
         file_config,
         {
-            "ALLOWED_ORIGINS_RAW": "https://example.com,https://admin.example.com",
             "COOKIE_DOMAIN": ".example.com",
             "AI_ACTIVE_PROFILE": "moonshot-cn/kimi-k2.6",
             "AI_CHAT_DAILY_REQUEST_LIMIT": "88",
         },
     )
 
-    assert resolved.cors.allowed_origins == ["https://example.com", "https://admin.example.com"]
     assert resolved.security.cookie_domain == ".example.com"
     assert resolved.ai.active_profile == "moonshot-cn/kimi-k2.6"
     assert resolved.ai.chat_daily_request_limit == 88

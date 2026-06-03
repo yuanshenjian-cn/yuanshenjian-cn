@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
@@ -110,16 +112,16 @@ def get_stream_ai_advisor_service() -> StreamAIAdvisorAppService:
 def _parse_briefing_range(payload: StreamAIAssistantChatReq) -> BriefingRange:
     raw_context = payload.context if isinstance(payload.context, dict) else {}
     raw_range = raw_context.get("range")
-    if raw_range in {"today", "3d", "7d", "14d", "30d"}:
-        return raw_range
+    if isinstance(raw_range, str) and raw_range in {"today", "3d", "7d", "14d", "30d"}:
+        return cast(BriefingRange, raw_range)
     raise HTTPException(status_code=400, detail="invalid_range")
 
 
 def _parse_investment_briefing_range(payload: StreamAIAssistantChatReq) -> InvestmentBriefingRange:
     raw_context = payload.context if isinstance(payload.context, dict) else {}
     raw_range = raw_context.get("range")
-    if raw_range in {"3d", "7d", "14d", "30d"}:
-        return raw_range
+    if isinstance(raw_range, str) and raw_range in {"3d", "7d", "14d", "30d"}:
+        return cast(InvestmentBriefingRange, raw_range)
     raise HTTPException(status_code=400, detail="invalid_range")
 
 
