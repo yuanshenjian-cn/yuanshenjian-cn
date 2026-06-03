@@ -187,3 +187,48 @@ npm run test
 ### 结论
 
 带仓库根级测试的 Vitest workspace，如果包含依赖相对路径的脚本测试，必须在仓库根目录执行；不能简单沿用 `working-directory: site`。
+
+## 2026-06-03 `core-service-ci` 的 migration smoke 不能与 pytest 共用默认 SQLite 文件
+
+### 现象
+
+GitHub Actions 的 `Migration smoke` 步骤执行：
+
+```text
+uv run --frozen --no-sync alembic -c alembic.ini upgrade head
+```
+
+报错：
+
+```text
+sqlite3.OperationalError: table visitors already exists
+```
+
+### 根因
+
+`core-service-ci.yml` 先跑 pytest，再跑 Alembic migration smoke。两步都没有显式覆盖 `DATABASE_URL`，于是都会落到同一个默认 SQLite 文件。
+
+测试阶段会先创建业务表，但不会写入 Alembic 版本表；后续 migration smoke 再执行 `0001_initial` 时，Alembic 认为这是一个空库，于是尝试重复建表，最终触发：
+
+```text
+table visitors already exists
+```
+
+### 修复
+
+给两个步骤使用不同数据库文件：
+
+```text
+pytest           -> sqlite+pysqlite:///./test.db
+migration smoke  -> sqlite+pysqlite:///./migration-smoke.db
+```
+
+同时显式设置：
+
+```text
+APP_ENV=test
+```
+
+### 结论
+
+在 CI 中，只要同一个 job 既跑测试又跑 Alembic migration smoke，就不要共用默认 SQLite 文件；必须把测试库和迁移烟测库隔离开。

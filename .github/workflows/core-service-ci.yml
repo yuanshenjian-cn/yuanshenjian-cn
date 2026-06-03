@@ -40,10 +40,16 @@ jobs:
         working-directory: core-service
 
       - name: Test
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite+pysqlite:///./test.db
         run: uv run --frozen --no-sync pytest tests -q
         working-directory: core-service
 
       - name: Migration smoke
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite+pysqlite:///./migration-smoke.db
         run: uv run --frozen --no-sync alembic -c alembic.ini upgrade head
         working-directory: core-service
 
