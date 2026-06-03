@@ -101,18 +101,18 @@ create_async_engine(settings.database_url, ...)
 1. 误填成旧同步驱动 `postgresql+psycopg://...` 或裸 `postgresql://...`
 2. 密码里包含原始 `#`，没有编码成 `%23`
 
-另外，当前项目的连接串查询参数应写成：
+另外，当前项目使用 `postgresql+asyncpg://`，连接串查询参数应写成：
 
-- `sslmode=require`
+- `ssl=require`
 
 而不是：
 
-- `ssl=require`
+- `sslmode=require`
 
 ### 正确示例
 
 ```text
-postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?ssl=require
 ```
 
 如果密码里有 `#`，例如：
@@ -129,7 +129,7 @@ abc%23123
 
 ### 修复
 
-1. 将 GitHub Secret `CORE_SERVICE_DATABASE_URL` 改成 `postgresql+asyncpg://...?...sslmode=require`
+1. 将 GitHub Secret `CORE_SERVICE_DATABASE_URL` 改成 `postgresql+asyncpg://...?...ssl=require`
 2. 如果 Render 里的 `DATABASE_URL` 也用了同一条旧值，一并修正
 3. 对密码中的特殊字符做 URL encode，尤其是 `# -> %23`
 
@@ -253,13 +253,14 @@ ValueError: invalid interpolation syntax in 'postgresql+asyncpg://...Ysj%23blog2
 ### 当前项目的正确连接串
 
 ```text
-postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?ssl=require
 ```
 
 说明：
 
 - `asyncpg` 适用于 async SQLAlchemy 链路，需要 `create_async_engine()` 和 `AsyncSession`
 - 当前项目已经走 async SQLAlchemy，所以不能继续使用 `postgresql+psycopg://` 或裸 `postgresql://`
+- 当前 asyncpg 连接串使用 `?ssl=require`，不要写 `?sslmode=require`
 - 密码里的 `#` 仍然必须 URL encode 成 `%23`
 
 ### 修复
@@ -271,11 +272,51 @@ config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"
 ```
 
 2. `Settings` 增加数据库 URL 校验，发现 `postgresql+psycopg://`、裸 `postgresql://`、`sqlite+pysqlite://` 或裸 `sqlite://` 时直接报错，避免 async engine 误用同步 driver。
-3. Render 的 `DATABASE_URL` 必须同步改成 `postgresql+asyncpg://...?...sslmode=require`。
+3. Render 的 `DATABASE_URL` 必须同步改成 `postgresql+asyncpg://...?...ssl=require`。
 
 ### 结论
 
 URL encode 是正确的，`%23` 可以被数据库驱动还原成 `#`；问题在 Alembic configparser 需要额外转义 `%`。生产后端和 Alembic 都走 async SQLAlchemy，所以 Render 上必须使用 `asyncpg` 连接串。
+
+## 2026-06-03 Render asyncpg 启动时报 `unexpected keyword argument 'sslmode'`
+
+### 现象
+
+Render 启动命令执行 Alembic migration 时失败：
+
+```text
+TypeError: connect() got an unexpected keyword argument 'sslmode'
+```
+
+### 根因
+
+`core-service` 已使用 SQLAlchemy asyncpg driver：
+
+```text
+postgresql+asyncpg://...
+```
+
+这个 driver 会把 URL 查询参数直接传给 `asyncpg.connect()`。`asyncpg.connect()` 接受 `ssl` 参数，不接受 psycopg/libpq 风格的 `sslmode` 参数。
+
+### 修复
+
+把 Render 的 `DATABASE_URL` 从：
+
+```text
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+```
+
+改成：
+
+```text
+postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?ssl=require
+```
+
+密码中的特殊字符仍然需要 URL encode，例如 `# -> %23`。
+
+### 结论
+
+asyncpg 生产连接串使用 `?ssl=require`；`sslmode=require` 只适用于 psycopg/libpq 风格连接串。
 
 ## 2026-06-03 FastAPI `TestClient` 未触发 lifespan 时，SQLite fresh DB 会缺表
 
