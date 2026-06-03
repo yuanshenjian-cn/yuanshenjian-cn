@@ -232,3 +232,47 @@ APP_ENV=test
 ### 结论
 
 在 CI 中，只要同一个 job 既跑测试又跑 Alembic migration smoke，就不要共用默认 SQLite 文件；必须把测试库和迁移烟测库隔离开。
+
+## 2026-06-03 Render 上 Alembic 不能直接把含 `%23` 的 `DATABASE_URL` 写入 configparser
+
+### 现象
+
+Render 启动命令执行 Alembic migration 时失败：
+
+```text
+ValueError: invalid interpolation syntax in 'postgresql+asyncpg://...Ysj%23blog2026...'
+```
+
+### 根因
+
+这里有两个问题：
+
+1. Alembic 的 config 底层是 Python `configparser`，它会把 `%` 当成插值语法。数据库密码里的 `#` 被正确 URL encode 成 `%23` 后，`configparser` 会因为裸 `%` 抛 `invalid interpolation syntax`。
+2. 当前 `core-service` 使用同步 SQLAlchemy `create_engine()` 和同步 `Session`，生产 `DATABASE_URL` 不能使用 `postgresql+asyncpg://`。
+
+### 当前项目的正确连接串
+
+```text
+postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
+```
+
+说明：
+
+- `asyncpg` 适用于 async SQLAlchemy 链路，需要 `create_async_engine()` 和 `AsyncSession`
+- 当前项目没有走 async SQLAlchemy，所以不能只把 URL 写成 `postgresql+asyncpg://`
+- 密码里的 `#` 仍然必须 URL encode 成 `%23`
+
+### 修复
+
+1. Alembic 写入 `sqlalchemy.url` 前，把 `%` 转义成 `%%`：
+
+```python
+config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))
+```
+
+2. `Settings` 增加数据库 URL 校验，发现 `postgresql+asyncpg://` 时直接报错，避免同步引擎误用 async driver。
+3. Render 的 `DATABASE_URL` 必须同步改成 `postgresql+psycopg://...?...sslmode=require`。
+
+### 结论
+
+URL encode 是正确的，`%23` 可以被数据库驱动还原成 `#`；问题在 Alembic configparser 需要额外转义 `%`。生产后端和 Alembic 都走同步 SQLAlchemy，所以 Render 上不要使用 `asyncpg` 连接串。

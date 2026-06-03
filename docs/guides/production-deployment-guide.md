@@ -108,7 +108,9 @@ postgresql+psycopg://USER:PASSWORD@HOST:PORT/postgres?sslmode=require
 
 | 项 | 说明 |
 |---|---|
+| SQLAlchemy driver | 当前后端使用同步 `create_engine()`，生产必须用 `postgresql+psycopg://`，不要用 `postgresql+asyncpg://` |
 | 密码特殊字符 | `@`、`#`、`%`、`:` 等字符需要 URL encode |
+| SSL 参数 | 当前 psycopg 连接串使用 `sslmode=require`，不要写 `ssl=require` |
 | Supabase anon key | 后端直连 Postgres，不需要配置 anon key |
 | Supabase service role key | 后端直连 Postgres，不需要配置 service role key |
 | 数据迁移 | Render 启动命令会执行 Alembic migration |
@@ -286,7 +288,7 @@ Render 环境变量：
 | `API_PUBLIC_BASE_URL` | `https://api.yuanshenjian.cn` | 后端公网地址 |
 | `COOKIE_DOMAIN` | `.yuanshenjian.cn` | 生产 cookie domain |
 | `AI_ACTIVE_PROFILE` | `deepseek/deepseek-v4-flash` | 可选，覆盖当前激活的 LLM profile |
-| `DATABASE_URL` | Supabase 连接串 | 必填 |
+| `DATABASE_URL` | `postgresql+psycopg://...?...sslmode=require` | 必填，Supabase 连接串 |
 | `SESSION_SECRET` | 长随机字符串 | 必填 |
 | `ADMIN_SECRET_HASH` | 管理员密码哈希 | 必填 |
 | `TURNSTILE_SECRET_KEY` | Turnstile Secret Key | 必填 |

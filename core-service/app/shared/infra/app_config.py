@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 from dotenv import dotenv_values
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 CORE_SERVICE_ROOT = Path(__file__).resolve().parents[3]
 REPO_ROOT = CORE_SERVICE_ROOT.parent
@@ -188,6 +188,13 @@ class Settings(BaseModel):
     file_config: AppFileConfig = Field(default_factory=AppFileConfig, exclude=True, repr=False)
     core_service_root: Path = Field(default=CORE_SERVICE_ROOT, exclude=True, repr=False)
     repo_root: Path = Field(default=REPO_ROOT, exclude=True, repr=False)
+
+    @field_validator("database_url")
+    @classmethod
+    def validate_sync_database_url(cls, value: str) -> str:
+        if value.startswith("postgresql+asyncpg://"):
+            raise ValueError("DATABASE_URL must use postgresql+psycopg:// because core-service uses sync SQLAlchemy")
+        return value
 
     @property
     def allowed_origins(self) -> list[str]:

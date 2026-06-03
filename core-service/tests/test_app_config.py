@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import pytest
+from pydantic import ValidationError
+
 from app.shared.infra import app_config
 
 
@@ -34,3 +37,11 @@ def test_app_file_env_overrides_only_dynamic_runtime_values() -> None:
 def test_site_public_dir_is_derived_from_repo_root() -> None:
     settings = app_config.build_settings()
     assert settings.site_public_dir == settings.repo_root / "site" / "public"
+
+
+def test_settings_rejects_asyncpg_database_url() -> None:
+    settings_data = app_config.build_settings().model_dump()
+    settings_data["database_url"] = "postgresql+asyncpg://user:password@example.com/postgres"
+
+    with pytest.raises(ValidationError, match=r"postgresql\+psycopg"):
+        app_config.Settings.model_validate(settings_data)
