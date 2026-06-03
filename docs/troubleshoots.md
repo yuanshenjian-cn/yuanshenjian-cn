@@ -140,3 +140,50 @@ abc%23123
 - Secret 为空
 - 驱动不是 `postgresql+psycopg://`
 - URL 中仍包含原始 `#`
+
+## 2026-06-03 `site-ci` 的根级 Vitest 不能在 `site/` 目录下执行
+
+### 现象
+
+GitHub Actions 的 `Run tests` 步骤在 `site` 内测试通过后，根级 workspace 测试仍然失败，典型报错包括：
+
+```text
+Error: Cannot find module '/.../site/scripts/validate-post.js'
+ENOENT: no such file or directory, open 'skills/ai-briefing/SKILL.md'
+```
+
+### 根因
+
+根因有两层：
+
+1. `npm exec vitest ...` 在 CI 的 npm 版本下需要显式 `--`
+2. 更关键的是，`site/vitest.workspace.config.ts` 会加载仓库根目录下的测试：
+
+- `tests/scripts/**`
+- `tests/skills/**`
+- `tests/blog-ai-worker/**`
+
+这些测试依赖的相对路径是按仓库根目录设计的。如果在 `working-directory: site` 下执行，就会错误地去找：
+
+- `site/scripts/validate-post.js`
+- `site/skills/...`
+
+从而导致根级测试失败。
+
+### 修复
+
+把测试拆成两步：
+
+```bash
+npm run test
+./site/node_modules/.bin/vitest run -c site/vitest.workspace.config.ts
+```
+
+其中：
+
+- `npm run test` 在 `site/` 目录执行，负责主站自身测试
+- workspace tests 在仓库根目录执行，负责 `tests/scripts`、`tests/skills`、`tests/blog-ai-worker`
+
+### 结论
+
+带仓库根级测试的 Vitest workspace，如果包含依赖相对路径的脚本测试，必须在仓库根目录执行；不能简单沿用 `working-directory: site`。

@@ -44,9 +44,12 @@ jobs:
       - name: Validate content
         run: node scripts/validate-post.js
 
-      - name: Run tests
-        run: npm run test && npm exec vitest run -c vitest.workspace.config.ts
+      - name: Run site tests
+        run: npm run test
         working-directory: site
+
+      - name: Run workspace tests
+        run: ./site/node_modules/.bin/vitest run -c site/vitest.workspace.config.ts
 
       - name: Restore Next.js cache
         uses: actions/cache@v4
