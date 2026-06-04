@@ -1,6 +1,20 @@
 {
-  "generated": "2026-06-02T00:00:00.000Z",
+  "generated": "2026-06-04T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-04",
+      "title": "AI 简报 · 2026-06-04",
+      "excerpt": "DeepSeek 首轮融资约 500 亿元人民币，OpenAI 将 Codex 推向知识工作者，Meta 正式进军企业 AI 代理市场。",
+      "tags": [
+        "AI",
+        "DeepSeek",
+        "OpenAI",
+        "Meta",
+        "Anthropic"
+      ],
+      "date": "2026-06-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-04"
+    },
     {
       "slug": "2026-06-02",
       "title": "AI 简报 · 2026-06-02",
@@ -750,6 +764,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-04",
+      "title": "AI 简报 · 2026-06-04",
+      "excerpt": "DeepSeek 首轮融资约 500 亿元人民币，OpenAI 将 Codex 推向知识工作者，Meta 正式进军企业 AI 代理市场。",
+      "tags": [
+        "AI",
+        "DeepSeek",
+        "OpenAI",
+        "Meta",
+        "Anthropic"
+      ],
+      "date": "2026-06-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-04"
+    },
     {
       "slug": "2026-06-02",
       "title": "AI 简报 · 2026-06-02",
