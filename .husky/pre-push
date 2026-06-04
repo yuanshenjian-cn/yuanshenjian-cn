@@ -1,1 +1,1 @@
-just build-site-prod
+INCREMENTAL_BUILD=true just build-site-prod

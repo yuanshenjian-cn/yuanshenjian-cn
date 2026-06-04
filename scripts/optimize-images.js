@@ -154,18 +154,27 @@ async function main() {
       console.log('   没有旧文件需要清理\n');
     }
     
-    const imageFiles = await getImageFiles(INPUT_DIR);
-    
+    const allImageFiles = await getImageFiles(INPUT_DIR);
+
+    const imageFiles = allImageFiles.filter((inputPath) => {
+      const outputPath = path.join(
+        path.dirname(inputPath),
+        `${path.basename(inputPath, path.extname(inputPath))}.webp`
+      );
+      if (!fs.existsSync(outputPath)) return true;
+      return fs.statSync(outputPath).mtime < fs.statSync(inputPath).mtime;
+    });
+
     if (imageFiles.length === 0) {
-      console.log('📭 没有找到需要转换的图片');
+      console.log('📭 所有图片均已是最新，无需转换');
       process.exit(0);
     }
-    
+
     console.log(`📊 发现 ${imageFiles.length} 张需要转换的图片\n`);
-    
+
     let converted = 0;
     let skipped = 0;
-    
+
     for (const file of imageFiles) {
       const result = await convertToWebP(file);
       if (result) {
