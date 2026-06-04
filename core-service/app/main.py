@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.responses import Response as StarletteResponse
 
 from app.contexts.admin_console.interface.admin_auth_router import router as admin_auth_router
 from app.contexts.admin_console.interface.admin_console_router import router as admin_console_router
@@ -18,6 +21,7 @@ from app.shared.infra.app_config import settings
 from app.shared.infra.persistence.base import Base
 import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
 from app.shared.infra.database import engine
+from app.shared.infra.request_identity_resolver import trusted_custom_hosts
 
 
 @asynccontextmanager
@@ -29,6 +33,21 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Blog Core Service", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def reject_untrusted_production_host(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[StarletteResponse]],
+) -> StarletteResponse:
+    host = request.url.hostname or request.headers.get("host", "").split(":", 1)[0]
+    if (
+        settings.app_env == "production"
+        and not settings.allow_direct_render_subdomain
+        and host not in trusted_custom_hosts()
+    ):
+        return JSONResponse(status_code=404, content={"detail": "not_found"})
+    return await call_next(request)
 
 app.add_middleware(
     CORSMiddleware,

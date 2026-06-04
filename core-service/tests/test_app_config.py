@@ -34,6 +34,22 @@ def test_app_file_env_overrides_only_dynamic_runtime_values() -> None:
     assert resolved.ai.chat_daily_request_limit == 88
 
 
+def test_rate_limit_settings_read_from_env() -> None:
+    resolved = app_config.build_settings_from_env(
+        {
+            "APP_ENV": "local",
+            "KEY_VALUE_URL": "redis://localhost:6379/0",
+            "TRUST_CF_CONNECTING_IP": "true",
+            "ALLOW_DIRECT_RENDER_SUBDOMAIN": "false",
+        }
+    )
+
+    assert resolved.key_value_url == "redis://localhost:6379/0"
+    assert resolved.trust_cf_connecting_ip is True
+    assert resolved.allow_direct_render_subdomain is False
+    assert resolved.rate_limit_enabled is True
+
+
 def test_site_public_dir_is_derived_from_repo_root() -> None:
     settings = app_config.build_settings()
     assert settings.site_public_dir == settings.repo_root / "site" / "public"

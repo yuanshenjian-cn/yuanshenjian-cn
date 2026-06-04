@@ -7,6 +7,10 @@ vi.mock("@/components/investment/investment-briefing-recommend-widget", () => ({
   InvestmentBriefingRecommendWidget: () => <div data-testid="investment-recommend-widget">investment-recommend-widget</div>,
 }));
 
+vi.mock("@/components/article-stats-badge", () => ({
+  ArticleStatsBadge: ({ slug }: { slug: string }) => <div data-testid={`stats-${slug}`}>stats-{slug}</div>,
+}));
+
 const briefings: InvestmentBriefing[] = [
   {
     slug: "2026-05-09",
@@ -27,7 +31,7 @@ const briefings: InvestmentBriefing[] = [
   {
     slug: "2026-04-15",
     title: "投资简报 · 2026-04-15",
-    date: "2026-04-15T00:00:00.000Z",
+    date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
     year: "2026",
     month: "04",
     day: "15",
@@ -62,6 +66,8 @@ describe("InvestmentBriefingsPageClient", () => {
     expect(screen.getByRole("heading", { name: "往期简报" })).toBeInTheDocument();
     expect(screen.getByText("（共 42 期）")).toBeInTheDocument();
     expect(screen.getByTestId("investment-recommend-widget")).toBeInTheDocument();
+    expect(screen.getByTestId("stats-investment-briefing-2026-05-09")).toBeInTheDocument();
+    expect(screen.getByTestId("stats-investment-briefing-2026-04-15")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 3 天" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 14 天" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 30 天" })).toBeInTheDocument();

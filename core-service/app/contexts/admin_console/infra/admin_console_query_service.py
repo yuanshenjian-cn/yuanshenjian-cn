@@ -45,7 +45,28 @@ class AdminConsoleQueryService:
 
     async def get_ai_usage_overview(self) -> dict[str, object]:
         total = await self._session.scalar(select(func.count()).select_from(AIRequestEventPO)) or 0
-        return {"total_requests": int(total), "items": []}
+        rows = await self._session.execute(
+            select(
+                AIRequestEventPO.scene,
+                AIRequestEventPO.status,
+                func.count(),
+                func.coalesce(func.sum(AIRequestEventPO.prompt_tokens), 0),
+                func.coalesce(func.sum(AIRequestEventPO.completion_tokens), 0),
+            ).group_by(AIRequestEventPO.scene, AIRequestEventPO.status)
+        )
+        return {
+            "total_requests": int(total),
+            "items": [
+                {
+                    "scene": str(scene),
+                    "status": str(status),
+                    "requests": int(requests),
+                    "prompt_tokens": int(prompt_tokens),
+                    "completion_tokens": int(completion_tokens),
+                }
+                for scene, status, requests, prompt_tokens, completion_tokens in rows
+            ],
+        }
 
     async def get_system_status(self) -> dict[str, object]:
         documents = await self._session.scalar(select(func.count()).select_from(KnowledgeDocumentPO)) or 0

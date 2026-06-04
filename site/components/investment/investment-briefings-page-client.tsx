@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { ArticleStatsBadge } from "@/components/article-stats-badge";
 import { InvestmentBriefingRecommendWidget } from "@/components/investment/investment-briefing-recommend-widget";
 import type { InvestmentBriefing } from "@/types/investment";
 
@@ -91,6 +92,7 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
                   </time>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
+                <ArticleStatsBadge slug={`investment-briefing-${briefing.slug}`} className="mt-3" />
                 <div className="mt-3 flex flex-wrap gap-2">
                   {briefing.tags.map((tag) => (
                     <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">

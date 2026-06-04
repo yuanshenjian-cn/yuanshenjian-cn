@@ -362,3 +362,50 @@ with TestClient(app) as client:
 ### 结论
 
 迁移到 FastAPI lifespan 后，测试不能再依赖 `TestClient(app)` 的裸实例化；凡是依赖 startup/lifespan 初始化的测试，都必须使用 `with TestClient(app) as client:`。
+
+## 2026-06-04 Render Key Value 只适合短窗口，不适合作为 AI 日预算真相源
+
+### 现象
+
+AI、评论和管理员登录原先都使用进程内 `InMemoryRateLimiter`，多实例部署时无法共享状态；同时 `daily_budget_usage` 和 `rate_limit_buckets` 表曾处于半成品状态，没有真正承接业务限流。
+
+### 根因
+
+短窗口限流和日预算是两类不同问题：
+
+- 短窗口限流需要低延迟、可丢失、跨实例共享的计数器，适合 Render Key Value / Valkey
+- AI 日请求数、日 token 预算和审计是账本语义，需要持久化和可追溯，必须落 Postgres
+- 进程内 memory 只能作为 Key Value 故障降级，不能作为正常预算判断缓存
+
+### 修复
+
+1. 短窗口限流统一走 `ShortWindowRateLimiter`，默认使用 Render Key Value，异常或未配置时降级到 memory fallback。
+2. Valkey 多窗口限流采用 Lua 原子脚本，先检查所有窗口，只有全部允许时才递增，避免被拒请求污染长窗口。
+3. AI 日预算重建为 `daily_budget_usage(usage_date, budget_key, request_count, token_count, updated_at)`。
+4. AI 请求先预扣估算 token，流式响应结束后从 `done` 事件读取真实 usage 并补差，同时写入 `ai_request_events`。
+5. 删除旧 `rate_limit_buckets` PO 和表，避免误以为 Postgres 短窗口表仍是主路径。
+
+### 结论
+
+Render Key Value 是短窗口治理组件，不是预算账本。AI 预算和审计的真相源必须是 Postgres；memory fallback 只能降低 Key Value 故障时的可用性损失，不能承担跨实例一致性。
+
+## 2026-06-04 Cloudflare 橙云后不能继续信任客户端 `X-Forwarded-For`
+
+### 现象
+
+生产环境如果直接使用 `X-Forwarded-For` 作为限流 IP，攻击者可以伪造 header 绕过 IP 桶；灰云直连 Render 和橙云代理阶段的可信 header 也不同。
+
+### 根因
+
+`X-Forwarded-For` 是普通客户端也能发送的 header，除非应用前面有可信代理并剥离/重写该 header，否则不能作为生产可信 IP。Cloudflare 橙云后，应优先读取 Cloudflare 注入的 `CF-Connecting-IP`；灰云阶段则应继续使用 socket IP。
+
+### 修复
+
+1. 新增 `TRUST_CF_CONNECTING_IP` 配置。
+2. 灰云验证阶段设为 `false`，使用 Render socket IP。
+3. `api.yuanshenjian.cn` 切到 Cloudflare 橙云后设为 `true` 并重新部署。
+4. `hash_request_ip()` 和统一 `RequestIdentityResolver` 都通过同一套可信 IP 策略解析。
+
+### 结论
+
+Cloudflare 橙云只提供外层代理和粗限流能力，不替代应用内主体解析、Turnstile、短窗口限流与 Postgres 日预算。生产默认不要信任客户端提供的 `X-Forwarded-For`。

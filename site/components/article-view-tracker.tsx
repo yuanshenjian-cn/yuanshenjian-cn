@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Eye, Users } from "lucide-react";
-import { recordArticleView } from "@/lib/core-service-client";
-
-interface ArticleStats {
-  pv: number;
-  uv: number;
-}
+import { recordArticleView, type ArticleStats } from "@/lib/core-service-client";
 
 export function ArticleViewTracker({ slug }: { slug: string }) {
   const [stats, setStats] = useState<ArticleStats | null>(null);
@@ -15,8 +10,10 @@ export function ArticleViewTracker({ slug }: { slug: string }) {
   useEffect(() => {
     void recordArticleView(slug).then((result) => {
       if (result) {
-        setStats({ pv: result.pv, uv: result.uv });
+        setStats(result);
       }
+    }).catch(() => {
+      // Ignore transient view sync failures so article content remains readable.
     });
   }, [slug]);
 

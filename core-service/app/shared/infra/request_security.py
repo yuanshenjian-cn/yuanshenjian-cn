@@ -6,6 +6,7 @@ import httpx
 from fastapi import HTTPException, Request
 
 from app.shared.infra.app_config import settings
+from app.shared.infra.request_identity_resolver import resolve_request_ip
 from app.shared.infra.secret_hash import hash_with_pepper
 
 TURNSTILE_ACTIONS = {
@@ -32,9 +33,7 @@ def turnstile_action_for_scene(scene: str) -> str:
 
 
 def hash_request_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-    host = forwarded or (request.client.host if request.client else "unknown")
-    return hash_with_pepper(host, settings.session_secret)
+    return hash_with_pepper(resolve_request_ip(request), settings.session_secret)
 
 
 def hash_user_agent(request: Request) -> str:

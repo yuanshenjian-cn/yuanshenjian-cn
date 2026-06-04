@@ -170,6 +170,7 @@ https://api.yuanshenjian.cn/healthz
 - 验证阶段建议先使用 Cloudflare 灰云 `DNS only`
 - Render 官方建议在配置时移除相关 `AAAA` 记录，避免 IPv6 干扰验证
 - 如果域名配置了 `CAA`，需要允许 `letsencrypt.org` 和 `pki.goog`
+- Render 绑定自定义域名后，默认仍然会保留 `xxx.onrender.com` 子域名；如果希望所有公网流量都只经过 `api.yuanshenjian.cn` 和 Cloudflare，需要在自定义域名稳定后额外关闭 Render 默认子域名
 
 ### Cloudflare 灰云与橙云
 
@@ -191,11 +192,12 @@ https://api.yuanshenjian.cn/healthz
 1. 先用灰云 `DNS only` 跑通 Render 自定义域名验证
 2. 确认 `https://api.yuanshenjian.cn/healthz` 正常
 3. 确认主站、评论、管理后台、AI 接口都能正常访问 API
-4. 如果后续需要 Cloudflare 代理防护，再切橙云 `Proxied`
+4. 稳定后将 `api.yuanshenjian.cn` 切到橙云 `Proxied`
+5. 用 Cloudflare 代理层补一层外部粗限流 / WAF，再在 Render 中关闭默认 `onrender.com` 子域名
 
 ### `api.yuanshenjian.cn` 是否值得切橙云
 
-结论：值得，但不建议作为首发前置条件。
+结论：值得，并且建议作为当前项目的稳定后最终形态。
 
 原因：
 
@@ -203,7 +205,7 @@ https://api.yuanshenjian.cn/healthz
 - 后端虽然已经有应用层限流和 Turnstile，但 Cloudflare 代理层可以补充 WAF、Rate Limiting、Bot 管理，形成第二层防护
 - 对公开 API 来说，这些能力在上线后有真实价值，尤其是评论和 AI 接口开始被搜索引擎、脚本或恶意流量碰撞之后
 
-不建议首发就切橙云的原因：
+不建议在自定义域名尚未验证完成前就切橙云的原因：
 
 - 当前还处于基础设施刚接通阶段，优先目标是确认 Render、自定义域名、TLS、Supabase、前后端联调都稳定
 - 橙云会把问题面扩大到 Cloudflare 规则、缓存、SSL/TLS、代理行为，排障成本明显上升
@@ -211,9 +213,10 @@ https://api.yuanshenjian.cn/healthz
 
 推荐决策：
 
-1. 首次上线阶段：保持灰云 `DNS only`
-2. 主站、评论、管理后台、AI 接口稳定运行一段时间后，再评估是否切橙云
-3. 如果开始出现探测流量、评论刷接口、AI 滥用或异常爬虫，再切橙云通常是值得的
+1. 首次接入阶段：保持灰云 `DNS only`
+2. 自定义域名验证通过并稳定后：切橙云 `Proxied`
+3. Cloudflare 代理层作为外部粗限流和 WAF，应用内限流继续保留做业务语义控制
+4. 确认 `api.yuanshenjian.cn` 代理链路稳定后，再关闭 Render 默认 `onrender.com` 子域名，阻断绕过 Cloudflare 的直连访问
 
 如果后续切橙云，额外检查：
 
@@ -221,6 +224,73 @@ https://api.yuanshenjian.cn/healthz
 - 不要给 API 路径错误开启缓存
 - 确认流式响应、长连接或 SSE 没有被代理层干扰
 - 确认后端对 `api.yuanshenjian.cn` 的跨域和 cookie 行为仍然正确
+
+### `api.yuanshenjian.cn` 切橙云的具体配置步骤
+
+推荐按下面顺序切换：
+
+1. 先确保 Render `Custom Domains` 中的 `api.yuanshenjian.cn` 已经 `Verified`
+2. 在灰云状态下先验证：
+
+```text
+https://api.yuanshenjian.cn/healthz
+```
+
+3. 到 Cloudflare `DNS` 页面，把 `api` 这条 `CNAME -> xxx.onrender.com` 从灰云 `DNS only` 切到橙云 `Proxied`
+4. 到 Cloudflare `SSL/TLS` 页面确认模式为 `Full (strict)`
+5. 到 Cloudflare `WAF -> Rate limiting rules` 新建一条外层粗限流规则
+6. 如果当前 Cloudflare 套餐只提供 1 条免费速率规则，优先把它留给最高成本、最容易被刷的接口；当前推荐优先保护：
+
+```text
+/api/v1/ai-assistant/*
+```
+
+7. 规则先从保守值开始，例如按 `IP` 做粗粒度限流，不要一开始就把评论、管理员登录、AI 接口全部混进同一条高敏规则
+8. 切换后按本文下方验收顺序逐项回归，尤其是 AI SSE 流式接口
+
+说明：
+
+- 橙云后，Cloudflare 才能真正提供 WAF、Rate Limiting、Bot 防护等 HTTP 代理层能力
+- Cloudflare 免费计划的 Rate Limiting rules 数量和表达能力都比较有限，具体配额以当时套餐页为准；它适合做外层粗限流，不适合替代应用层限流
+- 即使已经切橙云，也不要删除后端自己的 Turnstile、应用层限流和预算控制
+
+### 禁用 Render 默认 `onrender.com` 子域名
+
+如果只把 `api.yuanshenjian.cn` 切到橙云，但仍然保留默认 `xxx.onrender.com` 可访问，那么攻击者理论上仍可以绕过 Cloudflare，直接命中 Render 源站。因此最终建议把 Render 默认子域名一起关闭。
+
+推荐在以下前提都满足后再关闭：
+
+1. `api.yuanshenjian.cn` 已在 Render 中 `Verified`
+2. `https://api.yuanshenjian.cn/healthz` 正常
+3. 主站评论、AI 流式接口、管理后台登录都已经用自定义域名验证通过
+4. Cloudflare 橙云链路已稳定，没有缓存、TLS 或 SSE 问题
+
+Render Dashboard 操作步骤：
+
+1. 打开后端 Web Service
+2. 进入 `Settings -> Custom Domains`
+3. 找到 `Render Subdomain` 开关
+4. 切换为 `Disabled`
+5. 确认保存
+
+关闭后的行为：
+
+- Render 默认 `xxx.onrender.com` 会返回 `404`
+- 这些请求不会再到达你的应用服务
+- 后端公网流量将只通过你保留的自定义域名进入
+
+如果后续改用 Blueprint，也可以显式写：
+
+```yaml
+renderSubdomainPolicy: disabled
+```
+
+注意：
+
+- 在关闭前，先把所有健康检查、前端环境变量、管理后台环境变量、手工排障书签都切换到 `https://api.yuanshenjian.cn`
+- 如果 Cloudflare 或自定义域名出现配置错误，你需要先到 Render Dashboard 重新启用 `Render Subdomain`，才能恢复默认域名访问
+- 关闭 `onrender.com` 默认域名不等于可以删除应用内限流；它只是阻断绕过 Cloudflare 的一条直连路径
+- 最终必须用真实访问结果验收：默认 `xxx.onrender.com` 不应再返回 `200`，理想结果是 `404`
 
 ### 切橙云后，这个项目要重点检查的 Cloudflare 配置
 
@@ -246,6 +316,7 @@ https://api.yuanshenjian.cn/healthz
 4. Rate Limiting
 
 - 优先保护高成本或可滥用接口：评论提交、管理员认证、AI chat/stream、AI 推荐类接口
+- 如果当前使用 Cloudflare Free，通常可用规则数较少，优先给最贵的公开 AI 接口，再由应用内限流覆盖评论、管理员登录等其他路径
 - Cloudflare 限流适合做外层粗限流，应用内限流继续保留做业务语义控制
 - 不建议只依赖 Cloudflare 限流替代应用层限流
 
@@ -278,6 +349,7 @@ https://api.yuanshenjian.cn/healthz
 3. 评论提交
 4. AI 推荐与 AI 流式问答
 5. 管理后台登录与受保护接口
+6. `xxx.onrender.com` 访问应返回 `404`，确认默认 Render 子域名已经真正失效
 
 Render 环境变量：
 

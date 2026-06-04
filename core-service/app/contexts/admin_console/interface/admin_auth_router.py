@@ -13,9 +13,11 @@ from app.contexts.admin_console.infra.admin_session_request_guard import AdminSe
 from app.contexts.admin_console.infra.dao.admin_session_dao import AdminSessionDAO
 from app.contexts.admin_console.infra.sqlmodel_admin_session_repository import SQLModelAdminSessionRepository
 from app.shared.infra.app_config import settings
-from app.shared.infra.in_memory_rate_limiter import admin_login_limiter
-from app.shared.infra.request_security import turnstile_action_for_scene, verify_origin, verify_turnstile
 from app.shared.infra.database import get_session
+from app.shared.infra.pre_auth_rate_limit_guard import PreAuthRateLimitGuard
+from app.shared.infra.rate_limit_guard import RateLimitGuard
+from app.shared.infra.request_identity_resolver import RequestIdentityResolver
+from app.shared.infra.request_security import turnstile_action_for_scene, verify_origin, verify_turnstile
 
 router = APIRouter(prefix="/api/v1/admin")
 
@@ -54,12 +56,12 @@ async def login_admin_session(
     service: LoginAdminSessionAppService = Depends(get_login_admin_session_service),
 ) -> LoginAdminSessionResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    bucket_key = request.client.host if request.client else "unknown"
-    if not admin_login_limiter.hit(bucket_key):
-        raise HTTPException(status_code=429, detail="admin_login_rate_limited")
-    verified = await verify_turnstile(payload.turnstile_token, turnstile_action_for_scene("admin-login"), request.client.host if request.client else None)
+    subject = await RequestIdentityResolver().resolve_public_subject(request, response)
+    await PreAuthRateLimitGuard().enforce("admin_login", subject)
+    verified = await verify_turnstile(payload.turnstile_token, turnstile_action_for_scene("admin-login"), subject.raw_ip)
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
+    await RateLimitGuard().enforce("admin_login", subject)
     try:
         result = await service.execute(payload)
         response.set_cookie(

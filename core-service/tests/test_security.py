@@ -1,4 +1,6 @@
-from app.shared.infra.in_memory_rate_limiter import InMemoryRateLimiter
+import asyncio
+
+from app.shared.infra.in_memory_fallback_rate_limiter import InMemoryFallbackRateLimiter
 from app.shared.infra.request_security import verify_origin
 from app.shared.infra.secret_hash import create_secret_token, hash_with_pepper
 
@@ -13,11 +15,14 @@ def test_origin_must_be_allowed() -> None:
     verify_origin("https://yuanshenjian.cn", ["https://yuanshenjian.cn"])
 
 
-def test_rate_limiter_rejects_after_limit() -> None:
-    limiter = InMemoryRateLimiter(limit=2)
-    assert limiter.hit("visitor:a") is True
-    assert limiter.hit("visitor:a") is True
-    assert limiter.hit("visitor:a") is False
+def test_memory_fallback_rate_limiter_rejects_after_limit() -> None:
+    async def run() -> None:
+        limiter = InMemoryFallbackRateLimiter()
+        assert (await limiter.check_and_hit_many("test", "visitor:a", [(2, 60)])).allowed is True
+        assert (await limiter.check_and_hit_many("test", "visitor:a", [(2, 60)])).allowed is True
+        assert (await limiter.check_and_hit_many("test", "visitor:a", [(2, 60)])).allowed is False
+
+    asyncio.run(run())
 
 
 def test_secret_token_has_enough_entropy() -> None:

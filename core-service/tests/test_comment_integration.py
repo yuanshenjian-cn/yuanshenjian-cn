@@ -13,11 +13,9 @@ def test_comment_submission_review_and_public_visibility(monkeypatch) -> None:
         return True
 
     monkeypatch.setattr(article_comment_router, "verify_origin", lambda origin, allowed: None)
-    monkeypatch.setattr(article_comment_router.comment_limiter, "hit", lambda bucket: True)
     monkeypatch.setattr(article_comment_router, "verify_turnstile", _verify_turnstile)
 
     monkeypatch.setattr(admin_auth_router, "verify_origin", lambda origin, allowed: None)
-    monkeypatch.setattr(admin_auth_router.admin_login_limiter, "hit", lambda bucket: True)
     monkeypatch.setattr(admin_auth_router, "verify_turnstile", _verify_turnstile)
     monkeypatch.setattr(
         admin_session_authenticator.RepositoryAdminSessionAuthenticator,

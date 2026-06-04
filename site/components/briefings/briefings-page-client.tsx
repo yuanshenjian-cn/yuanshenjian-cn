@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { ArticleStatsBadge } from "@/components/article-stats-badge";
 import { BriefingRecommendWidget } from "@/components/briefings/briefing-recommend-widget";
 import { BRIEFING_FILTER_OPTIONS, isBriefingInRange } from "@/lib/briefing-ranges";
 import type { Briefing, BriefingRecommendationRange } from "@/types/briefing";
@@ -79,6 +80,7 @@ export function BriefingsPageClient({ briefings, totalBriefings, aiConfig }: Bri
                   </time>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
+                <ArticleStatsBadge slug={`ai-briefing-${briefing.slug}`} className="mt-3" />
                 {briefing.tags.length > 0 ? (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {briefing.tags.map((tag) => (

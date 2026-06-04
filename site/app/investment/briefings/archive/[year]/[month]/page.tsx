@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ArticleStatsBadge } from "@/components/article-stats-badge";
 import { getInvestmentBriefingArchives, getInvestmentBriefingsByMonth } from "@/lib/investment-briefings";
 
 export const dynamicParams = false;
@@ -68,6 +69,7 @@ export default async function InvestmentBriefingArchiveMonthPage({ params }: Pro
                 </time>
               </div>
               <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
+              <ArticleStatsBadge slug={`investment-briefing-${briefing.slug}`} className="mt-3" />
               <div className="mt-3 flex flex-wrap gap-2">
                 {briefing.tags.map((tag) => (
                   <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">

@@ -25,8 +25,14 @@ interface Props {
   params: Promise<{ date: string }>;
 }
 
+const INCREMENTAL_BUILD_LIMIT = 30;
+
 export function generateStaticParams() {
-  const params = getAllInvestmentBriefings().map((briefing) => ({
+  const allBriefings = getAllInvestmentBriefings();
+  const briefings = process.env.INCREMENTAL_BUILD === "true"
+    ? allBriefings.slice(0, INCREMENTAL_BUILD_LIMIT)
+    : allBriefings;
+  const params = briefings.map((briefing) => ({
     date: briefing.slug,
   }));
 

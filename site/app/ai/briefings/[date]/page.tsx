@@ -20,8 +20,14 @@ interface Props {
 
 export const dynamicParams = false;
 
+const INCREMENTAL_BUILD_LIMIT = 30;
+
 export async function generateStaticParams() {
-  const params = getAllBriefings().map((briefing) => ({
+  const allBriefings = getAllBriefings();
+  const briefings = process.env.INCREMENTAL_BUILD === "true"
+    ? allBriefings.slice(0, INCREMENTAL_BUILD_LIMIT)
+    : allBriefings;
+  const params = briefings.map((briefing) => ({
     date: briefing.slug,
   }));
 

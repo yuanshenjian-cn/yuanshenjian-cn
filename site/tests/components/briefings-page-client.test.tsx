@@ -7,6 +7,10 @@ vi.mock("@/components/briefings/briefing-recommend-widget", () => ({
   BriefingRecommendWidget: () => <div data-testid="recommend-widget">recommend-widget</div>,
 }));
 
+vi.mock("@/components/article-stats-badge", () => ({
+  ArticleStatsBadge: ({ slug }: { slug: string }) => <div data-testid={`stats-${slug}`}>stats-{slug}</div>,
+}));
+
 const briefings: Briefing[] = [
   {
     slug: "2026-05-08",
@@ -26,7 +30,7 @@ const briefings: Briefing[] = [
   {
     slug: "2026-05-01",
     title: "AI 简报 · 2026-05-01",
-    date: "2026-05-01T00:00:00.000Z",
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     year: "2026",
     month: "05",
     day: "01",
@@ -59,6 +63,8 @@ describe("BriefingsPageClient", () => {
     expect(screen.getByRole("heading", { name: "往期简报" })).toBeInTheDocument();
     expect(screen.getByText("（共 19 期）")).toBeInTheDocument();
     expect(screen.getByTestId("recommend-widget")).toBeInTheDocument();
+    expect(screen.getByTestId("stats-ai-briefing-2026-05-08")).toBeInTheDocument();
+    expect(screen.getByTestId("stats-ai-briefing-2026-05-01")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "今天" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 30 天" })).toBeInTheDocument();
 

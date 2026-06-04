@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { ArticleStatsBadge } from "@/components/article-stats-badge";
 import { getBriefingArchives, getBriefingsByMonth } from "@/lib/briefings";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
@@ -71,6 +72,7 @@ export default async function BriefingArchiveMonthPage({ params }: Props) {
                 </time>
               </div>
               <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
+              <ArticleStatsBadge slug={`ai-briefing-${briefing.slug}`} className="mt-3" />
               {briefing.tags.length > 0 ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {briefing.tags.map((tag) => (

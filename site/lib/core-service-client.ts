@@ -21,6 +21,20 @@ function getCoreServiceUrl(): string {
   return config.ai.coreServiceUrl;
 }
 
+export async function fetchArticleStats(slug: string): Promise<ArticleStats | null> {
+  const baseUrl = getCoreServiceUrl();
+  if (!baseUrl) {
+    return null;
+  }
+  const response = await fetch(`${baseUrl}/api/v1/articles/${slug}/stats`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    return null;
+  }
+  return response.json() as Promise<ArticleStats>;
+}
+
 export async function recordArticleView(slug: string): Promise<ArticleStats | null> {
   const baseUrl = getCoreServiceUrl();
   if (!baseUrl || typeof window === "undefined") {

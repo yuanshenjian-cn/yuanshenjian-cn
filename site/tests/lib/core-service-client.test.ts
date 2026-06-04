@@ -8,7 +8,7 @@ vi.mock("@/lib/config", () => ({
   },
 }));
 
-import { fetchComments, submitComment } from "@/lib/core-service-client";
+import { fetchArticleStats, fetchComments, submitComment } from "@/lib/core-service-client";
 
 describe("core-service-client", () => {
   afterEach(() => {
@@ -30,6 +30,22 @@ describe("core-service-client", () => {
     });
     expect(comments).toHaveLength(1);
     expect(comments[0]?.display_name).toBe("tester");
+  });
+
+  it("fetchArticleStats 请求只读统计接口", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ article_slug: "slug", pv: 123, uv: 45 }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    const stats = await fetchArticleStats("slug");
+
+    expect(fetchSpy).toHaveBeenCalledWith("https://api.example.com/api/v1/articles/slug/stats", {
+      credentials: "include",
+    });
+    expect(stats).toEqual({ article_slug: "slug", pv: 123, uv: 45 });
   });
 
   it("submitComment 发送评论创建请求", async () => {

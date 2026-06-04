@@ -22,7 +22,6 @@ def test_v1_schema_contains_required_tables() -> None:
         "ai_messages",
         "ai_request_events",
         "rag_query_events",
-        "rate_limit_buckets",
         "daily_budget_usage",
     }
     assert required.issubset(Base.metadata.tables.keys())

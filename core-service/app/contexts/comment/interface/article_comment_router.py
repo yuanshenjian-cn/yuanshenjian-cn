@@ -21,8 +21,10 @@ from app.contexts.visitor_identity.infra.sqlmodel_visitor_identity_repository im
 from app.contexts.visitor_identity.infra.visitor_actor_resolver import VisitorActorResolver
 from app.shared.infra.app_config import settings
 from app.shared.infra.database import get_session
-from app.shared.infra.in_memory_rate_limiter import comment_limiter
-from app.shared.infra.request_security import hash_request_ip, hash_user_agent, verify_origin, verify_turnstile
+from app.shared.infra.pre_auth_rate_limit_guard import PreAuthRateLimitGuard
+from app.shared.infra.rate_limit_guard import RateLimitGuard
+from app.shared.infra.request_identity_resolver import RequestIdentityResolver
+from app.shared.infra.request_security import verify_origin, verify_turnstile
 from app.shared.infra.secret_hash import hash_with_pepper
 
 router = APIRouter()
@@ -73,12 +75,13 @@ async def create_article_comment(
     service: CreateArticleCommentAppService = Depends(get_create_article_comment_service),
 ) -> CreateArticleCommentResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    actor = await actor_resolver.resolve(request, response)
-    if not comment_limiter.hit(actor.visitor_id or hash_request_ip(request)):
-        raise HTTPException(status_code=429, detail="comment_rate_limited")
-    verified = await verify_turnstile(payload.turnstile_token, "comment_submit", request.client.host if request.client else None)
+    subject = await RequestIdentityResolver().resolve_public_subject(request, response)
+    await PreAuthRateLimitGuard().enforce("comment_submit", subject)
+    verified = await verify_turnstile(payload.turnstile_token, "comment_submit", subject.raw_ip)
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
+    await RateLimitGuard().enforce("comment_submit", subject)
+    actor = await actor_resolver.resolve_subject(subject)
     try:
         return await service.execute(
             CreateArticleCommentReq(
@@ -88,8 +91,8 @@ async def create_article_comment(
                 email_hash=hash_with_pepper(payload.email, "email") if payload.email else None,
                 content_markdown=payload.content_markdown,
                 parent_id=payload.parent_id,
-                ip_hash=hash_request_ip(request),
-                user_agent_hash=hash_user_agent(request),
+                ip_hash=subject.ip_hash,
+                user_agent_hash=subject.user_agent_hash,
             )
         )
     except InvalidParentCommentError as error:

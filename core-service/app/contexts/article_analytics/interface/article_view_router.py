@@ -10,12 +10,14 @@ from app.contexts.article_analytics.application.record_article_view_app_service 
 from app.contexts.article_analytics.infra.dao.article_daily_stats_dao import ArticleDailyStatsDAO
 from app.contexts.article_analytics.infra.dao.article_view_event_dao import ArticleViewEventDAO
 from app.contexts.article_analytics.infra.sqlmodel_article_analytics_repository import SQLModelArticleAnalyticsRepository
+from app.contexts.article_analytics.infra.view_deduplicator import ViewDeduplicator
 from app.contexts.visitor_identity.infra.dao.visitor_identity_dao import VisitorIdentityDAO
 from app.contexts.visitor_identity.infra.sqlmodel_visitor_identity_repository import SQLModelVisitorIdentityRepository
 from app.contexts.visitor_identity.infra.visitor_actor_resolver import VisitorActorResolver
 from app.shared.infra.app_config import settings
 from app.shared.infra.database import get_session
-from app.shared.infra.request_security import hash_request_ip, hash_user_agent, normalize_referrer_origin, verify_origin
+from app.shared.infra.request_identity_resolver import RequestIdentityResolver
+from app.shared.infra.request_security import normalize_referrer_origin, verify_origin
 
 router = APIRouter()
 
@@ -46,6 +48,14 @@ def get_visitor_actor_resolver(session: AsyncSession = Depends(get_session)) -> 
     return build_visitor_actor_resolver(session)
 
 
+def build_view_deduplicator() -> ViewDeduplicator:
+    return ViewDeduplicator()
+
+
+def get_view_deduplicator() -> ViewDeduplicator:
+    return build_view_deduplicator()
+
+
 @router.post("/api/v1/articles/{article_slug}/view", response_model=RecordArticleViewResp)
 async def record_article_view(
     article_slug: str,
@@ -54,15 +64,21 @@ async def record_article_view(
     response: Response,
     actor_resolver: VisitorActorResolver = Depends(get_visitor_actor_resolver),
     service: RecordArticleViewAppService = Depends(get_record_article_view_service),
+    stats_service: GetArticleStatsAppService = Depends(get_get_article_stats_service),
+    view_deduplicator: ViewDeduplicator = Depends(get_view_deduplicator),
 ) -> RecordArticleViewResp:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    actor = await actor_resolver.resolve(request, response)
+    subject = await RequestIdentityResolver().resolve_public_subject(request, response)
+    if not await view_deduplicator.should_count(article_slug, subject):
+        stats = await stats_service.execute(article_slug)
+        return RecordArticleViewResp(article_slug=stats.article_slug, pv=stats.pv, uv=stats.uv)
+    actor = await actor_resolver.resolve_subject(subject)
     return await service.execute(
         RecordArticleViewReq(
             article_slug=article_slug,
             actor=actor,
-            ip_hash=hash_request_ip(request),
-            user_agent_hash=hash_user_agent(request),
+            ip_hash=subject.ip_hash,
+            user_agent_hash=subject.user_agent_hash,
             referrer_origin=normalize_referrer_origin(payload.referrer),
         )
     )

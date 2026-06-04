@@ -15,7 +15,6 @@ from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 from app.contexts.visitor_identity.infra.po.auth_identity_po import AuthIdentityPO
 from app.contexts.visitor_identity.infra.po.user_po import UserPO
 from app.contexts.visitor_identity.infra.po.visitor_po import VisitorPO
-from app.shared.infra.persistence.po.rate_limit_bucket_po import RateLimitBucketPO
 
 __all__ = [
     "AIConversationPO",
@@ -31,7 +30,6 @@ __all__ = [
     "KnowledgeDocumentPO",
     "RagQueryEventPO",
     "RagSyncRunPO",
-    "RateLimitBucketPO",
     "UserPO",
     "VisitorPO",
 ]

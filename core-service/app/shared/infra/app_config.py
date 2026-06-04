@@ -184,6 +184,9 @@ class Settings(BaseModel):
     embedding_model_id: str = ""
     embedding_dimensions: int = 1536
     emergency_disable_ai: bool = False
+    key_value_url: str = ""
+    trust_cf_connecting_ip: bool = True
+    allow_direct_render_subdomain: bool = False
     env_map: dict[str, str] = Field(default_factory=dict, exclude=True, repr=False)
     file_config: AppFileConfig = Field(default_factory=AppFileConfig, exclude=True, repr=False)
     core_service_root: Path = Field(default=CORE_SERVICE_ROOT, exclude=True, repr=False)
@@ -234,10 +237,13 @@ class Settings(BaseModel):
     def active_ai_profile(self) -> str:
         return self.file_config.ai.active_profile
 
+    @property
+    def rate_limit_enabled(self) -> bool:
+        return bool(self.key_value_url.strip())
 
-def build_settings() -> Settings:
-    app_env = _current_app_env()
-    env_map = _load_env_map(app_env)
+
+def build_settings_from_env(env_map: dict[str, str]) -> Settings:
+    app_env = env_map.get("APP_ENV", _current_app_env()).strip() or "local"
     file_config = _apply_app_file_env_overrides(_load_app_file_config(app_env, env_map), env_map)
     return Settings.model_validate(
         {
@@ -254,12 +260,21 @@ def build_settings() -> Settings:
             "embedding_model_id": env_map.get("EMBEDDING_MODEL_ID", ""),
             "embedding_dimensions": int(env_map.get("EMBEDDING_DIMENSIONS", "1536")),
             "emergency_disable_ai": _parse_bool(env_map.get("EMERGENCY_DISABLE_AI"), default=False),
+            "key_value_url": env_map.get("KEY_VALUE_URL", ""),
+            "trust_cf_connecting_ip": _parse_bool(env_map.get("TRUST_CF_CONNECTING_IP"), default=True),
+            "allow_direct_render_subdomain": _parse_bool(env_map.get("ALLOW_DIRECT_RENDER_SUBDOMAIN"), default=False),
             "env_map": env_map,
             "file_config": file_config,
             "core_service_root": CORE_SERVICE_ROOT,
             "repo_root": REPO_ROOT,
         }
     )
+
+
+def build_settings() -> Settings:
+    app_env = _current_app_env()
+    env_map = _load_env_map(app_env)
+    return build_settings_from_env(env_map)
 
 
 settings = build_settings()

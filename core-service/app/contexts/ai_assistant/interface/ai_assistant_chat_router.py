@@ -2,9 +2,19 @@ from __future__ import annotations
 
 from typing import cast
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 
+from app.contexts.ai_assistant.application.ai_usage_recorder import (
+    AIUsageAuditContext,
+    AIUsageRecorder,
+    wrap_stream_with_usage_finalize,
+)
+from app.contexts.ai_assistant.application.daily_budget_service import (
+    DailyBudgetExceededError,
+    DailyBudgetReservation,
+    DailyBudgetService,
+)
 from app.contexts.ai_assistant.application.dto.stream_ai_briefing_recommendation_dto import (
     BriefingRange,
     StreamAiBriefingRecommendationReq,
@@ -37,9 +47,14 @@ from app.contexts.ai_assistant.infra.llm_message_stream_gateway import ProviderB
 from app.contexts.ai_assistant.infra.llm_profile_query_service import LLMProfileQueryService
 from app.contexts.ai_assistant.infra.llm_stream_service import LLMStreamService
 from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
+from app.contexts.ai_assistant.infra.dao.daily_budget_usage_dao import DailyBudgetUsageDAO
+from app.contexts.ai_assistant.infra.sqlmodel_daily_budget_repository import SQLModelDailyBudgetRepository
 from app.shared.infra.app_config import settings
-from app.shared.infra.in_memory_rate_limiter import public_ai_limiter
-from app.shared.infra.request_security import hash_request_ip, turnstile_action_for_scene, verify_origin, verify_turnstile
+from app.shared.infra.database import transactional_session
+from app.shared.infra.pre_auth_rate_limit_guard import PreAuthRateLimitGuard
+from app.shared.infra.rate_limit_guard import RateLimitGuard
+from app.shared.infra.request_identity_resolver import RequestIdentityResolver
+from app.shared.infra.request_security import turnstile_action_for_scene, verify_origin, verify_turnstile
 
 router = APIRouter()
 
@@ -109,6 +124,22 @@ def get_stream_ai_advisor_service() -> StreamAIAdvisorAppService:
     return build_stream_ai_advisor_service()
 
 
+def estimate_token_budget(message: str) -> int:
+    return min(max(len(message) // 2 + 512, 512), 4_000)
+
+
+async def reserve_ai_chat_budget(estimated_tokens: int) -> DailyBudgetReservation:
+    async with transactional_session() as session:
+        repository = SQLModelDailyBudgetRepository(DailyBudgetUsageDAO(session))
+        return await DailyBudgetService(repository).reserve_chat_request(estimated_tokens)
+
+
+async def reserve_ai_advisor_budget(estimated_tokens: int) -> DailyBudgetReservation:
+    async with transactional_session() as session:
+        repository = SQLModelDailyBudgetRepository(DailyBudgetUsageDAO(session))
+        return await DailyBudgetService(repository).reserve_advisor_request(estimated_tokens)
+
+
 def _parse_briefing_range(payload: StreamAIAssistantChatReq) -> BriefingRange:
     raw_context = payload.context if isinstance(payload.context, dict) else {}
     raw_range = raw_context.get("range")
@@ -137,6 +168,7 @@ def _parse_article_slug(payload: StreamAIAssistantChatReq) -> str:
 async def stream_ai_assistant_chat(
     payload: StreamAIAssistantChatReq,
     request: Request,
+    response: Response,
     article_recommendation_service: StreamArticleRecommendationAppService = Depends(get_stream_article_recommendation_service),
     ai_briefing_recommendation_service: StreamAiBriefingRecommendationAppService = Depends(get_stream_ai_briefing_recommendation_service),
     investment_briefing_recommendation_service: StreamInvestmentBriefingRecommendationAppService = Depends(get_stream_investment_briefing_recommendation_service),
@@ -144,16 +176,20 @@ async def stream_ai_assistant_chat(
     author_chat_service: StreamAuthorChatAppService = Depends(get_stream_author_chat_service),
 ) -> StreamingResponse:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    bucket = request.cookies.get("visitor_id") or hash_request_ip(request)
-    if not public_ai_limiter.hit(f"ai_assistant:{payload.scene}:{bucket}"):
-        raise HTTPException(status_code=429, detail="ai_rate_limited")
+    subject = await RequestIdentityResolver().resolve_public_subject(request, response)
+    await PreAuthRateLimitGuard().enforce("ai_chat", subject)
     verified = await verify_turnstile(
         payload.cf_turnstile_response,
         turnstile_action_for_scene(payload.scene),
-        request.client.host if request.client else None,
+        subject.raw_ip,
     )
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
+    await RateLimitGuard().enforce("ai_chat", subject)
+    try:
+        reservation = await reserve_ai_chat_budget(estimate_token_budget(payload.message))
+    except DailyBudgetExceededError as error:
+        raise HTTPException(status_code=429, detail=f"ai_budget_exceeded:{error.budget_key}") from error
 
     if payload.scene == "article_recommendation":
         stream = (await article_recommendation_service.execute(StreamArticleRecommendationReq(message=payload.message))).stream
@@ -179,20 +215,53 @@ async def stream_ai_assistant_chat(
     else:
         raise HTTPException(status_code=400, detail="unsupported_scene")
 
-    return StreamingResponse(stream, media_type="text/event-stream")
+    return StreamingResponse(
+        wrap_stream_with_usage_finalize(
+            stream,
+            reservation,
+            AIUsageAuditContext(
+                scene=payload.scene,
+                actor=None,
+                provider=None,
+                model=None,
+                input_chars=len(payload.message),
+            ),
+            AIUsageRecorder(),
+        ),
+        media_type="text/event-stream",
+    )
 
 
 @router.post("/api/v1/ai-assistant/advisor/stream")
 async def stream_ai_advisor(
     payload: StreamAIAdvisorReq,
     request: Request,
+    response: Response,
     service: StreamAIAdvisorAppService = Depends(get_stream_ai_advisor_service),
 ) -> StreamingResponse:
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
-    bucket = request.cookies.get("visitor_id") or hash_request_ip(request)
-    if not public_ai_limiter.hit(f"advisor:{bucket}"):
-        raise HTTPException(status_code=429, detail="ai_rate_limited")
-    verified = await verify_turnstile(payload.turnstile_token, "ai_advisor", request.client.host if request.client else None)
+    subject = await RequestIdentityResolver().resolve_public_subject(request, response)
+    await PreAuthRateLimitGuard().enforce("ai_advisor", subject)
+    verified = await verify_turnstile(payload.turnstile_token, "ai_advisor", subject.raw_ip)
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
-    return StreamingResponse(service.execute(payload), media_type="text/event-stream")
+    await RateLimitGuard().enforce("ai_advisor", subject)
+    try:
+        reservation = await reserve_ai_advisor_budget(estimate_token_budget(payload.message))
+    except DailyBudgetExceededError as error:
+        raise HTTPException(status_code=429, detail=f"ai_budget_exceeded:{error.budget_key}") from error
+    return StreamingResponse(
+        wrap_stream_with_usage_finalize(
+            service.execute(payload),
+            reservation,
+            AIUsageAuditContext(
+                scene="advisor",
+                actor=None,
+                provider=None,
+                model=None,
+                input_chars=len(payload.message),
+            ),
+            AIUsageRecorder(),
+        ),
+        media_type="text/event-stream",
+    )
