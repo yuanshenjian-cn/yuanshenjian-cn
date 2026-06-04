@@ -1042,7 +1042,7 @@ function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sec
     .filter(isPublishedBriefingEntry)
     .filter((entry) => entry.date < currentDate)
     .filter((entry) => !dedupeEffectiveFrom || entry.date >= dedupeEffectiveFrom)
-    .sort((left, right) => right.date.localeCompare(left.date))
+    .sort((left, right) => (right.date > left.date ? 1 : right.date < left.date ? -1 : 0))
     .slice(0, lookbackIssues)
     .flatMap((entry) => extractDedupeEntries(entry.body, sectionHeading, genericHeadingSet).map((item) => ({
       ...item,
