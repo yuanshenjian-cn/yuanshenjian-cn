@@ -1,6 +1,19 @@
 {
-  "generated": "2026-06-04T00:00:00.000Z",
+  "generated": "2026-06-05T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-05",
+      "title": "AI 简报 · 2026-06-05",
+      "excerpt": "OpenAI 发布 Dreaming 记忆系统，Anthropic 警告递归自我改进已临近，Google 开源 Gemma 4 笔记本模型，美国众议院推出 AI 监管草案。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-05"
+    },
     {
       "slug": "2026-06-04",
       "title": "AI 简报 · 2026-06-04",
@@ -764,6 +777,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-05",
+      "title": "AI 简报 · 2026-06-05",
+      "excerpt": "OpenAI 发布 Dreaming 记忆系统，Anthropic 警告递归自我改进已临近，Google 开源 Gemma 4 笔记本模型，美国众议院推出 AI 监管草案。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-05"
+    },
     {
       "slug": "2026-06-04",
       "title": "AI 简报 · 2026-06-04",
