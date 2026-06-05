@@ -58,8 +58,8 @@ def test_article_view_dedup_prevents_fast_repeat_pv(monkeypatch) -> None:
     app.dependency_overrides[article_view_router.get_view_deduplicator] = lambda: view_deduplicator
     monkeypatch.setattr(article_view_router, "verify_origin", lambda origin, allowed: None)
     try:
+        article_slug = f"rate-limit-dedup-{__import__('uuid').uuid4().hex[:8]}"
         with TestClient(app) as client:
-            article_slug = "rate-limit-dedup-20260604"
             first = client.post(
                 f"/api/v1/articles/{article_slug}/view",
                 json={"referrer": "https://yuanshenjian.cn"},
@@ -73,4 +73,5 @@ def test_article_view_dedup_prevents_fast_repeat_pv(monkeypatch) -> None:
 
     assert first.status_code == 200
     assert second.status_code == 200
-    assert first.json()["pv"] == second.json()["pv"]
+    # 第二次 should_count 返回 False，走只读 stats，PV 应与第一次一致
+    assert second.json()["pv"] == first.json()["pv"]

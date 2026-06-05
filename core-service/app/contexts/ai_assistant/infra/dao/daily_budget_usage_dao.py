@@ -26,15 +26,15 @@ class DailyBudgetUsageDAO:
         statement = text(
             f"""
             insert into daily_budget_usage (usage_date, budget_key, request_count, token_count, updated_at)
-            select :usage_date, :budget_key, :delta_requests, :delta_tokens, {now_expression}
-            where :delta_requests <= :request_limit
-              and :delta_tokens <= :token_limit
+            select cast(:usage_date as date), cast(:budget_key as varchar(64)), cast(:delta_requests as integer), cast(:delta_tokens as integer), {now_expression}
+            where cast(:delta_requests as integer) <= cast(:request_limit as integer)
+              and cast(:delta_tokens as integer) <= cast(:token_limit as integer)
             on conflict (usage_date, budget_key) do update
-            set request_count = daily_budget_usage.request_count + :delta_requests,
-                token_count = daily_budget_usage.token_count + :delta_tokens,
+            set request_count = daily_budget_usage.request_count + cast(:delta_requests as integer),
+                token_count = daily_budget_usage.token_count + cast(:delta_tokens as integer),
                 updated_at = {now_expression}
-            where daily_budget_usage.request_count + :delta_requests <= :request_limit
-              and daily_budget_usage.token_count + :delta_tokens <= :token_limit
+            where daily_budget_usage.request_count + cast(:delta_requests as integer) <= cast(:request_limit as integer)
+              and daily_budget_usage.token_count + cast(:delta_tokens as integer) <= cast(:token_limit as integer)
             returning usage_date, budget_key, request_count, token_count
             """
         )
@@ -64,10 +64,10 @@ class DailyBudgetUsageDAO:
         statement = text(
             f"""
             insert into daily_budget_usage (usage_date, budget_key, request_count, token_count, updated_at)
-            values (:usage_date, :budget_key, :delta_requests, :delta_tokens, {now_expression})
+            values (cast(:usage_date as date), cast(:budget_key as varchar(64)), cast(:delta_requests as integer), cast(:delta_tokens as integer), {now_expression})
             on conflict (usage_date, budget_key) do update
-            set request_count = daily_budget_usage.request_count + :delta_requests,
-                token_count = daily_budget_usage.token_count + :delta_tokens,
+            set request_count = daily_budget_usage.request_count + cast(:delta_requests as integer),
+                token_count = daily_budget_usage.token_count + cast(:delta_tokens as integer),
                 updated_at = {now_expression}
             returning usage_date, budget_key, request_count, token_count
             """
