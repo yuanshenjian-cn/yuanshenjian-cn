@@ -1,6 +1,20 @@
 {
-  "generated": "2026-06-08T00:00:00.000Z",
+  "generated": "2026-06-10T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-10",
+      "title": "AI 简报 · 2026-06-10",
+      "excerpt": "Anthropic 发布最强公开模型 Claude Fable 5，OpenAI 正式提交 IPO 申请，Google 推出实时语音翻译 Gemini 3.5 Live Translate。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Perplexity"
+      ],
+      "date": "2026-06-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-10"
+    },
     {
       "slug": "2026-06-08",
       "title": "AI 简报 · 2026-06-08",
@@ -790,6 +804,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-10",
+      "title": "AI 简报 · 2026-06-10",
+      "excerpt": "Anthropic 发布最强公开模型 Claude Fable 5，OpenAI 正式提交 IPO 申请，Google 推出实时语音翻译 Gemini 3.5 Live Translate。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Perplexity"
+      ],
+      "date": "2026-06-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-10"
+    },
     {
       "slug": "2026-06-08",
       "title": "AI 简报 · 2026-06-08",
