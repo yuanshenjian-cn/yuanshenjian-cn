@@ -8,7 +8,7 @@ let buildBriefingsPayload: () => {
 };
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
-const briefingsDir = path.join(process.cwd(), "content", "investment-briefings");
+const briefingsDir = path.resolve(__dirname, "../../content", "investment-briefings");
 const testFile = path.join(briefingsDir, "2099-01-03-investment-briefing.md");
 
 describe("build-investment-data script", () => {
