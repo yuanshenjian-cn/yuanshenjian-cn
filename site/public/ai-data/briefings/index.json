@@ -1,6 +1,18 @@
 {
-  "generated": "2026-06-11T00:00:00.000Z",
+  "generated": "2026-06-12T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-12",
+      "title": "AI 简报 · 2026-06-12",
+      "excerpt": "Anthropic 同日发布 Claude Corps、DXC 与 TCS 三项重大合作，并计划自建数据中心；加拿大隐私专员裁定 Grok 违反隐私法。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI"
+      ],
+      "date": "2026-06-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-12"
+    },
     {
       "slug": "2026-06-11",
       "title": "AI 简报 · 2026-06-11",
@@ -819,6 +831,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-12",
+      "title": "AI 简报 · 2026-06-12",
+      "excerpt": "Anthropic 同日发布 Claude Corps、DXC 与 TCS 三项重大合作，并计划自建数据中心；加拿大隐私专员裁定 Grok 违反隐私法。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI"
+      ],
+      "date": "2026-06-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-12"
+    },
     {
       "slug": "2026-06-11",
       "title": "AI 简报 · 2026-06-11",

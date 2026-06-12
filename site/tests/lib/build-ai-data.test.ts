@@ -47,6 +47,9 @@ describe("build-ai-data helpers", () => {
     const heroChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "hero");
     const educationChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "education");
     const publicationChunk = payload.chunks.find((chunk: { id: string }) => chunk.id === "extra-著作发表");
+    const openSourceProjectChunk = payload.chunks.find(
+      (chunk: { id: string }) => chunk.id === "open-source-project-agent-skills",
+    );
 
     expect(payload.slug).toBe("author");
     expect(payload.title).toBe("袁慎建");
@@ -54,6 +57,7 @@ describe("build-ai-data helpers", () => {
     expect(payload.entities.profile).not.toHaveProperty("resumeHref");
     expect(payload.entities.skills.length).toBeGreaterThan(0);
     expect(payload.entities.projects.length).toBeGreaterThan(0);
+    expect(payload.entities.openSourceProjects.length).toBeGreaterThan(0);
     expect(payload.chunks.length).toBeGreaterThan(payload.entities.skills.length);
     expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("project-locammend-智能顾问-研发交付");
     expect(payload.chunks.map((chunk: { id: string }) => chunk.id)).toContain("skill-ai-agent");
@@ -63,8 +67,12 @@ describe("build-ai-data helpers", () => {
     expect(payload.sections.find((section: { id: string }) => section.id === "project-locammend-智能顾问-研发交付")?.anchorId).toBe(
       "projects",
     );
+    expect(
+      payload.sections.find((section: { id: string }) => section.id === "open-source-project-agent-skills")?.anchorId,
+    ).toBe("open-source-projects");
     expect(heroChunk?.content).not.toContain("简历 PDF");
     expect(educationChunk?.content).toContain("学校官网：https://www.chd.edu.cn/");
+    expect(openSourceProjectChunk?.content).toContain("GitHub 仓库：https://github.com/ysjai/.agent-skills");
     expect(publicationChunk?.content).toContain("整洁软件设计：https://www.yuque.com/yuanshenjian/agile-software-design");
   });
 
