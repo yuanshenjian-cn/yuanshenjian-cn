@@ -9,7 +9,8 @@ let buildBriefingsPayload: () => {
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
 const briefingsDir = path.resolve(__dirname, "../../content", "investment-briefings");
-const testFile = path.join(briefingsDir, "2099-01-03-investment-briefing.md");
+const testSlug = "2199-01-01";
+const testFile = path.join(briefingsDir, `${testSlug}-investment-briefing.md`);
 
 describe("build-investment-data script", () => {
   beforeAll(async () => {
@@ -21,8 +22,8 @@ describe("build-investment-data script", () => {
     fs.writeFileSync(
       testFile,
       `---
-title: "投资简报 · 2099-01-03"
-date: "2099-01-03"
+title: "投资简报 · ${testSlug}"
+date: "${testSlug}"
 brief: "测试摘要"
 published: true
 tags:
@@ -41,7 +42,7 @@ tags:
 
 ## 来源
 
-- https://example.com/2099-01-03
+- https://example.com/${testSlug}
 
 **郑重声明：本文仅为公开信息整理与观察记录，不构成任何投资建议或个股推荐。**`,
     );
@@ -61,15 +62,15 @@ tags:
 
   it("生成投资简报索引", () => {
     const payload = buildBriefingsPayload();
-    const target = payload.items.find((item: { slug: string }) => item.slug === "2099-01-03");
+    const target = payload.items.find((item: { slug: string }) => item.slug === testSlug);
 
     expect(payload.briefings).toEqual(payload.items);
     expect(target).toEqual(
       expect.objectContaining({
-        slug: "2099-01-03",
-        title: "投资简报 · 2099-01-03",
+        slug: testSlug,
+        title: `投资简报 · ${testSlug}`,
         brief: "测试摘要",
-        url: "/investment/briefings/2099-01-03",
+        url: `/investment/briefings/${testSlug}`,
       }),
     );
   });

@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, SendHorizontal, Sparkles, X } from "lucide-react";
+import { Maximize2, MessageCircle, Minimize2, SendHorizontal, Sparkles, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -65,6 +65,7 @@ export function ContextualAIAdvisor({
   promptVersion,
 }: ContextualAIAdvisorProps) {
   const [isOpen, setIsOpen] = useState(Boolean(initialPrompt));
+  const [isMaximized, setIsMaximized] = useState(false);
   const [message, setMessage] = useState(initialPrompt ?? "");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
@@ -267,29 +268,45 @@ export function ContextualAIAdvisor({
       ) : null}
 
       {isOpen ? (
-        <section className="fixed bottom-4 left-3 right-3 top-14 z-[60] flex flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background/95 shadow-2xl backdrop-blur md:bottom-8 md:left-auto md:right-6 md:w-[min(94vw,28rem)]">
-          <div className="border-b border-border/70 bg-muted/20 px-5 py-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-2">
+        <div className={isMaximized ? "fixed inset-0 z-[60] flex justify-center bg-background" : "contents"}>
+          <section
+            className={
+              isMaximized
+                ? "flex h-full w-full max-w-2xl flex-col overflow-hidden border-x border-border/70 bg-background shadow-2xl"
+                : "fixed bottom-4 left-3 right-3 top-14 z-[60] flex flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background/95 shadow-2xl backdrop-blur md:bottom-8 md:left-auto md:right-6 md:w-[min(94vw,28rem)]"
+            }
+          >
+            <div className="border-b border-border/70 bg-muted/20 px-4 py-2">
+              <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                    <Sparkles className="h-4 w-4" />
+                  <span className="flex h-7 w-7 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Sparkles className="h-3.5 w-3.5" />
                   </span>
                   袁慎建
                 </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsMaximized((prev) => !prev)}
+                    aria-label={isMaximized ? "缩小对话窗" : "放大对话窗"}
+                    aria-pressed={isMaximized}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                  >
+                    {isMaximized ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    aria-label="关闭对话窗"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                aria-label="关闭对话窗"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
-          </div>
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
+            <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
             {!hasMessages ? (
               <div className="flex h-full items-center justify-center px-4 text-center">
                 <div className="w-full max-w-sm space-y-3">
@@ -352,32 +369,33 @@ export function ContextualAIAdvisor({
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-border/70 bg-background/90 p-4 sm:p-5">
-            <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                onKeyDown={handleTextareaKeyDown}
-                maxLength={maxInputChars}
-                placeholder={placeholder}
-                className="min-h-24 w-full resize-none rounded-[1.5rem] border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/15"
-              />
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs text-muted-foreground">Enter 发送 · Shift+Enter 换行 · {message.length}/{maxInputChars}</span>
-                <button
-                  type="submit"
-                  disabled={!message.trim() || isStreaming}
-                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
-                >
-                  <SendHorizontal className="h-4 w-4" />
-                  {isStreaming ? "思考中" : "发送"}
-                </button>
-              </div>
-            </form>
-          </div>
-          <div ref={containerRef} aria-hidden="true" className="h-0 overflow-hidden" />
-        </section>
+            <div className="border-t border-border/70 bg-background/90 px-4 py-2.5">
+              <form className="space-y-2" onSubmit={(event) => void handleSubmit(event)}>
+                <textarea
+                  ref={textareaRef}
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  onKeyDown={handleTextareaKeyDown}
+                  maxLength={maxInputChars}
+                  placeholder={placeholder}
+                  className="min-h-16 w-full resize-none rounded-2xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/15"
+                />
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-muted-foreground">Enter 发送 · Shift+Enter 换行 · {message.length}/{maxInputChars}</span>
+                  <button
+                    type="submit"
+                    disabled={!message.trim() || isStreaming}
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground px-3.5 py-1.5 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                  >
+                    <SendHorizontal className="h-3.5 w-3.5" />
+                    {isStreaming ? "思考中" : "发送"}
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div ref={containerRef} aria-hidden="true" className="h-0 overflow-hidden" />
+          </section>
+        </div>
       ) : null}
     </>
   );

@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
+    fileParallelism: false,
     include: [
       path.resolve(__dirname, "../scripts/tests/**/*.{test,spec}.{ts,tsx}"),
       path.resolve(__dirname, "../skills/tests/**/*.{test,spec}.{ts,tsx}"),
