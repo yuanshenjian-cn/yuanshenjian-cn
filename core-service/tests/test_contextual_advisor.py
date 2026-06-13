@@ -113,7 +113,7 @@ def test_stream_ai_advisor_keeps_latest_history_in_natural_order() -> None:
                     message="继续说",
                     page_title="作者",
                     page_slug="author",
-                    history=[f"历史 {index:02d}" for index in range(22)],
+                    history=[f"历史 {index:02d}" for index in range(42)],
                     cf_turnstile_response="token",
                 )
             )
@@ -123,7 +123,7 @@ def test_stream_ai_advisor_keeps_latest_history_in_natural_order() -> None:
 
     assert "历史 00" not in event
     assert "历史 01" not in event
-    assert event.index("历史 02") < event.index("历史 21")
+    assert event.index("历史 02") < event.index("历史 41")
     assert "最近对话（从旧到新）" in event
 
 

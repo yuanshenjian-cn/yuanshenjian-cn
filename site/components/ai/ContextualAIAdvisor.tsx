@@ -273,7 +273,7 @@ export function ContextualAIAdvisor({
             className={
               isMaximized
                 ? "flex h-full w-full max-w-2xl flex-col overflow-hidden border-x border-border/70 bg-background shadow-2xl"
-                : "fixed bottom-4 left-3 right-3 top-14 z-[60] flex flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background/95 shadow-2xl backdrop-blur md:bottom-8 md:left-auto md:right-6 md:w-[min(94vw,28rem)]"
+                : "fixed bottom-4 left-3 right-3 top-14 z-[60] flex flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background/95 shadow-2xl backdrop-blur md:bottom-4 md:left-auto md:right-6 md:top-16 md:w-[min(94vw,28rem)]"
             }
           >
             <div className="border-b border-border/70 bg-muted/20 px-4 py-2">

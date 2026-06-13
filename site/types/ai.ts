@@ -138,9 +138,10 @@ export interface TurnstileRenderOptions {
   execution?: "execute" | "render";
   appearance?: "execute" | "always" | "interaction-only";
   callback?: (token: string) => void;
-  "error-callback"?: () => void;
+  "error-callback"?: (code?: string) => void;
   "expired-callback"?: () => void;
   "timeout-callback"?: () => void;
+  "unsupported-callback"?: () => void;
 }
 
 export interface TurnstileApi {

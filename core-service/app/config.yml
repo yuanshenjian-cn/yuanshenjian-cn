@@ -40,7 +40,7 @@ default:
     global_daily_token_limit: ${AI_GLOBAL_DAILY_TOKEN_LIMIT:200000}
     chat_daily_request_limit: ${AI_CHAT_DAILY_REQUEST_LIMIT:100}
     advisor_daily_request_limit: ${AI_ADVISOR_DAILY_REQUEST_LIMIT:100}
-    advisor_history_rounds: ${AI_ADVISOR_HISTORY_ROUNDS:10}
+    advisor_history_rounds: ${AI_ADVISOR_HISTORY_ROUNDS:20}
     moderation_daily_request_limit: ${AI_MODERATION_DAILY_REQUEST_LIMIT:200}
     embedding_daily_token_limit: ${AI_EMBEDDING_DAILY_TOKEN_LIMIT:100000}
 

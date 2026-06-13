@@ -82,33 +82,64 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
   }, [clearWaiters]);
 
   const getToken = useCallback(async (): Promise<string> => {
-    await loadTurnstileScript();
+    if (!siteKey) {
+      throw new Error("Turnstile 站点密钥未配置（NEXT_PUBLIC_TURNSTILE_SITE_KEY 为空）。");
+    }
+    try {
+      await loadTurnstileScript();
+    } catch (error) {
+      console.error("[Turnstile] script load failed", error);
+      throw error;
+    }
     if (!window.turnstile || !containerRef.current) {
+      console.error("[Turnstile] init failed", {
+        hasGlobal: Boolean(window.turnstile),
+        hasContainer: Boolean(containerRef.current),
+      });
       throw new Error("Turnstile 初始化失败，请稍后重试。");
     }
     if (!widgetIdRef.current) {
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: siteKey,
-        action: TURNSTILE_ACTIONS[scene],
-        size: "flexible",
-        execution: "execute",
-        appearance: "interaction-only",
-        callback: (token) => {
-          const resolve = resolveRef.current;
-          clearWaiters();
-          resolve?.(token);
-        },
-        "error-callback": () => {
-          const reject = rejectRef.current;
-          clearWaiters();
-          reject?.(new Error("安全验证失败，请稍后重试。"));
-        },
-      });
+      try {
+        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          sitekey: siteKey,
+          action: TURNSTILE_ACTIONS[scene],
+          size: "flexible",
+          execution: "execute",
+          appearance: "interaction-only",
+          callback: (token) => {
+            const resolve = resolveRef.current;
+            clearWaiters();
+            resolve?.(token);
+          },
+          "error-callback": (code?: string) => {
+            console.error("[Turnstile] error-callback", { code, scene, siteKey });
+            const reject = rejectRef.current;
+            clearWaiters();
+            reject?.(new Error(`安全验证失败（${code ?? "unknown"}），请稍后重试。`));
+          },
+          "unsupported-callback": () => {
+            console.error("[Turnstile] unsupported-callback: browser/region not supported", { scene });
+            const reject = rejectRef.current;
+            clearWaiters();
+            reject?.(new Error("当前浏览器或网络不支持人机验证，请换浏览器或网络再试。"));
+          },
+        });
+        console.info("[Turnstile] widget rendered", { widgetId: widgetIdRef.current, scene });
+      } catch (error) {
+        console.error("[Turnstile] render threw", error);
+        throw error;
+      }
     }
     return new Promise<string>((resolve, reject) => {
       resolveRef.current = resolve;
       rejectRef.current = reject;
       timeoutRef.current = window.setTimeout(() => {
+        console.error(
+          "[Turnstile] token timeout after",
+          timeoutMs,
+          "ms; check Cloudflare hostname allowlist (yuanshenjian.cn) and widget status.",
+          { scene, siteKey },
+        );
         const currentReject = rejectRef.current;
         clearWaiters();
         currentReject?.(new Error("安全验证超时，请稍后再试。"));
@@ -119,7 +150,13 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
         reject(new Error("Turnstile 初始化失败，请稍后重试。"));
         return;
       }
-      window.turnstile?.execute(widgetId);
+      try {
+        window.turnstile?.execute(widgetId);
+      } catch (error) {
+        console.error("[Turnstile] execute threw", error);
+        clearWaiters();
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
     });
   }, [clearWaiters, scene, siteKey, timeoutMs]);
 

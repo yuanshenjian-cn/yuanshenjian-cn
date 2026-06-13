@@ -122,7 +122,7 @@ class AIConfig(BaseModel):
     global_daily_token_limit: int = 200_000
     chat_daily_request_limit: int = 50
     advisor_daily_request_limit: int = 30
-    advisor_history_rounds: int = 10
+    advisor_history_rounds: int = 20
     moderation_daily_request_limit: int = 200
     embedding_daily_token_limit: int = 100_000
 
