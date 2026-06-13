@@ -1,6 +1,21 @@
 {
-  "generated": "2026-06-12T00:00:00.000Z",
+  "generated": "2026-06-13T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-13",
+      "title": "AI 简报 · 2026-06-13",
+      "excerpt": "Anthropic 发布首个公众 AI 态度调查，Mistral 被曝启动新一轮大额融资，Meta、Google 与 OpenAI 同日面临转型与诉讼压力。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Mistral",
+        "Meta",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-06-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-13"
+    },
     {
       "slug": "2026-06-12",
       "title": "AI 简报 · 2026-06-12",
@@ -831,6 +846,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-13",
+      "title": "AI 简报 · 2026-06-13",
+      "excerpt": "Anthropic 发布首个公众 AI 态度调查，Mistral 被曝启动新一轮大额融资，Meta、Google 与 OpenAI 同日面临转型与诉讼压力。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Mistral",
+        "Meta",
+        "Google",
+        "OpenAI"
+      ],
+      "date": "2026-06-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-13"
+    },
     {
       "slug": "2026-06-12",
       "title": "AI 简报 · 2026-06-12",
