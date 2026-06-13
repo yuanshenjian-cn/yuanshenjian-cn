@@ -16,6 +16,13 @@ TURNSTILE_ACTIONS = {
     "ai_briefing_recommendation": "ai_briefing_recommendation",
     "investment_briefing_recommendation": "investment_briefing_recommendation",
     "advisor": "ai_advisor",
+    "health": "contextual_ai_advisor",
+    "health-column": "contextual_ai_advisor",
+    "ai": "contextual_ai_advisor",
+    "ai-column": "contextual_ai_advisor",
+    "investment": "contextual_ai_advisor",
+    "investment-column": "contextual_ai_advisor",
+    "contextual_ai_advisor": "contextual_ai_advisor",
     "comment-submit": "comment_submit",
     "admin-login": "admin_login",
 }

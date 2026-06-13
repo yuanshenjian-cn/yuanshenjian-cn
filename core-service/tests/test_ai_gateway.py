@@ -20,6 +20,7 @@ def test_ai_config_uses_config_yml_profiles() -> None:
     assert settings.core_service_root.name == "core-service"
     assert "deepseek" in settings.file_config.ai.providers
     assert settings.file_config.ai.scene_profiles["advisor"] == "deepseek/deepseek-v4-pro"
+    assert settings.file_config.ai.scene_profiles["contextual_ai_advisor"] == "deepseek/deepseek-v4-pro"
 
 
 def test_scene_llm_profile_mapping_resolves_specific_profile() -> None:

@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import frontmatter
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
+from app.contexts.knowledge_base.infra.po.knowledge_source_po import KnowledgeSourcePO
 from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 from app.shared.infra.database import transactional_session
 
@@ -45,6 +47,62 @@ class PublishedContentSyncService:
             return "investment_briefing"
         return "article"
 
+    def _domains_for_path(self, path: Path, source_type: str) -> list[str]:
+        value = path.as_posix()
+        if "/health/" in value:
+            return ["health"]
+        if "/investment/" in value or source_type == "investment_briefing":
+            return ["investment"]
+        if "/swd/ai-coding/" in value or source_type == "ai_briefing":
+            return ["ai"]
+        return ["article"]
+
+    def _scenes_for_path(self, path: Path, source_type: str) -> list[str]:
+        value = path.as_posix()
+        if source_type == "article":
+            if "/health/" in value:
+                return ["article", "health", "health-column"]
+            if "/investment/" in value:
+                return ["article", "investment", "investment-column"]
+            if "/swd/ai-coding/" in value:
+                return ["article", "ai", "ai-column"]
+            return ["article"]
+        if source_type == "ai_briefing":
+            return ["ai", "ai-column"]
+        if source_type == "investment_briefing":
+            return ["investment", "investment-column"]
+        return ["article"]
+
+    async def _ensure_default_source(
+        self,
+        session: AsyncSession,
+        *,
+        source_type: str,
+        domains: list[str],
+        scenes: list[str],
+    ) -> KnowledgeSourcePO:
+        source = cast(
+            KnowledgeSourcePO | None,
+            await session.scalar(select(KnowledgeSourcePO).where(KnowledgeSourcePO.name == f"系统内容-{source_type}")),
+        )
+        if source is None:
+            source = KnowledgeSourcePO(
+                name=f"系统内容-{source_type}",
+                source_kind=source_type,
+                domains=domains,
+                scenes=scenes,
+                status="enabled",
+                sync_strategy="auto",
+                content_config={},
+                updated_by="system",
+            )
+            session.add(source)
+            await session.flush()
+            return source
+        source.domains = domains
+        source.scenes = scenes
+        return source
+
     async def sync_public_content(self, repo_root: Path, commit_sha: str = "") -> RagSyncRunPO:
         async with transactional_session() as session:
             sync_run = RagSyncRunPO(status="running", commit_sha=commit_sha or None)
@@ -64,11 +122,22 @@ class PublishedContentSyncService:
                 sync_run.documents_seen = len(paths)
                 for path in paths:
                     post = frontmatter.loads(path.read_text(encoding="utf-8"))
-                    if not self.should_ingest_frontmatter(dict(post.metadata)):
+                    metadata: dict[str, Any] = dict(post.metadata)
+                    if not self.should_ingest_frontmatter(metadata):
                         continue
                     slug = path.stem
                     source_type = self._source_type_for_path(path)
                     source_id = self.canonical_source_id(source_type, slug)
+                    domains = self._domains_for_path(path, source_type)
+                    scenes = self._scenes_for_path(path, source_type)
+                    raw_tags = metadata.get("tags", [])
+                    tags = [str(tag) for tag in raw_tags if isinstance(tag, str)] if isinstance(raw_tags, list) else []
+                    source = await self._ensure_default_source(
+                        session,
+                        source_type=source_type,
+                        domains=domains,
+                        scenes=scenes,
+                    )
                     document = await session.scalar(
                         select(KnowledgeDocumentPO).where(
                             KnowledgeDocumentPO.source_type == source_type,
@@ -80,22 +149,30 @@ class PublishedContentSyncService:
                         document = KnowledgeDocumentPO(
                             source_type=source_type,
                             source_id=source_id,
+                            knowledge_source_id=source.id,
                             slug=slug,
-                            title=str(post.metadata.get("title") or slug),
+                            title=str(metadata.get("title") or slug),
                             url=f"/articles/{slug}" if source_type == "article" else None,
-                            summary=str(post.metadata.get("brief") or post.metadata.get("excerpt") or ""),
+                            summary=str(metadata.get("brief") or metadata.get("excerpt") or ""),
                             visibility="public",
                             content_hash=body_hash,
-                            metadata_json=dict(post.metadata),
+                            domains=domains,
+                            scenes=scenes,
+                            tags=tags,
+                            metadata_json=metadata,
                         )
                         session.add(document)
                         await session.flush()
                         sync_run.documents_upserted += 1
                     elif document.content_hash != body_hash:
                         document.content_hash = body_hash
-                        document.title = str(post.metadata.get("title") or slug)
-                        document.summary = str(post.metadata.get("brief") or post.metadata.get("excerpt") or "")
-                        document.metadata_json = dict(post.metadata)
+                        document.title = str(metadata.get("title") or slug)
+                        document.summary = str(metadata.get("brief") or metadata.get("excerpt") or "")
+                        document.knowledge_source_id = source.id
+                        document.domains = domains
+                        document.scenes = scenes
+                        document.tags = tags
+                        document.metadata_json = metadata
                         sync_run.documents_upserted += 1
 
                     chunks = self.chunk_text(post.content)
@@ -115,6 +192,8 @@ class PublishedContentSyncService:
                                     content_hash=chunk_hash,
                                     embedding=[],
                                     embedding_model="not-generated",
+                                    embedding_dimensions=None,
+                                    embedding_status="not-generated",
                                     metadata_json={},
                                 )
                             )
@@ -123,6 +202,7 @@ class PublishedContentSyncService:
                             chunk.content = chunk_body
                             chunk.content_hash = chunk_hash
                             chunk.token_count = max(1, len(chunk_body) // 4)
+                            chunk.embedding_status = "not-generated"
                             sync_run.chunks_upserted += 1
 
                     for stale_index, stale_chunk in by_index.items():

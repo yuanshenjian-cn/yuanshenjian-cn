@@ -2,15 +2,17 @@ import { useState } from "react";
 import { AiUsagePage } from "./pages/AiUsagePage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CommentsPage } from "./pages/CommentsPage";
+import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 import { LoginPage } from "./pages/LoginPage";
 import { SystemPage } from "./pages/SystemPage";
 
-type Page = "login" | "comments" | "analytics" | "ai-usage" | "system";
+type Page = "login" | "comments" | "analytics" | "ai-usage" | "knowledge-base" | "system";
 
 const pages: Array<{ key: Page; label: string }> = [
   { key: "comments", label: "评论审核" },
   { key: "analytics", label: "阅读统计" },
   { key: "ai-usage", label: "AI 用量" },
+  { key: "knowledge-base", label: "知识库" },
   { key: "system", label: "系统状态" },
 ];
 
@@ -33,6 +35,7 @@ export function App() {
       {page === "comments" && <CommentsPage />}
       {page === "analytics" && <AnalyticsPage />}
       {page === "ai-usage" && <AiUsagePage />}
+      {page === "knowledge-base" && <KnowledgeBasePage />}
       {page === "system" && <SystemPage />}
     </main>
   );

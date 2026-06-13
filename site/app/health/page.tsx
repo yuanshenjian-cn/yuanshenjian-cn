@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Utensils, GlassWater } from "lucide-react";
 import type { Metadata } from "next";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { config } from "@/lib/config";
 import { getHealthColumns } from "@/lib/health-columns";
 import { generateListPageSEO } from "@/lib/seo-utils";
@@ -23,6 +26,25 @@ export default async function HealthPage() {
             先从饮食健康切入，后续逐步补充运动健身、养生习惯等长期专栏。
           </p>
         </div>
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "health",
+              title: "健康栏目",
+              domain: "health",
+              pageSlug: "health",
+              quickTopics: defaultAdvisorQuickTopics("health"),
+            })}
+            cardTitle="AI 带你快速浏览健康栏目"
+            cardDescription="如果你想知道先看哪个方向，或者这组内容更适合什么人群，可以直接问。"
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
+        ) : null}
 
         {columns.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2">

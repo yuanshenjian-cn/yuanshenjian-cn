@@ -260,7 +260,8 @@ function extractArticleSections(content) {
 }
 
 function buildAuthorPayload() {
-  const { hero, skills, education, experience, projects, extras } = authorProfileData;
+  const { hero, skills, education, experience, projects, openSourceProjects, extras } =
+    authorProfileData;
   const slugger = new GitHubSlugger();
   slugger.reset();
 
@@ -310,6 +311,13 @@ function buildAuthorPayload() {
     highlights: item.highlights ?? [],
     techs: (item.techs ?? []).map((tech) => tech.name),
     organization: parseEntityTitle(item.name).organization,
+  }));
+  const openSourceProjectEntities = openSourceProjects.items.map((item) => ({
+    id: createAuthorScopedId(slugger, "open-source-project", item.name),
+    name: item.name,
+    description: item.description,
+    type: item.type,
+    repositoryUrl: item.repositoryUrl,
   }));
   const extraEntities = extras.groups.map((group) => ({
     id: createAuthorScopedId(slugger, "extra", group.title),
@@ -421,6 +429,27 @@ function buildAuthorPayload() {
         techs: item.techs,
       }),
     ),
+    ...openSourceProjectEntities.map((item) =>
+      createAuthorChunk({
+        id: item.id,
+        anchorId: openSourceProjects.id,
+        heading: `开源项目｜${item.name}`,
+        content: [
+          `项目类型：${item.type}`,
+          item.description,
+          `GitHub 仓库：${item.repositoryUrl}`,
+        ].join("\n"),
+        sectionType: openSourceProjects.id,
+        entityType: "open-source-project",
+        entityId: item.id,
+        keywords: dedupeStrings([
+          item.name,
+          item.type,
+          item.repositoryUrl,
+          ...extractKeywordParts(item.description),
+        ]).slice(0, 10),
+      }),
+    ),
     ...extraEntities.map((group) =>
       createAuthorChunk({
         id: group.id,
@@ -449,6 +478,7 @@ function buildAuthorPayload() {
       education: educationEntity,
       experiences: experienceEntities,
       projects: projectEntities,
+      openSourceProjects: openSourceProjectEntities,
       extras: extraEntities,
     },
     chunks,

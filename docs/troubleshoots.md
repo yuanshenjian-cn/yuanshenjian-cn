@@ -4,6 +4,153 @@
 
 ---
 
+## 2026-06-13 栏目页顾问知识库空命中时不能回退到全站文章
+
+### 现象
+
+在 `/investment` 投资栏目页问候“哈喽”这类与栏目无关的开放式问题时，顾问回答里会出现 OpenAI、Claude、GLM、MiMo、地中海饮食等明显跨栏目的文章推荐。
+
+### 根因
+
+`core-service/app/contexts/ai_assistant/application/stream_ai_advisor_app_service.py` 在 `contexts` 仍然为空时，会无条件回退到 `load_article_recommendation_candidates()[:5]`，把全站推荐池（AI / 健康 / 投资混在一起）拼进 prompt。栏目页携带 `scene` / `domain` / `page_slug` 等过滤条件，但这条最终的全站 fallback 完全忽略它们，于是模型基于全站资料作答，看起来像是在投资栏目里串迷。
+
+### 修复
+
+为最终的全站推荐 fallback 加守卫：当请求带任意 `article_slug` / `page_slug` / `domain` / `scene` 时就跳过全站推荐，保持 `contexts` 为空，让 prompt 走“当前知识库没有检索到足够资料。”分支，由模型坦诚回应资料不足，而不是召出跨栏目文章。
+
+补充回归测试 `test_stream_ai_advisor_skips_global_fallback_when_column_scoped`：当 KB 返回空且 `scene=investment-column` 时，`load_article_recommendation_candidates` 不应被调用，跨栏目候选标题不会出现在 prompt 中。
+
+### 结论
+
+场景顾问的“兜底”必须分级守卫：作者页有 author fallback、单篇文章有 article fallback、栏目页则宁可让模型说“资料不足”，也不能跳过 scene/domain 边界召回全站文章。任何看起来兜底的逻辑，只要不考虑当前栏目语义，就会在生产里制造跨栏目串迷。
+
+## 2026-06-13 栏目页顾问推荐文章时必须把文章 URL 注入提示词
+
+### 现象
+
+在 `/health` 等栏目页里，用户问“有哪些文章”“推荐几篇文章”时，顾问可能只回答纯文本标题，或者无法稳定基于栏目下文章内容推荐可点击的站内文章。
+
+### 根因
+
+场景顾问的前端聊天窗虽然已经支持 Markdown 渲染，但后端传给 LLM 的知识上下文只有正文片段，没有把文章标题和 URL 一起注入。模型不知道文章链接，自然只能输出纯文本标题。
+
+另外，“有哪些文章 / 推荐文章”这类导航型问题不一定会命中文章正文关键词。如果仍然按普通问答做关键词过滤，会把同栏目文章候选过滤掉。
+
+### 修复
+
+1. 场景顾问应用层把检索上下文扩展为“标题 / 链接 / 内容”
+2. 提示词明确要求推荐站内文章时使用 Markdown 链接，例如 `[文章标题](/articles/example-slug)`
+3. 聊天窗 Markdown 链接统一 `target="_blank"`，点击后新标签打开
+4. 检索层识别“有哪些文章 / 推荐文章 / 推荐阅读”等导航型问题，保留同栏目候选并按文章去重
+
+### 结论
+
+“引用事件”只够前端展示依据，不等于 LLM 知道文章链接。只要要求模型在正文里推荐可点击文章，就必须把 URL 明确放进 prompt 上下文。
+
+## 2026-06-13 场景顾问中文问题不能只按空格拆词
+
+### 现象
+
+在 `/health` 页面询问“陈皮怎么喝更健康”时，知识库里明明已有陈皮文章，顾问却回答当前资料主要是地中海饮食，无法基于资料回答陈皮问题。
+
+### 根因
+
+`/health` 页面传入的 `scene=health`、`domain=health`、`pageSlug=health` 是正确的，后端也会在页面级资料没命中时回退到整个健康域。
+
+真正的问题在检索层：原逻辑只用 `query.lower().split()` 按空格拆关键词。中文问题通常没有空格，“陈皮怎么喝更健康”会被当成一个完整关键词，导致包含“陈皮”的文章也无法命中。
+
+同时，检索 SQL 先 `limit top_k` 再做内存过滤，容易只拿到健康域前几篇文章，错过后面的陈皮文章。
+
+### 修复
+
+`KnowledgeContextQueryService` 改为：
+
+1. 对中文连续文本生成 2 到 6 字短语，用于匹配“陈皮”这类主题词
+2. 先取更大的 scoped candidate 集合，再按关键词命中得分重排，最后返回 `top_k`
+3. 标题和分片标题命中权重大于正文命中，避免“健康”这种泛词压过“陈皮”主题词
+
+### 结论
+
+中文 RAG 检索不能只依赖空格拆词。栏目页这类场景还要先扩大同域候选集，再做主题词重排，否则“页面下确实有文章”也可能因为候选截断或中文整句匹配而被漏掉。
+
+## 2026-06-13 场景顾问检索在带过滤条件时不能回退到全量知识库
+
+### 现象
+
+场景顾问接到 `scene` / `domain` / `page_slug` 过滤参数时，如果目标页面没有命中资料，回答会意外引用其他栏目内容。
+
+典型表现：
+
+- 作者页提问时，回答依据却变成健康或 AI 栏目文章
+- 栏目页 `page_slug` 没有对应文档时，本该退回同栏目资料，结果退回了全站任意资料
+
+### 根因
+
+`core-service/app/contexts/knowledge_base/infra/knowledge_context_query_service.py` 里原先的回退逻辑是：
+
+1. 先带 `article_slug` / `page_slug` / `scene` / `domain` 查一次
+2. 只要第一次没命中，并且存在任一过滤条件，就直接退回到**不带任何过滤条件**的全量查询
+
+这会破坏场景顾问的边界，尤其在作者页这类主要依赖后续 fallback 资料的场景里，会先被全量知识库“误命中”，从而吃掉正确的作者资料 fallback。
+
+### 修复
+
+把回退策略改成两级：
+
+1. 先按 `page_slug + scene/domain` 精确查
+2. 若只是在 `page_slug` 上没命中，则去掉 `page_slug`，但**保留 `scene/domain` 继续查**
+3. 只有在一开始就完全没有任何过滤条件时，才允许走全量回退
+
+### 结论
+
+场景顾问的检索回退必须遵守“逐步放宽，但不越过场景边界”的原则。`page_slug` 可以放宽，`scene` 和 `domain` 不能在回退时一并丢掉，否则会把顾问回答污染成跨栏目混答。
+
+## 2026-06-13 本地 SQLite schema 漂移会导致场景顾问查询直接报缺列
+
+### 现象
+
+本地调用 `POST /api/v1/ai-assistant/advisor/stream` 时，后端在知识库检索阶段报错：
+
+```text
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: knowledge_chunks.embedding_dimensions
+```
+
+### 根因
+
+`core-service` 的 ORM 已经为 `knowledge_chunks` 和 `knowledge_documents` 增加了新字段，但本地 `dev.db` 仍停留在旧 revision，表结构没有同步升级。
+
+这会导致查询服务生成的 SQL 已经选择了：
+
+- `knowledge_chunks.embedding_dimensions`
+- `knowledge_chunks.embedding_status`
+- `knowledge_documents.knowledge_source_id`
+- `knowledge_documents.domains`
+- `knowledge_documents.scenes`
+- `knowledge_documents.tags`
+
+而本地 SQLite 里这些列还不存在，于是运行期直接报错。
+
+另外，`test.db` 上执行 `alembic upgrade head` 看到的 `table visitors already exists` 不是这次迁移本身有问题，而是因为该库之前已被 pytest 建过表、但没有 Alembic 版本表，属于脏测试库重复跑初始化迁移。
+
+### 修复
+
+1. 新增并收敛知识库增量迁移：`core-service/migrations/versions/9ad634c7ec9e_contextual_ai_advisor_knowledge_base.py`
+2. 对本地开发库执行：
+
+```bash
+DATABASE_URL="sqlite+aiosqlite:///./dev.db" APP_ENV=test .venv/bin/python -m alembic -c alembic.ini upgrade head
+```
+
+3. 升级后确认：
+
+- `alembic_version` 变为 `9ad634c7ec9e`
+- `knowledge_chunks` 已包含 `embedding_dimensions`、`embedding_status`
+- `knowledge_documents` 已包含 `knowledge_source_id`、`domains`、`scenes`、`tags`
+
+### 结论
+
+只要修改了知识库相关 PO，并且查询 SQL 会直接选取新列，就不能依赖“旧本地库也先跑起来”的侥幸路径，必须同步生成 Alembic migration 并先升级本地 SQLite。迁移烟测也要使用全新的临时库，避免被 `test.db` 这类脏库误导。
+
 ## 2026-06-02 切换到 `uv --directory core-service` 后，Alembic 不能再使用 `core-service/migrations`
 
 ### 现象

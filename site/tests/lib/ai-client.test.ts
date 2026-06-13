@@ -4,6 +4,7 @@ import {
   aiArticleRecommendationStream,
   aiBriefingRecommendationStream,
   aiChatStream,
+  aiContextualAdvisorStream,
   aiInvestmentBriefingRecommendationStream,
 } from "@/lib/ai-client";
 
@@ -200,6 +201,61 @@ describe("aiArticleRecommendationStream", () => {
         onEvent: vi.fn(),
       }),
     ).rejects.toThrow("AI 服务刚刚开小差了，请稍后重试。");
+  });
+});
+
+describe("aiContextualAdvisorStream", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("should post advisor stream request and parse advisor references", async () => {
+    const onEvent = vi.fn();
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      createStreamResponse([
+        'event: answer-delta\ndata: {"delta":"建议先看当前栏目导读。"}\n\n',
+        'event: references\ndata: {"references":[{"id":"ref-1","title":"当前栏目导读","excerpt":"先看阅读路径。","sourceType":"ai-section","url":"/articles/ai-guide"}]}\n\n',
+        'event: done\ndata: {}\n\n',
+      ]),
+    );
+
+    await aiContextualAdvisorStream({
+      workerUrl: "/api/v1/ai-assistant/",
+      message: "我该先看什么",
+      turnstileToken: "token",
+      context: {
+        scene: "ai-column",
+        domain: "ai",
+        pageTitle: "OpenCode",
+        pageSlug: "opencode",
+        articleSlug: undefined,
+        history: ["之前看过一篇入门文章"],
+      },
+      onEvent,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith("/api/v1/ai-assistant/advisor/stream", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scene: "ai-column",
+        domain: "ai",
+        page_title: "OpenCode",
+        page_slug: "opencode",
+        article_slug: undefined,
+        history: ["之前看过一篇入门文章"],
+        entrypoint: "ai-column",
+        message: "我该先看什么",
+        cf_turnstile_response: "token",
+      }),
+      signal: undefined,
+    });
+    expect(onEvent).toHaveBeenNthCalledWith(1, { type: "answer-delta", delta: "建议先看当前栏目导读。" });
+    expect(onEvent).toHaveBeenNthCalledWith(2, expect.objectContaining({ type: "references" }));
+    expect(onEvent).toHaveBeenNthCalledWith(3, { type: "done", usage: undefined });
   });
 });
 

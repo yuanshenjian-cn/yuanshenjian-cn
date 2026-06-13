@@ -7,10 +7,9 @@ const authorProfileData = {
     phone: "18192235667",
     email: "yuanshenjian@foxmail.com",
     summary: [
-      "在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目",
-      "长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地",
-      "擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率",
-      "具备扎实的软件架构设计与服务端开发功底，有良好的业务 Sense 和产品思维、代码洁癖",
+      "在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目",
+      "擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率",
+      "具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖",
     ],
   },
   skills: {
@@ -98,6 +97,12 @@ const authorProfileData = {
     heading: "经历概览",
     items: [
       {
+        period: "2026.02 ~ 至今",
+        title: "创业项目 - AI 应用 & 效率工程师",
+        description:
+          "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      },
+      {
         period: "2025.05 ~ 2025.12",
         title: "Locammend 智能顾问 - 技术负责人",
         description:
@@ -137,6 +142,42 @@ const authorProfileData = {
     id: "projects",
     heading: "重要项目",
     items: [
+      {
+        period: "2026.02 ~ 至今",
+        name: "创业项目",
+        role: "AI 效率 && Agent 应用 工程师",
+        achievements: [
+          { metric: "核心系统", text: "设计与交付" },
+          { metric: "数据资产服务", text: "设计和落地" },
+          { metric: "aa-delivery", text: "设计和实现" },
+          { metric: "Bug Fixer Skill Framework", text: "设计与实现" },
+          { metric: "LLM 网关", text: "设计与落地" },
+        ],
+        description:
+          "我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。",
+        highlights: [
+          { text: "深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率" },
+          { text: "负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关" },
+          { text: "设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力" },
+          { text: "基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量" },
+        ],
+        techs: [
+          { name: "Fast API" },
+          { name: "Python3" },
+          { name: "Postgres SQL" },
+          { name: "Postgres vector" },
+          { name: "Langfuse" },
+          { name: "Pydandic AI" },
+          { name: "Next JS" },
+          { name: "Spring Cloud" },
+          { name: "Redis" },
+          { name: "Claude CLI" },
+          { name: "OpenCode" },
+          { name: "GitHub CI/CD" },
+          { name: "阿里云 K8S" },
+          { name: "OSS" },
+        ],
+      },
       {
         period: "2025.05 ~ 2025.12",
         name: "Locammend 智能顾问 研发交付",
@@ -278,6 +319,47 @@ const authorProfileData = {
           { name: "K8S" },
         ],
       },
+    ],
+  },
+  openSourceProjects: {
+    id: "open-source-projects",
+    heading: "开源项目",
+    items: [
+      {
+        name: "个人博客工程",
+        type: "个人知识系统 / AI 内容工程",
+        description:
+          "高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。",
+        repositoryUrl: "https://github.com/yuanshenjian-cn/yuanshenjian-cn",
+      },
+      {
+        name: ".agent-skills",
+        type: "AI Agent Skills 管理器",
+        description:
+          "用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。",
+        repositoryUrl: "https://github.com/ysjai/.agent-skills",
+      },
+      {
+        name: "aa-delivery",
+        type: "Agentic Agile Delivery 框架",
+        description:
+          "面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。",
+        repositoryUrl: "https://github.com/ysjai/aa-delivery",
+      },
+      {
+        name: "agile-delivery-opencode",
+        type: "OpenCode 敏捷交付插件",
+        description:
+          "轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。",
+        repositoryUrl: "https://github.com/ysjai/agile-delivery-opencode",
+      },
+      {
+        name: "agent-skills-market",
+        type: "Agent Skills 管理平台",
+        description:
+          "B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。",
+        repositoryUrl: "https://github.com/ysjai/agent-skills-market",
+      }
     ],
   },
   extras: {

@@ -21,4 +21,6 @@ class KnowledgeChunkPO(Base, TimestampMixin):
     content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     embedding: Mapped[list[float] | None] = mapped_column(JSON)
     embedding_model: Mapped[str | None] = mapped_column(String(128))
+    embedding_dimensions: Mapped[int | None] = mapped_column(Integer)
+    embedding_status: Mapped[str] = mapped_column(String(32), default="not-generated")
     metadata_json: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, default=dict)

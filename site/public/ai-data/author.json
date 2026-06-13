@@ -15,10 +15,9 @@
       "phone": "18192235667",
       "email": "yuanshenjian@foxmail.com",
       "summary": [
-        "在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目",
-        "长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地",
-        "擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率",
-        "具备扎实的软件架构设计与服务端开发功底，有良好的业务 Sense 和产品思维、代码洁癖"
+        "在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目",
+        "擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率",
+        "具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖"
       ]
     },
     "skills": [
@@ -114,6 +113,15 @@
     },
     "experiences": [
       {
+        "id": "experience-创业项目-ai-应用-and-效率工程师",
+        "title": "创业项目 - AI 应用 & 效率工程师",
+        "period": "2026.02 ~ 至今",
+        "description": "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+        "list": [],
+        "organization": "创业项目",
+        "role": "AI 应用 & 效率工程师"
+      },
+      {
         "id": "experience-locammend-智能顾问-技术负责人",
         "title": "Locammend 智能顾问 - 技术负责人",
         "period": "2025.05 ~ 2025.12",
@@ -163,6 +171,66 @@
       }
     ],
     "projects": [
+      {
+        "id": "project-创业项目",
+        "period": "2026.02 ~ 至今",
+        "name": "创业项目",
+        "role": "AI 效率 && Agent 应用 工程师",
+        "description": "我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。",
+        "achievements": [
+          {
+            "metric": "核心系统",
+            "text": "设计与交付"
+          },
+          {
+            "metric": "数据资产服务",
+            "text": "设计和落地"
+          },
+          {
+            "metric": "aa-delivery",
+            "text": "设计和实现"
+          },
+          {
+            "metric": "Bug Fixer Skill Framework",
+            "text": "设计与实现"
+          },
+          {
+            "metric": "LLM 网关",
+            "text": "设计与落地"
+          }
+        ],
+        "highlights": [
+          {
+            "text": "深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率"
+          },
+          {
+            "text": "负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关"
+          },
+          {
+            "text": "设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力"
+          },
+          {
+            "text": "基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量"
+          }
+        ],
+        "techs": [
+          "Fast API",
+          "Python3",
+          "Postgres SQL",
+          "Postgres vector",
+          "Langfuse",
+          "Pydandic AI",
+          "Next JS",
+          "Spring Cloud",
+          "Redis",
+          "Claude CLI",
+          "OpenCode",
+          "GitHub CI/CD",
+          "阿里云 K8S",
+          "OSS"
+        ],
+        "organization": "创业项目"
+      },
       {
         "id": "project-locammend-智能顾问-研发交付",
         "period": "2025.05 ~ 2025.12",
@@ -411,6 +479,43 @@
         "organization": "戴姆勒"
       }
     ],
+    "openSourceProjects": [
+      {
+        "id": "open-source-project-个人博客工程",
+        "name": "个人博客工程",
+        "description": "高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。",
+        "type": "个人知识系统 / AI 内容工程",
+        "repositoryUrl": "https://github.com/yuanshenjian-cn/yuanshenjian-cn"
+      },
+      {
+        "id": "open-source-project-agent-skills",
+        "name": ".agent-skills",
+        "description": "用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。",
+        "type": "AI Agent Skills 管理器",
+        "repositoryUrl": "https://github.com/ysjai/.agent-skills"
+      },
+      {
+        "id": "open-source-project-aa-delivery",
+        "name": "aa-delivery",
+        "description": "面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。",
+        "type": "Agentic Agile Delivery 框架",
+        "repositoryUrl": "https://github.com/ysjai/aa-delivery"
+      },
+      {
+        "id": "open-source-project-agile-delivery-opencode",
+        "name": "agile-delivery-opencode",
+        "description": "轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。",
+        "type": "OpenCode 敏捷交付插件",
+        "repositoryUrl": "https://github.com/ysjai/agile-delivery-opencode"
+      },
+      {
+        "id": "open-source-project-agent-skills-market",
+        "name": "agent-skills-market",
+        "description": "B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。",
+        "type": "Agent Skills 管理平台",
+        "repositoryUrl": "https://github.com/ysjai/agent-skills-market"
+      }
+    ],
     "extras": [
       {
         "id": "extra-著作发表",
@@ -476,8 +581,8 @@
       "id": "hero",
       "anchorId": "hero",
       "heading": "个人简介",
-      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目 长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率 具备扎实的软件架构设计与服务端开发功底，有良好的业务 Sense 和产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
-      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目 长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率 具备扎实的软件架构设计与服务端...",
+      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：1819...",
       "sectionType": "hero",
       "entityType": "profile",
       "entityId": "hero",
@@ -732,6 +837,27 @@
       ]
     },
     {
+      "id": "experience-创业项目-ai-应用-and-效率工程师",
+      "anchorId": "experience",
+      "heading": "经历｜创业项目 - AI 应用 & 效率工程师",
+      "content": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-创业项目-ai-应用-and-效率工程师",
+      "organization": "创业项目",
+      "role": "AI 应用 & 效率工程师",
+      "period": "2026.02 ~ 至今",
+      "keywords": [
+        "创业项目",
+        "AI 应用 & 效率工程师",
+        "AI 应用",
+        "效率工程师",
+        "同时负责深度参与项目架构设计和实施",
+        "并独立负责多个项目的开发和设计。"
+      ]
+    },
+    {
       "id": "experience-locammend-智能顾问-技术负责人",
       "anchorId": "experience",
       "heading": "经历｜Locammend 智能顾问 - 技术负责人",
@@ -836,6 +962,49 @@
         "软件开发工作室(自由创业",
         "2013.06 ~ 2014.09",
         "西安美林数据股份有限公司"
+      ]
+    },
+    {
+      "id": "project-创业项目",
+      "anchorId": "projects",
+      "heading": "项目｜创业项目",
+      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现；LLM 网关 设计与落地 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
+      "excerpt": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-deli...",
+      "sectionType": "projects",
+      "entityType": "project",
+      "entityId": "project-创业项目",
+      "organization": "创业项目",
+      "role": "AI 效率 && Agent 应用 工程师",
+      "period": "2026.02 ~ 至今",
+      "keywords": [
+        "创业项目",
+        "AI 效率 && Agent 应用 工程师",
+        "Fast API",
+        "Python3",
+        "Postgres SQL",
+        "Postgres vector",
+        "Langfuse",
+        "Pydandic AI",
+        "Next JS",
+        "Spring Cloud",
+        "Redis",
+        "Claude CLI"
+      ],
+      "techs": [
+        "Fast API",
+        "Python3",
+        "Postgres SQL",
+        "Postgres vector",
+        "Langfuse",
+        "Pydandic AI",
+        "Next JS",
+        "Spring Cloud",
+        "Redis",
+        "Claude CLI",
+        "OpenCode",
+        "GitHub CI/CD",
+        "阿里云 K8S",
+        "OSS"
       ]
     },
     {
@@ -1017,6 +1186,103 @@
       ]
     },
     {
+      "id": "open-source-project-个人博客工程",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜个人博客工程",
+      "content": "项目类型：个人知识系统 / AI 内容工程 高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。 GitHub 仓库：https://github.com/yuanshenjian-cn/yuanshenjian-cn",
+      "excerpt": "项目类型：个人知识系统 / AI 内容工程 高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。 GitHub 仓库：https://github.com/yuanshenjian-cn/yuanshenjian-...",
+      "sectionType": "open-source-projects",
+      "entityType": "open-source-project",
+      "entityId": "open-source-project-个人博客工程",
+      "keywords": [
+        "个人博客工程",
+        "个人知识系统 / AI 内容工程",
+        "https://github.com/yuanshenjian-cn/yuanshenjian-cn",
+        "高度集成 Agent 自动化工作流",
+        "FastAPI",
+        "Next.js",
+        "AI 问答",
+        "简报",
+        "评论系统"
+      ]
+    },
+    {
+      "id": "open-source-project-agent-skills",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜.agent-skills",
+      "content": "项目类型：AI Agent Skills 管理器 用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。 GitHub 仓库：https://github.com/ysjai/.agent-skills",
+      "excerpt": "项目类型：AI Agent Skills 管理器 用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。 GitHub 仓库：https://github.com/ysjai/.agent-skil...",
+      "sectionType": "open-source-projects",
+      "entityType": "open-source-project",
+      "entityId": "open-source-project-agent-skills",
+      "keywords": [
+        ".agent-skills",
+        "AI Agent Skills 管理器",
+        "https://github.com/ysjai/.agent-skills",
+        "支持 OpenCode",
+        "Claude Code 和 Codex 三个平台",
+        "方便在不同设备间同步",
+        "安装和更新 skills。"
+      ]
+    },
+    {
+      "id": "open-source-project-aa-delivery",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜aa-delivery",
+      "content": "项目类型：Agentic Agile Delivery 框架 面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。 GitHub 仓库：https://github.com/ysjai/aa-delivery",
+      "excerpt": "项目类型：Agentic Agile Delivery 框架 面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。 GitHub 仓库：https://github.com/ysjai/aa-delivery",
+      "sectionType": "open-source-projects",
+      "entityType": "open-source-project",
+      "entityId": "open-source-project-aa-delivery",
+      "keywords": [
+        "aa-delivery",
+        "Agentic Agile Delivery 框架",
+        "https://github.com/ysjai/aa-delivery",
+        "面向编码 Agent 的轻量级敏捷交付框架",
+        "将需求",
+        "设计",
+        "验证",
+        "验收和交付报告拆成可追踪的角色工作单元。"
+      ]
+    },
+    {
+      "id": "open-source-project-agile-delivery-opencode",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜agile-delivery-opencode",
+      "content": "项目类型：OpenCode 敏捷交付插件 轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。 GitHub 仓库：https://github.com/ysjai/agile-delivery-opencode",
+      "excerpt": "项目类型：OpenCode 敏捷交付插件 轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。 GitHub 仓库：https://github.com/ysjai/agile-delivery-opencode",
+      "sectionType": "open-source-projects",
+      "entityType": "open-source-project",
+      "entityId": "open-source-project-agile-delivery-opencode",
+      "keywords": [
+        "agile-delivery-opencode",
+        "OpenCode 敏捷交付插件",
+        "https://github.com/ysjai/agile-delivery-opencode",
+        "轻量编排型 OpenCode 插件",
+        "并维护结构化交付产物。"
+      ]
+    },
+    {
+      "id": "open-source-project-agent-skills-market",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜agent-skills-market",
+      "content": "项目类型：Agent Skills 管理平台 B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。 GitHub 仓库：https://github.com/ysjai/agent-skills-market",
+      "excerpt": "项目类型：Agent Skills 管理平台 B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。 GitHub 仓库：https://github.com/ysjai/agent-skills-market",
+      "sectionType": "open-source-projects",
+      "entityType": "open-source-project",
+      "entityId": "open-source-project-agent-skills-market",
+      "keywords": [
+        "agent-skills-market",
+        "Agent Skills 管理平台",
+        "https://github.com/ysjai/agent-skills-market",
+        "支持 Web 界面创建",
+        "编辑",
+        "分享",
+        "版本管理",
+        "以及本地与云端双向同步自定义 Skills。"
+      ]
+    },
+    {
       "id": "extra-著作发表",
       "anchorId": "extras",
       "heading": "兴趣｜著作发表",
@@ -1070,8 +1336,8 @@
       "id": "hero",
       "anchorId": "hero",
       "heading": "个人简介",
-      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目 长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率 具备扎实的软件架构设计与服务端开发功底，有良好的业务 Sense 和产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
-      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个国内外交付、咨询和技术人才培养项目 长期关注 AI 软件工程优化、研发效能提升与敏捷实践落地 擅长将 AI 工具、Agent 工作流与工程实践结合到真实研发场景中，提升团队研发效率 具备扎实的软件架构设计与服务端..."
+      "content": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 效率工程师，研发效能专家，敏捷开发教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：1819..."
     },
     {
       "id": "skill-敏捷开发",
@@ -1172,6 +1438,13 @@
       "excerpt": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/"
     },
     {
+      "id": "experience-创业项目-ai-应用-and-效率工程师",
+      "anchorId": "experience",
+      "heading": "经历｜创业项目 - AI 应用 & 效率工程师",
+      "content": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。"
+    },
+    {
       "id": "experience-locammend-智能顾问-技术负责人",
       "anchorId": "experience",
       "heading": "经历｜Locammend 智能顾问 - 技术负责人",
@@ -1207,6 +1480,13 @@
       "excerpt": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司"
     },
     {
+      "id": "project-创业项目",
+      "anchorId": "projects",
+      "heading": "项目｜创业项目",
+      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现；LLM 网关 设计与落地 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
+      "excerpt": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-deli..."
+    },
+    {
       "id": "project-locammend-智能顾问-研发交付",
       "anchorId": "projects",
       "heading": "项目｜Locammend 智能顾问 研发交付",
@@ -1240,6 +1520,41 @@
       "heading": "项目｜戴姆勒 - OTR 研发交付",
       "content": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要职责和贡献：完成日常需求开发，推动团队敏捷工程实践的落地优化，比如Code Review、Tasking、TDD、测试策略；推动技术债管理，带领技术栈小组优化系统的自动化测试策略，引入有效的进程内API功能测试和契约测试，大大提升了测试的有效性；CI/CD Pipeline测试阶段从30~50分钟缩短至10分钟以内，需求Bug返工率降低约40%；主导设计微服务技术工作坊，通过业务场景驱动从0到1搭建微服务架构，深度学习Spring Cloud原理和实战，包括服务注册和发现、负载均衡、配置中心、限流和熔断，服务运维监控 技术栈：Java 8、Spring Cloud、Consul、Hystrix、MongoDB、MySQL、GoCD、Docker、Redis、React Native、ELK、K8S",
       "excerpt": "时间：2017.06 ~ 2019.05 角色：Tech Lead 2Tier 这是一个手机App系统，为奔驰经销商提供一站式销售服务。后台采用了微服务架构。 核心成果：50% CI/CD Pipeline提速约；约40% 需求Bug返工率降低；设计微服务技术工作坊；深度实践 Spring Cloud 微服务架构 主要..."
+    },
+    {
+      "id": "open-source-project-个人博客工程",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜个人博客工程",
+      "content": "项目类型：个人知识系统 / AI 内容工程 高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。 GitHub 仓库：https://github.com/yuanshenjian-cn/yuanshenjian-cn",
+      "excerpt": "项目类型：个人知识系统 / AI 内容工程 高度集成 Agent 自动化工作流，基于 FastAPI、 Next.js、AI 问答、简报、评论系统、管理后台和自动化部署链路构建的个人博客与知识发布系统。 GitHub 仓库：https://github.com/yuanshenjian-cn/yuanshenjian-..."
+    },
+    {
+      "id": "open-source-project-agent-skills",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜.agent-skills",
+      "content": "项目类型：AI Agent Skills 管理器 用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。 GitHub 仓库：https://github.com/ysjai/.agent-skills",
+      "excerpt": "项目类型：AI Agent Skills 管理器 用于集中管理 AI Agent Skills 的仓库，支持 OpenCode、Claude Code 和 Codex 三个平台，方便在不同设备间同步、安装和更新 skills。 GitHub 仓库：https://github.com/ysjai/.agent-skil..."
+    },
+    {
+      "id": "open-source-project-aa-delivery",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜aa-delivery",
+      "content": "项目类型：Agentic Agile Delivery 框架 面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。 GitHub 仓库：https://github.com/ysjai/aa-delivery",
+      "excerpt": "项目类型：Agentic Agile Delivery 框架 面向编码 Agent 的轻量级敏捷交付框架，将需求、设计、实现、验证、验收和交付报告拆成可追踪的角色工作单元。 GitHub 仓库：https://github.com/ysjai/aa-delivery"
+    },
+    {
+      "id": "open-source-project-agile-delivery-opencode",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜agile-delivery-opencode",
+      "content": "项目类型：OpenCode 敏捷交付插件 轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。 GitHub 仓库：https://github.com/ysjai/agile-delivery-opencode",
+      "excerpt": "项目类型：OpenCode 敏捷交付插件 轻量编排型 OpenCode 插件，通过 /agile-deliver 驱动 story-sized 敏捷交付流水线，并维护结构化交付产物。 GitHub 仓库：https://github.com/ysjai/agile-delivery-opencode"
+    },
+    {
+      "id": "open-source-project-agent-skills-market",
+      "anchorId": "open-source-projects",
+      "heading": "开源项目｜agent-skills-market",
+      "content": "项目类型：Agent Skills 管理平台 B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。 GitHub 仓库：https://github.com/ysjai/agent-skills-market",
+      "excerpt": "项目类型：Agent Skills 管理平台 B/S 架构的 Agent Skills 管理平台，支持 Web 界面创建、编辑、分享、版本管理，以及本地与云端双向同步自定义 Skills。 GitHub 仓库：https://github.com/ysjai/agent-skills-market"
     },
     {
       "id": "extra-著作发表",

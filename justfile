@@ -2,11 +2,11 @@ set shell := ["bash", "-uc"]
 
 SITE_DIR := "site"
 SITE_HOST := env_var_or_default("SITE_HOST", "localhost")
-SITE_PORT := env_var_or_default("SITE_PORT", "3000")
+SITE_PORT := env_var_or_default("SITE_PORT", "3001")
 ADMIN_HOST := env_var_or_default("ADMIN_HOST", "localhost")
 ADMIN_PORT := env_var_or_default("ADMIN_PORT", "5173")
 CORE_HOST := env_var_or_default("CORE_HOST", "127.0.0.1")
-CORE_PORT := env_var_or_default("CORE_PORT", "8000")
+CORE_PORT := env_var_or_default("CORE_PORT", "8001")
 TURNSTILE_SITE_KEY := env_var_or_default("TURNSTILE_SITE_KEY", "1x00000000000000000000AA")
 
 # 默认列出所有可用命令。

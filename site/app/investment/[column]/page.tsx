@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
+import { config } from "@/lib/config";
 import { getInvestmentColumnBySlug, getInvestmentColumns } from "@/lib/investment-columns";
 
 export const dynamicParams = false;
@@ -86,6 +90,25 @@ export default async function InvestmentColumnPage({ params }: Props) {
               </ul>
             ) : null}
           </div>
+        ) : null}
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "investment-column",
+              title: column.title,
+              domain: "investment",
+              pageSlug: column.slug,
+              quickTopics: defaultAdvisorQuickTopics("investment-column"),
+            })}
+            cardTitle="AI 带你快速读懂这个投资专栏"
+            cardDescription="如果你想先建立阅读顺序，或者快速了解重点和风险边界，可以直接问。"
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
         ) : null}
 
         {column.posts.length > 0 ? (

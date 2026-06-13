@@ -10,7 +10,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -57,7 +58,8 @@ textarea {
 }
 
 input,
-textarea {
+textarea,
+select {
   border: 1px solid #cbd5e1;
   border-radius: 12px;
   box-sizing: border-box;

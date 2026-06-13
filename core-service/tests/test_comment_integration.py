@@ -35,7 +35,7 @@ def test_comment_submission_review_and_public_visibility(monkeypatch) -> None:
                 "content_markdown": "这篇文章很有帮助。",
                 "turnstile_token": "token",
             },
-            headers={"Origin": "http://localhost:3000"},
+            headers={"Origin": "http://localhost:3001"},
         )
         assert create_response.status_code == 200
         comment_id = create_response.json()["id"]
@@ -50,7 +50,7 @@ def test_comment_submission_review_and_public_visibility(monkeypatch) -> None:
                 "password": "admin123456",
                 "turnstile_token": "token",
             },
-            headers={"Origin": "http://localhost:3000"},
+            headers={"Origin": "http://localhost:3001"},
         )
         assert login_response.status_code == 200
         csrf_token = login_response.json()["csrf_token"]
@@ -62,7 +62,7 @@ def test_comment_submission_review_and_public_visibility(monkeypatch) -> None:
         approve_response = client.post(
             f"/api/v1/admin/comments/{comment_id}/approve",
             json={"review_note": "通过", "csrf_token": csrf_token},
-            headers={"Origin": "http://localhost:3000", "X-CSRF-Token": csrf_token},
+            headers={"Origin": "http://localhost:3001", "X-CSRF-Token": csrf_token},
         )
         assert approve_response.status_code == 200
         assert approve_response.json()["status"] == "approved"

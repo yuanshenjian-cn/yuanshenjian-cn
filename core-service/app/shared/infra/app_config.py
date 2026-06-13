@@ -122,6 +122,7 @@ class AIConfig(BaseModel):
     global_daily_token_limit: int = 200_000
     chat_daily_request_limit: int = 50
     advisor_daily_request_limit: int = 30
+    advisor_history_rounds: int = 10
     moderation_daily_request_limit: int = 200
     embedding_daily_token_limit: int = 100_000
 
@@ -159,6 +160,7 @@ def _apply_app_file_env_overrides(file_config: AppFileConfig, env_map: dict[str,
         "global_daily_token_limit": "AI_GLOBAL_DAILY_TOKEN_LIMIT",
         "chat_daily_request_limit": "AI_CHAT_DAILY_REQUEST_LIMIT",
         "advisor_daily_request_limit": "AI_ADVISOR_DAILY_REQUEST_LIMIT",
+        "advisor_history_rounds": "AI_ADVISOR_HISTORY_ROUNDS",
         "moderation_daily_request_limit": "AI_MODERATION_DAILY_REQUEST_LIMIT",
         "embedding_daily_token_limit": "AI_EMBEDDING_DAILY_TOKEN_LIMIT",
     }
@@ -173,7 +175,7 @@ class Settings(BaseModel):
 
     app_env: str = "local"
     public_site_url: str = "https://yuanshenjian.cn"
-    api_public_base_url: str = "http://localhost:8000"
+    api_public_base_url: str = "http://localhost:8001"
     cookie_domain_override: str = ""
     database_url: str = DEFAULT_DATABASE_URL
     session_secret: str = "dev-session-secret"
@@ -222,6 +224,10 @@ class Settings(BaseModel):
         return self.file_config.ai.advisor_daily_request_limit
 
     @property
+    def ai_advisor_history_rounds(self) -> int:
+        return self.file_config.ai.advisor_history_rounds
+
+    @property
     def ai_moderation_daily_request_limit(self) -> int:
         return self.file_config.ai.moderation_daily_request_limit
 
@@ -249,7 +255,7 @@ def build_settings_from_env(env_map: dict[str, str]) -> Settings:
         {
             "app_env": env_map.get("APP_ENV", app_env),
             "public_site_url": env_map.get("PUBLIC_SITE_URL", "https://yuanshenjian.cn"),
-            "api_public_base_url": env_map.get("API_PUBLIC_BASE_URL", "http://localhost:8000"),
+            "api_public_base_url": env_map.get("API_PUBLIC_BASE_URL", "http://localhost:8001"),
             "cookie_domain_override": env_map.get("COOKIE_DOMAIN", ""),
             "database_url": env_map.get("DATABASE_URL", DEFAULT_DATABASE_URL),
             "session_secret": env_map.get("SESSION_SECRET", "dev-session-secret"),

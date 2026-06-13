@@ -26,12 +26,19 @@ def test_app_file_env_overrides_only_dynamic_runtime_values() -> None:
             "COOKIE_DOMAIN": ".example.com",
             "AI_ACTIVE_PROFILE": "moonshot-cn/kimi-k2.6",
             "AI_CHAT_DAILY_REQUEST_LIMIT": "88",
+            "AI_ADVISOR_HISTORY_ROUNDS": "6",
         },
     )
 
     assert resolved.security.cookie_domain == ".example.com"
     assert resolved.ai.active_profile == "moonshot-cn/kimi-k2.6"
     assert resolved.ai.chat_daily_request_limit == 88
+    assert resolved.ai.advisor_history_rounds == 6
+
+
+def test_app_config_keeps_contextual_advisor_profile() -> None:
+    resolved = app_config.build_settings()
+    assert resolved.file_config.ai.scene_profiles["contextual_ai_advisor"] == "deepseek/deepseek-v4-pro"
 
 
 def test_rate_limit_settings_read_from_env() -> None:

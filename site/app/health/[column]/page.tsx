@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
+import { config } from "@/lib/config";
 import { getHealthColumnBySlug, getHealthColumns } from "@/lib/health-columns";
 
 export const dynamicParams = false;
@@ -86,6 +90,25 @@ export default async function HealthColumnPage({ params }: Props) {
               </ul>
             ) : null}
           </div>
+        ) : null}
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "health-column",
+              title: column.title,
+              domain: "health",
+              pageSlug: column.slug,
+              quickTopics: defaultAdvisorQuickTopics("health-column"),
+            })}
+            cardTitle="AI 带你快速读懂这个健康专栏"
+            cardDescription="不知道从哪篇开始，或者想先按目标筛选内容时，可以直接问。"
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
         ) : null}
 
         {column.posts.length > 0 ? (

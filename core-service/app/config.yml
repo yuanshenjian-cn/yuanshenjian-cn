@@ -36,17 +36,19 @@ default:
       ai_briefing_recommendation: deepseek/deepseek-v4-flash
       investment_briefing_recommendation: deepseek/deepseek-v4-flash
       advisor: deepseek/deepseek-v4-pro
+      contextual_ai_advisor: deepseek/deepseek-v4-pro
     global_daily_token_limit: ${AI_GLOBAL_DAILY_TOKEN_LIMIT:200000}
-    chat_daily_request_limit: ${AI_CHAT_DAILY_REQUEST_LIMIT:50}
-    advisor_daily_request_limit: ${AI_ADVISOR_DAILY_REQUEST_LIMIT:30}
+    chat_daily_request_limit: ${AI_CHAT_DAILY_REQUEST_LIMIT:100}
+    advisor_daily_request_limit: ${AI_ADVISOR_DAILY_REQUEST_LIMIT:100}
+    advisor_history_rounds: ${AI_ADVISOR_HISTORY_ROUNDS:10}
     moderation_daily_request_limit: ${AI_MODERATION_DAILY_REQUEST_LIMIT:200}
     embedding_daily_token_limit: ${AI_EMBEDDING_DAILY_TOKEN_LIMIT:100000}
 
 local:
   cors:
     allowed_origins:
-      - http://localhost:3000
-      - http://127.0.0.1:3000
+      - http://localhost:3001
+      - http://127.0.0.1:3001
       - http://localhost:5173
       - http://127.0.0.1:5173
   security:

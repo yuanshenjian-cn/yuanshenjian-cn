@@ -75,6 +75,19 @@ export interface AuthorProjectsProfile {
   items: AuthorProjectItem[];
 }
 
+export interface AuthorOpenSourceProjectItem {
+  name: string;
+  description: string;
+  type: string;
+  repositoryUrl: string;
+}
+
+export interface AuthorOpenSourceProjectsProfile {
+  id: string;
+  heading: string;
+  items: AuthorOpenSourceProjectItem[];
+}
+
 export interface AuthorExtraTextItem {
   type: "text";
   label: string;
@@ -105,6 +118,7 @@ export interface AuthorProfile {
   education: AuthorEducationProfile;
   experience: AuthorExperienceProfile;
   projects: AuthorProjectsProfile;
+  openSourceProjects: AuthorOpenSourceProjectsProfile;
   extras: AuthorExtrasProfile;
 }
 

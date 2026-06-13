@@ -1,6 +1,8 @@
 from app.contexts.comment.infra.po.article_comment_po import ArticleCommentPO
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
+from app.contexts.knowledge_base.infra.po.knowledge_index_run_po import KnowledgeIndexRunPO
+from app.contexts.knowledge_base.infra.po.knowledge_source_po import KnowledgeSourcePO
 from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 from app.shared.infra.persistence.base import Base
 import app.shared.infra.persistence.model_registry as _persistence_model_registry  # noqa: F401
@@ -14,6 +16,8 @@ def test_v1_schema_contains_required_tables() -> None:
         "admin_sessions",
         "knowledge_documents",
         "knowledge_chunks",
+        "knowledge_sources",
+        "knowledge_index_runs",
         "rag_sync_runs",
         "comments",
         "article_view_events",
@@ -43,3 +47,19 @@ def test_comment_review_and_ai_moderation_fields_exist() -> None:
 def test_rag_sync_run_tracks_result() -> None:
     columns = set(RagSyncRunPO.__table__.columns.keys())
     assert {"status", "commit_sha", "documents_seen", "chunks_upserted", "error_message"}.issubset(columns)
+
+
+def test_knowledge_source_model_uses_source_kind() -> None:
+    columns = set(KnowledgeSourcePO.__table__.columns.keys())
+    assert "source_kind" in columns
+    assert "source_type" not in columns
+    assert {"status", "domains", "scenes"}.issubset(columns)
+
+
+def test_knowledge_document_adds_context_fields() -> None:
+    columns = set(KnowledgeDocumentPO.__table__.columns.keys())
+    assert {"source_id", "source_type", "knowledge_source_id", "domains", "scenes", "tags"}.issubset(columns)
+
+
+def test_knowledge_index_run_model_uses_new_table_name() -> None:
+    assert KnowledgeIndexRunPO.__tablename__ == "knowledge_index_runs"

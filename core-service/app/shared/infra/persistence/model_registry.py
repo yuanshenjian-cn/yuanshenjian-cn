@@ -11,6 +11,8 @@ from app.contexts.article_analytics.infra.po.article_view_event_po import Articl
 from app.contexts.comment.infra.po.article_comment_po import ArticleCommentPO
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
+from app.contexts.knowledge_base.infra.po.knowledge_index_run_po import KnowledgeIndexRunPO
+from app.contexts.knowledge_base.infra.po.knowledge_source_po import KnowledgeSourcePO
 from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 from app.contexts.visitor_identity.infra.po.auth_identity_po import AuthIdentityPO
 from app.contexts.visitor_identity.infra.po.user_po import UserPO
@@ -28,6 +30,8 @@ __all__ = [
     "DailyBudgetUsagePO",
     "KnowledgeChunkPO",
     "KnowledgeDocumentPO",
+    "KnowledgeIndexRunPO",
+    "KnowledgeSourcePO",
     "RagQueryEventPO",
     "RagSyncRunPO",
     "UserPO",

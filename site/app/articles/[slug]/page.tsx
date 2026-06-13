@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
+import Script from "next/script";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
 import { getPostBySlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
+import { buildAdvisorContext, defaultAdvisorQuickTopics, resolveAdvisorDomainByPath } from "@/lib/advisor-context";
 import { getColumnContextByPost } from "@/lib/columns";
 import { extractHeadings } from "@/lib/mdx";
 import { config } from "@/lib/config";
-import Script from "next/script";
-import { ArticleAiAssistant } from "@/components/ai/article-ai-assistant";
-import { PageAIAssistantProvider } from "@/components/ai/page-ai-assistant-provider";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleHeader } from "@/components/article-header";
 import { TableOfContents } from "@/components/table-of-contents";
@@ -104,33 +105,27 @@ export default async function PostPage({ params }: Props) {
   const breadcrumbStructuredData = generateBreadcrumbStructuredData(breadcrumbs);
 
   const allStructuredData = [articleStructuredData, breadcrumbStructuredData];
-  const pageAssistantEnabled = config.ai.pageAssistantEnabled;
+  const contextualAdvisorEnabled = config.ai.contextualAdvisorEnabled;
 
-  const primaryAssistant = pageAssistantEnabled ? (
-    <PageAIAssistantProvider
-      scene="article"
-      context={{ slug: post.slug }}
+  const primaryAssistant = contextualAdvisorEnabled ? (
+    <ContextualAIAdvisorSurface
+      context={buildAdvisorContext({
+        scene: "article",
+        title: post.title,
+        domain: resolveAdvisorDomainByPath(post.relativePath),
+        pageSlug: post.slug,
+        articleSlug: post.slug,
+        quickTopics: defaultAdvisorQuickTopics("article"),
+      })}
+      cardTitle="AI 带你快速读懂文章"
+      cardDescription=""
       workerUrl={config.ai.workerUrl}
       turnstileSiteKey={config.ai.turnstileSiteKey}
-      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
+      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
       maxInputChars={config.ai.maxInputChars}
-    >
-      <ArticleAiAssistant variant="primary" />
-    </PageAIAssistantProvider>
+      historyRounds={config.ai.contextualAdvisorHistoryRounds}
+    />
   ) : null;
-
-  const footerAssistant = pageAssistantEnabled ? (
-    <PageAIAssistantProvider
-      scene="article"
-      context={{ slug: post.slug }}
-      workerUrl={config.ai.workerUrl}
-      turnstileSiteKey={config.ai.turnstileSiteKey}
-      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.pageAssistant.article}
-      maxInputChars={config.ai.maxInputChars}
-    >
-      <ArticleAiAssistant variant="footer" />
-    </PageAIAssistantProvider>
-  ) : undefined;
 
   const articleContent = (
     <>
@@ -156,7 +151,7 @@ export default async function PostPage({ params }: Props) {
           shareTitle={shareTitle}
           shareDescription={shareDescription}
           columnContext={columnContext}
-          footerAssistant={footerAssistant}
+          footerAssistant={undefined}
           turnstileSiteKey={config.ai.turnstileSiteKey}
         />
     </>

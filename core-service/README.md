@@ -47,8 +47,8 @@ just start-all-services
 
 ## 本地默认值
 
-- 服务地址：`http://localhost:8000`
-- 健康检查：`http://localhost:8000/healthz`
+- 服务地址：`http://localhost:8001`
+- 健康检查：`http://localhost:8001/healthz`
 - 本地数据库：`core-service/dev.db`
 - 默认 cookie domain：本地环境为空，生产从 `app/config.yml` 读取 `.yuanshenjian.cn`
 - 默认管理员口令：`admin123456`
@@ -116,8 +116,8 @@ uv --directory core-service sync --frozen --extra dev
 
 ```bash
 APP_ENV=local \
-PUBLIC_SITE_URL=http://localhost:3000 \
-API_PUBLIC_BASE_URL=http://localhost:8000 \
+PUBLIC_SITE_URL=http://localhost:3001 \
+API_PUBLIC_BASE_URL=http://localhost:8001 \
 uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head
 ```
 
@@ -125,9 +125,9 @@ uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head
 
 ```bash
 APP_ENV=local \
-PUBLIC_SITE_URL=http://localhost:3000 \
-API_PUBLIC_BASE_URL=http://localhost:8000 \
-uv --directory core-service run --no-sync uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+PUBLIC_SITE_URL=http://localhost:3001 \
+API_PUBLIC_BASE_URL=http://localhost:8001 \
+uv --directory core-service run --no-sync uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
 ```
 
 ## 相关命令

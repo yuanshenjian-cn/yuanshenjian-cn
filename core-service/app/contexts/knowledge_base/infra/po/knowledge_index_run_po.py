@@ -1,0 +1,29 @@
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any
+
+from sqlalchemy import DateTime, Integer, JSON, String, Text, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.shared.infra.persistence.base import Base, uuid_pk
+
+
+class KnowledgeIndexRunPO(Base):
+    __tablename__ = "knowledge_index_runs"
+
+    id: Mapped[str] = uuid_pk()
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    trigger: Mapped[str] = mapped_column(String(64), nullable=False, default="manual")
+    source_id: Mapped[str | None] = mapped_column(String(36))
+    commit_sha: Mapped[str | None] = mapped_column(String(64))
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    documents_seen: Mapped[int] = mapped_column(Integer, default=0)
+    documents_upserted: Mapped[int] = mapped_column(Integer, default=0)
+    chunks_upserted: Mapped[int] = mapped_column(Integer, default=0)
+    chunks_deleted: Mapped[int] = mapped_column(Integer, default=0)
+    embeddings_generated: Mapped[int] = mapped_column(Integer, default=0)
+    error_message: Mapped[str | None] = mapped_column(Text)
+    metadata_json: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

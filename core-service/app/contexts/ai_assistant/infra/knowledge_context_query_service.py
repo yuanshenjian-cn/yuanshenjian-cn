@@ -5,6 +5,23 @@ from app.shared.infra.database import transactional_session
 
 
 class KnowledgeContextQueryService:
-    async def query(self, query: str, article_slug: str | None = None, top_k: int = 5) -> tuple[list[str], list[dict[str, str]]]:
+    async def query(
+        self,
+        query: str,
+        article_slug: str | None = None,
+        top_k: int = 5,
+        *,
+        scene: str | None = None,
+        domain: str | None = None,
+        page_slug: str | None = None,
+    ) -> tuple[list[str], list[dict[str, str]]]:
         async with transactional_session() as session:
-            return await KnowledgeBaseContextQueryService().query_contexts(session, query, article_slug, top_k)
+            return await KnowledgeBaseContextQueryService().query_contexts(
+                session,
+                query,
+                article_slug,
+                top_k,
+                scene=scene,
+                domain=domain,
+                page_slug=page_slug,
+            )

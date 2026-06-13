@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Newspaper } from "lucide-react";
 import type { Metadata } from "next";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { generateListPageSEO } from "@/lib/seo-utils";
 import { config } from "@/lib/config";
 import { getLatestInvestmentBriefing, getAllInvestmentBriefings } from "@/lib/investment-briefings";
@@ -24,6 +27,25 @@ export default async function InvestmentPage() {
         <div className="mb-12">
           <h1 className="text-2xl font-medium tracking-tight mb-3">投资栏目</h1>
         </div>
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "investment",
+              title: "投资栏目",
+              domain: "investment",
+              pageSlug: "investment",
+              quickTopics: defaultAdvisorQuickTopics("investment"),
+            })}
+            cardTitle="AI 带你快速浏览"
+            cardDescription=""
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
+        ) : null}
 
         <section className="mb-10 rounded-2xl border bg-gradient-to-br from-card via-card to-muted/40 p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4">

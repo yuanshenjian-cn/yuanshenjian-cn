@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, Newspaper } from "lucide-react";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { getAIColumns } from "@/lib/columns";
 import { getAllBriefings, getLatestBriefing } from "@/lib/briefings";
 import { getColumnIconBySlug } from "@/components/column-icons";
@@ -25,6 +28,25 @@ export default async function AIColumnsPage() {
         <div className="mb-12">
           <h1 className="text-2xl font-medium tracking-tight mb-3">AI 栏目</h1>
         </div>
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "ai",
+              title: "AI 栏目",
+              domain: "ai",
+              pageSlug: "ai",
+              quickTopics: defaultAdvisorQuickTopics("ai"),
+            })}
+            cardTitle="AI 带你快速浏览"
+            cardDescription="如果你想知道先看哪条线、哪些内容更适合你的问题，可以直接问。"
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
+        ) : null}
 
         <section className="mb-10 rounded-2xl border bg-gradient-to-br from-card via-card to-muted/40 p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4">

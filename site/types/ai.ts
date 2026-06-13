@@ -11,7 +11,17 @@ export interface PageReference {
   id: string;
   title: string;
   excerpt: string;
-  sourceType: "article-section" | "author-section";
+  sourceType: "article-section" | "author-section" | "health-section" | "ai-section" | "investment-section";
+  url?: string;
+  anchorId?: string;
+}
+
+export interface AdvisorReference {
+  id: string;
+  title: string;
+  excerpt: string;
+  sourceType: PageReference["sourceType"];
+  url?: string;
   anchorId?: string;
 }
 
@@ -38,6 +48,31 @@ interface BaseAIChatStreamOptions {
   message: string;
   turnstileToken: string;
   signal?: AbortSignal;
+}
+
+export type AdvisorScene = "article" | "author" | "health" | "health-column" | "ai" | "ai-column" | "investment" | "investment-column";
+
+export interface AdvisorContextValue {
+  scene: AdvisorScene;
+  pageTitle: string;
+  domain?: string;
+  pageSlug?: string;
+  articleSlug?: string;
+  quickTopics: AIQuickTopic[];
+}
+
+export interface AdvisorStreamContext {
+  scene: AdvisorScene;
+  domain?: string;
+  pageTitle: string;
+  pageSlug?: string;
+  articleSlug?: string;
+  history: string[];
+}
+
+export interface ContextualAdvisorStreamOptions extends BaseAIChatStreamOptions {
+  context: AdvisorStreamContext;
+  onEvent: (event: AdvisorStreamEvent) => void;
 }
 
 export interface ArticleRecommendationStreamOptions extends BaseAIChatStreamOptions {
@@ -80,6 +115,12 @@ export type RecommendStreamEvent =
 export type PageStreamEvent =
   | { type: "answer-delta"; delta: string }
   | { type: "references"; references: PageReference[] }
+  | { type: "done"; usage?: AIUsage }
+  | { type: "error"; message: string };
+
+export type AdvisorStreamEvent =
+  | { type: "answer-delta"; delta: string }
+  | { type: "references"; references: AdvisorReference[] }
   | { type: "done"; usage?: AIUsage }
   | { type: "error"; message: string };
 

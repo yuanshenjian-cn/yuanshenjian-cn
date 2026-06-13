@@ -1,4 +1,4 @@
-const baseUrl = import.meta.env.VITE_CORE_SERVICE_URL ?? "http://localhost:8000";
+const baseUrl = import.meta.env.VITE_CORE_SERVICE_URL ?? "http://localhost:8001";
 
 export interface AdminCommentItem {
   id: string;
@@ -26,6 +26,35 @@ export interface SystemStatus {
   rag_documents: number;
   rag_chunks: number;
   last_rag_sync: { status: string; commit_sha: string | null; started_at: string } | null;
+}
+
+export interface KnowledgeSourceItem {
+  id: string;
+  name: string;
+  source_kind: string;
+  domains: string[];
+  scenes: string[];
+  status: string;
+  source_uri: string | null;
+  sync_strategy: string;
+  content_config: Record<string, unknown>;
+  notes: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaveKnowledgeSourcePayload {
+  name: string;
+  source_kind: string;
+  domains: string[];
+  scenes: string[];
+  status: string;
+  source_uri?: string;
+  sync_strategy: string;
+  content_config: Record<string, unknown>;
+  notes?: string;
+  updated_by?: string;
 }
 
 function getCsrfToken(): string {
@@ -80,4 +109,36 @@ export function fetchAiUsage() {
 
 export function fetchSystemStatus() {
   return request<SystemStatus>("/api/v1/admin/system/status");
+}
+
+export function fetchKnowledgeSources() {
+  return request<{ items: KnowledgeSourceItem[] }>("/api/v1/admin/knowledge-base");
+}
+
+export function createKnowledgeSource(payload: SaveKnowledgeSourcePayload) {
+  return request<{ id: string; status: string }>("/api/v1/admin/knowledge-base", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateKnowledgeSource(id: string, payload: SaveKnowledgeSourcePayload) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-base/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function archiveKnowledgeSource(id: string) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-base/${id}/archive`, {
+    method: "POST",
+    body: JSON.stringify({ csrf_token: getCsrfToken() }),
+  });
+}
+
+export function rebuildKnowledgeSource(id: string) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-base/${id}/rebuild`, {
+    method: "POST",
+    body: JSON.stringify({ csrf_token: getCsrfToken() }),
+  });
 }

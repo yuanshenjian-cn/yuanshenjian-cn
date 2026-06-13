@@ -3,6 +3,16 @@ import type { AIQuickTopic } from "@/types/ai";
 const HOMEPAGE_RECOMMEND_TURNSTILE_TIMEOUT_MS = 20000;
 const ARTICLE_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS = 25000;
 const AUTHOR_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS = 25000;
+const CONTEXTUAL_ADVISOR_TURNSTILE_TIMEOUT_MS = 25000;
+const DEFAULT_CONTEXTUAL_ADVISOR_HISTORY_ROUNDS = 10;
+
+function parsePositiveInteger(value: string | undefined, fallback: number) {
+  if (!value) {
+    return fallback;
+  }
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
 
 const aiQuickTopics: AIQuickTopic[] = [
   {
@@ -69,6 +79,7 @@ export const config = {
     turnstile: {
       timeoutMs: {
         homepageRecommend: HOMEPAGE_RECOMMEND_TURNSTILE_TIMEOUT_MS,
+        contextualAdvisor: CONTEXTUAL_ADVISOR_TURNSTILE_TIMEOUT_MS,
         pageAssistant: {
           article: ARTICLE_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS,
           author: AUTHOR_PAGE_ASSISTANT_TURNSTILE_TIMEOUT_MS,
@@ -76,6 +87,14 @@ export const config = {
       },
     },
     maxInputChars: 200,
+    contextualAdvisorHistoryRounds: parsePositiveInteger(
+      process.env.NEXT_PUBLIC_AI_CONTEXTUAL_ADVISOR_HISTORY_ROUNDS,
+      DEFAULT_CONTEXTUAL_ADVISOR_HISTORY_ROUNDS,
+    ),
+    contextualAdvisorEnabled:
+      process.env.NEXT_PUBLIC_AI_ENABLED !== "false" &&
+      process.env.NEXT_PUBLIC_AI_CONTEXTUAL_ADVISOR_ENABLED !== "false" &&
+      (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim().length > 0,
     pageAssistantEnabled:
       process.env.NEXT_PUBLIC_AI_ENABLED !== "false" &&
       process.env.NEXT_PUBLIC_AI_PAGE_ASSISTANT_ENABLED !== "false" &&

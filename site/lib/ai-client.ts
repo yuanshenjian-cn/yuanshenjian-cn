@@ -1,6 +1,9 @@
 import type {
   AIChatStreamOptions,
   AIUsage,
+  AdvisorReference,
+  AdvisorStreamEvent,
+  ContextualAdvisorStreamOptions,
   AiBriefingRecommendationStreamOptions,
   InvestmentBriefingRecommendationStreamOptions,
   PageReference,
@@ -59,9 +62,20 @@ function isPageReference(value: unknown): value is PageReference {
     typeof value.id === "string" &&
     typeof value.title === "string" &&
     typeof value.excerpt === "string" &&
-    (value.sourceType === "article-section" || value.sourceType === "author-section") &&
+    (
+      value.sourceType === "article-section" ||
+      value.sourceType === "author-section" ||
+      value.sourceType === "health-section" ||
+      value.sourceType === "ai-section" ||
+      value.sourceType === "investment-section"
+    ) &&
+    (value.url === undefined || typeof value.url === "string") &&
     (value.anchorId === undefined || typeof value.anchorId === "string")
   );
+}
+
+function isAdvisorReference(value: unknown): value is AdvisorReference {
+  return isPageReference(value);
 }
 
 function isRecommendResponse(value: unknown): value is RecommendResponse {
@@ -156,6 +170,56 @@ function parsePageStreamEvent(block: string): PageStreamEvent {
       };
     case "references":
       if (!isRecord(payload) || !Array.isArray(payload.references) || !payload.references.every(isPageReference)) {
+        throw new Error("Invalid references event payload");
+      }
+
+      return {
+        type: "references",
+        references: payload.references,
+      };
+    case "done":
+      if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
+        throw new Error("Invalid done event payload");
+      }
+
+      return {
+        type: "done",
+        usage: payload.usage,
+      };
+    case "error":
+      if (!isRecord(payload) || typeof payload.message !== "string") {
+        throw new Error("Invalid error event payload");
+      }
+
+      return {
+        type: "error",
+        message: payload.message,
+      };
+    default:
+      throw new Error(`Unsupported SSE event: ${parsedEvent.event}`);
+  }
+}
+
+function parseAdvisorStreamEvent(block: string): AdvisorStreamEvent {
+  const parsedEvent = parseSSEEventBlock(block);
+  if (!parsedEvent) {
+    throw new Error("Invalid SSE event block");
+  }
+
+  const payload: unknown = parsedEvent.data ? JSON.parse(parsedEvent.data) : {};
+
+  switch (parsedEvent.event) {
+    case "answer-delta":
+      if (!isRecord(payload) || typeof payload.delta !== "string") {
+        throw new Error("Invalid answer-delta event payload");
+      }
+
+      return {
+        type: "answer-delta",
+        delta: payload.delta,
+      };
+    case "references":
+      if (!isRecord(payload) || !Array.isArray(payload.references) || !payload.references.every(isAdvisorReference)) {
         throw new Error("Invalid references event payload");
       }
 
@@ -306,6 +370,36 @@ export async function aiChatStream(options: AIChatStreamOptions): Promise<void> 
   await readEventStream(response, options.onEvent, parsePageStreamEvent);
 }
 
+export async function aiContextualAdvisorStream(options: ContextualAdvisorStreamOptions): Promise<void> {
+  const workerUrl = options.workerUrl.replace(/\/$/, "");
+  const response = await fetch(`${workerUrl}/advisor/stream`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      scene: options.context.scene,
+      domain: options.context.domain,
+      page_title: options.context.pageTitle,
+      page_slug: options.context.pageSlug,
+      article_slug: options.context.articleSlug,
+      history: options.context.history,
+      entrypoint: options.context.scene,
+      message: options.message,
+      cf_turnstile_response: options.turnstileToken,
+    }),
+    signal: options.signal,
+  });
+
+  if (!response.ok) {
+    const payload: unknown = await response.json().catch(() => null);
+    throw new Error(getErrorMessage(payload, response.status));
+  }
+
+  await readEventStream(response, options.onEvent, parseAdvisorStreamEvent);
+}
+
 export async function aiArticleRecommendationStream(options: ArticleRecommendationStreamOptions): Promise<void> {
   const workerUrl = options.workerUrl.replace(/\/$/, "");
   const response = await fetch(`${workerUrl}/chat/stream`, {
@@ -380,4 +474,4 @@ export async function aiInvestmentBriefingRecommendationStream(options: Investme
   await readEventStream(response, options.onEvent, parseRecommendStreamEvent);
 }
 
-export { getErrorMessage, isPageResponse, isRecommendResponse, parsePageStreamEvent, parseRecommendStreamEvent };
+export { getErrorMessage, isPageResponse, isRecommendResponse, parseAdvisorStreamEvent, parsePageStreamEvent, parseRecommendStreamEvent };

@@ -242,7 +242,7 @@ async def stream_ai_advisor(
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
     subject = await RequestIdentityResolver().resolve_public_subject(request, response)
     await PreAuthRateLimitGuard().enforce("ai_advisor", subject)
-    verified = await verify_turnstile(payload.turnstile_token, "ai_advisor", subject.raw_ip)
+    verified = await verify_turnstile(payload.cf_turnstile_response, turnstile_action_for_scene(payload.scene), subject.raw_ip)
     if not verified:
         raise HTTPException(status_code=403, detail="turnstile_failed")
     await RateLimitGuard().enforce("ai_advisor", subject)
@@ -255,7 +255,7 @@ async def stream_ai_advisor(
             service.execute(payload),
             reservation,
             AIUsageAuditContext(
-                scene="advisor",
+                scene=payload.scene,
                 actor=None,
                 provider=None,
                 model=None,

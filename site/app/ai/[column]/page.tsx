@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+
+import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { getAIColumnBySlug, getAIColumns } from "@/lib/columns";
 import { getColumnIconBySlug } from "@/components/column-icons";
 import { config } from "@/lib/config";
@@ -104,6 +107,25 @@ export default async function ColumnPage({ params }: Props) {
             )}
           </div>
         )}
+
+        {config.ai.contextualAdvisorEnabled ? (
+          <ContextualAIAdvisorSurface
+            context={buildAdvisorContext({
+              scene: "ai-column",
+              title: column.title,
+              domain: "ai",
+              pageSlug: column.slug,
+              quickTopics: defaultAdvisorQuickTopics("ai-column"),
+            })}
+            cardTitle="AI 带你快速读懂这个 AI 专栏"
+            cardDescription="如果你想按问题、阶段或厂商快速定位阅读顺序，可以直接问。"
+            workerUrl={config.ai.workerUrl}
+            turnstileSiteKey={config.ai.turnstileSiteKey}
+            turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
+            maxInputChars={config.ai.maxInputChars}
+            historyRounds={config.ai.contextualAdvisorHistoryRounds}
+          />
+        ) : null}
 
         {/* 文章列表 */}
         <ol className="space-y-0">
