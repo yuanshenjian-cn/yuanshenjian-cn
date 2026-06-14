@@ -96,7 +96,7 @@ export function getAllInvestmentBriefings(): InvestmentBriefing[] {
     (value) => {
       cachedBriefings = value;
     },
-    () => getMarkdownFiles(investmentBriefingsDirectory, false)
+    () => getMarkdownFiles(investmentBriefingsDirectory)
       .map(parseInvestmentBriefingFile)
       .filter((briefing): briefing is InvestmentBriefing => briefing !== null)
       .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime()),

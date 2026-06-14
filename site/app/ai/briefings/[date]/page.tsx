@@ -9,6 +9,7 @@ import { FloatingTocButton } from "@/components/FloatingTocButton";
 import { ShareButtons } from "@/components/ShareButtons";
 import { TableOfContents } from "@/components/TableOfContents";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
+import { getBriefingStaticParamDates } from "@/lib/site-build-plan";
 
 function getDisplayTag(tag: string): string {
   return tag === "AI简报" ? "AI" : tag;
@@ -20,20 +21,14 @@ interface Props {
 
 export const dynamicParams = false;
 
-const INCREMENTAL_BUILD_LIMIT = 30;
-
 export async function generateStaticParams() {
   const allBriefings = getAllBriefings();
-  const briefings = process.env.INCREMENTAL_BUILD === "true"
-    ? allBriefings.slice(0, INCREMENTAL_BUILD_LIMIT)
-    : allBriefings;
-  const params = briefings.map((briefing) => ({
-    date: briefing.slug,
-  }));
+  const params = getBriefingStaticParamDates("aiBriefings", allBriefings.map((briefing) => briefing.slug))
+    .map((date) => ({ date }));
 
   // Next static export treats an empty dynamic route param list as missing params.
   // Render this hidden placeholder as 404 until the first real briefing exists.
-  return params.length > 0 ? [...params, { date: "latest" }] : [{ date: "__empty__" }, { date: "latest" }];
+  return params;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

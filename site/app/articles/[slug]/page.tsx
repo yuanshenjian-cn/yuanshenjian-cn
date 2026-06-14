@@ -15,6 +15,7 @@ import { TableOfContents } from "@/components/TableOfContents";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 import { generateOpenGraph, generateTwitterCard } from "@/lib/seo-utils";
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from "@/lib/structured-data";
+import { getArticleStaticParamSlugs } from "@/lib/site-build-plan";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,7 +25,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
-  return [...posts.map((post) => ({ slug: post.slug })), { slug: "latest" }];
+  return getArticleStaticParamSlugs(posts.map((post) => post.slug)).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props) {

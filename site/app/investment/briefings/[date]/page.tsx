@@ -14,6 +14,7 @@ import {
   getLatestInvestmentBriefing,
 } from "@/lib/investment-briefings";
 import { MDXContent, extractHeadings } from "@/lib/mdx";
+import { getBriefingStaticParamDates } from "@/lib/site-build-plan";
 
 function getDisplayTag(tag: string): string {
   return tag === "投资简报" ? "投资" : tag;
@@ -25,18 +26,10 @@ interface Props {
   params: Promise<{ date: string }>;
 }
 
-const INCREMENTAL_BUILD_LIMIT = 30;
-
 export function generateStaticParams() {
   const allBriefings = getAllInvestmentBriefings();
-  const briefings = process.env.INCREMENTAL_BUILD === "true"
-    ? allBriefings.slice(0, INCREMENTAL_BUILD_LIMIT)
-    : allBriefings;
-  const params = briefings.map((briefing) => ({
-    date: briefing.slug,
-  }));
-
-  return params.length > 0 ? [...params, { date: "latest" }] : [{ date: "__empty__" }, { date: "latest" }];
+  return getBriefingStaticParamDates("investmentBriefings", allBriefings.map((briefing) => briefing.slug))
+    .map((date) => ({ date }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

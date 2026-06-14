@@ -9,8 +9,9 @@ let buildBriefingsPayload: () => {
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
 const briefingsDir = path.resolve(__dirname, "../../content", "investment-briefings");
+const nestedBriefingsDir = path.join(briefingsDir, "2199", "01");
 const testSlug = "2199-01-01";
-const testFile = path.join(briefingsDir, `${testSlug}-investment-briefing.md`);
+const testFile = path.join(nestedBriefingsDir, `${testSlug}-investment-briefing.md`);
 
 describe("build-investment-data script", () => {
   beforeAll(async () => {
@@ -18,7 +19,7 @@ describe("build-investment-data script", () => {
   });
 
   beforeEach(() => {
-    fs.mkdirSync(briefingsDir, { recursive: true });
+    fs.mkdirSync(nestedBriefingsDir, { recursive: true });
     fs.writeFileSync(
       testFile,
       `---
@@ -50,6 +51,7 @@ tags:
 
   afterEach(() => {
     fs.rmSync(testFile, { force: true });
+    fs.rmSync(path.join(briefingsDir, "2199"), { recursive: true, force: true });
   });
 
   it("生成公开 coverage 投影时只保留 allowlist 字段", () => {

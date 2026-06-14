@@ -29,7 +29,7 @@ argument-hint: "[时间范围，如 今天/本周/2026-05-08] [厂商，如 Open
 | 输出语言 | 中文 |
 | 成稿正文长度 | 900~1300 个中文汉字，不统计 `## 来源` 章节下的字数 |
 | 正式文件类型 | `.md` |
-| 正式输出目录 | `content/ai-briefings/` |
+| 正式输出目录 | `content/ai-briefings/YYYY/MM/` |
 | published | `true` |
 | 发布动作 | 仅在发布模式且最终审核通过后自动 commit 并 push |
 
@@ -275,7 +275,7 @@ tags:
 
 仅在发布模式中，且成稿内容通过最终审核后，才允许写入：
 
-- `content/ai-briefings/YYYY-MM-DD-ai-briefing.md`
+- `content/ai-briefings/YYYY/MM/YYYY-MM-DD-ai-briefing.md`
 
 如果当天文件已存在，先停止并说明冲突；除非用户明确要求覆盖当天简报。
 
@@ -350,7 +350,7 @@ tags:
 ```bash
 just validate-content
 just build-site-ai-data
-git add content/ai-briefings/YYYY-MM-DD-ai-briefing.md site/public/ai-data/briefings/index.json
+git add content/ai-briefings/YYYY/MM/YYYY-MM-DD-ai-briefing.md site/public/ai-data/briefings/index.json
 git commit -m "add ai briefing for YYYY-MM-DD"
 git push
 ```

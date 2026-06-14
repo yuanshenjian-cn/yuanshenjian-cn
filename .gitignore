@@ -66,6 +66,7 @@ tmp/
 .draft/
 blog-ai-worker/node_modules/
 site/node_modules/
+site/.cache/
 admin-console/node_modules/
 admin-console/dist/
 core-service/.venv/

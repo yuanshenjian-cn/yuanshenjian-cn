@@ -4,27 +4,27 @@ import { execFileSync } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const investmentBriefingsDir = path.join(process.cwd(), "content", "investment-briefings");
-const investmentTestFile = path.join(investmentBriefingsDir, "2099-01-04-investment-briefing.md");
-const relativeInvestmentTestFile = "content/investment-briefings/2099-01-04-investment-briefing.md";
-const legacyInvestmentTestFile = path.join(investmentBriefingsDir, "2026-05-25-investment-briefing.md");
-const relativeLegacyInvestmentTestFile = "content/investment-briefings/2026-05-25-investment-briefing.md";
+const investmentTestFile = path.join(investmentBriefingsDir, "2099", "01", "2099-01-04-investment-briefing.md");
+const relativeInvestmentTestFile = "content/investment-briefings/2099/01/2099-01-04-investment-briefing.md";
+const legacyInvestmentTestFile = path.join(investmentBriefingsDir, "2026", "05", "2026-05-25-investment-briefing.md");
+const relativeLegacyInvestmentTestFile = "content/investment-briefings/2026/05/2026-05-25-investment-briefing.md";
 const previousInvestmentFiles = [
-  path.join(investmentBriefingsDir, "2099-01-03-investment-briefing.md"),
-  path.join(investmentBriefingsDir, "2099-01-02-investment-briefing.md"),
-  path.join(investmentBriefingsDir, "2099-01-01-investment-briefing.md"),
-  path.join(investmentBriefingsDir, "2098-12-31-investment-briefing.md"),
-  path.join(investmentBriefingsDir, "2098-12-30-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2099", "01", "2099-01-03-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2099", "01", "2099-01-02-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2099", "01", "2099-01-01-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2098", "12", "2098-12-31-investment-briefing.md"),
+  path.join(investmentBriefingsDir, "2098", "12", "2098-12-30-investment-briefing.md"),
 ];
 
 const aiBriefingsDir = path.join(process.cwd(), "content", "ai-briefings");
-const aiTestFile = path.join(aiBriefingsDir, "2099-01-06-ai-briefing.md");
-const relativeAiTestFile = "content/ai-briefings/2099-01-06-ai-briefing.md";
+const aiTestFile = path.join(aiBriefingsDir, "2099", "01", "2099-01-06-ai-briefing.md");
+const relativeAiTestFile = "content/ai-briefings/2099/01/2099-01-06-ai-briefing.md";
 const previousAiFiles = [
-  path.join(aiBriefingsDir, "2099-01-05-ai-briefing.md"),
-  path.join(aiBriefingsDir, "2099-01-04-ai-briefing.md"),
-  path.join(aiBriefingsDir, "2099-01-03-ai-briefing.md"),
-  path.join(aiBriefingsDir, "2099-01-02-ai-briefing.md"),
-  path.join(aiBriefingsDir, "2099-01-01-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099", "01", "2099-01-05-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099", "01", "2099-01-04-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099", "01", "2099-01-03-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099", "01", "2099-01-02-ai-briefing.md"),
+  path.join(aiBriefingsDir, "2099", "01", "2099-01-01-ai-briefing.md"),
 ];
 
 function runValidate(relativePath: string): never {
@@ -53,6 +53,7 @@ function getStderr(error: unknown): string {
 }
 
 function writeInvestmentBriefing(filePath: string, date: string, body: string, brief = "测试投资简报") {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(
     filePath,
     `---
@@ -71,6 +72,7 @@ ${body}`,
 }
 
 function writeAiBriefing(filePath: string, date: string, body: string, brief = "测试 AI 简报") {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(
     filePath,
     `---
@@ -130,6 +132,8 @@ describe("validate-post investment briefing guards", () => {
     for (const file of previousInvestmentFiles) {
       fs.rmSync(file, { force: true });
     }
+    fs.rmSync(path.join(investmentBriefingsDir, "2099"), { recursive: true, force: true });
+    fs.rmSync(path.join(investmentBriefingsDir, "2098"), { recursive: true, force: true });
   });
 
   it("rejects leaked editorial reasoning in published investment briefings", () => {
@@ -240,7 +244,7 @@ describe("validate-post investment briefing guards", () => {
       const output = getStderr(error);
       expect(output).toContain("投资简报 最近 5 期存在疑似重复事件");
       expect(output).toContain("英伟达财报看新利润口径");
-      expect(output).toContain("content/investment-briefings/2099-01-03-investment-briefing.md");
+      expect(output).toContain("content/investment-briefings/2099/01/2099-01-03-investment-briefing.md");
     }
   });
 
@@ -328,6 +332,7 @@ describe("validate-post ai briefing guards", () => {
     for (const file of previousAiFiles) {
       fs.rmSync(file, { force: true });
     }
+    fs.rmSync(path.join(aiBriefingsDir, "2099"), { recursive: true, force: true });
   });
 
   it("rejects duplicate events from recent five ai briefings", () => {
@@ -391,7 +396,7 @@ OpenAI 在 1 月 6 日把 Realtime API 升级为完整的语音模型矩阵，�
       const output = getStderr(error);
       expect(output).toContain("AI 简报 最近 5 期存在疑似重复事件");
       expect(output).toContain("OpenAI 推出 Realtime API 新语音矩阵");
-      expect(output).toContain("content/ai-briefings/2099-01-05-ai-briefing.md");
+      expect(output).toContain("content/ai-briefings/2099/01/2099-01-05-ai-briefing.md");
     }
   });
 

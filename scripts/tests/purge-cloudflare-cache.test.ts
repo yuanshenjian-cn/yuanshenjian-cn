@@ -94,8 +94,8 @@ describe("purge-cloudflare-cache script", () => {
 
   it("derives purge targets from changed content files", () => {
     const paths = derivePurgePathsFromChangedFiles([
-      "content/ai-briefings/2026-05-26-ai-briefing.md",
-      "content/investment-briefings/2026-05-26-investment-briefing.md",
+      "content/ai-briefings/2026/05/2026-05-26-ai-briefing.md",
+      "content/investment-briefings/2026/05/2026-05-26-investment-briefing.md",
       "content/blog/swd/ai-coding/opencode/opencode-efficiency-config-handbook.md",
     ], { articlePageCount: 2 });
 
@@ -121,7 +121,7 @@ describe("purge-cloudflare-cache script", () => {
 
   it("builds absolute URLs from derived paths and explicit URLs", () => {
     const urls = buildTargetUrls({
-      changedFiles: ["content/ai-briefings/2026-05-26-ai-briefing.md"],
+      changedFiles: ["content/ai-briefings/2026/05/2026-05-26-ai-briefing.md"],
       date: null,
       dryRun: false,
       help: false,

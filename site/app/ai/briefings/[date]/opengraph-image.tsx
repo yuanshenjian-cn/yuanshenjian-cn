@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import fs from "node:fs";
 import { getAllBriefings, getBriefingBySlug, getLatestBriefing } from "@/lib/briefings";
+import { getBriefingStaticParamDates } from "@/lib/site-build-plan";
 import { siteBrandingAiIconPath } from "@/lib/workspace-paths";
 
 export const size = {
@@ -11,18 +12,10 @@ export const size = {
 export const contentType = "image/png";
 export const dynamic = "force-static";
 
-const INCREMENTAL_BUILD_LIMIT = 30;
-
 export async function generateStaticParams() {
   const allBriefings = getAllBriefings();
-  const briefings = process.env.INCREMENTAL_BUILD === "true"
-    ? allBriefings.slice(0, INCREMENTAL_BUILD_LIMIT)
-    : allBriefings;
-  const params = briefings.map((briefing) => ({
-    date: briefing.slug,
-  }));
-
-  return params.length > 0 ? [...params, { date: "latest" }] : [{ date: "__empty__" }, { date: "latest" }];
+  return getBriefingStaticParamDates("aiBriefings", allBriefings.map((briefing) => briefing.slug))
+    .map((date) => ({ date }));
 }
 
 interface Props {

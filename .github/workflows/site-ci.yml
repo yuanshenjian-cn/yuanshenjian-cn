@@ -58,16 +58,17 @@ jobs:
             site/dist/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('site/package-lock.json', 'site/**/*.js', 'site/**/*.jsx', 'site/**/*.ts', 'site/**/*.tsx', 'content/**/*.md', 'content/**/*.mdx') }}
 
-      - name: Restore briefings HTML cache
-        id: briefings-cache
+      - name: Restore site incremental cache
         uses: actions/cache/restore@v4
         with:
           path: |
+            site/.cache/site-build
+            site/dist/articles
             site/dist/ai/briefings
             site/dist/investment/briefings
-          key: briefings-dist-v1-${{ hashFiles('site/**/*.ts', 'site/**/*.tsx', 'site/package-lock.json') }}-${{ github.sha }}
+          key: site-incremental-v1-${{ github.sha }}
           restore-keys: |
-            briefings-dist-v1-${{ hashFiles('site/**/*.ts', 'site/**/*.tsx', 'site/package-lock.json') }}-
+            site-incremental-v1-
 
       - name: Build
         env:
@@ -76,17 +77,18 @@ jobs:
           NEXT_PUBLIC_CORE_SERVICE_URL: ${{ vars.NEXT_PUBLIC_CORE_SERVICE_URL }}
           NEXT_PUBLIC_AI_ENABLED: ${{ vars.NEXT_PUBLIC_AI_ENABLED }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
-          INCREMENTAL_BUILD: ${{ steps.briefings-cache.outputs.cache-matched-key != '' && 'true' || 'false' }}
         run: npm run build:prod
         working-directory: site
 
-      - name: Save briefings HTML cache
+      - name: Save site incremental cache
         uses: actions/cache/save@v4
         with:
           path: |
+            site/.cache/site-build
+            site/dist/articles
             site/dist/ai/briefings
             site/dist/investment/briefings
-          key: briefings-dist-v1-${{ hashFiles('site/**/*.ts', 'site/**/*.tsx', 'site/package-lock.json') }}-${{ github.sha }}
+          key: site-incremental-v1-${{ github.sha }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

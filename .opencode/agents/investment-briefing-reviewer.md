@@ -17,7 +17,7 @@ permission:
 - `skills/investment-briefing/config/market-watch.json`
 - `skills/investment-briefing/config/blocked-companies.json`
 - `docs/troubleshoots.md` 中与投资简报相关的条目
-- 最近已发布的 `content/investment-briefings/*.md`
+- 最近已发布的 `content/investment-briefings/**/*.md`
 
 审核重点：
 

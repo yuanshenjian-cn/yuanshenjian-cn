@@ -22,7 +22,7 @@ argument-hint: "[时间范围，如 今天/本周] [市场或公司，如 港股
 | 正常版字数 | 1400~1700 个中文汉字 |
 | 短版字数 | 1100~1399 个中文汉字 |
 | 正式文件类型 | `.md` |
-| 正式输出目录 | `content/investment-briefings/` |
+| 正式输出目录 | `content/investment-briefings/YYYY/MM/` |
 | 发布动作 | 仅在发布模式且审核通过后自动 commit 并 push |
 
 ## 意图分流
@@ -96,7 +96,7 @@ argument-hint: "[时间范围，如 今天/本周] [市场或公司，如 港股
 
 正式文件路径：
 
-- `content/investment-briefings/YYYY-MM-DD-investment-briefing.md`
+- `content/investment-briefings/YYYY/MM/YYYY-MM-DD-investment-briefing.md`
 
 frontmatter 模板：
 
@@ -214,7 +214,7 @@ frontmatter `tags` 规则：
 ```bash
 just validate-content
 just build-site-investment-data
-git add content/investment-briefings/YYYY-MM-DD-investment-briefing.md site/public/investment-data/briefings/index.json site/public/investment-data/coverage.json
+git add content/investment-briefings/YYYY/MM/YYYY-MM-DD-investment-briefing.md site/public/investment-data/briefings/index.json site/public/investment-data/coverage.json
 git commit -m "add investment briefing for YYYY-MM-DD"
 git push
 ```

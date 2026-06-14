@@ -32,8 +32,14 @@ function getAllMarkdownFiles(dir) {
   }
 
   return fs.readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && /\.md$/i.test(entry.name))
-    .map((entry) => path.join(dir, entry.name))
+    .flatMap((entry) => {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        return getAllMarkdownFiles(fullPath);
+      }
+
+      return entry.isFile() && /\.md$/i.test(entry.name) ? [fullPath] : [];
+    })
     .sort();
 }
 

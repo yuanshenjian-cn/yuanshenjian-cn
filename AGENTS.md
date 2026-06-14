@@ -73,7 +73,7 @@ just validate-content                     # 校验内容
 
 ## 内容（`content/`）规范
 
-- 博客文章位于 `content/blog/`，AI 简报位于 `content/ai-briefings/`，投资简报位于 `content/investment-briefings/`
+- 博客文章位于 `content/blog/`，AI 简报位于 `content/ai-briefings/YYYY/MM/`，投资简报位于 `content/investment-briefings/YYYY/MM/`
 - 必需 frontmatter 字段：`title`、`date`
 - 可选字段：`tags`、`published`、`brief`
 - 修改内容后执行 `just validate-content` 验证

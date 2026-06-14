@@ -15,7 +15,7 @@ tools: Read, Grep, Glob
 - `skills/ai-briefing/config/briefing.json`
 - `skills/ai-briefing/config/focus-companies.json`
 - `docs/troubleshoots.md` 中与 AI 简报相关的条目
-- 最近已发布的 `content/ai-briefings/*.md`
+- 最近已发布的 `content/ai-briefings/**/*.md`
 
 审核重点：
 
