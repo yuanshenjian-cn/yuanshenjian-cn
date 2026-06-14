@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "content/**"
+      - "core-service/**"
       - "site/lib/author-profile-data.js"
       - "scripts/build-ai-data.js"
       - "site/package-lock.json"
