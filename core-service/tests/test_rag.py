@@ -1,7 +1,7 @@
 import asyncio
 from types import SimpleNamespace
 
-from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects.postgresql.asyncpg import dialect as asyncpg_dialect
 
 from app.contexts.knowledge_base.infra.knowledge_context_query_service import KnowledgeContextQueryService
 from app.contexts.knowledge_base.infra.advisor_prompt_builder import build_advisor_prompt
@@ -194,14 +194,16 @@ def test_query_service_casts_json_scope_filters_for_postgresql() -> None:
 
     asyncio.run(run())
 
-    compiled = str(
-        captured_statements[0].compile(
-            dialect=postgresql.dialect(),
-            compile_kwargs={"literal_binds": True},
-        )
-    )
+    compiled_statement = captured_statements[0].compile(dialect=asyncpg_dialect())
+    compiled = str(compiled_statement)
 
     assert "CAST(knowledge_documents.scenes AS TEXT)" in compiled
     assert "CAST(knowledge_documents.domains AS TEXT)" in compiled
     assert "knowledge_documents.scenes LIKE" not in compiled
     assert "knowledge_documents.domains LIKE" not in compiled
+    assert "CAST(knowledge_documents.scenes AS TEXT) LIKE $4::VARCHAR" in compiled
+    assert "CAST(knowledge_documents.domains AS TEXT) LIKE $5::VARCHAR" in compiled
+    assert '%"article"%' == compiled_statement.params["param_1"]
+    assert '%"ai"%' == compiled_statement.params["param_2"]
+    assert str(compiled_statement.binds["param_1"].type) == "VARCHAR"
+    assert str(compiled_statement.binds["param_2"].type) == "VARCHAR"

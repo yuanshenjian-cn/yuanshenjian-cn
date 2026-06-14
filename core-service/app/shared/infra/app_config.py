@@ -12,7 +12,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 CORE_SERVICE_ROOT = Path(__file__).resolve().parents[3]
 REPO_ROOT = CORE_SERVICE_ROOT.parent
 APP_CONFIG_PATH = CORE_SERVICE_ROOT / "app" / "config.yml"
-DEFAULT_DATABASE_URL = f"sqlite+aiosqlite:///{(CORE_SERVICE_ROOT / 'dev.db').resolve()}"
+DEFAULT_DATABASE_URL = ""
+LOCAL_DATABASE_URL_HINT = "postgresql+asyncpg://<USER>:<PASSWORD>@127.0.0.1:5432/<DB_NAME>"
 ENV_PLACEHOLDER_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::([^}]*))?\}")
 
 
@@ -197,6 +198,10 @@ class Settings(BaseModel):
     @field_validator("database_url")
     @classmethod
     def validate_async_database_url(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError(
+                f"DATABASE_URL is required; configure core-service/.env.local with a local Postgres URL such as {LOCAL_DATABASE_URL_HINT}"
+            )
         if value.startswith("postgresql://") or value.startswith("postgresql+psycopg://"):
             raise ValueError("DATABASE_URL must use postgresql+asyncpg:// because core-service uses async SQLAlchemy")
         if value.startswith("sqlite://") or value.startswith("sqlite+pysqlite://"):

@@ -4,6 +4,33 @@
 
 ---
 
+## 2026-06-14 本地 SQLite 会掩盖线上 PostgreSQL 的 JSON 查询问题
+
+### 现象
+
+本地启动 `core-service` 时，场景顾问可以正常返回；但部署到 Render + PostgreSQL 后，同一条请求在知识库检索阶段报错，最终表现为顾问对话无内容。
+
+### 根因
+
+本地默认链路原先使用 SQLite，线上使用 PostgreSQL。某些 SQLAlchemy 写法在 SQLite 上可以“看起来能跑”，但到了 PostgreSQL 就会因为 JSON 列类型和操作符差异直接失败，例如：
+
+1. SQLite 把 JSON 当文本处理，很多字符串匹配不会立刻报错
+2. PostgreSQL 对 `JSON` / `JSONB` 操作更严格，错误的 `.contains()` 编译结果会直接触发类型异常
+
+这会让本地联调产生“接口没问题”的错觉，直到上线才暴露数据库方言兼容问题。
+
+### 修复
+
+1. 本地开发默认数据库从 SQLite 切到 Postgres
+2. `just run-core-migrations`、`just start-core-service` 及相关联调命令不再覆盖 `DATABASE_URL`，统一改为读取 `core-service/.env.local` 或当前 shell 环境
+3. 新增 `just start-local-pgvector-postgres`，本地默认用 `pgvector/pgvector:pg16` 在 `127.0.0.1:5437` 提供 `ysj_blog` 数据库
+4. `core-service/.env.example`、`core-service/README.md` 改为以 `postgresql+asyncpg://postgres:postgres@127.0.0.1:5437/ysj_blog` 为本地示例
+5. `Settings` 在缺少 `DATABASE_URL` 时直接报错，避免静默回退到 SQLite
+
+### 结论
+
+只要生产环境使用 PostgreSQL，本地默认联调环境也应该尽量保持 PostgreSQL。一旦本地和线上数据库方言不一致，RAG、JSON 条件、迁移和限流这类依赖数据库行为的逻辑都可能出现“本地正常、线上翻车”的假象。
+
 ## 2026-06-14 PostgreSQL 上不能对 `JSON` 列直接用 SQLAlchemy `.contains([...])` 做场景过滤
 
 ### 现象
@@ -36,16 +63,16 @@ knowledge_documents.domains LIKE '%' || $5::JSON || '%'
 
 把场景/领域过滤改成对 JSON 文本做成员匹配：
 
-1. `cast(column, Text).contains('"article"')`
-2. `cast(column, Text).contains('"ai"')`
+1. `cast(column, Text).like(literal('%"article"%'))`
+2. `cast(column, Text).like(literal('%"ai"%'))`
 
 这样生成的 SQL 形如：
 
 ```sql
-CAST(knowledge_documents.scenes AS TEXT) LIKE '%"article"%'
+CAST(knowledge_documents.scenes AS TEXT) LIKE '%' || $4::VARCHAR || '%'
 ```
 
-避免了 PostgreSQL 上对 `JSON` 直接做 `LIKE` 的类型错误，同时保持 SQLite / PostgreSQL 两端行为一致。
+关键点不是只有 `CAST(... AS TEXT)`，还要避免继续使用 `.contains()` 这类可能被方言重写的语法糖，直接生成显式 `TEXT LIKE TEXT`，才能稳定避免 PostgreSQL 上出现 `$4::JSON` 这类错误绑定。
 
 补充回归测试 `test_query_service_casts_json_scope_filters_for_postgresql`，确保 SQL 编译结果包含 `CAST(... AS TEXT)`，不再出现 `knowledge_documents.scenes LIKE` 这类错误形式。
 

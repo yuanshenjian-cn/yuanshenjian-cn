@@ -8,6 +8,11 @@ ADMIN_PORT := env_var_or_default("ADMIN_PORT", "5173")
 CORE_HOST := env_var_or_default("CORE_HOST", "127.0.0.1")
 CORE_PORT := env_var_or_default("CORE_PORT", "8001")
 TURNSTILE_SITE_KEY := env_var_or_default("TURNSTILE_SITE_KEY", "1x00000000000000000000AA")
+CORE_PGVECTOR_CONTAINER := env_var_or_default("CORE_PGVECTOR_CONTAINER", "blog-pgvector-postgres")
+CORE_PGVECTOR_PORT := env_var_or_default("CORE_PGVECTOR_PORT", "5437")
+CORE_PGVECTOR_USER := env_var_or_default("CORE_PGVECTOR_USER", "postgres")
+CORE_PGVECTOR_PASSWORD := env_var_or_default("CORE_PGVECTOR_PASSWORD", "postgres")
+CORE_PGVECTOR_DB := env_var_or_default("CORE_PGVECTOR_DB", "ysj_blog")
 
 # 默认列出所有可用命令。
 default:
@@ -34,6 +39,13 @@ _check_uv:
         exit 1; \
     fi
 
+# 检查 docker 是否可用。
+_check_docker:
+    @if ! command -v docker >/dev/null; then \
+        printf "未找到 docker，请先安装并启动 Docker Desktop。\n"; \
+        exit 1; \
+    fi
+
 # 同步 core-service 本地 uv 环境依赖。
 _ensure_core_venv: _check_uv
     @uv --directory core-service sync --frozen --extra dev
@@ -45,6 +57,7 @@ urls:
         "Admin Console: http://{{ADMIN_HOST}}:{{ADMIN_PORT}}" \
         "Core Service: http://localhost:{{CORE_PORT}}" \
         "Core Health: http://localhost:{{CORE_PORT}}/healthz" \
+        "Core Database: 从 core-service/.env.local 或当前 shell 的 DATABASE_URL 读取" \
         "默认管理员口令: admin123456 (仅 just 本地默认环境)"
 
 # 安装 site 依赖。
@@ -60,6 +73,47 @@ install-core-service: _ensure_core_venv
 
 # 一次性安装三套本地开发依赖。
 setup: install-site install-admin-console install-core-service
+
+# 启动本地 pgvector Postgres 开发容器，并确保 ysj_blog 数据库存在。
+start-local-pgvector-postgres: _check_docker
+    @if docker ps -a --format '{{"{{.Names}}"}}' | grep -xq "{{CORE_PGVECTOR_CONTAINER}}"; then \
+        if [ "$(docker inspect -f '{{"{{.State.Running}}"}}' "{{CORE_PGVECTOR_CONTAINER}}")" = "true" ]; then \
+            printf "pgvector Postgres 容器已在运行: %s\n" "{{CORE_PGVECTOR_CONTAINER}}"; \
+        else \
+            docker start "{{CORE_PGVECTOR_CONTAINER}}" >/dev/null; \
+            printf "已启动 pgvector Postgres 容器: %s\n" "{{CORE_PGVECTOR_CONTAINER}}"; \
+        fi; \
+    else \
+        docker run -d \
+            --name "{{CORE_PGVECTOR_CONTAINER}}" \
+            -e POSTGRES_USER="{{CORE_PGVECTOR_USER}}" \
+            -e POSTGRES_PASSWORD="{{CORE_PGVECTOR_PASSWORD}}" \
+            -e POSTGRES_DB=postgres \
+            -p "{{CORE_PGVECTOR_PORT}}:5432" \
+            pgvector/pgvector:pg16 >/dev/null; \
+        printf "已创建 pgvector Postgres 容器: %s\n" "{{CORE_PGVECTOR_CONTAINER}}"; \
+    fi
+    @until docker exec "{{CORE_PGVECTOR_CONTAINER}}" pg_isready -U "{{CORE_PGVECTOR_USER}}" -d postgres >/dev/null 2>&1; do \
+        sleep 1; \
+    done
+    @if ! docker exec "{{CORE_PGVECTOR_CONTAINER}}" psql -U "{{CORE_PGVECTOR_USER}}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='{{CORE_PGVECTOR_DB}}'" | grep -q 1; then \
+        docker exec "{{CORE_PGVECTOR_CONTAINER}}" psql -U "{{CORE_PGVECTOR_USER}}" -d postgres -c "CREATE DATABASE {{CORE_PGVECTOR_DB}}" >/dev/null; \
+        printf "已创建数据库: %s\n" "{{CORE_PGVECTOR_DB}}"; \
+    else \
+        printf "数据库已存在: %s\n" "{{CORE_PGVECTOR_DB}}"; \
+    fi
+    @printf '%s\n' \
+        "连接串: postgresql+asyncpg://{{CORE_PGVECTOR_USER}}:{{CORE_PGVECTOR_PASSWORD}}@127.0.0.1:{{CORE_PGVECTOR_PORT}}/{{CORE_PGVECTOR_DB}}" \
+        "建议写入 core-service/.env.local 的 DATABASE_URL"
+
+# 停止本地 pgvector Postgres 开发容器。
+stop-local-pgvector-postgres: _check_docker
+    @if docker ps --format '{{"{{.Names}}"}}' | grep -xq "{{CORE_PGVECTOR_CONTAINER}}"; then \
+        docker stop "{{CORE_PGVECTOR_CONTAINER}}" >/dev/null; \
+        printf "已停止 pgvector Postgres 容器: %s\n" "{{CORE_PGVECTOR_CONTAINER}}"; \
+    else \
+        printf "pgvector Postgres 容器未运行: %s\n" "{{CORE_PGVECTOR_CONTAINER}}"; \
+    fi
 
 # 为当前仓库安装 Git hooks。
 install-git-hooks:
@@ -190,7 +244,6 @@ run-core-migrations: _ensure_core_venv
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head
@@ -207,7 +260,6 @@ start-core-service: run-core-migrations
     @APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}}
@@ -218,14 +270,12 @@ start-site-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
@@ -241,14 +291,12 @@ start-admin-console-and-core-service: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \
@@ -263,14 +311,12 @@ start-all-services: _check_node _ensure_core_venv
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync alembic -c alembic.ini upgrade head && \
     APP_ENV=local \
     PUBLIC_SITE_URL="http://{{SITE_HOST}}:{{SITE_PORT}}" \
     API_PUBLIC_BASE_URL="http://localhost:{{CORE_PORT}}" \
-    DATABASE_URL="${DATABASE_URL:-sqlite+aiosqlite:///./dev.db}" \
     SESSION_SECRET="dev-session-secret" \
     ADMIN_SECRET_HASH="0e926fc654f93f0a1687a22384c7c27f03ccf038cf7cf3ab37fc6177f8553317" \
     uv --directory core-service run --no-sync uvicorn app.main:app --reload --host {{CORE_HOST}} --port {{CORE_PORT}} & \

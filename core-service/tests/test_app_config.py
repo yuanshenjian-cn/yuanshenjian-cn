@@ -45,6 +45,7 @@ def test_rate_limit_settings_read_from_env() -> None:
     resolved = app_config.build_settings_from_env(
         {
             "APP_ENV": "local",
+            "DATABASE_URL": "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/blog",
             "KEY_VALUE_URL": "redis://localhost:6379/0",
             "TRUST_CF_CONNECTING_IP": "true",
             "ALLOW_DIRECT_RENDER_SUBDOMAIN": "false",
@@ -55,6 +56,11 @@ def test_rate_limit_settings_read_from_env() -> None:
     assert resolved.trust_cf_connecting_ip is True
     assert resolved.allow_direct_render_subdomain is False
     assert resolved.rate_limit_enabled is True
+
+
+def test_settings_require_database_url() -> None:
+    with pytest.raises(ValidationError, match=r"DATABASE_URL is required"):
+        app_config.build_settings_from_env({"APP_ENV": "local"})
 
 
 def test_site_public_dir_is_derived_from_repo_root() -> None:

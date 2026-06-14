@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from sqlalchemy import Select, Text, cast, or_, select
+from sqlalchemy import Select, Text, cast, literal, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import ColumnElement
 
@@ -60,7 +60,7 @@ class KnowledgeContextQueryService:
         return score
 
     def _json_array_contains(self, column: Any, value: str) -> ColumnElement[bool]:
-        return cast(column, Text).contains(f'"{value}"')
+        return cast(column, Text).like(literal(f'%"{value}"%'))
 
     async def query_contexts(
         self,
