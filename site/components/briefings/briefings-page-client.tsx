@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArticleStatsBadge } from "@/components/article-stats-badge";
+import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { BriefingRecommendWidget } from "@/components/briefings/briefing-recommend-widget";
 import { BRIEFING_FILTER_OPTIONS, isBriefingInRange } from "@/lib/briefing-ranges";
 import type { Briefing, BriefingRecommendationRange } from "@/types/briefing";

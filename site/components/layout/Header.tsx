@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HeaderClient } from "./header-client";
+import { HeaderClient } from "./HeaderClient";
 import { getPostsForSearch } from "@/lib/blog";
 
 const navItems = [

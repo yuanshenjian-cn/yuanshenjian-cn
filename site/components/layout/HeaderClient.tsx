@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { SearchPost } from "@/types/blog";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   sparkles: Sparkles,
 };
-import { ThemeToggle } from "./theme-toggle";
-import { GlobalSearch } from "./global-search";
-import { SearchPost } from "@/types/blog";
 
 interface NavItem {
   href: string;

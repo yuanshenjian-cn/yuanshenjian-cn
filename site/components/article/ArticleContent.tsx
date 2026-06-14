@@ -1,10 +1,10 @@
 import { Suspense, type ReactNode } from "react";
 import { MDXContent as MDXRemoteContent } from "@/lib/mdx";
+import { CommentSection } from "@/components/comments/comment-section";
 import { PostNavigation } from "@/components/post-navigation";
 import { ColumnNavigation } from "@/components/column-navigation";
-import { ArticleHeader } from "@/components/article-header";
+import { ArticleHeader } from "@/components/article/ArticleHeader";
 import { ShareButtons } from "@/components/share-buttons";
-import { CommentSection } from "@/components/comments/comment-section";
 import type { Post } from "@/types/blog";
 import type { ColumnContext } from "@/lib/columns";
 

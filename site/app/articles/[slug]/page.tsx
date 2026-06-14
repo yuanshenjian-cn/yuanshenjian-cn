@@ -7,12 +7,12 @@ import { buildAdvisorContext, defaultAdvisorQuickTopics, resolveAdvisorDomainByP
 import { getColumnContextByPost } from "@/lib/columns";
 import { extractHeadings } from "@/lib/mdx";
 import { config } from "@/lib/config";
-import { ArticleContent } from "@/components/article-content";
-import { ArticleHeader } from "@/components/article-header";
+import { ArticleContent } from "@/components/article/ArticleContent";
+import { ArticleHeader } from "@/components/article/ArticleHeader";
 import { TableOfContents } from "@/components/table-of-contents";
 import { FloatingTocButton } from "@/components/floating-toc-button";
 import { ReadingProgress } from "@/components/reading-progress";
-import { ArticleViewTracker } from "@/components/article-view-tracker";
+import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 import { generateOpenGraph, generateTwitterCard } from "@/lib/seo-utils";
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from "@/lib/structured-data";
 

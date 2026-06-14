@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { type AdvisorSessionMessage, formatAdvisorConversationHistory } from "@/components/ai/use-advisor-session";
+import { type AdvisorSessionMessage, formatAdvisorConversationHistory } from "@/hooks/ai/use-advisor-session";
 
 describe("advisor session", () => {
   it("formats latest configured conversation rounds from old to new", () => {

@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { HUMANIZED_TURNSTILE_MESSAGES } from "@/components/ai/user-facing-messages";
+import { HUMANIZED_TURNSTILE_MESSAGES } from "@/lib/ai/user-facing-messages";
 import { aiChatStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 import type { PageReference, PageStreamEvent } from "@/types/ai";
 

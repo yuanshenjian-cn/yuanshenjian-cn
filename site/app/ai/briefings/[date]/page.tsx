@@ -8,7 +8,7 @@ import { config } from "@/lib/config";
 import { ShareButtons } from "@/components/share-buttons";
 import { TableOfContents } from "@/components/table-of-contents";
 import { FloatingTocButton } from "@/components/floating-toc-button";
-import { ArticleViewTracker } from "@/components/article-view-tracker";
+import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 
 function getDisplayTag(tag: string): string {
   return tag === "AI简报" ? "AI" : tag;

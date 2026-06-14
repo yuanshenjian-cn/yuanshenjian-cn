@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArticleStatsBadge } from "@/components/article-stats-badge";
+import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { InvestmentBriefingRecommendWidget } from "@/components/investment/investment-briefing-recommend-widget";
 import type { InvestmentBriefing } from "@/types/investment";
 

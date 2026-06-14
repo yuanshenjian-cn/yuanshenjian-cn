@@ -4,6 +4,43 @@
 
 ---
 
+## 2026-06-14 `site/components` 命名与分层长期失配会放大维护成本
+
+### 现象
+
+`site/components/` 下长期同时存在两类问题：
+
+1. 组件文件命名混用 PascalCase 与 kebab-case
+2. 布局、主题、系统、文章、搜索、AI hooks、消息常量等职责平铺在同一目录或放错层
+
+继续在这个状态下开发时，新文件很容易跟着历史惯性继续落到根目录，或者把 hook / 常量继续塞进 `components/`。
+
+### 根因
+
+`site/AGENTS.md` 已明确要求“组件文件 PascalCase、其他文件 kebab-case”，但工程历史实现没有持续执行，导致：
+
+1. 目录结构不能表达职责边界
+2. import 路径风格持续漂移
+3. `components/ai` 中混入 hook 和消息常量，破坏 `components/` / `hooks/` / `lib/` 分层
+
+### 修复
+
+先做低风险、机械可替换的归类与迁移：
+
+1. 布局组件迁到 `site/components/layout/`
+2. 主题组件迁到 `site/components/theme/`
+3. 系统组件迁到 `site/components/system/`
+4. 文章相关组件迁到 `site/components/article/`
+5. 搜索组件迁到 `site/components/search/`
+6. AI hook 迁到 `site/hooks/ai/`
+7. AI 消息常量迁到 `site/lib/ai/`
+
+同时配套更新 import，确保这类整理先“修边界、保行为”，而不是夹带大规模业务重构。
+
+### 结论
+
+目录整理最怕一口气全量搬迁。更稳妥的做法是先迁移职责最清晰、引用面可控的一批文件，让工程重新回到可持续演进的分层上，再继续处理剩余历史文件。
+
 ## 2026-06-14 本地 SQLite 会掩盖线上 PostgreSQL 的 JSON 查询问题
 
 ### 现象

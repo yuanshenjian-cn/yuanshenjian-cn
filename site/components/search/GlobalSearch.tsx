@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { SearchPost } from "@/types/blog";
+import type { SearchPost } from "@/types/blog";
 
 interface GlobalSearchProps {
   posts: SearchPost[];

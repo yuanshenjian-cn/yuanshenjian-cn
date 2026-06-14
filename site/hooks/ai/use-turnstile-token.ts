@@ -124,7 +124,7 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
             reject?.(new Error("当前浏览器或网络不支持人机验证，请换浏览器或网络再试。"));
           },
         });
-        console.info("[Turnstile] widget rendered", { widgetId: widgetIdRef.current, scene });
+        console.warn("[Turnstile] widget rendered", { widgetId: widgetIdRef.current, scene });
       } catch (error) {
         console.error("[Turnstile] render threw", error);
         throw error;

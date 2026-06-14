@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { ArticleStatsBadge } from "@/components/article-stats-badge";
+import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { getBriefingArchives, getBriefingsByMonth } from "@/lib/briefings";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";

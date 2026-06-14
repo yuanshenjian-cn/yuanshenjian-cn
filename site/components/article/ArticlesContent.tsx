@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { Post } from "@/types/blog";
-import { Pagination } from "./pagination";
 import { Calendar, Clock, Rss } from "lucide-react";
+import { Pagination } from "@/components/article/Pagination";
 
 interface ArticlesContentProps {
   allPosts: Post[];
@@ -23,8 +23,9 @@ export function ArticlesContent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const tagFromUrl = searchParams.get("tag");
+  const pageFromUrl = Number.parseInt(searchParams.get("page") ?? "", 10);
   const [selectedTag, setSelectedTag] = useState<string | null>(tagFromUrl);
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState(Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : initialPage);
 
   // 筛选文章
   const filteredPosts = useMemo(() => {

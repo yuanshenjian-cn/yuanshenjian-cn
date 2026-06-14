@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
-import { HUMANIZED_TURNSTILE_MESSAGES } from "@/components/ai/user-facing-messages";
+import { HUMANIZED_TURNSTILE_MESSAGES } from "@/lib/ai/user-facing-messages";
 import { aiInvestmentBriefingRecommendationStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 import type { RecommendResponse, RecommendStreamEvent } from "@/types/ai";
 

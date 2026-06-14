@@ -7,7 +7,7 @@ vi.mock("@/components/briefings/briefing-recommend-widget", () => ({
   BriefingRecommendWidget: () => <div data-testid="recommend-widget">recommend-widget</div>,
 }));
 
-vi.mock("@/components/article-stats-badge", () => ({
+vi.mock("@/components/article/ArticleStatsBadge", () => ({
   ArticleStatsBadge: ({ slug }: { slug: string }) => <div data-testid={`stats-${slug}`}>stats-{slug}</div>,
 }));
 

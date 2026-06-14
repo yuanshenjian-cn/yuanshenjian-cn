@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { ThemeProvider } from "@/components/theme-provider";
-import { BackToTop } from "@/components/back-to-top";
-import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { BackToTop } from "@/components/system/BackToTop";
+import { ServiceWorkerRegistration } from "@/components/system/ServiceWorkerRegistration";
 import { config } from "@/lib/config";
 
 const inter = localFont({
@@ -64,7 +64,7 @@ export default function RootLayout({
       <body className="font-sans min-h-screen flex flex-col">
         <ThemeProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <div className="flex-1">{children}</div>
           <Footer />
           <BackToTop />
           <ServiceWorkerRegistration />

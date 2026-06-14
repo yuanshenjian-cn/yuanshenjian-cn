@@ -5,8 +5,8 @@ import { Maximize2, MessageCircle, Minimize2, SendHorizontal, Sparkles, X } from
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { type AdvisorSessionMessage, useAdvisorSession } from "@/components/ai/use-advisor-session";
-import { useTurnstileToken } from "@/components/ai/use-turnstile-token";
+import { useTurnstileToken } from "@/hooks/ai/use-turnstile-token";
+import { type AdvisorSessionMessage, useAdvisorSession } from "@/hooks/ai/use-advisor-session";
 import { aiContextualAdvisorStream } from "@/lib/ai-client";
 import type { AdvisorContextValue, AdvisorStreamEvent } from "@/types/ai";
 
@@ -282,7 +282,7 @@ export function ContextualAIAdvisor({
                   <span className="flex h-7 w-7 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Sparkles className="h-3.5 w-3.5" />
                   </span>
-                  袁慎建
+                  袁慎建的 AI顾问
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button

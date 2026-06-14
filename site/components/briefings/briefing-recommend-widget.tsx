@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 import { aiBriefingRecommendationStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
 
 import type { RecommendResponse, RecommendStreamEvent } from "@/types/ai";
-import { HUMANIZED_TURNSTILE_MESSAGES } from "@/components/ai/user-facing-messages";
+import { HUMANIZED_TURNSTILE_MESSAGES } from "@/lib/ai/user-facing-messages";
 import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
 
 const TURNSTILE_ACTION = "ai_briefing_recommendation";

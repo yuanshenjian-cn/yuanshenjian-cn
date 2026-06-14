@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FloatingTocButton } from "@/components/floating-toc-button";
-import { ArticleViewTracker } from "@/components/article-view-tracker";
+import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 import { ShareButtons } from "@/components/share-buttons";
 import { TableOfContents } from "@/components/table-of-contents";
 import { config } from "@/lib/config";

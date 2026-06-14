@@ -3,8 +3,8 @@ import { Suspense } from "react";
 import { getAllTags, getAllPosts } from "@/lib/blog";
 import { POSTS_PER_PAGE, config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
-import { ArticlesContent } from "@/components/articles-content";
-import { ArticlesSkeleton } from "@/components/articles-skeleton";
+import { ArticlesContent } from "@/components/article/ArticlesContent";
+import { ArticlesSkeleton } from "@/components/article/ArticlesSkeleton";
 import { notFound } from "next/navigation";
 
 interface Props {

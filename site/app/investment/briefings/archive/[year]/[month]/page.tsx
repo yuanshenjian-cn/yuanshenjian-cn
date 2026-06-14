@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArticleStatsBadge } from "@/components/article-stats-badge";
+import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { getInvestmentBriefingArchives, getInvestmentBriefingsByMonth } from "@/lib/investment-briefings";
 
 export const dynamicParams = false;
