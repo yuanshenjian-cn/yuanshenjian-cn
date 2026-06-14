@@ -26,6 +26,10 @@ const SOURCE_DIRECTORIES = [
   path.join(siteDir, "types"),
 ];
 
+const EXCLUDED_SOURCE_FILES = new Set([
+  path.join(siteDir, "lib", "site-build-plan.ts"),
+]);
+
 const SOURCE_FILES = [
   path.join(siteDir, "package.json"),
   path.join(siteDir, "package-lock.json"),
@@ -157,7 +161,7 @@ function scanContentState() {
   const sourceFiles = [
     ...SOURCE_DIRECTORIES.flatMap((dir) => collectFiles(dir, /\.(css|cjs|js|jsx|json|mjs|ts|tsx)$/i)),
     ...SOURCE_FILES,
-  ];
+  ].filter((filePath) => !EXCLUDED_SOURCE_FILES.has(filePath));
 
   return {
     version: VERSION,
@@ -353,6 +357,7 @@ function prepare() {
   }
 
   console.log(`Site build plan: ${plan.mode}`);
+  console.log(`Reasons: ${JSON.stringify(plan.reasons)}`);
   console.log(`Plan file: ${repoRelativePath(PLAN_FILE)}`);
   return plan;
 }
