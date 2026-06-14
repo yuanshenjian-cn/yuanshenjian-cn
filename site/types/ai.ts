@@ -134,7 +134,7 @@ export interface AIQuickTopic {
 export interface TurnstileRenderOptions {
   sitekey: string;
   action?: string;
-  size?: "normal" | "flexible" | "compact";
+  size?: "normal" | "flexible" | "compact" | "invisible";
   execution?: "execute" | "render";
   appearance?: "execute" | "always" | "interaction-only";
   callback?: (token: string) => void;

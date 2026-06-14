@@ -103,7 +103,7 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
           action: TURNSTILE_ACTIONS[scene],
-          size: "flexible",
+          size: "invisible",
           execution: "execute",
           appearance: "interaction-only",
           callback: (token) => {
