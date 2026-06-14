@@ -218,6 +218,11 @@ test-core-service: _ensure_core_venv
     DATABASE_URL="sqlite+aiosqlite:///./test.db" \
     uv --directory core-service run --no-sync pytest tests -q
 
+# 同步 content/ 公开内容到 core-service 知识库。
+# 需要在仓库根目录 .env 或 core-service/.env.local 中配置 DATABASE_URL。
+sync-knowledge-base: _ensure_core_venv
+    @bash -c 'set -a; [ -f .env ] && source .env; set +a; uv --directory core-service run --no-sync python -m app.contexts.knowledge_base.interface.published_content_sync_cli --repo-root "$(pwd)"'
+
 # 查看当前 Alembic 迁移版本。
 show-core-migration-current: _ensure_core_venv
     @uv --directory core-service run --no-sync alembic -c alembic.ini current

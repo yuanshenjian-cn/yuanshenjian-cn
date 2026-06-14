@@ -11,6 +11,9 @@ from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChu
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
 
 
+_FALLBACK_SCORE = 1
+
+
 class KnowledgeContextQueryService:
     _ARTICLE_NAVIGATION_PHRASES = (
         "有哪些文章",
@@ -102,6 +105,7 @@ class KnowledgeContextQueryService:
                     ).limit(candidate_limit)
                 )
             )
+
         contexts: list[str] = []
         references: list[dict[str, str]] = []
         is_article_navigation_query = self._is_article_navigation_query(query)
@@ -117,6 +121,15 @@ class KnowledgeContextQueryService:
                 continue
             seen_documents.add(document_key)
             scored_rows.append((score, chunk, document))
+
+        if not scored_rows and (scene or domain) and not article_slug:
+            scored_rows = await self._fallback_recent_chunks(
+                session,
+                scene=scene,
+                domain=domain,
+                top_k=top_k,
+            )
+
         scored_rows.sort(key=lambda item: item[0], reverse=True)
         for _, chunk, document in scored_rows[:top_k]:
             contexts.append(chunk.content)
@@ -130,3 +143,36 @@ class KnowledgeContextQueryService:
                 }
             )
         return contexts, references
+
+    async def _fallback_recent_chunks(
+        self,
+        session: AsyncSession,
+        *,
+        scene: str | None,
+        domain: str | None,
+        top_k: int,
+    ) -> list[tuple[int, KnowledgeChunkPO, KnowledgeDocumentPO]]:
+        statement = (
+            select(KnowledgeChunkPO, KnowledgeDocumentPO)
+            .join(KnowledgeDocumentPO, KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id)
+            .where(KnowledgeChunkPO.chunk_index == 0)
+            .order_by(KnowledgeDocumentPO.published_at.desc().nullslast())
+            .limit(top_k)
+        )
+        if scene:
+            statement = statement.where(or_(KnowledgeDocumentPO.scenes.is_(None), self._json_array_contains(KnowledgeDocumentPO.scenes, scene)))
+        if domain:
+            statement = statement.where(or_(KnowledgeDocumentPO.domains.is_(None), self._json_array_contains(KnowledgeDocumentPO.domains, domain)))
+
+        fallback_rows = list(await session.execute(statement))
+        seen_documents: set[str] = set()
+        result: list[tuple[int, KnowledgeChunkPO, KnowledgeDocumentPO]] = []
+        for chunk, document in fallback_rows:
+            document_key = document.url or document.title
+            if document_key in seen_documents:
+                continue
+            seen_documents.add(document_key)
+            result.append((_FALLBACK_SCORE, chunk, document))
+            if len(result) >= top_k:
+                break
+        return result

@@ -45,15 +45,20 @@ export function defaultAdvisorQuickTopics(scene: AdvisorScene): AIQuickTopic[] {
   }
   if (scene === "investment" || scene === "investment-column") {
     return [
-      { label: "重点关注什么", prompt: "请告诉我最值得优先关注的要点。" },
-      { label: "有哪些风险提醒", prompt: "请总结需要注意的风险和限制。" },
-      { label: "小白如何学投资", prompt: "请推荐适合小白学习的文章。" },
+      { label: "这个栏目主要聊什么", prompt: "这个栏目主要关注哪些投资话题？用一两句话帮我快速定位。" },
+      { label: "最近有什么变化", prompt: "结合最近的内容，观察名单或市场层面有什么值得注意的变化？" },
+      { label: "小白从哪开始看", prompt: "如果我想系统了解投资，从这个栏目里的文章开始，应该按什么顺序看？" },
+      { label: "当前重点风险", prompt: "结合栏目内容，当前需要重点关注哪些风险或限制？" },
+      { label: "有没有长期方向", prompt: "这个栏目里有没有适合长期跟踪的方向或标的？简单说说理由。" },
     ];
   }
   if (scene === "ai" || scene === "ai-column") {
     return [
-      { label: "怎么阅读这一页", prompt: "请结合当前页面内容，给我一个快速阅读顺序。" },
-      { label: "适合什么问题", prompt: "请结合当前页面内容，说明这组内容更适合解决什么问题。" },
+      { label: "这个栏目关注什么", prompt: "这个 AI 栏目主要关注哪些方向？用一两句话帮我快速定位。" },
+      { label: "最近有什么动态", prompt: "最近 AI 领域有哪些值得跟进的动态或发布？" },
+      { label: "小白怎么入门", prompt: "如果我想系统了解 AI，从这个栏目开始应该先看哪几篇？" },
+      { label: "AI 编程有推荐吗", prompt: "栏目里关于 AI 编程、AI 辅助开发的内容，有哪些值得先看？" },
+      { label: "怎么找某厂商内容", prompt: "我想快速找到关于 OpenAI、DeepSeek、Claude 或 Kimi 的文章，应该怎么筛选？" },
     ];
   }
   return [];
