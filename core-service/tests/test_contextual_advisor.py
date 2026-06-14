@@ -141,6 +141,20 @@ class EmptyKnowledgeReader:
         return [], []
 
 
+class ExplodingKnowledgeReader:
+    async def query(
+        self,
+        query: str,
+        article_slug: str | None = None,
+        top_k: int = 5,
+        *,
+        scene: str | None = None,
+        domain: str | None = None,
+        page_slug: str | None = None,
+    ):
+        raise RuntimeError("boom")
+
+
 class CrossColumnPublishedAssets:
     def __init__(self) -> None:
         self.recommendation_calls = 0
@@ -202,3 +216,34 @@ def test_stream_ai_advisor_skips_global_fallback_when_column_scoped() -> None:
     assert "cross-column-openai-news" not in event
     assert "当前知识库没有检索到足够资料。" in event
     assert "references=0" in event
+
+
+def test_stream_ai_advisor_returns_error_event_when_context_loading_fails() -> None:
+    service = StreamAIAdvisorAppService(
+        StubProfileResolver(),
+        StubLLMStreamService(),
+        ExplodingKnowledgeReader(),
+        StubPublishedAssets(),
+    )
+
+    async def collect() -> list[str]:
+        return [
+            item
+            async for item in service.execute(
+                StreamAIAdvisorReq(
+                    scene="article",
+                    message="这篇文章在讲什么",
+                    article_slug="demo-article",
+                    page_title="Demo",
+                    page_slug="demo-article",
+                    cf_turnstile_response="token",
+                )
+            )
+        ]
+
+    events = asyncio.run(collect())
+
+    assert events == [
+        'event: error\ndata: {"message":"AI 服务刚刚开小差了，请稍后重试。"}\n\n',
+        'event: done\ndata: {"usage":null}\n\n',
+    ]

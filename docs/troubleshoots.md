@@ -4,6 +4,40 @@
 
 ---
 
+## 2026-06-14 场景顾问首个 SSE chunk 之前抛异常时会表现成 200 空响应
+
+### 现象
+
+线上调用 `POST /api/v1/ai-assistant/advisor/stream` 时，浏览器 Network 面板显示 `200 OK`，但 Response / Preview 为空，对话窗里也没有任何回答内容。
+
+本地启动 `core-service` 调同一个大模型配置时可以正常返回，问题只在线上部署环境出现。
+
+### 根因
+
+`ai_assistant` 的顾问流接口使用 `StreamingResponse`。如果异常发生在**第一个 SSE chunk 发出之前**，例如：
+
+1. 知识库查询报错
+2. 已发布资料读取报错
+3. prompt 组装阶段报错
+
+那么 HTTP 响应头仍然可能先被 FastAPI/ASGI 发送出去，于是浏览器看到的是 `200`；但因为生成器在首包前就中断，body 实际为空，看起来就像“成功但没返回”。
+
+原实现里，只有 LLM provider 调用阶段做了 SSE `error` 兜底；前面的顾问上下文构建阶段一旦报错，会直接把流打断。
+
+### 修复
+
+在 `core-service/app/contexts/ai_assistant/application/stream_ai_advisor_app_service.py` 的 `execute()` 顶层增加异常兜底：
+
+1. 记录 `advisor stream failed before completion` 异常日志
+2. 向前端补发 `event: error`
+3. 再补发 `event: done`
+
+补充回归测试 `test_stream_ai_advisor_returns_error_event_when_context_loading_fails`，覆盖“知识库查询在首包前抛异常”场景，确保不再出现空流。
+
+### 结论
+
+只要使用 SSE / `StreamingResponse`，就不能只在“真正调用 LLM”那一段兜底。任何会发生在首包前的步骤，都必须转换成可见的 SSE 错误事件；否则线上最直观的症状就是 `200 OK` + 空响应，排查成本很高。
+
 ## 2026-06-13 栏目页顾问知识库空命中时不能回退到全站文章
 
 ### 现象

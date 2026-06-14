@@ -151,7 +151,6 @@ const authorProfileData = {
           { metric: "数据资产服务", text: "设计和落地" },
           { metric: "aa-delivery", text: "设计和实现" },
           { metric: "Bug Fixer Skill Framework", text: "设计与实现" },
-          { metric: "LLM 网关", text: "设计与落地" },
         ],
         description:
           "我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。",
