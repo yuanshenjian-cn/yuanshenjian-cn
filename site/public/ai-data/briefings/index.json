@@ -1,6 +1,20 @@
 {
-  "generated": "2026-06-13T00:00:00.000Z",
+  "generated": "2026-06-14T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-14",
+      "title": "AI 简报 · 2026-06-14",
+      "excerpt": "美国政府以国家安全为由要求 Anthropic 下线 Fable 5 与 Mythos 5，OpenAI 遭多州总检察长调查，Google 起诉利用 Gemini 作案的中国诈骗网络，Meta 开始拆解对 Manus 的 20 亿美元收购。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-06-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-14"
+    },
     {
       "slug": "2026-06-13",
       "title": "AI 简报 · 2026-06-13",
@@ -846,6 +860,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-14",
+      "title": "AI 简报 · 2026-06-14",
+      "excerpt": "美国政府以国家安全为由要求 Anthropic 下线 Fable 5 与 Mythos 5，OpenAI 遭多州总检察长调查，Google 起诉利用 Gemini 作案的中国诈骗网络，Meta 开始拆解对 Manus 的 20 亿美元收购。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-06-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-14"
+    },
     {
       "slug": "2026-06-13",
       "title": "AI 简报 · 2026-06-13",
