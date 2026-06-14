@@ -39,7 +39,7 @@ export default async function AIColumnsPage() {
               quickTopics: defaultAdvisorQuickTopics("ai"),
             })}
             cardTitle="AI 带你快速浏览"
-            cardDescription="如果你想知道先看哪条线、哪些内容更适合你的问题，可以直接问。"
+            cardDescription=""
             workerUrl={config.ai.workerUrl}
             turnstileSiteKey={config.ai.turnstileSiteKey}
             turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}

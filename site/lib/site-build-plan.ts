@@ -12,9 +12,18 @@ interface SiteBuildPlan {
   };
 }
 
-const planFilePath = path.join(process.cwd(), ".cache", "site-build", "plan.json");
-
 let cachedPlan: SiteBuildPlan | null | undefined;
+
+function resolvePlanFilePath(): string | null {
+  const cwd = process.cwd();
+  const candidates = [
+    path.join(cwd, ".cache", "site-build", "plan.json"),
+    path.join(cwd, "site", ".cache", "site-build", "plan.json"),
+    path.join(cwd, "..", "site", ".cache", "site-build", "plan.json"),
+  ];
+
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null;
+}
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -45,7 +54,8 @@ function readSiteBuildPlan(): SiteBuildPlan | null {
     return cachedPlan;
   }
 
-  if (process.env.SITE_INCREMENTAL_BUILD !== "true" || !fs.existsSync(planFilePath)) {
+  const planFilePath = resolvePlanFilePath();
+  if (process.env.SITE_INCREMENTAL_BUILD !== "true" || !planFilePath) {
     cachedPlan = null;
     return cachedPlan;
   }
