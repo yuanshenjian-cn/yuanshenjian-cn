@@ -1,6 +1,8 @@
 import asyncio
 from types import SimpleNamespace
 
+from sqlalchemy.dialects import postgresql
+
 from app.contexts.knowledge_base.infra.knowledge_context_query_service import KnowledgeContextQueryService
 from app.contexts.knowledge_base.infra.advisor_prompt_builder import build_advisor_prompt
 from app.contexts.knowledge_base.infra.published_content_sync_service import PublishedContentSyncService
@@ -170,3 +172,36 @@ def test_query_service_does_not_fallback_to_global_scope_when_article_slug_is_pr
         assert session.calls == 1
 
     asyncio.run(run())
+
+
+def test_query_service_casts_json_scope_filters_for_postgresql() -> None:
+    captured_statements = []
+
+    class StubSession:
+        async def execute(self, statement):
+            captured_statements.append(statement)
+            return []
+
+    async def run() -> None:
+        await KnowledgeContextQueryService().query_contexts(
+            StubSession(),
+            "AI",
+            article_slug="demo-article",
+            scene="article",
+            domain="ai",
+            page_slug="demo-article",
+        )
+
+    asyncio.run(run())
+
+    compiled = str(
+        captured_statements[0].compile(
+            dialect=postgresql.dialect(),
+            compile_kwargs={"literal_binds": True},
+        )
+    )
+
+    assert "CAST(knowledge_documents.scenes AS TEXT)" in compiled
+    assert "CAST(knowledge_documents.domains AS TEXT)" in compiled
+    assert "knowledge_documents.scenes LIKE" not in compiled
+    assert "knowledge_documents.domains LIKE" not in compiled

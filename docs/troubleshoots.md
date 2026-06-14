@@ -4,6 +4,55 @@
 
 ---
 
+## 2026-06-14 PostgreSQL 上不能对 `JSON` 列直接用 SQLAlchemy `.contains([...])` 做场景过滤
+
+### 现象
+
+线上 Render 使用 PostgreSQL 时，调用 `POST /api/v1/ai-assistant/advisor/stream` 会在知识库检索阶段报错：
+
+```text
+asyncpg.exceptions.UndefinedFunctionError: operator does not exist: json ~~ text
+```
+
+SQL 日志里可以看到类似条件：
+
+```sql
+knowledge_documents.scenes LIKE '%' || $4::JSON || '%'
+knowledge_documents.domains LIKE '%' || $5::JSON || '%'
+```
+
+本地 SQLite 环境不一定会暴露这个问题，因此容易出现“本地能答、线上 200 但无内容”的错觉。
+
+### 根因
+
+`core-service/app/contexts/knowledge_base/infra/knowledge_context_query_service.py` 原本对 `scenes` / `domains` 这两个 `JSON` 数组列使用：
+
+1. `KnowledgeDocumentPO.scenes.contains([scene])`
+2. `KnowledgeDocumentPO.domains.contains([domain])`
+
+这两个列在 PostgreSQL 里是 `JSON`，不是 `JSONB`。SQLAlchemy 对 generic `JSON` 的 `.contains()` 不会编译成 PostgreSQL 的 JSON 包含操作符，而是退化成字符串 `LIKE` 匹配，最终触发 `json ~~ text` 报错。
+
+### 修复
+
+把场景/领域过滤改成对 JSON 文本做成员匹配：
+
+1. `cast(column, Text).contains('"article"')`
+2. `cast(column, Text).contains('"ai"')`
+
+这样生成的 SQL 形如：
+
+```sql
+CAST(knowledge_documents.scenes AS TEXT) LIKE '%"article"%'
+```
+
+避免了 PostgreSQL 上对 `JSON` 直接做 `LIKE` 的类型错误，同时保持 SQLite / PostgreSQL 两端行为一致。
+
+补充回归测试 `test_query_service_casts_json_scope_filters_for_postgresql`，确保 SQL 编译结果包含 `CAST(... AS TEXT)`，不再出现 `knowledge_documents.scenes LIKE` 这类错误形式。
+
+### 结论
+
+如果字段在 PostgreSQL 中是 `JSON` 而不是 `JSONB`，不要直接依赖 SQLAlchemy generic `JSON.contains()` 做数组成员过滤。要么显式转 `JSONB` 再用包含操作符，要么像本项目这样在受控字符串数组场景下改用 `CAST(... AS TEXT)` 做精确成员匹配。
+
 ## 2026-06-14 场景顾问首个 SSE chunk 之前抛异常时会表现成 200 空响应
 
 ### 现象

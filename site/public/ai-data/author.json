@@ -193,10 +193,6 @@
           {
             "metric": "Bug Fixer Skill Framework",
             "text": "设计与实现"
-          },
-          {
-            "metric": "LLM 网关",
-            "text": "设计与落地"
           }
         ],
         "highlights": [
@@ -968,7 +964,7 @@
       "id": "project-创业项目",
       "anchorId": "projects",
       "heading": "项目｜创业项目",
-      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现；LLM 网关 设计与落地 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
+      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
       "excerpt": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-deli...",
       "sectionType": "projects",
       "entityType": "project",
@@ -1483,7 +1479,7 @@
       "id": "project-创业项目",
       "anchorId": "projects",
       "heading": "项目｜创业项目",
-      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现；LLM 网关 设计与落地 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
+      "content": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-delivery 设计和实现；Bug Fixer Skill Framework 设计与实现 主要职责和贡献：深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率；负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关；设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力；基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量 技术栈：Fast API、Python3、Postgres SQL、Postgres vector、Langfuse、Pydandic AI、Next JS、Spring Cloud、Redis、Claude CLI、OpenCode、GitHub CI/CD、阿里云 K8S、OSS",
       "excerpt": "时间：2026.02 ~ 至今 角色：AI 效率 && Agent 应用 工程师 我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。 核心成果：核心系统 设计与交付；数据资产服务 设计和落地；aa-deli..."
     },
     {

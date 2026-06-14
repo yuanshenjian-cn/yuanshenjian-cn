@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 
-from sqlalchemy import Select, or_, select
+from sqlalchemy import Select, Text, cast, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
@@ -57,6 +59,9 @@ class KnowledgeContextQueryService:
                 score += len(term)
         return score
 
+    def _json_array_contains(self, column: Any, value: str) -> ColumnElement[bool]:
+        return cast(column, Text).contains(f'"{value}"')
+
     async def query_contexts(
         self,
         session: AsyncSession,
@@ -80,9 +85,9 @@ class KnowledgeContextQueryService:
             if include_page_slug and page_slug:
                 statement = statement.where(or_(KnowledgeDocumentPO.slug == page_slug, KnowledgeDocumentPO.source_id == page_slug))
             if scene:
-                statement = statement.where(or_(KnowledgeDocumentPO.scenes.is_(None), KnowledgeDocumentPO.scenes.contains([scene])))
+                statement = statement.where(or_(KnowledgeDocumentPO.scenes.is_(None), self._json_array_contains(KnowledgeDocumentPO.scenes, scene)))
             if domain:
-                statement = statement.where(or_(KnowledgeDocumentPO.domains.is_(None), KnowledgeDocumentPO.domains.contains([domain])))
+                statement = statement.where(or_(KnowledgeDocumentPO.domains.is_(None), self._json_array_contains(KnowledgeDocumentPO.domains, domain)))
             return statement.limit(candidate_limit)
 
         rows = list(await session.execute(build_statement(include_page_slug=True)))
