@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchMe } from "./api/client";
 import { AiUsagePage } from "./pages/AiUsagePage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CommentsPage } from "./pages/CommentsPage";
@@ -18,6 +19,18 @@ const pages: Array<{ key: Page; label: string }> = [
 
 export function App() {
   const [page, setPage] = useState<Page>("login");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    fetchMe()
+      .then(() => setPage("comments"))
+      .catch(() => setPage("login"))
+      .finally(() => setReady(true));
+  }, []);
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <main className="shell">

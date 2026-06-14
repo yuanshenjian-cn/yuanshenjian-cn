@@ -88,6 +88,10 @@ export function login(password: string, turnstileToken = "") {
   });
 }
 
+export function fetchMe() {
+  return request<{ role: string }>("/api/v1/admin/me");
+}
+
 export function fetchComments(status = "pending") {
   return request<{ items: AdminCommentItem[]; next_cursor: string | null }>(`/api/v1/admin/comments?status=${status}`);
 }
