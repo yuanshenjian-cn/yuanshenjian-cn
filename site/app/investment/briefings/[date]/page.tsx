@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { FloatingTocButton } from "@/components/floating-toc-button";
+import { FloatingTocButton } from "@/components/FloatingTocButton";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
-import { ShareButtons } from "@/components/share-buttons";
-import { TableOfContents } from "@/components/table-of-contents";
+import { ShareButtons } from "@/components/ShareButtons";
+import { TableOfContents } from "@/components/TableOfContents";
 import { config } from "@/lib/config";
 import {
   getAdjacentInvestmentBriefings,

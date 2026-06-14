@@ -6,7 +6,7 @@ import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorS
 import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { getAIColumns } from "@/lib/columns";
 import { getAllBriefings, getLatestBriefing } from "@/lib/briefings";
-import { getColumnIconBySlug } from "@/components/column-icons";
+import { getColumnIconBySlug } from "@/components/ColumnIcons";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 

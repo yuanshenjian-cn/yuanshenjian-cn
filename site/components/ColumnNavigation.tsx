@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ColumnContext } from "@/lib/columns";
 import type { Post } from "@/types/blog";
-import { getColumnIconBySlug } from "@/components/column-icons";
-import { PrevNextNav } from "@/components/prev-next-nav";
+import { getColumnIconBySlug } from "@/components/ColumnIcons";
+import { PrevNextNav } from "@/components/PrevNextNav";
 
 interface ColumnNavigationProps {
   context: ColumnContext;

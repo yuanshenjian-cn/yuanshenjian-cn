@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { generateListPageSEO } from "@/lib/seo-utils";
 import { config } from "@/lib/config";
 import { getAllInvestmentBriefings, getRecentInvestmentBriefings } from "@/lib/investment-briefings";
-import { InvestmentBriefingsPageClient } from "@/components/investment/investment-briefings-page-client";
+import { InvestmentBriefingsPageClient } from "@/components/investment/InvestmentBriefingsPageClient";
 
 export const metadata: Metadata = generateListPageSEO(
   "投资简报",

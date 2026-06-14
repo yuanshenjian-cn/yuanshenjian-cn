@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArticleAiAssistant } from "@/components/ai/article-ai-assistant";
-import { AuthorAiAssistant } from "@/components/ai/author-ai-assistant";
-import { PageAIAssistantProvider } from "@/components/ai/page-ai-assistant-provider";
+import { ArticleAiAssistant } from "@/components/ai/ArticleAiAssistant";
+import { AuthorAiAssistant } from "@/components/ai/AuthorAiAssistant";
+import { PageAIAssistantProvider } from "@/components/ai/PageAIAssistantProvider";
 
 const aiChatStreamMock = vi.fn();
 

@@ -2,32 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { fetchComments, submitComment, type PublicComment } from "@/lib/core-service-client";
-
-const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-
-let turnstileScriptPromise: Promise<void> | null = null;
-
-function loadTurnstileScript(): Promise<void> {
-  if (typeof window === "undefined") {
-    return Promise.resolve();
-  }
-  if (window.turnstile) {
-    return Promise.resolve();
-  }
-  if (turnstileScriptPromise) {
-    return turnstileScriptPromise;
-  }
-  turnstileScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = TURNSTILE_SCRIPT_SRC;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", () => resolve(), { once: true });
-    script.addEventListener("error", () => reject(new Error("Turnstile 加载失败")), { once: true });
-    document.head.appendChild(script);
-  });
-  return turnstileScriptPromise;
-}
+import { loadTurnstileScript } from "@/lib/turnstile";
 
 interface CommentSectionProps {
   slug: string;

@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
+import { loadTurnstileScript, preloadTurnstileScript } from "@/lib/turnstile";
 import type { AdvisorScene } from "@/types/ai";
-
-const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 const TURNSTILE_ACTIONS: Record<AdvisorScene, string> = {
   article: "article_page_ai",
@@ -16,48 +15,6 @@ const TURNSTILE_ACTIONS: Record<AdvisorScene, string> = {
   investment: "contextual_ai_advisor",
   "investment-column": "contextual_ai_advisor",
 };
-
-let turnstileScriptPromise: Promise<void> | null = null;
-
-function loadTurnstileScript(): Promise<void> {
-  if (typeof window === "undefined") {
-    return Promise.reject(new Error("Turnstile 仅能在浏览器环境使用。"));
-  }
-  if (window.turnstile) {
-    return Promise.resolve();
-  }
-  if (turnstileScriptPromise) {
-    return turnstileScriptPromise;
-  }
-  turnstileScriptPromise = new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_SRC}"]`);
-
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener(
-        "error",
-        () => {
-          turnstileScriptPromise = null;
-          reject(new Error("Turnstile 脚本加载失败，请稍后刷新重试。"));
-        },
-        { once: true },
-      );
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = TURNSTILE_SCRIPT_SRC;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => {
-      turnstileScriptPromise = null;
-      reject(new Error("Turnstile 脚本加载失败，请稍后刷新重试。"));
-    };
-    document.head.appendChild(script);
-  });
-  return turnstileScriptPromise;
-}
 
 export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutMs: number) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,6 +37,10 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
       clearWaiters();
     };
   }, [clearWaiters]);
+
+  useEffect(() => {
+    preloadTurnstileScript(siteKey);
+  }, [siteKey]);
 
   const getToken = useCallback(async (): Promise<string> => {
     if (!siteKey) {

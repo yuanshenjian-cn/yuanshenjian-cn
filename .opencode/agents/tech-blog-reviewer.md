@@ -1,7 +1,7 @@
 ---
 mode: subagent
-model: github-copilot/gpt-5.4
-reasoningEffort: high
+model: openai/gpt-5.5
+reasoningEffort: xhigh
 tools:
   write: false
   edit: false

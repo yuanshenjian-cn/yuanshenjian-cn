@@ -6,14 +6,13 @@ import { Search, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { aiBriefingRecommendationStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
-
-import type { RecommendResponse, RecommendStreamEvent } from "@/types/ai";
+import { AnimatedEllipsisText } from "@/components/ai/AnimatedEllipsisText";
 import { HUMANIZED_TURNSTILE_MESSAGES } from "@/lib/ai/user-facing-messages";
-import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
+import { aiInvestmentBriefingRecommendationStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
+import { loadTurnstileScript } from "@/lib/turnstile";
+import type { RecommendResponse, RecommendStreamEvent } from "@/types/ai";
 
-const TURNSTILE_ACTION = "ai_briefing_recommendation";
-const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const TURNSTILE_ACTION = "investment_briefing_recommendation";
 
 const answerMarkdownComponents = {
   h1: ({ children }: { children?: ReactNode }) => (
@@ -49,7 +48,7 @@ const answerMarkdownComponents = {
   ),
 } as const;
 
-interface BriefingRecommendWidgetProps {
+interface InvestmentBriefingRecommendWidgetProps {
   enabled: boolean;
   maxInputChars: number;
   turnstileSiteKey: string;
@@ -57,48 +56,13 @@ interface BriefingRecommendWidgetProps {
   workerUrl: string;
 }
 
-let turnstileScriptPromise: Promise<void> | null = null;
-
-function loadTurnstileScript(): Promise<void> {
-  if (typeof window === "undefined") {
-    return Promise.resolve();
-  }
-
-  if (window.turnstile) {
-    return Promise.resolve();
-  }
-
-  if (turnstileScriptPromise) {
-    return turnstileScriptPromise;
-  }
-
-  turnstileScriptPromise = new Promise((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_SRC}"]`);
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener("error", () => reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed)), { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = TURNSTILE_SCRIPT_SRC;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
-    document.head.appendChild(script);
-  });
-
-  return turnstileScriptPromise;
-}
-
-export function BriefingRecommendWidget({
+export function InvestmentBriefingRecommendWidget({
   enabled,
   maxInputChars,
   turnstileSiteKey,
   turnstileTimeoutMs,
   workerUrl,
-}: BriefingRecommendWidgetProps) {
+}: InvestmentBriefingRecommendWidgetProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<RecommendResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -257,9 +221,9 @@ export function BriefingRecommendWidget({
         abortControllerRef.current = null;
       };
 
-      await aiBriefingRecommendationStream({
+      await aiInvestmentBriefingRecommendationStream({
         workerUrl,
-        scene: "ai_briefing_recommendation",
+        scene: "investment_briefing_recommendation",
         message: nextMessage,
         context: { range: "30d" },
         turnstileToken,
@@ -283,11 +247,11 @@ export function BriefingRecommendWidget({
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <h2 className="text-lg font-medium tracking-tight">AI 简报推荐</h2>
+          <h2 className="text-lg font-medium tracking-tight">投资简报推荐</h2>
         </div>
       </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">基于“近 30 天”的范围推荐</p>
+      <p className="mt-4 text-xs text-muted-foreground">基于“近 30 天”的投资简报范围推荐，不构成投资建议。</p>
 
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="relative">
@@ -296,7 +260,7 @@ export function BriefingRecommendWidget({
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             maxLength={maxInputChars}
-            placeholder="输入主题，例如 OpenAI 发布、Agent 动态、多模态"
+            placeholder="输入主题，例如 英伟达财报、港股回购、半导体设备"
             className="w-full rounded-2xl border bg-background py-3 pl-11 pr-24 text-sm outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
           />
           <button
@@ -325,12 +289,12 @@ export function BriefingRecommendWidget({
 
       {response ? (
         <div className="mt-5 space-y-3">
-          <p className="text-xs font-medium text-muted-foreground">近 30 天内的推荐结果</p>
+          <p className="text-xs font-medium text-muted-foreground">近 30 天内的投资简报推荐结果</p>
           {displayedBriefings.length > 0 ? (
             displayedBriefings.map((briefing) => (
               <Link
                 key={briefing.slug}
-                href={("url" in briefing && briefing.url) || `/ai/briefings/${briefing.slug}`}
+                href={("url" in briefing && briefing.url) || `/investment/briefings/${briefing.slug}`}
                 className="block rounded-xl border px-4 py-3 transition hover:border-primary/40 hover:bg-muted/30"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -353,7 +317,7 @@ export function BriefingRecommendWidget({
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有简报。
+              这个时间范围内还没有投资简报。
             </p>
           )}
         </div>

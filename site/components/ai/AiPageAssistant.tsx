@@ -6,8 +6,8 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
-import { usePageAIAssistant } from "@/components/ai/page-ai-assistant-provider";
+import { AnimatedEllipsisText } from "@/components/ai/AnimatedEllipsisText";
+import { usePageAIAssistant } from "@/components/ai/PageAIAssistantProvider";
 import type { AIQuickTopic } from "@/types/ai";
 
 interface AiPageAssistantProps {

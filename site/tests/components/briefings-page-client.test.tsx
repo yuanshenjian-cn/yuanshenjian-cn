@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { BriefingsPageClient } from "@/components/briefings/briefings-page-client";
+import { BriefingsPageClient } from "@/components/briefings/BriefingsPageClient";
 import type { Briefing } from "@/types/briefing";
 
-vi.mock("@/components/briefings/briefing-recommend-widget", () => ({
+vi.mock("@/components/briefings/BriefingRecommendWidget", () => ({
   BriefingRecommendWidget: () => <div data-testid="recommend-widget">recommend-widget</div>,
 }));
 

@@ -1,5 +1,5 @@
 import { Post } from "@/types/blog";
-import { PrevNextNav } from "@/components/prev-next-nav";
+import { PrevNextNav } from "@/components/PrevNextNav";
 
 interface PostNavigationProps {
   prev: Post | null;

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { BriefingRecommendWidget } from "@/components/briefings/briefing-recommend-widget";
+import { BriefingRecommendWidget } from "@/components/briefings/BriefingRecommendWidget";
 
 const aiBriefingRecommendationStreamMock = vi.fn();
 

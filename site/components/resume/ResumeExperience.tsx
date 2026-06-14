@@ -1,6 +1,6 @@
 import { authorProfile } from "@/lib/author-profile";
-import { SectionTitle } from "./section-title";
-import { ScrollAnimation } from "./scroll-animation";
+import { ScrollAnimation } from "./ScrollAnimation";
+import { SectionTitle } from "./SectionTitle";
 
 export function ResumeExperience() {
   const { experience } = authorProfile;

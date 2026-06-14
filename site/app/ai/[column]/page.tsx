@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
 import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { getAIColumnBySlug, getAIColumns } from "@/lib/columns";
-import { getColumnIconBySlug } from "@/components/column-icons";
+import { getColumnIconBySlug } from "@/components/ColumnIcons";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";
 

@@ -1,8 +1,8 @@
 import { ExternalLink, Github } from "lucide-react";
 
 import { authorProfile } from "@/lib/author-profile";
-import { SectionTitle } from "./section-title";
-import { ScrollAnimation } from "./scroll-animation";
+import { ScrollAnimation } from "./ScrollAnimation";
+import { SectionTitle } from "./SectionTitle";
 
 export function ResumeOpenSourceProjects() {
   const { openSourceProjects } = authorProfile;

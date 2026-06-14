@@ -1,5 +1,5 @@
-import { SectionTitle } from "./section-title";
-import { ScrollAnimation } from "./scroll-animation";
+import { ScrollAnimation } from "./ScrollAnimation";
+import { SectionTitle } from "./SectionTitle";
 import { authorProfile } from "@/lib/author-profile";
 
 export function ResumeSkills() {

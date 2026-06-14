@@ -1,6 +1,6 @@
 "use client";
 
-import { AiPageAssistant } from "@/components/ai/ai-page-assistant";
+import { AiPageAssistant } from "@/components/ai/AiPageAssistant";
 import type { AIQuickTopic } from "@/types/ai";
 
 interface ArticleAiAssistantProps {

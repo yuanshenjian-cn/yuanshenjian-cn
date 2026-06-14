@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { InvestmentBriefingsPageClient } from "@/components/investment/investment-briefings-page-client";
+import { InvestmentBriefingsPageClient } from "@/components/investment/InvestmentBriefingsPageClient";
 import type { InvestmentBriefing } from "@/types/investment";
 
-vi.mock("@/components/investment/investment-briefing-recommend-widget", () => ({
+vi.mock("@/components/investment/InvestmentBriefingRecommendWidget", () => ({
   InvestmentBriefingRecommendWidget: () => <div data-testid="investment-recommend-widget">investment-recommend-widget</div>,
 }));
 

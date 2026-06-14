@@ -39,7 +39,7 @@ export function defaultAdvisorQuickTopics(scene: AdvisorScene): AIQuickTopic[] {
   }
   if (scene === "health" || scene === "health-column") {
     return [
-      { label: "先从哪里开始看", prompt: "请告诉我应该先从哪里开始看。" },
+      { label: "介绍一些泡水的文章", prompt: "请推荐一些关于泡水的文章。" },
       { label: "适合什么人群", prompt: "请说明当前栏目内容更适合什么人群。" },
     ];
   }

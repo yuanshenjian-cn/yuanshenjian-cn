@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypePrismPlus from 'rehype-prism-plus';
 import GitHubSlugger from 'github-slugger';
-import { CodeBlock } from '@/components/code-block';
+import { CodeBlock } from '@/components/CodeBlock';
 
 
 export type MDXComponents = Record<string, React.FC<Record<string, unknown>>>;

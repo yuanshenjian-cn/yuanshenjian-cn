@@ -6,15 +6,13 @@ import { Search, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { AnimatedEllipsisText } from "@/components/ai/animated-ellipsis-text";
+import { AnimatedEllipsisText } from "@/components/ai/AnimatedEllipsisText";
 import { HUMANIZED_TURNSTILE_MESSAGES } from "@/lib/ai/user-facing-messages";
 import { aiArticleRecommendationStream, USER_FACING_AI_ERROR_MESSAGE } from "@/lib/ai-client";
+import { loadTurnstileScript } from "@/lib/turnstile";
 import type { AIQuickTopic, RecommendResponse, RecommendStreamEvent } from "@/types/ai";
 
-const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_ACTION = "homepage_article_recommendation";
-
-let turnstileScriptPromise: Promise<void> | null = null;
 
 const answerMarkdownComponents = {
   h1: ({ children }: { children?: ReactNode }) => (
@@ -64,46 +62,6 @@ const answerMarkdownComponents = {
     <pre className="my-4 overflow-x-auto rounded-xl bg-muted p-4 text-sm text-foreground first:mt-0 last:mb-0">{children}</pre>
   ),
 } as const;
-
-function loadTurnstileScript(): Promise<void> {
-  if (typeof window === "undefined") {
-    return Promise.reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.notReady));
-  }
-
-  if (window.turnstile) {
-    return Promise.resolve();
-  }
-
-  if (turnstileScriptPromise) {
-    return turnstileScriptPromise;
-  }
-
-  turnstileScriptPromise = new Promise((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_SRC}"]`);
-
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener("error", () => {
-        turnstileScriptPromise = null;
-        reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
-      }, { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = TURNSTILE_SCRIPT_SRC;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", () => resolve(), { once: true });
-    script.addEventListener("error", () => {
-      turnstileScriptPromise = null;
-      reject(new Error(HUMANIZED_TURNSTILE_MESSAGES.loadFailed));
-    }, { once: true });
-    document.head.appendChild(script);
-  });
-
-  return turnstileScriptPromise;
-}
 
 interface AiRecommendWidgetProps {
   enabled: boolean;

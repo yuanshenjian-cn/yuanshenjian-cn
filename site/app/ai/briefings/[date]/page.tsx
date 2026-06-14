@@ -5,9 +5,9 @@ import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { MDXContent, extractHeadings } from "@/lib/mdx";
 import { getAdjacentBriefings, getAllBriefings, getBriefingBySlug, getLatestBriefing } from "@/lib/briefings";
 import { config } from "@/lib/config";
-import { ShareButtons } from "@/components/share-buttons";
-import { TableOfContents } from "@/components/table-of-contents";
-import { FloatingTocButton } from "@/components/floating-toc-button";
+import { FloatingTocButton } from "@/components/FloatingTocButton";
+import { ShareButtons } from "@/components/ShareButtons";
+import { TableOfContents } from "@/components/TableOfContents";
 import { ArticleViewTracker } from "@/components/article/ArticleViewTracker";
 
 function getDisplayTag(tag: string): string {

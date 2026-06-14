@@ -3,7 +3,7 @@ import { generateListPageSEO } from "@/lib/seo-utils";
 import { config } from "@/lib/config";
 import { getGeneratedInvestmentCoverageData } from "@/lib/investment-config";
 import { getLatestInvestmentBriefing } from "@/lib/investment-briefings";
-import { CoveragePageClient } from "@/components/investment/coverage-page-client";
+import { CoveragePageClient } from "@/components/investment/CoveragePageClient";
 
 export const metadata: Metadata = generateListPageSEO(
   "投资观察范围",

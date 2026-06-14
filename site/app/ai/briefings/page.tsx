@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { BriefingsPageClient } from "@/components/briefings/briefings-page-client";
+import { BriefingsPageClient } from "@/components/briefings/BriefingsPageClient";
 import { getAllBriefings, getRecentBriefings } from "@/lib/briefings";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { CoveragePageClient } from "@/components/investment/coverage-page-client";
+import { CoveragePageClient } from "@/components/investment/CoveragePageClient";
 
 const coverage = {
   title: "投资观察范围",

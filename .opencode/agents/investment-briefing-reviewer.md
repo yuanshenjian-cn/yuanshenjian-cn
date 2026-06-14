@@ -1,7 +1,7 @@
 ---
 description: 投资简报阻断式复审代理。在 investment-briefing 完成自审后主动使用，复核草稿、内部审核摘要、红线语言、黑名单排除和发布门禁是否符合当前博客工程规则。
 mode: subagent
-model: kimi-for-coding/k2p6
+model: kimi-for-coding/k2p7
 permission:
   edit: deny
 ---

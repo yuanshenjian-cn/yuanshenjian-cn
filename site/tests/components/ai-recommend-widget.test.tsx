@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
+import { AiRecommendWidget } from "@/components/ai/AiRecommendWidget";
 
 const aiArticleRecommendationStreamMock = vi.fn();
 

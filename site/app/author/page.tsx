@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 
 import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
-import { ResumeHero } from "@/components/resume/resume-hero";
-import { ResumeSkills } from "@/components/resume/resume-skills";
-import { ResumeEducation } from "@/components/resume/resume-education";
-import { ResumeExperience } from "@/components/resume/resume-experience";
-import { ResumeProjects } from "@/components/resume/resume-projects";
-import { ResumeOpenSourceProjects } from "@/components/resume/resume-open-source-projects";
-import { ResumeExtras } from "@/components/resume/resume-extras";
+import { ResumeEducation } from "@/components/resume/ResumeEducation";
+import { ResumeExperience } from "@/components/resume/ResumeExperience";
+import { ResumeExtras } from "@/components/resume/ResumeExtras";
+import { ResumeHero } from "@/components/resume/ResumeHero";
+import { ResumeOpenSourceProjects } from "@/components/resume/ResumeOpenSourceProjects";
+import { ResumeProjects } from "@/components/resume/ResumeProjects";
+import { ResumeSkills } from "@/components/resume/ResumeSkills";
 import { buildAdvisorContext, defaultAdvisorQuickTopics } from "@/lib/advisor-context";
 import { config } from "@/lib/config";
 import { generateListPageSEO } from "@/lib/seo-utils";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ScrollAnimation } from "./scroll-animation";
+import { ScrollAnimation } from "./ScrollAnimation";
 
 interface SectionTitleProps {
   title: string;

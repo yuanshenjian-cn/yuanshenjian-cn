@@ -1,50 +1,36 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
-import { InvestmentBriefingRecommendWidget } from "@/components/investment/investment-briefing-recommend-widget";
-import type { InvestmentBriefing } from "@/types/investment";
+import { BriefingRecommendWidget } from "@/components/briefings/BriefingRecommendWidget";
+import { BRIEFING_FILTER_OPTIONS, isBriefingInRange } from "@/lib/briefing-ranges";
+import type { Briefing, BriefingRecommendationRange } from "@/types/briefing";
 
-interface InvestmentBriefingsPageClientProps {
+interface BriefingsPageClientProps {
+  briefings: Briefing[];
+  totalBriefings: number;
   aiConfig: {
     enabled: boolean;
-    maxInputChars: number;
+    workerUrl: string;
     turnstileSiteKey: string;
     turnstileTimeoutMs: number;
-    workerUrl: string;
+    maxInputChars: number;
   };
-  briefings: InvestmentBriefing[];
-  totalBriefings: number;
-  hasOlderBriefings: boolean;
 }
 
-const FILTERS = [
-  { value: "3d", label: "近 3 天" },
-  { value: "7d", label: "近 7 天" },
-  { value: "14d", label: "近 14 天" },
-  { value: "30d", label: "近 30 天" },
-] as const;
+export function BriefingsPageClient({ briefings, totalBriefings, aiConfig }: BriefingsPageClientProps) {
+  const [range, setRange] = useState<Exclude<BriefingRecommendationRange, "today">>("30d");
+  const activeRange: BriefingRecommendationRange = range;
 
-function isWithinRange(date: string, range: (typeof FILTERS)[number]["value"], now = new Date()) {
-  const days = Number.parseInt(range.replace("d", ""), 10);
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - days + 1);
-
-  return new Date(date).getTime() >= start.getTime();
-}
-
-export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefings, hasOlderBriefings }: InvestmentBriefingsPageClientProps) {
-  const [range, setRange] = useState<(typeof FILTERS)[number]["value"]>("30d");
   const filteredBriefings = useMemo(
-    () => briefings.filter((briefing) => isWithinRange(briefing.date, range)),
-    [briefings, range],
+    () => briefings.filter((briefing) => isBriefingInRange(briefing.date, activeRange)),
+    [activeRange, briefings],
   );
 
   return (
     <>
-      <InvestmentBriefingRecommendWidget
+      <BriefingRecommendWidget
         enabled={aiConfig.enabled}
         workerUrl={aiConfig.workerUrl}
         turnstileSiteKey={aiConfig.turnstileSiteKey}
@@ -60,11 +46,13 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {FILTERS.map((option) => (
+            {BRIEFING_FILTER_OPTIONS.map((option) => (
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setRange(option.value)}
+                onClick={() => {
+                  setRange(option.value);
+                }}
                 className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors ${
                   range === option.value
                     ? "border-foreground bg-foreground text-background"
@@ -92,32 +80,34 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
                   </time>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
-                <ArticleStatsBadge slug={`investment-briefing-${briefing.slug}`} className="mt-3" />
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {briefing.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <ArticleStatsBadge slug={`ai-briefing-${briefing.slug}`} className="mt-3" />
+                {briefing.tags.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {briefing.tags.map((tag) => (
+                      <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </Link>
             ))
           ) : (
             <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-              这个时间范围内还没有投资简报。
+              这个时间范围内还没有 AI 简报。
             </p>
           )}
         </div>
 
-        {hasOlderBriefings ? (
+        {totalBriefings > briefings.length ? (
           <div className="mt-6 rounded-2xl border bg-card/60 p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-sm font-medium text-foreground">查看更早简报</h3>
-                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史投资简报</p>
+                <p className="mt-1 text-sm text-muted-foreground">按月份浏览历史 AI 简报</p>
               </div>
               <Link
-                href="/investment/briefings/archive"
+                href="/ai/briefings/archive"
                 className="rounded-xl border px-4 py-2 text-sm transition hover:border-primary/40 hover:bg-muted/30"
               >
                 查看归档

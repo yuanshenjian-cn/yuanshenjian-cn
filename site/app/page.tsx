@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Calendar, Newspaper } from "lucide-react";
-import { AiRecommendWidget } from "@/components/ai/ai-recommend-widget";
+import { AiRecommendWidget } from "@/components/ai/AiRecommendWidget";
 import { getAllPosts } from "@/lib/blog";
 import { getLatestBriefing } from "@/lib/briefings";
 import { config } from "@/lib/config";

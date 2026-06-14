@@ -48,6 +48,13 @@ site/
 - 变量 / 函数：camelCase
 - 常量：UPPER_SNAKE_CASE
 
+### 目录与文件边界
+
+- `components/` 只放 React 组件；hooks 放 `hooks/`，业务/脚本工具放 `lib/`
+- `components/**` 中导出 React 组件的文件名必须与组件名一致，统一使用 PascalCase
+- 同一目录下不要混用 `PascalCase.tsx` 和 `kebab-case.tsx` 组件文件
+- 新增组件时优先放入按职责分组的子目录，如 `article/`、`layout/`、`theme/`、`system/`、`search/`
+
 ### 组件模式
 
 ```typescript
