@@ -282,7 +282,7 @@ export function ContextualAIAdvisor({
                   <span className="flex h-7 w-7 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Sparkles className="h-3.5 w-3.5" />
                   </span>
-                  AI 顾问
+                  YSJ • AI
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button
