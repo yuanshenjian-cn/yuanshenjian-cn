@@ -3,8 +3,8 @@ import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 let buildBriefingsPayload: () => {
-  items: Array<{ slug: string; title: string; brief: string; url: string }>;
-  briefings: Array<{ slug: string; title: string; brief: string; url: string }>;
+  items: Array<{ slug: string; title: string; excerpt: string; url: string }>;
+  briefings: Array<{ slug: string; title: string; excerpt: string; url: string }>;
 };
 let buildCoveragePayload: () => { areas: Array<Record<string, unknown>>; companies: Array<Record<string, unknown>>; methodCards: unknown[] };
 
@@ -71,7 +71,7 @@ tags:
       expect.objectContaining({
         slug: testSlug,
         title: `投资简报 · ${testSlug}`,
-        brief: "测试摘要",
+        excerpt: "测试摘要",
         url: `/investment/briefings/${testSlug}`,
       }),
     );

@@ -200,7 +200,7 @@ function parseBriefingFile(filePath) {
     return {
       slug,
       title: normalizeInvestmentBriefingTitle(data.title),
-      brief: data.brief,
+      excerpt,
       tags,
       date: new Date(data.date).toISOString(),
       url: `/investment/briefings/${slug}`,
