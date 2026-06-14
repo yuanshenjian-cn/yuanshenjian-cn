@@ -74,7 +74,7 @@ export default function Home() {
           </div>
           <div className="max-w-2xl mx-auto">
             <div className="grid gap-4 md:grid-cols-2">
-              <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
+              <section className="flex flex-col rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -100,7 +100,7 @@ export default function Home() {
                     : "持续追踪重点 AI 厂商的确定性动态，有更新时发布新一期简报。"}
                 </p>
 
-                <div className="mt-5 flex flex-wrap items-center gap-3">
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                   <Link
                     href="/ai/briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
@@ -117,7 +117,7 @@ export default function Home() {
                 </div>
               </section>
 
-              <section className="rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
+              <section className="flex flex-col rounded-2xl border bg-background/72 p-5 shadow-sm backdrop-blur-sm min-h-[196px]">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -143,7 +143,7 @@ export default function Home() {
                     : "持续整理重点公司的公开动态与未来观察，帮助你快速把握最新投资线索。"}
                 </p>
 
-                <div className="mt-5 flex flex-wrap items-center gap-3">
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                   <Link
                     href="/investment/briefings/latest"
                     className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[11px] font-medium text-background transition hover:bg-foreground/90"
