@@ -28,6 +28,16 @@ select {
   margin-bottom: 24px;
 }
 
+.nav button.logout {
+  margin-left: auto;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.nav button.logout:hover {
+  background: #fef2f2;
+}
+
 .nav button,
 .card button {
   border: 1px solid #cbd5e1;

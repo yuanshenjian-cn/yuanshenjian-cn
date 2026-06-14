@@ -72,7 +72,7 @@ async def login_admin_session(
             samesite="lax",
             domain=settings.cookie_domain if settings.app_env == "production" else None,
             path="/api/v1/admin",
-            max_age=60 * 60 * 24 * 7,
+            max_age=60 * 60 * 24 * settings.admin_session_ttl_days,
         )
         response.set_cookie(
             "csrf_token",
@@ -82,7 +82,7 @@ async def login_admin_session(
             samesite="lax",
             domain=settings.cookie_domain if settings.app_env == "production" else None,
             path="/",
-            max_age=60 * 60 * 24 * 7,
+            max_age=60 * 60 * 24 * settings.admin_session_ttl_days,
         )
         return result.response
     except InvalidAdminPasswordError as error:

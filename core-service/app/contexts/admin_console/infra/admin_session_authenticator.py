@@ -27,9 +27,10 @@ class RepositoryAdminSessionAuthenticator(AdminSessionAuthenticator):
             AdminSession(
                 id="",
                 session_hash=session_hash,
-                expires_at=datetime.now(UTC) + timedelta(days=7),
+                expires_at=datetime.now(UTC) + timedelta(days=settings.admin_session_ttl_days),
                 created_at=datetime.now(UTC),
                 last_seen_at=datetime.now(UTC),
             )
         )
         return IssuedAdminSession(raw_session_token=raw_session_token, csrf_token=create_secret_token())
+

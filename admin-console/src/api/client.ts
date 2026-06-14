@@ -92,6 +92,13 @@ export function fetchMe() {
   return request<{ role: string }>("/api/v1/admin/me");
 }
 
+export function logout() {
+  return request<{ ok: boolean }>("/api/v1/admin/auth/logout", {
+    method: "POST",
+    body: JSON.stringify({ csrf_token: getCsrfToken() }),
+  });
+}
+
 export function fetchComments(status = "pending") {
   return request<{ items: AdminCommentItem[]; next_cursor: string | null }>(`/api/v1/admin/comments?status=${status}`);
 }

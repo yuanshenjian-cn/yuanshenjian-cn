@@ -6,6 +6,7 @@ default:
       - https://admin.yuanshenjian.cn
   security:
     cookie_domain: .yuanshenjian.cn
+    admin_session_ttl_days: ${ADMIN_SESSION_TTL_DAYS:1}
   ai:
     active_profile: ${AI_ACTIVE_PROFILE:deepseek/deepseek-v4-flash}
     profile_defaults:

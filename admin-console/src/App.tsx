@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchMe } from "./api/client";
+import { fetchMe, logout } from "./api/client";
 import { AiUsagePage } from "./pages/AiUsagePage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CommentsPage } from "./pages/CommentsPage";
@@ -28,6 +28,14 @@ export function App() {
       .finally(() => setReady(true));
   }, []);
 
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      setPage("login");
+    }
+  }
+
   if (!ready) {
     return null;
   }
@@ -42,6 +50,7 @@ export function App() {
               {item.label}
             </button>
           ))}
+          <button className="logout" onClick={handleLogout}>退出登录</button>
         </nav>
       ) : null}
       {page === "login" && <LoginPage onLoggedIn={() => setPage("comments")} />}

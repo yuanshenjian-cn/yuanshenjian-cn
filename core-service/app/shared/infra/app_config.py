@@ -96,6 +96,7 @@ class CorsConfig(BaseModel):
 
 class SecurityConfig(BaseModel):
     cookie_domain: str = ".yuanshenjian.cn"
+    admin_session_ttl_days: int = 1
 
 
 class AIProfileDefaultsConfig(BaseModel):
@@ -215,6 +216,10 @@ class Settings(BaseModel):
     @property
     def cookie_domain(self) -> str:
         return self.cookie_domain_override or self.file_config.security.cookie_domain
+
+    @property
+    def admin_session_ttl_days(self) -> int:
+        return self.file_config.security.admin_session_ttl_days
 
     @property
     def ai_global_daily_token_limit(self) -> int:
