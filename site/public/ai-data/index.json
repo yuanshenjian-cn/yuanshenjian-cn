@@ -1,6 +1,45 @@
 {
-  "generated": "2026-05-16T00:00:00.000Z",
+  "generated": "2026-06-14T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "anthropic-model-family-notes",
+      "title": "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent",
+      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案。首版覆盖 Claude Opus 4.7、Claude Opus 4.6、Claude Opus 4、Claude 3.7 Sonnet、Claude 3.5 Sonnet 和 Claude 3 Opus 等最近几代主力，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续追加维护规则。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "Anthropic",
+        "Claude",
+        "模型评测"
+      ],
+      "date": "2026-06-14T00:00:00.000Z"
+    },
+    {
+      "slug": "google-gemini-model-family-notes",
+      "title": "Google Gemini 模型谱系档案：从长上下文到 agentic era 的主线怎么走",
+      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。首版覆盖 Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "Google",
+        "Gemini",
+        "模型评测"
+      ],
+      "date": "2026-06-14T00:00:00.000Z"
+    },
+    {
+      "slug": "kimi-model-family-notes",
+      "title": "Kimi 模型谱系档案：月之暗面这条线最特别的地方，是 Agent 味越来越重",
+      "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "月之暗面",
+        "Kimi",
+        "模型评测"
+      ],
+      "date": "2026-06-14T00:00:00.000Z"
+    },
     {
       "slug": "mimo-model-family-notes",
       "title": "小米 MiMo 模型谱系档案：这条线值得关注，不只是因为国产新玩家",
@@ -53,19 +92,6 @@
       "date": "2026-05-14T00:00:00.000Z"
     },
     {
-      "slug": "anthropic-model-family-notes",
-      "title": "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent",
-      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案。首版覆盖 Claude Opus 4.7、Claude Opus 4.6、Claude Opus 4、Claude 3.7 Sonnet、Claude 3.5 Sonnet 和 Claude 3 Opus 等最近几代主力，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续追加维护规则。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "Anthropic",
-        "Claude",
-        "模型评测"
-      ],
-      "date": "2026-05-14T00:00:00.000Z"
-    },
-    {
       "slug": "deepseek-model-family-notes",
       "title": "DeepSeek 模型谱系档案：从 V3 到 V4，这家最锋利的地方不只是便宜",
       "excerpt": "这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。",
@@ -75,32 +101,6 @@
         "DeepSeek",
         "模型评测",
         "开源权重"
-      ],
-      "date": "2026-05-14T00:00:00.000Z"
-    },
-    {
-      "slug": "google-gemini-model-family-notes",
-      "title": "Google Gemini 模型谱系档案：从长上下文到 agentic era 的主线怎么走",
-      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。首版覆盖 Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "Google",
-        "Gemini",
-        "模型评测"
-      ],
-      "date": "2026-05-14T00:00:00.000Z"
-    },
-    {
-      "slug": "kimi-model-family-notes",
-      "title": "Kimi 模型谱系档案：月之暗面这条线最特别的地方，是 Agent 味越来越重",
-      "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "月之暗面",
-        "Kimi",
-        "模型评测"
       ],
       "date": "2026-05-14T00:00:00.000Z"
     },

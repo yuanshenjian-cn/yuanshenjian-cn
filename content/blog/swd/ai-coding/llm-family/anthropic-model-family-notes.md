@@ -1,6 +1,6 @@
 ---
 title: "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent"
-date: '2026-05-14'
+date: '2026-06-14'
 tags:
   - AI前沿
   - LLM
@@ -36,6 +36,7 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中/读 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
+| Claude Opus 4.8 | 2026-05-28 | $5 / 1M | $0.50 / 1M | $25 / 1M | Opus 旗舰小幅但扎实的升级，更诚实、更稳的长程 Agent 协作 |
 | Claude Opus 4.7 | 2026-04-16 | $5 / 1M | $0.50 / 1M | $25 / 1M | 当前 Claude 主力旗舰，继续强化长程编码和高分辨率视觉 |
 | Claude Opus 4.6 | 2026-02-05 | $5 / 1M | $0.50 / 1M | $25 / 1M | 1M context + Adaptive Thinking + Agent Teams 预览 |
 | Claude Opus 4.5 | 2025-11-24 | $5 / 1M | $0.50 / 1M | $25 / 1M | Claude 旗舰价格首次直接砍到 1/3，编码能力同步补强 |
@@ -44,7 +45,24 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 | Claude 3.5 Sonnet | 2024-06-20 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
 | Claude 3 Opus | 2024-03-04 | $15 / 1M | 官方未公布 | $75 / 1M | Claude 3 家族旗舰，把长上下文和多模态能力打进前沿区 |
 
-<small>*数据来源：Anthropic 官方新闻页与官方 Pricing 页面，查询日期 2026-05-14。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.7 的缓存读价格沿用官方 pricing 当前页与“pricing remains the same as Opus 4.6”口径。*</small>
+<small>*数据来源：Anthropic 官方新闻页与官方 Pricing 页面，查询日期 2026-06-14。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+
+## Claude Opus 4.8：把“诚实”和“长程稳定”继续做厚的一代
+
+Anthropic 在 2026 年 5 月 28 日发布 Claude Opus 4.8。
+
+这代不是参数或架构上的大改，而是一次非常典型的旗舰迭代：在 Opus 4.7 的基础上把编码、agentic tasks、推理和知识工作继续打磨，同时保持 $5/$25 的价格不变。
+
+官方特别强调了几点值得记住的变化：
+
+- **更诚实**：Opus 4.8 更愿意主动标注不确定性，而不是自信地给出 unsupported claims；官方评估显示它相比前代大约少 4 倍让代码缺陷“蒙混过关”
+- **长程 Agent 更稳**：早期测试者反馈它在执行 agentic 任务时更可靠、判断更锐利
+- **Claude Code 的 dynamic workflows**：可以 tackle 更大规模的问题
+- **Fast mode 更便宜**：2.5× 速度，价格比之前模型的 fast mode 低三倍
+
+默认 effort 是 high，用户还可以选择 extra（xhigh）或 max，用于困难任务和长时异步工作流。
+
+我对 Opus 4.8 的理解是：Anthropic 没有换路线，而是在同一条路线上继续加厚。它的竞争点不是“最聪明”，而是“最可托付”。
 
 ## Claude Opus 4.7：这代真正补强的是“高难任务不掉链子”
 
@@ -144,7 +162,7 @@ Claude 3 Opus 是 2024 年 3 月 4 日发布的。
 
 ## 我对 Anthropic 这条线的实际判断
 
-Anthropic 从 Claude 3 Opus 到 Claude Opus 4.7 的完整主线，核心不是”功能越来越花”，而是”复杂任务越来越稳”。
+Anthropic 从 Claude 3 Opus 到 Claude Opus 4.8 的完整主线，核心不是”功能越来越花”，而是”复杂任务越来越稳”。
 
 这是 Claude 和其他头部厂商最值得单独看的地方。
 
@@ -168,6 +186,7 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 - Claude Opus 4.5：编码能力补强 + 把旗舰价格砍到 $5/$25
 - Claude Opus 4.6：1M context + 自适应思考 + Agent Teams 预览
 - Claude Opus 4.7：继续推高长程编码和视觉分辨率
+- Claude Opus 4.8：继续加厚诚实性与长程 Agent 稳定性
 
 所以如果你的问题是”Claude 这家最适合拿来干嘛”，我的答案会很集中：
 
@@ -183,6 +202,7 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 ## 官方来源
 
 - Anthropic Pricing: `https://claude.com/pricing#api`
+- Introducing Claude Opus 4.8: `https://www.anthropic.com/news/claude-opus-4-8`
 - Introducing Claude Opus 4.7: `https://www.anthropic.com/news/claude-opus-4-7`
 - Introducing Claude Opus 4.6: `https://www.anthropic.com/news/claude-opus-4-6`
 - Introducing Claude Opus 4.5: `https://www.anthropic.com/news/claude-opus-4-5`

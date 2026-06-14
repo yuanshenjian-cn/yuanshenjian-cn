@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import re
-from typing import Any
+from datetime import datetime, timedelta, timezone
+from typing import Any, cast as typing_cast
 
 from sqlalchemy import Select, Text, cast, literal, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,6 +45,34 @@ class KnowledgeContextQueryService:
                 for start in range(0, len(sequence) - size + 1):
                     terms.add(sequence[start : start + size])
         return sorted(terms, key=len, reverse=True)
+
+    def _extract_dates_from_query(self, query: str) -> list[datetime]:
+        """从查询中提取可能的日期（优先 YYYY-MM-DD，其次 M月D日）。"""
+        dates: list[datetime] = []
+        seen: set[str] = set()
+        for match in re.finditer(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})", query):
+            key = f"{match.group(1)}-{int(match.group(2)):02d}-{int(match.group(3)):02d}"
+            if key in seen:
+                continue
+            seen.add(key)
+            try:
+                dates.append(datetime.strptime(key, "%Y-%m-%d").replace(tzinfo=timezone.utc))
+            except ValueError:
+                continue
+        current_year = datetime.now(timezone.utc).year
+        for match in re.finditer(r"(\d{1,2})\s*月\s*(\d{1,2})\s*日", query):
+            month = int(match.group(1))
+            day = int(match.group(2))
+            for year in {current_year, current_year - 1}:
+                key = f"{year}-{month:02d}-{day:02d}"
+                if key in seen:
+                    continue
+                try:
+                    dates.append(datetime.strptime(key, "%Y-%m-%d").replace(tzinfo=timezone.utc))
+                    seen.add(key)
+                except ValueError:
+                    continue
+        return dates
 
     def _is_article_navigation_query(self, query: str) -> bool:
         normalized = query.replace(" ", "")
@@ -93,18 +122,29 @@ class KnowledgeContextQueryService:
                 statement = statement.where(or_(KnowledgeDocumentPO.domains.is_(None), self._json_array_contains(KnowledgeDocumentPO.domains, domain)))
             return statement.limit(candidate_limit)
 
-        rows = list(await session.execute(build_statement(include_page_slug=True)))
-        if not rows and page_slug and not article_slug:
-            rows = list(await session.execute(build_statement(include_page_slug=False)))
-        if not rows and not (article_slug or page_slug or scene or domain):
-            rows = list(
-                await session.execute(
-                    select(KnowledgeChunkPO, KnowledgeDocumentPO).join(
-                        KnowledgeDocumentPO,
-                        KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id,
-                    ).limit(candidate_limit)
-                )
+        query_dates = self._extract_dates_from_query(query)
+        rows: list[Any] = []
+        if query_dates and not article_slug:
+            rows = await self._query_by_dates(
+                session,
+                query_dates,
+                scene=scene,
+                domain=domain,
+                limit=candidate_limit,
             )
+        else:
+            rows = list(await session.execute(build_statement(include_page_slug=True)))
+            if not rows and page_slug and not article_slug:
+                rows = list(await session.execute(build_statement(include_page_slug=False)))
+            if not rows and not (article_slug or page_slug or scene or domain):
+                rows = list(
+                    await session.execute(
+                        select(KnowledgeChunkPO, KnowledgeDocumentPO).join(
+                            KnowledgeDocumentPO,
+                            KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id,
+                        ).limit(candidate_limit)
+                    )
+                )
 
         contexts: list[str] = []
         references: list[dict[str, str]] = []
@@ -176,3 +216,33 @@ class KnowledgeContextQueryService:
             if len(result) >= top_k:
                 break
         return result
+
+    async def _query_by_dates(
+        self,
+        session: AsyncSession,
+        dates: list[datetime],
+        *,
+        scene: str | None,
+        domain: str | None,
+        limit: int,
+    ) -> list[Any]:
+        """按日期精确匹配简报或文章，返回对应 chunk。"""
+        if not dates:
+            return []
+        start = min(dates)
+        end = max(dates) + timedelta(days=1)
+        statement = (
+            select(KnowledgeChunkPO, KnowledgeDocumentPO)
+            .join(KnowledgeDocumentPO, KnowledgeChunkPO.document_id == KnowledgeDocumentPO.id)
+            .where(
+                KnowledgeDocumentPO.published_at >= start,
+                KnowledgeDocumentPO.published_at < end,
+            )
+            .order_by(KnowledgeDocumentPO.published_at.desc())
+            .limit(limit)
+        )
+        if scene:
+            statement = statement.where(or_(KnowledgeDocumentPO.scenes.is_(None), self._json_array_contains(KnowledgeDocumentPO.scenes, scene)))
+        if domain:
+            statement = statement.where(or_(KnowledgeDocumentPO.domains.is_(None), self._json_array_contains(KnowledgeDocumentPO.domains, domain)))
+        return list(await session.execute(statement))

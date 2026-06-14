@@ -1,7 +1,7 @@
 {
   "slug": "kimi-model-family-notes",
   "title": "Kimi 模型谱系档案：月之暗面这条线最特别的地方，是 Agent 味越来越重",
-  "date": "2026-05-14T00:00:00.000Z",
+  "date": "2026-06-14T00:00:00.000Z",
   "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
   "tags": [
     "AI前沿",
@@ -29,14 +29,21 @@
       "id": "kimi-最近几代主线总表",
       "anchorId": "kimi-最近几代主线总表",
       "heading": "Kimi 最近几代主线总表",
-      "content": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.6 2026-04-20 ¥6.50 / 1M ¥1.10 / 1M ¥27.00 / 1M 当前主力开源 coding/agent 模型，长程执行能力明显拉升 Kimi K2.5 2026-01-27 ¥4.00 / 1M ¥0.70 / 1M ¥21.00 / 1M 视觉 Agent 与多步工具能力成型，Agent Swarm 100 并行 Kimi K2 Thinking 2025-11-06 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M thinking 专门型号，支持 reasoning_content 与多步工具 Kimi K2-0905 2025-09-05 官方页面未保留 官方页面未保留 官方页面未保留 Agentic Coding 增强，256K context Kimi K2 2025-07 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M Open Agentic Intelligence 的公开起点 Kimi K2-0711 2025-07-11 官方页面未保留 官方页面未保留 官方页面未保留 K2 基础模型预览版，128K context Moonshot V1 官方页面未直接标注 ¥2 / ¥5 / ¥10 每 1M 官方未公布 ¥10 / ¥20 / ¥30 每 1M K 系列之前的经典生成线，更像老一代基础盘 数据来源：Kimi 官方平台文档、官方 pricing 页面与官方博客，查询日期 2026-05-14。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。",
-      "excerpt": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.6 2026-04-20 ¥6.50 / 1M ¥1.10 / 1M ¥27.00 / 1M ..."
+      "content": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.7 Code 官方未公布 ¥6.50 / 1M ¥1.30 / 1M ¥27.00 / 1M Kimi 迄今最智能的 Coding 模型，仅思考模式，支持文本/图片/视频输入 Kimi K2.6 2026-04-20 ¥6.50 / 1M ¥1.10 / 1M ¥27.00 / 1M 当前主力开源 coding/agent 模型，长程执行能力明显拉升 Kimi K2.5 2026-01-27 ¥4.00 / 1M ¥0.70 / 1M ¥21.00 / 1M 视觉 Agent 与多步工具能力成型，Agent Swarm 100 并行 Kimi K2 Thinking 2025-11-06 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M thinking 专门型号，支持 reasoning_content 与多步工具 Kimi K2-0905 2025-09-05 官方页面未保留 官方页面未保留 官方页面未保留 Agentic Coding 增强，256K context Kimi K2 2025-07 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M Open Agentic Intelligence 的公开起点 Kimi K2-0711 2025-07-11 官方页面未保留 官方页面未保留 官方页面未保留 K2 基础模型预览版，128K context Moonshot V1 官方页面未直接标注 ¥2 / ¥5 / ¥10 每 1M 官方未公布 ¥10 / ¥20 / ¥30 每 1M K 系列之前的经典生成线，更像老一代基础盘 数据来源：Kimi 官方平台文档、官方 pricing 页面与官方博客，查询日期 2026-06-14。Kimi K2.7 Code 的官方发布日期未在官方博客或模型列表页直接标注，按“官方未公布”处理。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。",
+      "excerpt": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.7 Code 官方未公布 ¥6.50 / 1M ¥1.30 / 1M ¥27.00 / 1M ..."
+    },
+    {
+      "id": "kimi-k27-codekimi-把-coding-专门模型推到新高点",
+      "anchorId": "kimi-k27-codekimi-把-coding-专门模型推到新高点",
+      "heading": "Kimi K2.7 Code：Kimi 把 Coding 专门模型推到新高点",
+      "content": "Kimi K2.7 Code 已经出现在 Kimi 官方模型列表和官方定价页中，但官方博客目前没有专门的发布文章，因此官方发布日期按“官方未公布”处理。 从官方模型说明看，它的定位非常聚焦： Kimi 迄今最智能的 Coding 模型 上下文 256K，在长上下文中更可靠地遵循指令 支持文本、图片、视频输入 仅支持思考模式，适合需要深度推理的编程任务 支持自动上下文缓存、ToolCalls、JSON Mode、Partial Mode 价格方面，K2.7 Code 和 K2.6 保持一致：输入 ¥6.50/1M、输出 ¥27.00/1M，但缓存命中价略高（¥1.30/1M 对比 K2.6 的 ¥1.10/1M）。这说明它的定位不是“更便宜的替代”，而是“在同一价位上把 Coding 专门化做得更好”。 我把 K2.7 Code 放进主线档案，是因为 Kimi 明显在把 Coding 这条线独立出来做专门优化。它不是 K2.6 的简单复用，而是同一个上下文价位下、面向编程场景的深度特化版本。",
+      "excerpt": "Kimi K2.7 Code 已经出现在 Kimi 官方模型列表和官方定价页中，但官方博客目前没有专门的发布文章，因此官方发布日期按“官方未公布”处理。 从官方模型说明看，它的定位非常聚焦： Kimi 迄今最智能的 Coding 模型 上下文 256K，在长上下文中更可靠地遵循指令 支持文本、图片、视频输入 仅支持思考..."
     },
     {
       "id": "kimi-k26这代已经不只是会写代码而是能长时间把代码活跑下去",
       "anchorId": "kimi-k26这代已经不只是会写代码而是能长时间把代码活跑下去",
       "heading": "Kimi K2.6：这代已经不只是“会写代码”，而是“能长时间把代码活跑下去”",
-      "content": "K2.6 的官方博客标题就很直接：Advancing Open-Source Coding。 但我认为它最大的看点，不只是开源 coding，而是长程执行。 官方给了很多非常具体的案例： 4000+ tool calls 12 小时连续执行 13 小时改造老系统 1000+ tool calls 去完成复杂工程优化 这些案例可能有宣传成分，但至少说明一件事：Kimi 已经把“持续执行”和“工具循环”视作主能力，而不是锦上添花的展示项。 这也是为什么我觉得 K2.6 是月之暗面这条线目前最值得看的模型。 它的重点不是一两次漂亮输出，而是比较长的、需要不断推进的工程过程。",
+      "content": "K2.6 的官方博客标题就很直接：Advancing Open-Source Coding。 但我认为它最大的看点，不只是开源 coding，而是长程执行。 官方给了很多非常具体的案例： 4000+ tool calls 12 小时连续执行 13 小时改造老系统 1000+ tool calls 去完成复杂工程优化 这些案例可能有宣传成分，但至少说明一件事：Kimi 已经把“持续执行”和“工具循环”视作主能力，而不是锦上添花的展示项。 这也是为什么我觉得 K2.6 是月之暗面这条线非常值得看的模型之一。 它的重点不是一两次漂亮输出，而是比较长的、需要不断推进的工程过程。",
       "excerpt": "K2.6 的官方博客标题就很直接：Advancing Open-Source Coding。 但我认为它最大的看点，不只是开源 coding，而是长程执行。 官方给了很多非常具体的案例： 4000+ tool calls 12 小时连续执行 13 小时改造老系统 1000+ tool calls 去完成复杂工程优化 这..."
     },
     {
@@ -92,8 +99,8 @@
       "id": "官方来源",
       "anchorId": "官方来源",
       "heading": "官方来源",
-      "content": "Kimi Models: https://platform.kimi.com/docs/models.md Kimi K2.6 Quickstart: https://platform.kimi.com/docs/guide/kimi-k2-6-quickstart.md Kimi K2.6 Pricing: https://platform.kimi.com/docs/pricing/chat-k26.md Kimi K2.6 Blog: https://www.kimi.com/blog/kimi-k2-6 Kimi K2.5 Pricing: https://platform.kimi.com/docs/pricing/chat-k25.md Kimi K2 Pricing: https://platform.kimi.com/docs/pricing/chat-k2.md Kimi K2 Thinking Guide: https://platform.kimi.com/docs/guide/use-kimi-k2-thinking-model.md Kimi K2 Blog: https://www.kimi.com/blog/kimi-k2 Moonshot V1 Pricing: https://platform.kimi.com/docs/pricing/chat-v1.md",
-      "excerpt": "Kimi Models: https://platform.kimi.com/docs/models.md Kimi K2.6 Quickstart: https://platform.kimi.com/docs/guide/kimi-k2-6-quickstart.md Kimi K2.6 Pricing: http..."
+      "content": "Kimi Models: https://platform.kimi.com/docs/models.md Kimi K2.7 Code Pricing: https://platform.kimi.com/docs/pricing/chat-k27-code Kimi K2.6 Quickstart: https://platform.kimi.com/docs/guide/kimi-k2-6-quickstart.md Kimi K2.6 Pricing: https://platform.kimi.com/docs/pricing/chat-k26.md Kimi K2.6 Blog: https://www.kimi.com/blog/kimi-k2-6 Kimi K2.5 Pricing: https://platform.kimi.com/docs/pricing/chat-k25.md Kimi K2 Pricing: https://platform.kimi.com/docs/pricing/chat-k2.md Kimi K2 Thinking Guide: https://platform.kimi.com/docs/guide/use-kimi-k2-thinking-model.md Kimi K2 Blog: https://www.kimi.com/blog/kimi-k2 Moonshot V1 Pricing: https://platform.kimi.com/docs/pricing/chat-v1.md",
+      "excerpt": "Kimi Models: https://platform.kimi.com/docs/models.md Kimi K2.7 Code Pricing: https://platform.kimi.com/docs/pricing/chat-k27-code Kimi K2.6 Quickstart: https:/..."
     }
   ]
 }

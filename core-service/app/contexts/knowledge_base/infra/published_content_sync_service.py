@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, cast
 
@@ -32,6 +34,52 @@ class PublishedContentSyncService:
 
     def canonical_source_id(self, source_type: str, slug: str) -> str:
         return f"{source_type}:{slug}"
+
+    def _parse_published_at(self, metadata: dict[str, Any]) -> datetime | None:
+        raw_date = metadata.get("date")
+        if isinstance(raw_date, datetime):
+            if raw_date.tzinfo is None:
+                return raw_date.replace(tzinfo=timezone.utc)
+            return raw_date
+        if isinstance(raw_date, str):
+            try:
+                parsed = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+                if parsed.tzinfo is None:
+                    parsed = parsed.replace(tzinfo=timezone.utc)
+                return parsed
+            except ValueError:
+                return None
+        return None
+
+    def _format_briefing_date(self, metadata: dict[str, Any]) -> str | None:
+        published_at = self._parse_published_at(metadata)
+        if published_at is None:
+            return None
+        return published_at.strftime("%Y-%m-%d")
+
+    def _document_url(self, source_type: str, slug: str, metadata: dict[str, Any]) -> str | None:
+        if source_type == "article":
+            return f"/articles/{slug}"
+        if source_type == "ai_briefing":
+            date_str = self._format_briefing_date(metadata)
+            return f"/ai/briefings/{date_str}" if date_str else None
+        if source_type == "investment_briefing":
+            date_str = self._format_briefing_date(metadata)
+            return f"/investment/briefings/{date_str}" if date_str else None
+        return None
+
+    def _extract_briefing_date_terms(self, metadata: dict[str, Any]) -> list[str]:
+        date_str = self._format_briefing_date(metadata)
+        if date_str is None:
+            return []
+        terms = [date_str]
+        match = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", date_str)
+        if match:
+            year, month, day = match.groups()
+            terms.append(f"{year}年{int(month)}月{int(day)}日")
+            terms.append(f"{int(month)}月{int(day)}日")
+            terms.append(f"{year}/{month}/{day}")
+        return terms
 
     def discover_public_content(self, repo_root: Path) -> list[Path]:
         content_root = repo_root / "content"
@@ -145,17 +193,23 @@ class PublishedContentSyncService:
                         )
                     )
                     body_hash = self.content_hash(post.content)
+                    published_at = self._parse_published_at(metadata)
+                    url = self._document_url(source_type, slug, metadata)
+                    date_terms = self._extract_briefing_date_terms(metadata)
+                    title = str(metadata.get("title") or slug)
+                    summary = str(metadata.get("brief") or metadata.get("excerpt") or "")
                     if document is None:
                         document = KnowledgeDocumentPO(
                             source_type=source_type,
                             source_id=source_id,
                             knowledge_source_id=source.id,
                             slug=slug,
-                            title=str(metadata.get("title") or slug),
-                            url=f"/articles/{slug}" if source_type == "article" else None,
-                            summary=str(metadata.get("brief") or metadata.get("excerpt") or ""),
+                            title=title,
+                            url=url,
+                            summary=summary,
                             visibility="public",
                             content_hash=body_hash,
+                            published_at=published_at,
                             domains=domains,
                             scenes=scenes,
                             tags=tags,
@@ -164,22 +218,28 @@ class PublishedContentSyncService:
                         session.add(document)
                         await session.flush()
                         sync_run.documents_upserted += 1
-                    elif document.content_hash != body_hash:
+                    else:
                         document.content_hash = body_hash
-                        document.title = str(metadata.get("title") or slug)
-                        document.summary = str(metadata.get("brief") or metadata.get("excerpt") or "")
+                        document.title = title
+                        document.summary = summary
                         document.knowledge_source_id = source.id
+                        document.published_at = published_at
+                        document.url = url
                         document.domains = domains
                         document.scenes = scenes
                         document.tags = tags
                         document.metadata_json = metadata
                         sync_run.documents_upserted += 1
 
+                    heading_prefix = " ".join(date_terms)
                     chunks = self.chunk_text(post.content)
                     existing_chunks = list(await session.scalars(select(KnowledgeChunkPO).where(KnowledgeChunkPO.document_id == document.id)))
                     by_index = {chunk.chunk_index: chunk for chunk in existing_chunks}
                     for index, chunk_body in enumerate(chunks):
-                        chunk_hash = self.content_hash(chunk_body)
+                        enriched_body = chunk_body
+                        if heading_prefix and index == 0:
+                            enriched_body = f"{heading_prefix}\n{chunk_body}"
+                        chunk_hash = self.content_hash(enriched_body)
                         chunk = by_index.get(index)
                         if chunk is None:
                             session.add(
@@ -187,8 +247,8 @@ class PublishedContentSyncService:
                                     document_id=document.id,
                                     chunk_index=index,
                                     heading=document.title,
-                                    content=chunk_body,
-                                    token_count=max(1, len(chunk_body) // 4),
+                                    content=enriched_body,
+                                    token_count=max(1, len(enriched_body) // 4),
                                     content_hash=chunk_hash,
                                     embedding=[],
                                     embedding_model="not-generated",
@@ -199,9 +259,9 @@ class PublishedContentSyncService:
                             )
                             sync_run.chunks_upserted += 1
                         elif chunk.content_hash != chunk_hash:
-                            chunk.content = chunk_body
+                            chunk.content = enriched_body
                             chunk.content_hash = chunk_hash
-                            chunk.token_count = max(1, len(chunk_body) // 4)
+                            chunk.token_count = max(1, len(enriched_body) // 4)
                             chunk.embedding_status = "not-generated"
                             sync_run.chunks_upserted += 1
 

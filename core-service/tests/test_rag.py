@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 from sqlalchemy.dialects.postgresql.asyncpg import dialect as asyncpg_dialect
@@ -47,6 +48,39 @@ def test_sync_service_maps_ai_path_to_ai_scene() -> None:
 def test_sync_service_maps_investment_path_to_investment_domain() -> None:
     service = PublishedContentSyncService()
     assert service._domains_for_path(__import__("pathlib").Path("content/investment/beginner-investing/file.md"), "article") == ["investment"]
+
+
+def test_sync_service_parses_published_at_from_frontmatter() -> None:
+    service = PublishedContentSyncService()
+    assert service._parse_published_at({"date": "2026-06-14"}) == datetime(2026, 6, 14, tzinfo=timezone.utc)
+    assert service._parse_published_at({"date": datetime(2026, 6, 14, 10, 30, tzinfo=timezone.utc)}) == datetime(2026, 6, 14, 10, 30, tzinfo=timezone.utc)
+    assert service._parse_published_at({"date": "2026-06-14T10:30:00Z"}) == datetime(2026, 6, 14, 10, 30, tzinfo=timezone.utc)
+    assert service._parse_published_at({"title": "no date"}) is None
+
+
+def test_sync_service_builds_briefing_url_from_date() -> None:
+    service = PublishedContentSyncService()
+    metadata = {"date": "2026-06-14"}
+    assert service._document_url("ai_briefing", "2026-06-14-ai-briefing", metadata) == "/ai/briefings/2026-06-14"
+    assert service._document_url("investment_briefing", "2026-06-14-investment-briefing", metadata) == "/investment/briefings/2026-06-14"
+    assert service._document_url("article", "hello-world", {"date": "2026-06-14"}) == "/articles/hello-world"
+
+
+def test_sync_service_extracts_date_terms_for_chunk_enrichment() -> None:
+    service = PublishedContentSyncService()
+    terms = service._extract_briefing_date_terms({"date": "2026-06-14"})
+    assert "2026-06-14" in terms
+    assert "2026年6月14日" in terms
+    assert "6月14日" in terms
+    assert "2026/06/14" in terms
+
+
+def test_query_service_extracts_dates_from_query() -> None:
+    service = KnowledgeContextQueryService()
+    assert service._extract_dates_from_query("2026-06-14的简报")[0].date().isoformat() == "2026-06-14"
+    assert service._extract_dates_from_query("6月14日发生了什么")[0].month == 6
+    assert service._extract_dates_from_query("6月14日发生了什么")[0].day == 14
+    assert service._extract_dates_from_query("今天怎么样") == []
 
 
 def test_query_service_falls_back_from_page_slug_to_scene_scope() -> None:
