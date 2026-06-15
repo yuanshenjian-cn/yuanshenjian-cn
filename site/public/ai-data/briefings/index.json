@@ -1,6 +1,18 @@
 {
-  "generated": "2026-06-14T00:00:00.000Z",
+  "generated": "2026-06-15T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-15",
+      "title": "AI 简报 · 2026-06-15",
+      "excerpt": "加拿大总理 Carney 借 Anthropic 模型下线警告对美 AI 依赖风险；Meta AI 负责人 Alexandr Wang 入职一周年面临模型与组织双重挑战。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-06-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-15"
+    },
     {
       "slug": "2026-06-14",
       "title": "AI 简报 · 2026-06-14",
@@ -860,6 +872,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-15",
+      "title": "AI 简报 · 2026-06-15",
+      "excerpt": "加拿大总理 Carney 借 Anthropic 模型下线警告对美 AI 依赖风险；Meta AI 负责人 Alexandr Wang 入职一周年面临模型与组织双重挑战。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-06-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-15"
+    },
     {
       "slug": "2026-06-14",
       "title": "AI 简报 · 2026-06-14",
