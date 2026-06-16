@@ -1,6 +1,20 @@
 {
-  "generated": "2026-06-15T00:00:00.000Z",
+  "generated": "2026-06-16T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-16",
+      "title": "AI 简报 · 2026-06-16",
+      "excerpt": "Meta 在 Facebook 推出 AI Mode；Anthropic 赴华盛顿磋商 Fable/Mythos 限制令；xAI 诉 OpenAI 商业秘密案再遭驳回；智谱获 JPMorgan 上调目标价后股价大涨。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Anthropic",
+        "xAI",
+        "智谱 AI"
+      ],
+      "date": "2026-06-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-16"
+    },
     {
       "slug": "2026-06-15",
       "title": "AI 简报 · 2026-06-15",
@@ -872,6 +886,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-16",
+      "title": "AI 简报 · 2026-06-16",
+      "excerpt": "Meta 在 Facebook 推出 AI Mode；Anthropic 赴华盛顿磋商 Fable/Mythos 限制令；xAI 诉 OpenAI 商业秘密案再遭驳回；智谱获 JPMorgan 上调目标价后股价大涨。",
+      "tags": [
+        "AI",
+        "Meta",
+        "Anthropic",
+        "xAI",
+        "智谱 AI"
+      ],
+      "date": "2026-06-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-16"
+    },
     {
       "slug": "2026-06-15",
       "title": "AI 简报 · 2026-06-15",
