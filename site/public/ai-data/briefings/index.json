@@ -1,6 +1,21 @@
 {
-  "generated": "2026-06-16T00:00:00.000Z",
+  "generated": "2026-06-17T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-17",
+      "title": "AI 简报 · 2026-06-17",
+      "excerpt": "SpaceX 以 600 亿美元收购 Cursor；DeepSeek 融资超 74 亿美元成中国最具价值 AI 初创；OpenAI 财务文件泄露显示巨额亏损；Anthropic 企业 AI 采用率领先 OpenAI；Google 发布 Android 17 强化 Gemini。",
+      "tags": [
+        "AI",
+        "SpaceX",
+        "DeepSeek",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-17T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-17"
+    },
     {
       "slug": "2026-06-16",
       "title": "AI 简报 · 2026-06-16",
@@ -886,6 +901,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-17",
+      "title": "AI 简报 · 2026-06-17",
+      "excerpt": "SpaceX 以 600 亿美元收购 Cursor；DeepSeek 融资超 74 亿美元成中国最具价值 AI 初创；OpenAI 财务文件泄露显示巨额亏损；Anthropic 企业 AI 采用率领先 OpenAI；Google 发布 Android 17 强化 Gemini。",
+      "tags": [
+        "AI",
+        "SpaceX",
+        "DeepSeek",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-17T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-17"
+    },
     {
       "slug": "2026-06-16",
       "title": "AI 简报 · 2026-06-16",
