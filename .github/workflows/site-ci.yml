@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            site/dist/cache
+            site/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('site/package-lock.json', 'site/**/*.js', 'site/**/*.jsx', 'site/**/*.ts', 'site/**/*.tsx', 'content/**/*.md', 'content/**/*.mdx') }}
 
       - name: Restore site incremental cache
@@ -77,6 +77,7 @@ jobs:
           NEXT_PUBLIC_CORE_SERVICE_URL: ${{ vars.NEXT_PUBLIC_CORE_SERVICE_URL }}
           NEXT_PUBLIC_AI_ENABLED: ${{ vars.NEXT_PUBLIC_AI_ENABLED }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          SITE_FULL_BUILD: "true"
         run: npm run build:prod
         working-directory: site
 
