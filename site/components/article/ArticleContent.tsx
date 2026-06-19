@@ -40,10 +40,10 @@ export async function ArticleContent({ post, prev, next, slug, showHeader = true
         <div id="intro" />
         <Suspense fallback={<div className="text-muted-foreground">加载中...</div>}>
           <MDXRemoteContent source={post.content} />
+          <TermHighlighter terms={terms} />
         </Suspense>
       </div>
 
-      <TermHighlighter terms={terms} />
       <TextSelectionAIActions maxInputChars={config.ai.maxInputChars} />
 
       {/* 分享按钮 - 无上边框，更简洁 */}

@@ -5,8 +5,7 @@ from typing import NoReturn
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.contexts.admin_console.infra.admin_session_request_guard import AdminSessionRequestGuard
-from app.contexts.admin_console.interface.admin_auth_router import get_admin_session_request_guard
+from app.contexts.admin_console.infra.admin_request_guard import AdminRequestGuard, get_admin_request_guard
 from app.contexts.knowledge_base.application.archive_knowledge_term_app_service import ArchiveKnowledgeTermAppService
 from app.contexts.knowledge_base.application.create_knowledge_term_app_service import CreateKnowledgeTermAppService
 from app.contexts.knowledge_base.application.dto.list_knowledge_terms_dto import ListKnowledgeTermsResp
@@ -67,7 +66,7 @@ def _raise_http(error: Exception) -> NoReturn:
 @router.get("", response_model=ListKnowledgeTermsResp)
 async def list_knowledge_terms(
     request: Request,
-    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: ListKnowledgeTermsAppService = Depends(get_list_knowledge_terms_service),
 ) -> ListKnowledgeTermsResp:
     await guard.require_admin(request)
@@ -78,7 +77,7 @@ async def list_knowledge_terms(
 async def create_knowledge_term(
     payload: SaveKnowledgeTermReq,
     request: Request,
-    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: CreateKnowledgeTermAppService = Depends(get_create_knowledge_term_service),
     session: AsyncSession = Depends(get_session),
 ) -> SaveKnowledgeTermResp:
@@ -100,7 +99,7 @@ async def update_knowledge_term(
     term_id: str,
     payload: SaveKnowledgeTermReq,
     request: Request,
-    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: UpdateKnowledgeTermAppService = Depends(get_update_knowledge_term_service),
     session: AsyncSession = Depends(get_session),
 ) -> SaveKnowledgeTermResp:
@@ -121,7 +120,7 @@ async def update_knowledge_term(
 async def archive_knowledge_term(
     term_id: str,
     request: Request,
-    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: ArchiveKnowledgeTermAppService = Depends(get_archive_knowledge_term_service),
     session: AsyncSession = Depends(get_session),
 ) -> SaveKnowledgeTermResp:
@@ -141,7 +140,7 @@ async def archive_knowledge_term(
 @router.post("/rebuild", response_model=SaveKnowledgeTermResp)
 async def rebuild_knowledge_terms(
     request: Request,
-    guard: AdminSessionRequestGuard = Depends(get_admin_session_request_guard),
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
     session: AsyncSession = Depends(get_session),
 ) -> SaveKnowledgeTermResp:
     await guard.require_admin(request)

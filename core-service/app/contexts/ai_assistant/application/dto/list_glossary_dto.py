@@ -8,6 +8,7 @@ class GlossaryItemResp(BaseModel):
     term: str
     aliases: list[str]
     definition: str
+    explanation: str
     related_article_slugs: list[str]
 
 

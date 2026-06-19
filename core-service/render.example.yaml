@@ -24,6 +24,8 @@ services:
         sync: false
       - key: ADMIN_SECRET_HASH
         sync: false
+      - key: ADMIN_API_KEY
+        sync: false
       - key: TURNSTILE_SECRET_KEY
         sync: false
       - key: EMBEDDING_BASE_URL

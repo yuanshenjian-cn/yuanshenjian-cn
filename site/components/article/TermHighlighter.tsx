@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { TermExplanationBubble } from "@/components/article/TermExplanationBubble";
 import type { GlossaryItem } from "@/lib/ai/glossary";
 
 interface TermHighlighterProps {
@@ -28,9 +29,10 @@ function wrapTextNode(node: Text, termMap: Map<string, GlossaryItem>) {
     const item = termMap.get(part);
     if (item) {
       const mark = document.createElement("mark");
-      mark.className = "term-highlight cursor-help rounded bg-primary/10 px-0.5 text-foreground";
+      mark.className = "term-highlight cursor-pointer bg-transparent border-b border-dashed border-foreground/25 text-foreground transition-all duration-200 ease-out hover:-translate-y-px hover:border-foreground/60 hover:border-solid";
       mark.dataset.term = item.term;
-      mark.title = item.definition;
+      mark.dataset.definition = item.definition;
+      mark.dataset.explanation = item.explanation;
       mark.textContent = part;
       fragment.appendChild(mark);
     } else {
@@ -63,15 +65,32 @@ function walkTextNodes(root: HTMLElement, termMap: Map<string, GlossaryItem>) {
   }
 }
 
+interface ActiveBubble {
+  term: string;
+  definition: string;
+  explanation: string;
+  rect: DOMRect;
+}
+
 export function TermHighlighter({ terms, containerSelector = ".prose" }: TermHighlighterProps) {
-  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
-  const containerRef = useRef<HTMLElement | null>(null);
+  const [activeBubble, setActiveBubble] = useState<ActiveBubble | null>(null);
+
+  const handleClick = useCallback((event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target.classList.contains("term-highlight")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const term = target.dataset.term || "";
+    const definition = target.dataset.definition || "";
+    const explanation = target.dataset.explanation || "";
+    const rect = target.getBoundingClientRect();
+    setActiveBubble({ term, definition, explanation, rect });
+  }, []);
 
   useEffect(() => {
     if (terms.length === 0) return;
     const container = document.querySelector(containerSelector) as HTMLElement | null;
     if (!container) return;
-    containerRef.current = container;
 
     const termMap = new Map<string, GlossaryItem>();
     for (const item of terms) {
@@ -85,45 +104,22 @@ export function TermHighlighter({ terms, containerSelector = ".prose" }: TermHig
 
     walkTextNodes(container, termMap);
 
-    function handleMouseEnter(event: MouseEvent) {
-      const target = event.target as HTMLElement;
-      if (!target.classList.contains("term-highlight")) return;
-      const term = target.dataset.term;
-      const item = termMap.get(term || "");
-      if (!item) return;
-      const rect = target.getBoundingClientRect();
-      setTooltip({
-        text: item.definition,
-        x: rect.left + rect.width / 2,
-        y: rect.top - 8,
-      });
-    }
-
-    function handleMouseLeave() {
-      setTooltip(null);
-    }
-
-    container.addEventListener("mouseenter", handleMouseEnter, true);
-    container.addEventListener("mouseleave", handleMouseLeave, true);
+    container.addEventListener("click", handleClick, true);
 
     return () => {
-      container.removeEventListener("mouseenter", handleMouseEnter, true);
-      container.removeEventListener("mouseleave", handleMouseLeave, true);
+      container.removeEventListener("click", handleClick, true);
     };
-  }, [terms, containerSelector]);
+  }, [terms, containerSelector, handleClick]);
 
-  if (tooltip === null) return null;
+  if (activeBubble === null) return null;
 
   return (
-    <div
-      className="fixed z-50 max-w-xs rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground shadow-lg"
-      style={{
-        left: tooltip.x,
-        top: tooltip.y,
-        transform: "translate(-50%, -100%)",
-      }}
-    >
-      {tooltip.text}
-    </div>
+    <TermExplanationBubble
+      term={activeBubble.term}
+      definition={activeBubble.definition}
+      explanation={activeBubble.explanation}
+      anchorRect={activeBubble.rect}
+      onClose={() => setActiveBubble(null)}
+    />
   );
 }

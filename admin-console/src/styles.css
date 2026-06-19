@@ -82,3 +82,52 @@ select {
 .error {
   color: #b91c1c;
 }
+
+.term-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.term-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.term-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.term-actions button {
+  padding: 6px 12px;
+}
+
+.term-definition {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.term-meta {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.term-meta span {
+  display: inline-block;
+}
+
+.term-meta .term-status {
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.term-meta span + span {
+  margin-left: 12px;
+}

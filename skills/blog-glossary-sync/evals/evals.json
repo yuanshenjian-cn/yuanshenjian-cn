@@ -1,0 +1,23 @@
+{
+  "skill_name": "blog-glossary-sync",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我从博客所有文章和简报里提取术语，整理到术语库。先不要执行写入。",
+      "expected_output": "生成 scripts/glossary-candidates.json 和 scripts/sync-glossary.sh，展示候选术语摘要表格，等待用户确认后再执行。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "扫描 content/ai-briefings/2026/06/ 里的 AI 简报，把里面的专业术语同步到术语库，并更新已有术语。",
+      "expected_output": "只扫描指定目录的 AI 简报，提取术语，与现有术语去重，生成包含创建和更新请求的 curl 脚本。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我已经 review 完 glossary-candidates.json 了，现在执行写入术语库。",
+      "expected_output": "运行 scripts/sync-glossary.sh，向 core-service 发送 curl 请求创建/更新术语，并报告结果。",
+      "files": []
+    }
+  ]
+}

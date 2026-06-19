@@ -24,6 +24,7 @@ class ListGlossaryAppService:
                     term=term.term,
                     aliases=list(term.aliases or []),
                     definition=term.definition,
+                    explanation=term.explanation,
                     related_article_slugs=list(term.related_article_slugs or []),
                 )
             )

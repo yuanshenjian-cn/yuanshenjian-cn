@@ -221,18 +221,24 @@ export function GlossaryPage() {
 
       {items.map((item) => (
         <article className="card" key={item.id}>
-          <h3>{item.term}</h3>
-          <p>状态：{item.status}</p>
-          <p>定义：{item.definition}</p>
-          {item.aliases.length > 0 ? <p>别名：{item.aliases.join(" / ")}</p> : null}
-          <p>域：{item.domains.join(" / ") || "无"}</p>
-          <p>场景：{item.scenes.join(" / ") || "无"}</p>
-          {item.related_article_slugs.length > 0 ? (
-            <p>相关文章：{item.related_article_slugs.join(" / ")}</p>
-          ) : null}
-          {item.notes ? <p>备注：{item.notes}</p> : null}
-          <button onClick={() => handleEdit(item)}>编辑</button>{" "}
-          <button onClick={() => void handleArchive(item.id)}>归档</button>
+          <div className="term-header">
+            <h3>{item.term}</h3>
+            <div className="term-actions">
+              <button onClick={() => handleEdit(item)}>编辑</button>{" "}
+              <button onClick={() => void handleArchive(item.id)}>归档</button>
+            </div>
+          </div>
+          <p className="term-definition">{item.definition}</p>
+          <p className="term-meta">
+            <span className="term-status">{item.status}</span>
+            {item.aliases.length > 0 ? <span>别名：{item.aliases.join(" / ")}</span> : null}
+            <span>域：{item.domains.join(" / ") || "无"}</span>
+            <span>场景：{item.scenes.join(" / ") || "无"}</span>
+            {item.related_article_slugs.length > 0 ? (
+              <span>相关文章：{item.related_article_slugs.join(" / ")}</span>
+            ) : null}
+            {item.notes ? <span>备注：{item.notes}</span> : null}
+          </p>
         </article>
       ))}
     </section>

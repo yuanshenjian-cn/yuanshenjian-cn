@@ -182,6 +182,7 @@ class Settings(BaseModel):
     database_url: str = DEFAULT_DATABASE_URL
     session_secret: str = "dev-session-secret"
     admin_secret_hash: str = ""
+    admin_api_key: str = ""
     turnstile_secret_key: str = ""
     embedding_base_url: str = ""
     embedding_api_key: str = ""
@@ -270,6 +271,7 @@ def build_settings_from_env(env_map: dict[str, str]) -> Settings:
             "database_url": env_map.get("DATABASE_URL", DEFAULT_DATABASE_URL),
             "session_secret": env_map.get("SESSION_SECRET", "dev-session-secret"),
             "admin_secret_hash": env_map.get("ADMIN_SECRET_HASH", ""),
+            "admin_api_key": env_map.get("ADMIN_API_KEY", ""),
             "turnstile_secret_key": env_map.get("TURNSTILE_SECRET_KEY", ""),
             "embedding_base_url": env_map.get("EMBEDDING_BASE_URL", ""),
             "embedding_api_key": env_map.get("EMBEDDING_API_KEY", ""),

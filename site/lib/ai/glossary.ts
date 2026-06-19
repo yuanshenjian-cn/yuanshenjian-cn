@@ -5,13 +5,14 @@ export interface GlossaryItem {
   term: string;
   aliases: string[];
   definition: string;
+  explanation: string;
   related_article_slugs: string[];
 }
 
 function resolveBaseUrl(): string {
   const workerUrl = config.ai.workerUrl;
   if (workerUrl.startsWith("http")) {
-    return workerUrl;
+    return new URL(workerUrl).origin;
   }
   if (typeof window !== "undefined") {
     return "";
