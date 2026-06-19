@@ -121,6 +121,14 @@ export function TermExplanationBubble({
     };
   }, [onClose]);
 
+  useEffect(() => {
+    function handlePageScroll() {
+      onClose();
+    }
+    window.addEventListener("scroll", handlePageScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handlePageScroll);
+  }, [onClose]);
+
   const availableAbove = Math.max(0, anchorRect.top - VIEWPORT_MARGIN * 2);
   const availableBelow = Math.max(0, window.innerHeight - anchorRect.bottom - VIEWPORT_MARGIN * 2);
   const above = availableBelow < 220 && availableAbove > availableBelow;
