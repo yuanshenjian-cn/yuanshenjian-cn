@@ -5,6 +5,11 @@ import { CommentSection } from "@/components/comments/CommentSection";
 import { ArticleHeader } from "@/components/article/ArticleHeader";
 import { PostNavigation } from "@/components/PostNavigation";
 import { ShareButtons } from "@/components/ShareButtons";
+import { TermHighlighter } from "@/components/article/TermHighlighter";
+import { TextSelectionAIActions } from "@/components/article/TextSelectionAIActions";
+import { fetchGlossary } from "@/lib/ai/glossary";
+import { config } from "@/lib/config";
+import { resolveAdvisorDomainByPath } from "@/lib/advisor-context";
 import type { Post } from "@/types/blog";
 import type { ColumnContext } from "@/lib/columns";
 
@@ -22,9 +27,10 @@ interface ArticleContentProps {
   turnstileSiteKey?: string;
 }
 
-export function ArticleContent({ post, prev, next, slug, showHeader = true, url, shareTitle, shareDescription, columnContext, footerAssistant, turnstileSiteKey = "" }: ArticleContentProps) {
-  // URL 由父组件（服务端）传入，确保 SSR 和客户端一致
+export async function ArticleContent({ post, prev, next, slug, showHeader = true, url, shareTitle, shareDescription, columnContext, footerAssistant, turnstileSiteKey = "" }: ArticleContentProps) {
   const shareUrl = url || `/articles/${slug}`;
+  const domain = resolveAdvisorDomainByPath(post.relativePath);
+  const terms = await fetchGlossary("article", domain);
 
   return (
     <>
@@ -36,6 +42,9 @@ export function ArticleContent({ post, prev, next, slug, showHeader = true, url,
           <MDXRemoteContent source={post.content} />
         </Suspense>
       </div>
+
+      <TermHighlighter terms={terms} />
+      <TextSelectionAIActions maxInputChars={config.ai.maxInputChars} />
 
       {/* 分享按钮 - 无上边框，更简洁 */}
       <div className="mt-10">

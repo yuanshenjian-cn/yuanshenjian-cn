@@ -3,17 +3,19 @@ import { fetchMe, logout } from "./api/client";
 import { AiUsagePage } from "./pages/AiUsagePage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CommentsPage } from "./pages/CommentsPage";
+import { GlossaryPage } from "./pages/GlossaryPage";
 import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 import { LoginPage } from "./pages/LoginPage";
 import { SystemPage } from "./pages/SystemPage";
 
-type Page = "login" | "comments" | "analytics" | "ai-usage" | "knowledge-base" | "system";
+type Page = "login" | "comments" | "analytics" | "ai-usage" | "knowledge-base" | "glossary" | "system";
 
 const pages: Array<{ key: Page; label: string }> = [
   { key: "comments", label: "评论审核" },
   { key: "analytics", label: "阅读统计" },
   { key: "ai-usage", label: "AI 用量" },
   { key: "knowledge-base", label: "知识库" },
+  { key: "glossary", label: "术语库" },
   { key: "system", label: "系统状态" },
 ];
 
@@ -58,6 +60,7 @@ export function App() {
       {page === "analytics" && <AnalyticsPage />}
       {page === "ai-usage" && <AiUsagePage />}
       {page === "knowledge-base" && <KnowledgeBasePage />}
+      {page === "glossary" && <GlossaryPage />}
       {page === "system" && <SystemPage />}
     </main>
   );

@@ -12,6 +12,7 @@ from app.contexts.ai_assistant.domain.contextual_advisor_prompt import (
     extract_followup_questions,
 )
 from app.contexts.ai_assistant.domain.knowledge_context_reader import KnowledgeContextReader
+from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader
 from app.contexts.ai_assistant.domain.llm_answer_stream_gateway import LLMAnswerStreamGateway
 from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
 from app.contexts.ai_assistant.domain.published_ai_asset_reader import PublishedAIAssetReader
@@ -30,11 +31,13 @@ class StreamAIAdvisorAppService:
         llm_stream_service: LLMAnswerStreamGateway,
         knowledge_query_service: KnowledgeContextReader,
         published_ai_asset_query_service: PublishedAIAssetReader,
+        term_reader: KnowledgeTermReader | None = None,
     ) -> None:
         self._profile_query_service = profile_query_service
         self._llm_stream_service = llm_stream_service
         self._knowledge_query_service = knowledge_query_service
         self._published_ai_asset_query_service = published_ai_asset_query_service
+        self._term_reader = term_reader
 
     def _append_reference_links_to_contexts(self, contexts: list[str], references: list[dict[str, str]]) -> list[str]:
         if not references:
@@ -91,6 +94,26 @@ class StreamAIAdvisorAppService:
                 domain=domain,
                 page_slug=req.page_slug,
             )
+            if self._term_reader is not None:
+                matched_terms = await self._term_reader.find_matching_terms(req.message, scene=scene, domain=domain)
+                for matched_term in matched_terms:
+                    term_content = (
+                        f"术语：{matched_term['term']}\n"
+                        f"定义：{matched_term['definition']}\n"
+                        f"解释：{matched_term['explanation']}"
+                    )
+                    contexts.insert(0, term_content)
+                    if matched_term.get("related_article_slugs"):
+                        db_references.insert(
+                            0,
+                            {
+                                "id": f"glossary:{matched_term['term']}",
+                                "title": f"术语：{matched_term['term']}",
+                                "excerpt": matched_term["definition"],
+                                "url": "",
+                                "source_type": "article-section",
+                            },
+                        )
             references: list[dict[str, str]] = db_references
             if req.article_slug and not contexts:
                 article = self._published_ai_asset_query_service.load_article_payload(req.article_slug)

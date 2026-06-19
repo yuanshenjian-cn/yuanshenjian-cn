@@ -178,13 +178,13 @@ function parsePageStreamEvent(block: string): PageStreamEvent {
         references: payload.references,
       };
     case "done":
-      if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
+      if (!isRecord(payload) || (payload.usage !== undefined && payload.usage !== null && !isUsage(payload.usage))) {
         throw new Error("Invalid done event payload");
       }
 
       return {
         type: "done",
-        usage: payload.usage,
+        usage: payload.usage ?? undefined,
       };
     case "error":
       if (!isRecord(payload) || typeof payload.message !== "string") {
@@ -237,13 +237,13 @@ function parseAdvisorStreamEvent(block: string): AdvisorStreamEvent {
         questions: payload.questions,
       };
     case "done":
-      if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
+      if (!isRecord(payload) || (payload.usage !== undefined && payload.usage !== null && !isUsage(payload.usage))) {
         throw new Error("Invalid done event payload");
       }
 
       return {
         type: "done",
-        usage: payload.usage,
+        usage: payload.usage ?? undefined,
       };
     case "error":
       if (!isRecord(payload) || typeof payload.message !== "string") {
@@ -287,13 +287,13 @@ function parseRecommendStreamEvent(block: string): RecommendStreamEvent {
         references: payload.references,
       };
     case "done":
-      if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
+      if (!isRecord(payload) || (payload.usage !== undefined && payload.usage !== null && !isUsage(payload.usage))) {
         throw new Error("Invalid done event payload");
       }
 
       return {
         type: "done",
-        usage: payload.usage,
+        usage: payload.usage ?? undefined,
       };
     case "error":
       if (!isRecord(payload) || typeof payload.message !== "string") {

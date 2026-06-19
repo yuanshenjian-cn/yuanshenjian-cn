@@ -13,6 +13,7 @@ from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChu
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
 from app.contexts.knowledge_base.infra.po.knowledge_index_run_po import KnowledgeIndexRunPO
 from app.contexts.knowledge_base.infra.po.knowledge_source_po import KnowledgeSourcePO
+from app.contexts.knowledge_base.infra.po.knowledge_term_po import KnowledgeTermPO
 from app.contexts.knowledge_base.infra.po.rag_sync_run_po import RagSyncRunPO
 from app.contexts.visitor_identity.infra.po.auth_identity_po import AuthIdentityPO
 from app.contexts.visitor_identity.infra.po.user_po import UserPO
@@ -32,6 +33,7 @@ __all__ = [
     "KnowledgeDocumentPO",
     "KnowledgeIndexRunPO",
     "KnowledgeSourcePO",
+    "KnowledgeTermPO",
     "RagQueryEventPO",
     "RagSyncRunPO",
     "UserPO",

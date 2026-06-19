@@ -16,6 +16,7 @@ from app.contexts.ai_assistant.interface.ai_assistant_chat_router import router 
 from app.contexts.comment.interface.admin_comment_moderation_router import router as admin_comment_moderation_router
 from app.contexts.comment.interface.article_comment_router import router as article_comment_router
 from app.contexts.knowledge_base.interface.admin_knowledge_base_router import router as admin_knowledge_base_router
+from app.contexts.knowledge_base.interface.admin_knowledge_term_router import router as admin_knowledge_term_router
 from app.contexts.visitor_identity.interface.visitor_identity_router import router as visitor_identity_router
 from app.shared.interface.health_router import router as health_router
 from app.shared.infra.app_config import settings
@@ -66,4 +67,5 @@ app.include_router(admin_auth_router)
 app.include_router(admin_comment_moderation_router)
 app.include_router(admin_console_router)
 app.include_router(admin_knowledge_base_router)
+app.include_router(admin_knowledge_term_router)
 app.include_router(ai_assistant_chat_router)

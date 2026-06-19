@@ -44,6 +44,35 @@ export interface KnowledgeSourceItem {
   updated_at: string;
 }
 
+export interface KnowledgeTermItem {
+  id: string;
+  term: string;
+  aliases: string[];
+  definition: string;
+  explanation: string;
+  related_article_slugs: string[];
+  domains: string[];
+  scenes: string[];
+  status: string;
+  notes: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaveKnowledgeTermPayload {
+  term: string;
+  aliases: string[];
+  definition: string;
+  explanation: string;
+  related_article_slugs: string[];
+  domains: string[];
+  scenes: string[];
+  status: string;
+  notes?: string;
+  updated_by?: string;
+}
+
 export interface SaveKnowledgeSourcePayload {
   name: string;
   source_kind: string;
@@ -149,6 +178,38 @@ export function archiveKnowledgeSource(id: string) {
 
 export function rebuildKnowledgeSource(id: string) {
   return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-base/${id}/rebuild`, {
+    method: "POST",
+    body: JSON.stringify({ csrf_token: getCsrfToken() }),
+  });
+}
+
+export function fetchKnowledgeTerms() {
+  return request<{ items: KnowledgeTermItem[] }>("/api/v1/admin/knowledge-terms");
+}
+
+export function createKnowledgeTerm(payload: SaveKnowledgeTermPayload) {
+  return request<{ id: string; status: string }>("/api/v1/admin/knowledge-terms", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateKnowledgeTerm(id: string, payload: SaveKnowledgeTermPayload) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-terms/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function archiveKnowledgeTerm(id: string) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-terms/${id}/archive`, {
+    method: "POST",
+    body: JSON.stringify({ csrf_token: getCsrfToken() }),
+  });
+}
+
+export function rebuildKnowledgeTerms() {
+  return request<{ id: string; status: string }>("/api/v1/admin/knowledge-terms/rebuild", {
     method: "POST",
     body: JSON.stringify({ csrf_token: getCsrfToken() }),
   });

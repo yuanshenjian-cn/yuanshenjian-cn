@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import StreamingResponse
 
 from app.contexts.ai_assistant.application.ai_usage_recorder import (
@@ -19,6 +20,7 @@ from app.contexts.ai_assistant.application.dto.stream_ai_briefing_recommendation
     BriefingRange,
     StreamAiBriefingRecommendationReq,
 )
+from app.contexts.ai_assistant.application.dto.list_glossary_dto import ListGlossaryResp
 from app.contexts.ai_assistant.application.dto.stream_ai_advisor_dto import StreamAIAdvisorReq
 from app.contexts.ai_assistant.application.dto.stream_ai_assistant_chat_dto import StreamAIAssistantChatReq
 from app.contexts.ai_assistant.application.dto.stream_article_chat_dto import StreamArticleChatReq
@@ -30,6 +32,7 @@ from app.contexts.ai_assistant.application.dto.stream_investment_briefing_recomm
     InvestmentBriefingRange,
     StreamInvestmentBriefingRecommendationReq,
 )
+from app.contexts.ai_assistant.application.list_glossary_app_service import ListGlossaryAppService
 from app.contexts.ai_assistant.application.stream_ai_advisor_app_service import StreamAIAdvisorAppService
 from app.contexts.ai_assistant.application.stream_ai_briefing_recommendation_app_service import (
     StreamAiBriefingRecommendationAppService,
@@ -49,8 +52,10 @@ from app.contexts.ai_assistant.infra.llm_stream_service import LLMStreamService
 from app.contexts.ai_assistant.infra.published_ai_asset_query_service import PublishedAIAssetQueryService
 from app.contexts.ai_assistant.infra.dao.daily_budget_usage_dao import DailyBudgetUsageDAO
 from app.contexts.ai_assistant.infra.sqlmodel_daily_budget_repository import SQLModelDailyBudgetRepository
+from app.contexts.knowledge_base.infra.dao.knowledge_term_dao import KnowledgeTermDAO
+from app.contexts.knowledge_base.infra.knowledge_term_query_reader import KnowledgeTermQueryReader
 from app.shared.infra.app_config import settings
-from app.shared.infra.database import transactional_session
+from app.shared.infra.database import get_session, transactional_session
 from app.shared.infra.pre_auth_rate_limit_guard import PreAuthRateLimitGuard
 from app.shared.infra.rate_limit_guard import RateLimitGuard
 from app.shared.infra.request_identity_resolver import RequestIdentityResolver
@@ -111,17 +116,26 @@ def get_stream_author_chat_service() -> StreamAuthorChatAppService:
     return build_stream_author_chat_service()
 
 
-def build_stream_ai_advisor_service() -> StreamAIAdvisorAppService:
+def build_stream_ai_advisor_service(session: AsyncSession) -> StreamAIAdvisorAppService:
     return StreamAIAdvisorAppService(
         LLMProfileQueryService(),
         LLMStreamService(),
         KnowledgeContextQueryService(),
         PublishedAIAssetQueryService(),
+        KnowledgeTermQueryReader(session),
     )
 
 
-def get_stream_ai_advisor_service() -> StreamAIAdvisorAppService:
-    return build_stream_ai_advisor_service()
+def get_stream_ai_advisor_service(session: AsyncSession = Depends(get_session)) -> StreamAIAdvisorAppService:
+    return build_stream_ai_advisor_service(session)
+
+
+def build_list_glossary_service(session: AsyncSession) -> ListGlossaryAppService:
+    return ListGlossaryAppService(KnowledgeTermDAO(session))
+
+
+def get_list_glossary_service(session: AsyncSession = Depends(get_session)) -> ListGlossaryAppService:
+    return build_list_glossary_service(session)
 
 
 def estimate_token_budget(message: str) -> int:
@@ -230,6 +244,15 @@ async def stream_ai_assistant_chat(
         ),
         media_type="text/event-stream",
     )
+
+
+@router.get("/api/v1/ai-assistant/glossary", response_model=ListGlossaryResp)
+async def list_glossary(
+    scene: str | None = None,
+    domain: str | None = None,
+    service: ListGlossaryAppService = Depends(get_list_glossary_service),
+) -> ListGlossaryResp:
+    return await service.execute(scene, domain)
 
 
 @router.post("/api/v1/ai-assistant/advisor/stream")

@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import Script from "next/script";
 
-import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { ArticleAIAdvisor } from "@/components/article/ArticleAIAdvisor";
 import { getPostBySlug, getAllPosts, getAdjacentPosts } from "@/lib/blog";
-import { buildAdvisorContext, defaultAdvisorQuickTopics, resolveAdvisorDomainByPath } from "@/lib/advisor-context";
 import { getColumnContextByPost } from "@/lib/columns";
 import { extractHeadings } from "@/lib/mdx";
 import { config } from "@/lib/config";
@@ -109,23 +108,7 @@ export default async function PostPage({ params }: Props) {
   const contextualAdvisorEnabled = config.ai.contextualAdvisorEnabled;
 
   const primaryAssistant = contextualAdvisorEnabled ? (
-    <ContextualAIAdvisorSurface
-      context={buildAdvisorContext({
-        scene: "article",
-        title: post.title,
-        domain: resolveAdvisorDomainByPath(post.relativePath),
-        pageSlug: post.slug,
-        articleSlug: post.slug,
-        quickTopics: defaultAdvisorQuickTopics("article"),
-      })}
-      cardTitle="AI 带你快速读懂文章"
-      cardDescription=""
-      workerUrl={config.ai.workerUrl}
-      turnstileSiteKey={config.ai.turnstileSiteKey}
-      turnstileTimeoutMs={config.ai.turnstile.timeoutMs.contextualAdvisor}
-      maxInputChars={config.ai.maxInputChars}
-      historyRounds={config.ai.contextualAdvisorHistoryRounds}
-    />
+    <ArticleAIAdvisor post={post} headings={headings} />
   ) : null;
 
   const articleContent = (

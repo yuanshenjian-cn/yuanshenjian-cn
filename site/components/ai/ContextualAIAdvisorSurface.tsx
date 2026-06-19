@@ -15,6 +15,7 @@ interface ContextualAIAdvisorSurfaceProps {
   turnstileSiteKey: string;
   turnstileTimeoutMs: number;
   workerUrl: string;
+  dynamicQuickTopics?: () => AIQuickTopic[];
 }
 
 export function ContextualAIAdvisorSurface({
@@ -26,6 +27,7 @@ export function ContextualAIAdvisorSurface({
   turnstileSiteKey,
   turnstileTimeoutMs,
   workerUrl,
+  dynamicQuickTopics,
 }: ContextualAIAdvisorSurfaceProps) {
   const [promptState, setPromptState] = useState({ prompt: "", version: 0 });
 
@@ -45,6 +47,7 @@ export function ContextualAIAdvisorSurface({
         workerUrl={workerUrl}
         initialPrompt={promptState.prompt || undefined}
         promptVersion={promptState.version}
+        dynamicQuickTopics={dynamicQuickTopics}
       />
     </>
   );

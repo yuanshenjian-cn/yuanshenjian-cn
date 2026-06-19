@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, type KeyboardEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Maximize2, MessageCircle, Minimize2, SendHorizontal, Sparkles, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -8,8 +8,9 @@ import remarkGfm from "remark-gfm";
 import { useTurnstileToken } from "@/hooks/ai/use-turnstile-token";
 import { type AdvisorSessionMessage, useAdvisorSession } from "@/hooks/ai/use-advisor-session";
 import { aiContextualAdvisorStream } from "@/lib/ai-client";
+import { onAskAdvisor } from "@/lib/ai/advisor-events";
 import { stripFollowupQuestionsBlock, sanitizeAdvisorAnswer } from "@/lib/ai/followup-questions";
-import type { AdvisorContextValue, AdvisorStreamEvent } from "@/types/ai";
+import type { AdvisorContextValue, AdvisorStreamEvent, AIQuickTopic } from "@/types/ai";
 
 interface ContextualAIAdvisorProps {
   context: AdvisorContextValue;
@@ -20,6 +21,7 @@ interface ContextualAIAdvisorProps {
   initialPrompt?: string;
   historyRounds: number;
   promptVersion?: number;
+  dynamicQuickTopics?: () => AIQuickTopic[];
 }
 
 type ChatRole = "user" | "assistant";
@@ -87,6 +89,7 @@ export function ContextualAIAdvisor({
   initialPrompt,
   historyRounds,
   promptVersion,
+  dynamicQuickTopics,
 }: ContextualAIAdvisorProps) {
   const [isOpen, setIsOpen] = useState(Boolean(initialPrompt));
   const [isMaximized, setIsMaximized] = useState(false);
@@ -113,11 +116,15 @@ export function ContextualAIAdvisor({
     return "想快速了解这一页？直接问我";
   }, [context.scene]);
 
+  const quickTopics = useMemo(() => {
+    if (dynamicQuickTopics) {
+      return dynamicQuickTopics();
+    }
+    return context.quickTopics;
+  }, [context.quickTopics, dynamicQuickTopics]);
+
   const hasMessages = messages.length > 0;
   const thinkingText = "容我思考片刻...";
-  submitMessageRef.current = (value: string) => {
-    void submitMessage(value);
-  };
 
   useEffect(() => {
     const restoredMessages = loadMessages();
@@ -182,94 +189,107 @@ export function ContextualAIAdvisor({
     setMessages((current) => current.map((item) => (item.id === messageId ? updater(item) : item)));
   }
 
-  async function submitMessage(value: string) {
-    const nextMessage = value.trim();
-    if (!nextMessage || nextMessage.length > maxInputChars || isStreaming) {
-      return;
-    }
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    setIsOpen(true);
-    setIsStreaming(true);
-    const assistantMessageId = createMessageId("assistant");
-    const userMessageId = createMessageId("user");
-    setMessages((current) => [
-      ...current,
-      { content: nextMessage, id: userMessageId, role: "user" },
-      { content: "", id: assistantMessageId, role: "assistant" },
-    ]);
-    setMessage("");
-    try {
-      const turnstileToken = await getToken();
-      const history = loadHistory();
-      await aiContextualAdvisorStream({
-        workerUrl,
-        message: nextMessage,
-        turnstileToken,
-        signal: controller.signal,
-        context: {
-          scene: context.scene,
-          domain: context.domain,
-          pageTitle: context.pageTitle,
-          pageSlug: context.pageSlug,
-          articleSlug: context.articleSlug,
-          history,
-        },
-        onEvent: (streamEvent: AdvisorStreamEvent) => {
-          if (streamEvent.type === "answer-delta") {
-            updateAssistantMessage(assistantMessageId, (current) => ({
-              ...current,
-              content: current.content + streamEvent.delta,
-              error: undefined,
-            }));
-            return;
-          }
-          if (streamEvent.type === "references") {
-            return;
-          }
-          if (streamEvent.type === "followup-questions") {
-            updateAssistantMessage(assistantMessageId, (current) => ({
-              ...current,
-              content: stripFollowupQuestionsBlock(current.content),
-              followUpQuestions: streamEvent.questions,
-            }));
-            return;
-          }
-          if (streamEvent.type === "error") {
-            updateAssistantMessage(assistantMessageId, (current) => ({
-              ...current,
-              error: streamEvent.message,
-            }));
+  const submitMessage = useCallback(
+    async (value: string) => {
+      const nextMessage = value.trim();
+      if (!nextMessage || nextMessage.length > maxInputChars || isStreaming) {
+        return;
+      }
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      setIsOpen(true);
+      setIsStreaming(true);
+      const assistantMessageId = createMessageId("assistant");
+      const userMessageId = createMessageId("user");
+      setMessages((current) => [
+        ...current,
+        { content: nextMessage, id: userMessageId, role: "user" },
+        { content: "", id: assistantMessageId, role: "assistant" },
+      ]);
+      setMessage("");
+      try {
+        const turnstileToken = await getToken();
+        const history = loadHistory();
+        await aiContextualAdvisorStream({
+          workerUrl,
+          message: nextMessage,
+          turnstileToken,
+          signal: controller.signal,
+          context: {
+            scene: context.scene,
+            domain: context.domain,
+            pageTitle: context.pageTitle,
+            pageSlug: context.pageSlug,
+            articleSlug: context.articleSlug,
+            history,
+          },
+          onEvent: (streamEvent: AdvisorStreamEvent) => {
+            if (streamEvent.type === "answer-delta") {
+              updateAssistantMessage(assistantMessageId, (current) => ({
+                ...current,
+                content: current.content + streamEvent.delta,
+                error: undefined,
+              }));
+              return;
+            }
+            if (streamEvent.type === "references") {
+              return;
+            }
+            if (streamEvent.type === "followup-questions") {
+              updateAssistantMessage(assistantMessageId, (current) => ({
+                ...current,
+                content: stripFollowupQuestionsBlock(current.content),
+                followUpQuestions: streamEvent.questions,
+              }));
+              return;
+            }
+            if (streamEvent.type === "error") {
+              updateAssistantMessage(assistantMessageId, (current) => ({
+                ...current,
+                error: streamEvent.message,
+              }));
+              if (abortControllerRef.current === controller) {
+                setIsStreaming(false);
+              }
+              return;
+            }
             if (abortControllerRef.current === controller) {
               setIsStreaming(false);
             }
-            return;
-          }
-          if (abortControllerRef.current === controller) {
-            setIsStreaming(false);
-          }
-        },
-      });
-      appendHistory(nextMessage);
-    } catch (caught) {
-      if (!controller.signal.aborted) {
-        updateAssistantMessage(assistantMessageId, (current) => ({
-          ...current,
-          error: caught instanceof Error ? caught.message : "刚才没连上，你稍后再试一次。",
-        }));
+          },
+        });
+        appendHistory(nextMessage);
+      } catch (caught) {
+        if (!controller.signal.aborted) {
+          updateAssistantMessage(assistantMessageId, (current) => ({
+            ...current,
+            error: caught instanceof Error ? caught.message : "刚才没连上，你稍后再试一次。",
+          }));
+        }
+        if (abortControllerRef.current === controller) {
+          setIsStreaming(false);
+        }
+      } finally {
+        reset();
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setIsStreaming(false);
+        }
       }
-      if (abortControllerRef.current === controller) {
-        setIsStreaming(false);
-      }
-    } finally {
-      reset();
-      if (abortControllerRef.current === controller) {
-        abortControllerRef.current = null;
-        setIsStreaming(false);
-      }
-    }
-  }
+    },
+    [maxInputChars, isStreaming, getToken, loadHistory, workerUrl, context, appendHistory, reset],
+  );
+
+  useEffect(() => {
+    submitMessageRef.current = submitMessage;
+  }, [submitMessage]);
+
+  useEffect(() => {
+    return onAskAdvisor((question) => {
+      void submitMessage(question);
+    });
+  }, [submitMessage]);
 
   async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
@@ -350,7 +370,7 @@ export function ContextualAIAdvisor({
                       <p className="text-xs text-muted-foreground">选一个开始，或者直接输入你的问题</p>
                     </div>
                     <div className="space-y-3">
-                      {context.quickTopics.map((topic) => (
+                      {quickTopics.map((topic) => (
                         <button
                           key={topic.label}
                           type="button"
