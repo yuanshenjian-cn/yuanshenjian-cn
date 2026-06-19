@@ -4,14 +4,18 @@
 Usage (local):
     export CORE_SERVICE_URL="http://localhost:8001"
     export ADMIN_API_KEY="<local-api-key>"
-    python scripts/render_sync_script.py scripts/glossary-candidates.json > scripts/sync-glossary.sh
-    bash scripts/sync-glossary.sh
+    python skills/blog-glossary-sync/scripts/render_sync_script.py \
+      skills/blog-glossary-sync/out/glossary-candidates.json \
+      --out skills/blog-glossary-sync/out/sync-glossary.sh
+    bash skills/blog-glossary-sync/out/sync-glossary.sh
 
 Usage (production):
     export CORE_SERVICE_URL="https://api.yuanshenjian.cn"
     export ADMIN_API_KEY="<production-api-key>"
-    python scripts/render_sync_script.py scripts/glossary-candidates.json > scripts/sync-glossary.sh
-    bash scripts/sync-glossary.sh
+    python skills/blog-glossary-sync/scripts/render_sync_script.py \
+      skills/blog-glossary-sync/out/glossary-candidates.json \
+      --out skills/blog-glossary-sync/out/sync-glossary-prod.sh
+    bash skills/blog-glossary-sync/out/sync-glossary-prod.sh
 """
 
 from __future__ import annotations
@@ -31,7 +35,6 @@ def render_curl(
     url: str,
     payload: dict,
     origin: str,
-    api_key: str,
     label: str,
 ) -> str:
     body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
@@ -41,7 +44,7 @@ curl -s \
   -X {method} {shell_escape(url)} \
   -H "Content-Type: application/json" \
   -H {shell_escape('Origin: ' + origin)} \
-  -H {shell_escape('Authorization: Bearer ' + api_key)} \
+  -H "Authorization: Bearer ${{ADMIN_API_KEY}}" \
   -d {shell_escape(body)}
 echo
 """.strip()
@@ -49,13 +52,19 @@ echo
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("Usage: render_sync_script.py <glossary-candidates.json>", file=sys.stderr)
+        print("Usage: render_sync_script.py <glossary-candidates.json> [--out <script.sh>]", file=sys.stderr)
         return 1
 
     candidates_path = Path(sys.argv[1])
     if not candidates_path.exists():
         print(f"File not found: {candidates_path}", file=sys.stderr)
         return 1
+
+    out_path: Path | None = None
+    if "--out" in sys.argv:
+        out_idx = sys.argv.index("--out")
+        if out_idx + 1 < len(sys.argv):
+            out_path = Path(sys.argv[out_idx + 1])
 
     core_url = os.environ.get("CORE_SERVICE_URL", "http://localhost:8001").rstrip("/")
     origin = os.environ.get("ADMIN_CONSOLE_ORIGIN", "")
@@ -72,13 +81,14 @@ def main() -> int:
     create_items = data.get("create", [])
     update_items = data.get("update", [])
 
-    print("#!/bin/bash")
-    print("set -euo pipefail")
-    print()
-    print(f'CORE_URL="{core_url}"')
-    print('ADMIN_API_KEY="${ADMIN_API_KEY:?请设置 ADMIN_API_KEY 环境变量}"')
-    print(f'ORIGIN="{origin}"')
-    print()
+    lines: list[str] = []
+    lines.append("#!/bin/bash")
+    lines.append("set -euo pipefail")
+    lines.append("")
+    lines.append(f'CORE_URL="{core_url}"')
+    lines.append('ADMIN_API_KEY="${ADMIN_API_KEY:?请设置 ADMIN_API_KEY 环境变量}"')
+    lines.append(f'ORIGIN="{origin}"')
+    lines.append("")
 
     for item in create_items:
         payload = {
@@ -93,36 +103,44 @@ def main() -> int:
             "notes": item.get("notes", ""),
             "updated_by": item.get("updated_by", "admin"),
         }
-        print(
+        lines.append(
             render_curl(
                 "POST",
                 f"{core_url}/api/v1/admin/knowledge-terms",
                 payload,
                 origin,
-                api_key,
                 f"创建术语: {item.get('term', '')}",
             )
         )
-        print()
+        lines.append("")
 
     for item in update_items:
         term_id = item.get("id", "")
         changes = item.get("changes", {})
         if not term_id:
             continue
-        print(
+        lines.append(
             render_curl(
                 "PUT",
                 f"{core_url}/api/v1/admin/knowledge-terms/{term_id}",
                 changes,
                 origin,
-                api_key,
                 f"更新术语: {changes.get('term', item.get('term', ''))}",
             )
         )
-        print()
+        lines.append("")
 
-    print('echo "术语库同步完成"')
+    lines.append('echo "术语库同步完成"')
+    script = "\n".join(lines) + "\n"
+
+    if out_path is not None:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(script, encoding="utf-8")
+        out_path.chmod(0o755)
+        print(f"脚本已生成: {out_path}")
+    else:
+        print(script)
+
     return 0
 
 

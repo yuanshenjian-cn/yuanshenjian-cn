@@ -1,0 +1,4 @@
+# 由 blog-glossary-sync skill 生成的临时产物
+glossary-candidates.json
+sync-glossary*.sh
+*.log

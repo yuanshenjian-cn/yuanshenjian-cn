@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.contexts.admin_console.infra.admin_request_guard import AdminRequestGuard, get_admin_request_guard
 from app.contexts.knowledge_base.application.archive_knowledge_term_app_service import ArchiveKnowledgeTermAppService
 from app.contexts.knowledge_base.application.create_knowledge_term_app_service import CreateKnowledgeTermAppService
-from app.contexts.knowledge_base.application.dto.list_knowledge_terms_dto import ListKnowledgeTermsResp
+from app.contexts.knowledge_base.application.dto.list_knowledge_terms_dto import ListKnowledgeTermsReq, ListKnowledgeTermsResp
 from app.contexts.knowledge_base.application.dto.save_knowledge_term_dto import SaveKnowledgeTermReq, SaveKnowledgeTermResp
 from app.contexts.knowledge_base.application.list_knowledge_terms_app_service import ListKnowledgeTermsAppService
 from app.contexts.knowledge_base.application.update_knowledge_term_app_service import UpdateKnowledgeTermAppService
@@ -66,11 +66,13 @@ def _raise_http(error: Exception) -> NoReturn:
 @router.get("", response_model=ListKnowledgeTermsResp)
 async def list_knowledge_terms(
     request: Request,
+    page: int = 1,
+    page_size: int = 10,
     guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: ListKnowledgeTermsAppService = Depends(get_list_knowledge_terms_service),
 ) -> ListKnowledgeTermsResp:
     await guard.require_admin(request)
-    return await service.execute()
+    return await service.execute(ListKnowledgeTermsReq(page=page, page_size=page_size))
 
 
 @router.post("", response_model=SaveKnowledgeTermResp)

@@ -31,7 +31,7 @@
 
 ```bash
 export CORE_SERVICE_URL="http://localhost:8001"
-export ADMIN_API_KEY="$(grep ADMIN_API_KEY core-service/.env | cut -d= -f2)"
+export ADMIN_API_KEY="$(grep '^ADMIN_API_KEY=' core-service/.env | cut -d= -f2)"
 ```
 
 ### 生产环境
@@ -41,6 +41,7 @@ export ADMIN_API_KEY="$(grep ADMIN_API_KEY core-service/.env | cut -d= -f2)"
 ```bash
 export CORE_SERVICE_URL="https://api.yuanshenjian.cn"
 export ADMIN_API_KEY="<你的生产 ADMIN_API_KEY>"
+export ADMIN_CONSOLE_ORIGIN="https://admin.yuanshenjian.cn"
 ```
 
 `ADMIN_API_KEY` 通过 `Authorization: Bearer <key>` 调用 admin 术语接口，无需登录、CSRF 或 Turnstile，适合脚本自动化。
@@ -62,22 +63,25 @@ content/ 下的 Markdown/MDX
   区分「创建」和「更新」
         │
         ▼
-  生成 scripts/glossary-candidates.json
-  生成 scripts/sync-glossary.sh
+  生成 skills/blog-glossary-sync/output/glossary-candidates.json
+  生成 skills/blog-glossary-sync/output/sync-glossary.sh
         │
         ▼
   用户 review / 编辑候选列表
         │
         ▼
-  用户确认后执行 bash scripts/sync-glossary.sh
+  用户确认后执行 bash skills/blog-glossary-sync/output/sync-glossary.sh
 ```
 
 ## 输出文件
 
+所有产物都在 skill 内部目录 `skills/blog-glossary-sync/output/`，不会被提交到 Git（已配置 `.gitignore`）：
+
 | 文件 | 说明 |
 |------|------|
-| `scripts/glossary-candidates.json` | 提取后的候选术语列表，分 `create` 和 `update` 两组，可人工编辑 |
-| `scripts/sync-glossary.sh` | 由 `render_sync_script.py` 生成的可执行 curl 脚本 |
+| `glossary-candidates.json` | 提取后的候选术语列表，分 `create` 和 `update` 两组，可人工编辑 |
+| `sync-glossary.sh` | 本地环境 curl 脚本 |
+| `sync-glossary-prod.sh` | 生产环境 curl 脚本 |
 
 ## 字段映射
 
@@ -86,7 +90,7 @@ content/ 下的 Markdown/MDX
 - `term`：术语原文
 - `aliases`：别名数组（可包含中英文）
 - `definition`：一句话定义，用于博客文章页 hover tooltip
-- `explanation`：详细解释，用于 AI 顾问上下文增强。**要求包含核心定义、关键要点、典型场景和具体示例**，避免空话。
+- `explanation`：详细解释，用于文章页点击后的流式展示和 AI 顾问上下文增强。**要求包含核心定义、关键要点、典型场景和具体示例**，避免空话。
 - `related_article_slugs`：相关文章 slug 数组
 - `domains`：生效域，可选 `ai` / `investment` / `health` / `article`
 - `scenes`：生效场景，可选 `article` / `ai-briefing` / `investment-briefing` / `ai-column` / `health-column` / `investment-column` / `author`
@@ -96,6 +100,8 @@ content/ 下的 Markdown/MDX
 `domains` 和 `scenes` 由 LLM 根据内容主题从固定列表中选择，确保文章页 `TermHighlighter` 和 AI 顾问能正确检索到。
 
 ## 配套脚本
+
+脚本都位于 `skills/blog-glossary-sync/scripts/`。
 
 ### fetch_existing_terms.sh
 
@@ -112,10 +118,22 @@ bash skills/blog-glossary-sync/scripts/fetch_existing_terms.sh > existing-terms.
 根据 `glossary-candidates.json` 生成 curl 脚本：
 
 ```bash
+# 本地
 export CORE_SERVICE_URL="http://localhost:8001"
 export ADMIN_API_KEY="<api-key>"
-python skills/blog-glossary-sync/scripts/render_sync_script.py scripts/glossary-candidates.json > scripts/sync-glossary.sh
-bash scripts/sync-glossary.sh
+python skills/blog-glossary-sync/scripts/render_sync_script.py \
+  skills/blog-glossary-sync/output/glossary-candidates.json \
+  --out skills/blog-glossary-sync/output/sync-glossary.sh
+bash skills/blog-glossary-sync/output/sync-glossary.sh
+
+# 生产
+export CORE_SERVICE_URL="https://api.yuanshenjian.cn"
+export ADMIN_API_KEY="<api-key>"
+export ADMIN_CONSOLE_ORIGIN="https://admin.yuanshenjian.cn"
+python skills/blog-glossary-sync/scripts/render_sync_script.py \
+  skills/blog-glossary-sync/output/glossary-candidates.json \
+  --out skills/blog-glossary-sync/output/sync-glossary-prod.sh
+bash skills/blog-glossary-sync/output/sync-glossary-prod.sh
 ```
 
 ## 安全说明

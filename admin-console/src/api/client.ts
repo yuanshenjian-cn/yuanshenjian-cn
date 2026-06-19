@@ -183,8 +183,10 @@ export function rebuildKnowledgeSource(id: string) {
   });
 }
 
-export function fetchKnowledgeTerms() {
-  return request<{ items: KnowledgeTermItem[] }>("/api/v1/admin/knowledge-terms");
+export function fetchKnowledgeTerms(page = 1, pageSize = 10) {
+  return request<{ items: KnowledgeTermItem[]; total: number; page: number; page_size: number }>(
+    `/api/v1/admin/knowledge-terms?page=${page}&page_size=${pageSize}`,
+  );
 }
 
 export function createKnowledgeTerm(payload: SaveKnowledgeTermPayload) {

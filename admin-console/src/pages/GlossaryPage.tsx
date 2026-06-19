@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   archiveKnowledgeTerm,
@@ -23,6 +23,8 @@ const EMPTY_FORM: SaveKnowledgeTermPayload = {
   updated_by: "admin",
 };
 
+const PAGE_SIZES = [10, 20, 50, 100] as const;
+
 function parseCommaList(value: string): string[] {
   return value
     .split(",")
@@ -30,18 +32,27 @@ function parseCommaList(value: string): string[] {
     .filter(Boolean);
 }
 
+function formatCommaList(value: string[]): string {
+  return value.join(", ");
+}
+
 export function GlossaryPage() {
   const [items, setItems] = useState<KnowledgeTermItem[]>([]);
+  const [total, setTotal] = useState(0);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<SaveKnowledgeTermPayload>({ ...EMPTY_FORM });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10);
 
   async function load() {
     try {
       setError("");
-      const response = await fetchKnowledgeTerms();
+      const response = await fetchKnowledgeTerms(page, pageSize);
       setItems(response.items);
+      setTotal(response.total);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "加载失败");
     }
@@ -49,7 +60,11 @@ export function GlossaryPage() {
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [page, pageSize]);
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total, pageSize]);
+  const startItem = useMemo(() => (page - 1) * pageSize + 1, [page, pageSize]);
+  const endItem = useMemo(() => Math.min(startItem + pageSize - 1, total), [startItem, pageSize, total]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,8 +83,7 @@ export function GlossaryPage() {
       } else {
         await createKnowledgeTerm(payload);
       }
-      setForm({ ...EMPTY_FORM });
-      setEditingId(null);
+      closeModal();
       await load();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "保存失败");
@@ -78,7 +92,14 @@ export function GlossaryPage() {
     }
   }
 
-  function handleEdit(item: KnowledgeTermItem) {
+  function openCreate() {
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM });
+    setError("");
+    setModalOpen(true);
+  }
+
+  function openEdit(item: KnowledgeTermItem) {
     setEditingId(item.id);
     setForm({
       term: item.term,
@@ -92,9 +113,12 @@ export function GlossaryPage() {
       notes: item.notes ?? "",
       updated_by: item.updated_by ?? "admin",
     });
+    setError("");
+    setModalOpen(true);
   }
 
-  function handleCancel() {
+  function closeModal() {
+    setModalOpen(false);
     setEditingId(null);
     setForm({ ...EMPTY_FORM });
   }
@@ -109,114 +133,48 @@ export function GlossaryPage() {
     await load();
   }
 
+  function goToPage(next: number) {
+    setPage(Math.max(1, Math.min(totalPages, next)));
+  }
+
   return (
     <section>
-      <h2>术语库</h2>
-      <p>管理文章内高亮术语和 AI 顾问优先检索的词条。创建/更新后会自动同步到 RAG 索引。</p>
+      <div className="page-header">
+        <div>
+          <h2>术语库</h2>
+          <p>管理文章内高亮术语和 AI 顾问优先检索的词条。创建/更新后会自动同步到 RAG 索引。</p>
+        </div>
+        <div className="page-actions">
+          <button onClick={() => void handleRebuild()}>重建全部索引</button>
+          <button onClick={openCreate}>新增术语</button>
+        </div>
+      </div>
+
       {error ? <p className="error">{error}</p> : null}
 
-      <form className="card" onSubmit={handleSubmit}>
-        <h3>{editingId ? "编辑术语" : "新增术语"}</h3>
-        <div className="grid">
-          <label>
-            关键词
-            <input
-              value={form.term}
-              onChange={(event) => setForm((current) => ({ ...current, term: event.target.value }))}
-              placeholder="TDD"
-            />
-          </label>
-          <label>
-            别名
-            <input
-              value={form.aliases.join(", ")}
-              onChange={(event) => setForm((current) => ({ ...current, aliases: parseCommaList(event.target.value) }))}
-              placeholder="测试驱动开发, Test Driven Development"
-            />
-          </label>
-          <label>
-            状态
-            <select
-              value={form.status}
-              onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
+      <div className="list-toolbar">
+        <div className="pagination">
+          <button disabled={page <= 1} onClick={() => goToPage(1)}>首页</button>
+          <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>上一页</button>
+          <span className="pagination-info">
+            第 {page} / {totalPages} 页（{startItem}-{endItem} / 共 {total} 条）
+          </span>
+          <button disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>下一页</button>
+          <button disabled={page >= totalPages} onClick={() => goToPage(totalPages)}>末页</button>
+        </div>
+        <div className="page-size">
+          <span>每页</span>
+          {PAGE_SIZES.map((size) => (
+            <button
+              key={size}
+              className={pageSize === size ? "active" : ""}
+              onClick={() => setPageSize(size)}
             >
-              <option value="enabled">启用</option>
-              <option value="disabled">禁用</option>
-            </select>
-          </label>
-          <label>
-            生效域
-            <input
-              value={form.domains.join(", ")}
-              onChange={(event) => setForm((current) => ({ ...current, domains: parseCommaList(event.target.value) }))}
-              placeholder="ai, health, investment"
-            />
-          </label>
-          <label>
-            生效场景
-            <input
-              value={form.scenes.join(", ")}
-              onChange={(event) => setForm((current) => ({ ...current, scenes: parseCommaList(event.target.value) }))}
-              placeholder="article, ai-column"
-            />
-          </label>
-          <label>
-            相关文章 Slugs
-            <input
-              value={form.related_article_slugs.join(", ")}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  related_article_slugs: parseCommaList(event.target.value),
-                }))
-              }
-              placeholder="tdd-introduction, refactoring"
-            />
-          </label>
-          <label>
-            更新人
-            <input
-              value={form.updated_by}
-              onChange={(event) => setForm((current) => ({ ...current, updated_by: event.target.value }))}
-            />
-          </label>
+              {size}
+            </button>
+          ))}
+          <span>条</span>
         </div>
-        <label>
-          一句话定义
-          <textarea
-            value={form.definition}
-            onChange={(event) => setForm((current) => ({ ...current, definition: event.target.value }))}
-            rows={2}
-          />
-        </label>
-        <label>
-          详细解释（AI 回答时使用）
-          <textarea
-            value={form.explanation}
-            onChange={(event) => setForm((current) => ({ ...current, explanation: event.target.value }))}
-            rows={5}
-          />
-        </label>
-        <label>
-          备注
-          <textarea
-            value={form.notes}
-            onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
-            rows={2}
-          />
-        </label>
-        <div className="actions">
-          <button type="submit" disabled={saving}>
-            {saving ? "保存中..." : editingId ? "更新术语" : "创建术语"}
-          </button>
-          {editingId ? (
-            <button type="button" onClick={handleCancel}>取消</button>
-          ) : null}
-        </div>
-      </form>
-
-      <div className="actions">
-        <button onClick={() => void handleRebuild()}>重建全部术语索引</button>
       </div>
 
       {items.map((item) => (
@@ -224,7 +182,7 @@ export function GlossaryPage() {
           <div className="term-header">
             <h3>{item.term}</h3>
             <div className="term-actions">
-              <button onClick={() => handleEdit(item)}>编辑</button>{" "}
+              <button onClick={() => openEdit(item)}>编辑</button>{" "}
               <button onClick={() => void handleArchive(item.id)}>归档</button>
             </div>
           </div>
@@ -241,6 +199,123 @@ export function GlossaryPage() {
           </p>
         </article>
       ))}
+
+      {modalOpen ? (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal" onClick={(event) => event.stopPropagation()}>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-header">
+                <h3>{editingId ? "编辑术语" : "新增术语"}</h3>
+                <button type="button" className="modal-close" onClick={closeModal} aria-label="关闭">
+                  ×
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="grid">
+                  <label>
+                    关键词
+                    <input
+                      value={form.term}
+                      onChange={(event) => setForm((current) => ({ ...current, term: event.target.value }))}
+                      placeholder="TDD"
+                    />
+                  </label>
+                  <label>
+                    别名
+                    <input
+                      value={formatCommaList(form.aliases)}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, aliases: parseCommaList(event.target.value) }))
+                      }
+                      placeholder="测试驱动开发, Test Driven Development"
+                    />
+                  </label>
+                  <label>
+                    状态
+                    <select
+                      value={form.status}
+                      onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
+                    >
+                      <option value="enabled">启用</option>
+                      <option value="disabled">禁用</option>
+                    </select>
+                  </label>
+                  <label>
+                    生效域
+                    <input
+                      value={formatCommaList(form.domains)}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, domains: parseCommaList(event.target.value) }))
+                      }
+                      placeholder="ai, health, investment"
+                    />
+                  </label>
+                  <label>
+                    生效场景
+                    <input
+                      value={formatCommaList(form.scenes)}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, scenes: parseCommaList(event.target.value) }))
+                      }
+                      placeholder="article, ai-column"
+                    />
+                  </label>
+                  <label>
+                    相关文章 Slugs
+                    <input
+                      value={formatCommaList(form.related_article_slugs)}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          related_article_slugs: parseCommaList(event.target.value),
+                        }))
+                      }
+                      placeholder="tdd-introduction, refactoring"
+                    />
+                  </label>
+                  <label>
+                    更新人
+                    <input
+                      value={form.updated_by}
+                      onChange={(event) => setForm((current) => ({ ...current, updated_by: event.target.value }))}
+                    />
+                  </label>
+                </div>
+                <label>
+                  一句话定义
+                  <textarea
+                    value={form.definition}
+                    onChange={(event) => setForm((current) => ({ ...current, definition: event.target.value }))}
+                    rows={2}
+                  />
+                </label>
+                <label>
+                  详细解释（AI 回答时使用）
+                  <textarea
+                    value={form.explanation}
+                    onChange={(event) => setForm((current) => ({ ...current, explanation: event.target.value }))}
+                    rows={5}
+                  />
+                </label>
+                <label>
+                  备注
+                  <textarea
+                    value={form.notes}
+                    onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
+                    rows={2}
+                  />
+                </label>
+              </div>
+              <div className="modal-footer">
+                <button type="submit" disabled={saving}>
+                  {saving ? "保存中..." : editingId ? "更新术语" : "创建术语"}
+                </button>
+                <button type="button" onClick={closeModal}>取消</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
