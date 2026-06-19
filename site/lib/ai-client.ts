@@ -227,6 +227,15 @@ function parseAdvisorStreamEvent(block: string): AdvisorStreamEvent {
         type: "references",
         references: payload.references,
       };
+    case "followup-questions":
+      if (!isRecord(payload) || !Array.isArray(payload.questions) || !payload.questions.every((item): item is string => typeof item === "string")) {
+        throw new Error("Invalid followup-questions event payload");
+      }
+
+      return {
+        type: "followup-questions",
+        questions: payload.questions,
+      };
     case "done":
       if (!isRecord(payload) || (payload.usage !== undefined && !isUsage(payload.usage))) {
         throw new Error("Invalid done event payload");

@@ -59,6 +59,7 @@ export interface AdvisorContextValue {
   pageSlug?: string;
   articleSlug?: string;
   quickTopics: AIQuickTopic[];
+  welcomeMessage?: string;
 }
 
 export interface AdvisorStreamContext {
@@ -121,6 +122,7 @@ export type PageStreamEvent =
 export type AdvisorStreamEvent =
   | { type: "answer-delta"; delta: string }
   | { type: "references"; references: AdvisorReference[] }
+  | { type: "followup-questions"; questions: string[] }
   | { type: "done"; usage?: AIUsage }
   | { type: "error"; message: string };
 

@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import { useTurnstileToken } from "@/hooks/ai/use-turnstile-token";
 import { type AdvisorSessionMessage, useAdvisorSession } from "@/hooks/ai/use-advisor-session";
 import { aiContextualAdvisorStream } from "@/lib/ai-client";
+import { stripFollowupQuestionsBlock, sanitizeAdvisorAnswer } from "@/lib/ai/followup-questions";
 import type { AdvisorContextValue, AdvisorStreamEvent } from "@/types/ai";
 
 interface ContextualAIAdvisorProps {
@@ -24,6 +25,29 @@ interface ContextualAIAdvisorProps {
 type ChatRole = "user" | "assistant";
 
 type ChatMessage = AdvisorSessionMessage;
+
+function getWelcomeMessage(context: AdvisorContextValue): string {
+  if (context.welcomeMessage) {
+    return context.welcomeMessage;
+  }
+  switch (context.scene) {
+    case "article":
+      return "你好！我是袁慎建的 AI 助手，可以帮你快速理解这篇文章。你可以从下面选一个方向开始，也可以直接输入问题。";
+    case "author":
+      return "你好！我是袁慎建的 AI 助手，可以帮你快速了解作者。你想先了解什么？";
+    case "ai":
+    case "ai-column":
+      return "你好！我是 AI 栏目的 AI 助手，可以帮你发现感兴趣的文章和动态。";
+    case "health":
+    case "health-column":
+      return "你好！我是健康栏目的 AI 助手，可以帮你快速找到感兴趣的内容。";
+    case "investment":
+    case "investment-column":
+      return "你好！我是投资栏目的 AI 助手，可以帮你梳理栏目内容和观察方向。";
+    default:
+      return "你好！我是袁慎建的 AI 助手，可以帮你快速了解这一页。你可以从下面开始，或直接提问。";
+  }
+}
 
 function hasBookTitleMarks(children: ReactNode): boolean {
   if (typeof children === "string") {
@@ -105,7 +129,10 @@ export function ContextualAIAdvisor({
     if (isStreaming || messages.length === 0) {
       return;
     }
-    saveMessages(messages);
+    const messagesToSave = messages.map((item) =>
+      item.role === "assistant" ? { ...item, content: stripFollowupQuestionsBlock(item.content) } : item,
+    );
+    saveMessages(messagesToSave);
   }, [isStreaming, messages, saveMessages]);
 
   useEffect(() => {
@@ -199,6 +226,14 @@ export function ContextualAIAdvisor({
             return;
           }
           if (streamEvent.type === "references") {
+            return;
+          }
+          if (streamEvent.type === "followup-questions") {
+            updateAssistantMessage(assistantMessageId, (current) => ({
+              ...current,
+              content: stripFollowupQuestionsBlock(current.content),
+              followUpQuestions: streamEvent.questions,
+            }));
             return;
           }
           if (streamEvent.type === "error") {
@@ -307,67 +342,94 @@ export function ContextualAIAdvisor({
             </div>
 
             <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
-            {!hasMessages ? (
-              <div className="flex h-full items-center justify-center px-4 text-center">
-                <div className="w-full max-w-sm space-y-3">
-                  {context.quickTopics.map((topic) => (
-                    <button
-                      key={topic.label}
-                      type="button"
-                      onClick={() => void submitMessage(topic.prompt)}
-                      disabled={isStreaming}
-                      className="block w-full rounded-2xl border border-border/70 bg-card/80 px-4 py-3 text-left text-sm text-foreground shadow-sm transition hover:border-primary/40 hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {topic.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              messages.map((item) => {
-                const isUser = item.role === "user";
-                return (
-                  <div key={item.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[88%] rounded-[1.5rem] px-4 py-3 shadow-sm ${
-                        isUser
-                          ? "rounded-br-md bg-foreground text-background"
-                          : "rounded-bl-md border border-border/70 bg-card/80 text-foreground"
-                      }`}
-                    >
-                      <p className={`text-[11px] tracking-[0.18em] ${isUser ? "text-background/70" : "text-muted-foreground"}`}>
-                        {isUser ? "你" : "袁慎建"}
-                      </p>
-                      {item.content && isUser ? <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{item.content}</p> : null}
-                      {item.content && !isUser ? (
-                        <div className="mt-2 text-sm leading-6 text-foreground">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]} components={advisorMarkdownComponents}>
-                            {item.content}
-                          </ReactMarkdown>
-                        </div>
-                      ) : null}
-                      {!item.content && isStreaming && !item.error && !isUser ? (
-                        <span className="mt-2 inline-flex items-center text-sm text-muted-foreground" aria-label={thinkingText}>
-                          {Array.from(thinkingText).map((char, index) => (
-                            <span
-                              key={`${char}-${index}`}
-                              aria-hidden="true"
-                              className="inline-block animate-bounce motion-reduce:animate-none"
-                              style={{ animationDelay: `${index * 70}ms`, animationDuration: "1.4s" }}
-                            >
-                              {char}
-                            </span>
-                          ))}
-                        </span>
-                      ) : null}
-                      {item.error ? <p className="mt-2 text-sm leading-6 text-destructive">{item.error}</p> : null}
+              {!hasMessages ? (
+                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                  <div className="w-full max-w-sm space-y-5">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground">{getWelcomeMessage(context)}</p>
+                      <p className="text-xs text-muted-foreground">选一个开始，或者直接输入你的问题</p>
+                    </div>
+                    <div className="space-y-3">
+                      {context.quickTopics.map((topic) => (
+                        <button
+                          key={topic.label}
+                          type="button"
+                          onClick={() => void submitMessage(topic.prompt)}
+                          disabled={isStreaming}
+                          className="block w-full rounded-2xl border border-border/70 bg-card/80 px-4 py-3 text-left text-sm text-foreground shadow-sm transition hover:border-primary/40 hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {topic.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                );
-              })
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+                </div>
+              ) : (
+                messages.map((item) => {
+                  const isUser = item.role === "user";
+                  const displayContent = isUser ? item.content : sanitizeAdvisorAnswer(item.content);
+                  return (
+                    <div key={item.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                      <div className="max-w-[88%] space-y-2">
+                        <div
+                          className={`rounded-[1.5rem] px-4 py-3 shadow-sm ${
+                            isUser
+                              ? "rounded-br-md bg-foreground text-background"
+                              : "rounded-bl-md border border-border/70 bg-card/80 text-foreground"
+                          }`}
+                        >
+                          <p className={`text-[11px] tracking-[0.18em] ${isUser ? "text-background/70" : "text-muted-foreground"}`}>
+                            {isUser ? "你" : "袁慎建"}
+                          </p>
+                          {displayContent && isUser ? <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{displayContent}</p> : null}
+                          {displayContent && !isUser ? (
+                            <div className="mt-2 text-sm leading-6 text-foreground">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={advisorMarkdownComponents}>
+                                {displayContent}
+                              </ReactMarkdown>
+                            </div>
+                          ) : null}
+                          {!displayContent && isStreaming && !item.error && !isUser ? (
+                            <span className="mt-2 inline-flex items-center text-sm text-muted-foreground" aria-label={thinkingText}>
+                              {Array.from(thinkingText).map((char, index) => (
+                                <span
+                                  key={`${char}-${index}`}
+                                  aria-hidden="true"
+                                  className="inline-block animate-bounce motion-reduce:animate-none"
+                                  style={{ animationDelay: `${index * 70}ms`, animationDuration: "1.4s" }}
+                                >
+                                  {char}
+                                </span>
+                              ))}
+                            </span>
+                          ) : null}
+                          {item.error ? <p className="mt-2 text-sm leading-6 text-destructive">{item.error}</p> : null}
+                        </div>
+                        {!isUser && item.followUpQuestions && item.followUpQuestions.length > 0 ? (
+                          <div className="space-y-1.5 px-1">
+                            <p className="text-[11px] text-muted-foreground">你可能还想问</p>
+                            <div className="flex flex-col gap-2">
+                              {item.followUpQuestions.map((question, index) => (
+                                <button
+                                  key={`${item.id}-followup-${index}`}
+                                  type="button"
+                                  onClick={() => void submitMessage(question)}
+                                  disabled={isStreaming}
+                                  className="rounded-xl border border-border/70 bg-card/50 px-3 py-2 text-left text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {question}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+            </div>
 
             <div className="border-t border-border/70 bg-background/90 px-4 py-2.5">
               <form className="space-y-2" onSubmit={(event) => void handleSubmit(event)}>

@@ -7,7 +7,10 @@ from collections.abc import AsyncIterator
 from app.contexts.ai_assistant.application.dto.stream_ai_advisor_dto import StreamAIAdvisorReq
 from app.contexts.ai_assistant.application.stream_event_codec import encode_sse_event
 from app.contexts.ai_assistant.domain.contextual_advisor import normalize_advisor_domain, normalize_advisor_scene
-from app.contexts.ai_assistant.domain.contextual_advisor_prompt import build_contextual_advisor_prompt
+from app.contexts.ai_assistant.domain.contextual_advisor_prompt import (
+    build_contextual_advisor_prompt,
+    extract_followup_questions,
+)
 from app.contexts.ai_assistant.domain.knowledge_context_reader import KnowledgeContextReader
 from app.contexts.ai_assistant.domain.llm_answer_stream_gateway import LLMAnswerStreamGateway
 from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
@@ -47,6 +50,34 @@ class StreamAIAdvisorAppService:
             link_line = f"链接：{url}\n" if url else ""
             enriched_contexts.append(f"标题：{title}\n{link_line}内容：{context}")
         return enriched_contexts
+
+    async def _stream_with_followup_questions(
+        self,
+        llm_stream: AsyncIterator[str],
+    ) -> AsyncIterator[str]:
+        """透传 LLM 流式事件，将 followup-questions 事件插在 done 之前发出。"""
+        full_answer = ""
+        pending_done: str | None = None
+        async for event in llm_stream:
+            if event.startswith("event: done"):
+                pending_done = event
+                continue
+            if pending_done is not None:
+                yield pending_done
+                pending_done = None
+            yield event
+            if event.startswith("event: answer-delta"):
+                try:
+                    payload = json.loads(event.split("data: ", 1)[1])
+                    full_answer += payload.get("delta", "")
+                except (IndexError, json.JSONDecodeError):
+                    continue
+
+        followup_questions = extract_followup_questions(full_answer)
+        if followup_questions:
+            yield encode_sse_event("followup-questions", {"questions": followup_questions})
+        if pending_done is not None:
+            yield pending_done
 
     async def execute(self, req: StreamAIAdvisorReq) -> AsyncIterator[str]:
         try:
@@ -119,11 +150,13 @@ class StreamAIAdvisorAppService:
             if recent_history:
                 prompt += "\n\n最近对话（从旧到新）：\n" + "\n".join(f"- {item}" for item in recent_history)
             prompt += f"\n\n入口：{req.entrypoint}"
-            async for event in self._llm_stream_service.stream_completion(
-                profile,
-                prompt,
-                req.message,
-                format_references(references),
+            async for event in self._stream_with_followup_questions(
+                self._llm_stream_service.stream_completion(
+                    profile,
+                    prompt,
+                    req.message,
+                    format_references(references),
+                )
             ):
                 yield event
         except Exception:

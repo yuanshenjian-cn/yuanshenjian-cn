@@ -32,4 +32,18 @@ describe("advisor session", () => {
       "袁慎建：回答 11",
     ]);
   });
+
+  it("preserves followUpQuestions field when formatting history", () => {
+    const messages: AdvisorSessionMessage[] = [
+      { id: "user-0", role: "user", content: "问题" },
+      {
+        id: "assistant-0",
+        role: "assistant",
+        content: "回答",
+        followUpQuestions: ["问题 1", "问题 2", "问题 3"],
+      },
+    ];
+
+    expect(formatAdvisorConversationHistory(messages, 10)).toEqual(["用户：问题", "袁慎建：回答"]);
+  });
 });

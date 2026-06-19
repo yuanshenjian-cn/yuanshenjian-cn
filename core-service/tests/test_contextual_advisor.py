@@ -61,6 +61,40 @@ class StubLLMStreamService:
         yield f"profile={profile.id}|prompt={system_prompt}|message={user_message}|references={reference_count}"
 
 
+class FollowupLLMStreamService:
+    async def stream_completion(
+        self,
+        profile,
+        system_prompt,
+        user_message,
+        references=None,
+        *,
+        provider=None,
+        error_message="AI 服务刚刚开小差了，请稍后重试。",
+        fallback_answer="当前 AI provider 未配置，已返回基于本地资料的降级响应。",
+    ):
+        yield 'event: answer-delta\ndata: {"delta":"回答正文"}\n\n'
+        yield 'event: answer-delta\ndata: {"delta":"\\n\\n<followup-questions>\\n<question>问题 1</question>\\n<question>问题 2</question>\\n<question>问题 3</question>\\n</followup-questions>"}\n\n'
+        yield 'event: references\ndata: {"references":[]}\n\n'
+        yield 'event: done\ndata: {"usage":null}\n\n'
+
+
+class ErrorLLMStreamService:
+    async def stream_completion(
+        self,
+        profile,
+        system_prompt,
+        user_message,
+        references=None,
+        *,
+        provider=None,
+        error_message="AI 服务刚刚开小差了，请稍后重试。",
+        fallback_answer="当前 AI provider 未配置，已返回基于本地资料的降级响应。",
+    ):
+        yield 'event: answer-delta\ndata: {"delta":"部分回答"}\n\n'
+        yield 'event: error\ndata: {"message":"出错了"}\n\n'
+
+
 def test_stream_ai_advisor_passes_scene_domain_and_page_slug() -> None:
     reader = StubKnowledgeReader()
     service = StreamAIAdvisorAppService(StubProfileResolver(), StubLLMStreamService(), reader, StubPublishedAssets())
@@ -99,6 +133,8 @@ def test_stream_ai_advisor_passes_scene_domain_and_page_slug() -> None:
     assert "*[《文章标题》](/articles/example-slug)*" in events[0]
     assert "标题：资料 A" in events[0]
     assert "链接：/articles/doc-a" in events[0]
+    assert "<followup-questions>" in events[0]
+    assert "</question>" in events[0]
 
 
 def test_stream_ai_advisor_keeps_latest_history_in_natural_order() -> None:
@@ -125,6 +161,64 @@ def test_stream_ai_advisor_keeps_latest_history_in_natural_order() -> None:
     assert "历史 01" not in event
     assert event.index("历史 02") < event.index("历史 41")
     assert "最近对话（从旧到新）" in event
+
+
+def test_stream_ai_advisor_emits_followup_questions_event() -> None:
+    service = StreamAIAdvisorAppService(
+        StubProfileResolver(),
+        FollowupLLMStreamService(),
+        StubKnowledgeReader(),
+        StubPublishedAssets(),
+    )
+
+    async def collect() -> list[str]:
+        return [
+            item
+            async for item in service.execute(
+                StreamAIAdvisorReq(
+                    scene="article",
+                    message="总结文章",
+                    page_title="测试文章",
+                    page_slug="test-article",
+                    cf_turnstile_response="token",
+                )
+            )
+        ]
+
+    events = asyncio.run(collect())
+    event_types = [event.split("\n", 1)[0].replace("event: ", "") for event in events]
+
+    assert event_types == ["answer-delta", "answer-delta", "references", "followup-questions", "done"]
+    assert '{"questions":["问题 1","问题 2","问题 3"]}' in events[-2]
+
+
+def test_stream_ai_advisor_does_not_emit_followup_questions_on_error() -> None:
+    service = StreamAIAdvisorAppService(
+        StubProfileResolver(),
+        ErrorLLMStreamService(),
+        StubKnowledgeReader(),
+        StubPublishedAssets(),
+    )
+
+    async def collect() -> list[str]:
+        return [
+            item
+            async for item in service.execute(
+                StreamAIAdvisorReq(
+                    scene="article",
+                    message="总结文章",
+                    page_title="测试文章",
+                    page_slug="test-article",
+                    cf_turnstile_response="token",
+                )
+            )
+        ]
+
+    events = asyncio.run(collect())
+    event_types = [event.split("\n", 1)[0].replace("event: ", "") for event in events]
+
+    assert event_types == ["answer-delta", "error"]
+    assert "followup-questions" not in event_types
 
 
 class EmptyKnowledgeReader:

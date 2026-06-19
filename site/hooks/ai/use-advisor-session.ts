@@ -7,6 +7,7 @@ type AdvisorSessionRole = "user" | "assistant";
 export interface AdvisorSessionMessage {
   content: string;
   error?: string;
+  followUpQuestions?: string[];
   id: string;
   role: AdvisorSessionRole;
 }
@@ -34,11 +35,15 @@ function isSessionMessage(value: unknown): value is AdvisorSessionMessage {
     return false;
   }
   const item = value as Record<string, unknown>;
+  const hasValidFollowUpQuestions =
+    typeof item.followUpQuestions === "undefined" ||
+    (Array.isArray(item.followUpQuestions) && item.followUpQuestions.every((question): question is string => typeof question === "string"));
   return (
     typeof item.id === "string" &&
     typeof item.content === "string" &&
     (item.role === "user" || item.role === "assistant") &&
-    (typeof item.error === "undefined" || typeof item.error === "string")
+    (typeof item.error === "undefined" || typeof item.error === "string") &&
+    hasValidFollowUpQuestions
   );
 }
 

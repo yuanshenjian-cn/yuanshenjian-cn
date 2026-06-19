@@ -257,6 +257,40 @@ describe("aiContextualAdvisorStream", () => {
     expect(onEvent).toHaveBeenNthCalledWith(2, expect.objectContaining({ type: "references" }));
     expect(onEvent).toHaveBeenNthCalledWith(3, { type: "done", usage: undefined });
   });
+
+  it("should parse followup-questions event", async () => {
+    const onEvent = vi.fn();
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      createStreamResponse([
+        'event: answer-delta\ndata: {"delta":"回答正文"}\n\n',
+        'event: followup-questions\ndata: {"questions":["问题 1","问题 2","问题 3"]}\n\n',
+        'event: done\ndata: {}\n\n',
+      ]),
+    );
+
+    await aiContextualAdvisorStream({
+      workerUrl: "/api/v1/ai-assistant/",
+      message: "测试",
+      turnstileToken: "token",
+      context: {
+        scene: "ai-column",
+        domain: "ai",
+        pageTitle: "OpenCode",
+        pageSlug: "opencode",
+        articleSlug: undefined,
+        history: [],
+      },
+      onEvent,
+    });
+
+    expect(onEvent).toHaveBeenNthCalledWith(1, { type: "answer-delta", delta: "回答正文" });
+    expect(onEvent).toHaveBeenNthCalledWith(2, {
+      type: "followup-questions",
+      questions: ["问题 1", "问题 2", "问题 3"],
+    });
+    expect(onEvent).toHaveBeenNthCalledWith(3, { type: "done", usage: undefined });
+  });
 });
 
 describe("aiBriefingRecommendationStream", () => {
