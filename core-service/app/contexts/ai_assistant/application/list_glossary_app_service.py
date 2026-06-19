@@ -14,9 +14,9 @@ class ListGlossaryAppService:
         for term in terms:
             term_scenes = term.scenes or []
             term_domains = term.domains or []
-            if scene and scene not in term_scenes:
+            if scene and term_scenes and scene not in term_scenes:
                 continue
-            if domain and domain not in term_domains:
+            if domain and term_domains and domain not in term_domains:
                 continue
             items.append(
                 GlossaryItemResp(

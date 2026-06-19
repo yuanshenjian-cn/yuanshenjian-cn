@@ -182,6 +182,19 @@ def test_list_glossary_returns_all_when_no_filters() -> None:
     assert len(result.items) == 2
 
 
+def test_list_glossary_empty_scenes_matches_all_scenes() -> None:
+    terms = [
+        sample_term(term="TDD", scenes=[], domains=[]),
+        sample_term(term="Claude Code", scenes=["article"], domains=["ai"]),
+    ]
+    dao = StubKnowledgeTermDAO(terms)
+    service = ListGlossaryAppService(dao)
+
+    result = asyncio.run(service.execute(scene="article", domain="ai"))
+
+    assert {item.term for item in result.items} == {"TDD", "Claude Code"}
+
+
 class FakeTermReader(KnowledgeTermReader):
     def __init__(self, matches: list[dict[str, str]]) -> None:
         self._matches = matches

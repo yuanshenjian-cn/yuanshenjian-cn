@@ -14,6 +14,7 @@ from app.contexts.knowledge_base.application.list_knowledge_terms_app_service im
 from app.contexts.knowledge_base.application.update_knowledge_term_app_service import UpdateKnowledgeTermAppService
 from app.contexts.knowledge_base.domain.exceptions import KnowledgeTermNotFoundError, KnowledgeTermValidationError
 from app.contexts.knowledge_base.infra.dao.knowledge_term_dao import KnowledgeTermDAO
+from app.contexts.knowledge_base.infra.glossary_cache_purge_service import GlossaryCachePurgeService
 from app.contexts.knowledge_base.infra.knowledge_term_query_service import KnowledgeTermQueryService
 from app.contexts.knowledge_base.infra.knowledge_term_sync_service import KnowledgeTermSyncService
 from app.shared.infra.app_config import settings
@@ -91,6 +92,7 @@ async def create_knowledge_term(
         term = await KnowledgeTermDAO(session).get_by_id(result.id)
         if term is not None:
             await KnowledgeTermSyncService(session).sync_term(term)
+        await GlossaryCachePurgeService().purge()
         return result
     except Exception as error:
         _raise_http(error)
@@ -113,6 +115,7 @@ async def update_knowledge_term(
         term = await KnowledgeTermDAO(session).get_by_id(result.id)
         if term is not None:
             await KnowledgeTermSyncService(session).sync_term(term)
+        await GlossaryCachePurgeService().purge()
         return result
     except Exception as error:
         _raise_http(error)
@@ -134,6 +137,7 @@ async def archive_knowledge_term(
         term = await KnowledgeTermDAO(session).get_by_id(result.id)
         if term is not None:
             await KnowledgeTermSyncService(session).sync_term(term)
+        await GlossaryCachePurgeService().purge()
         return result
     except Exception as error:
         _raise_http(error)
@@ -149,4 +153,5 @@ async def rebuild_knowledge_terms(
     verify_origin(request.headers.get("origin"), settings.allowed_origins)
     guard.require_csrf(request)
     count = await KnowledgeTermSyncService(session).sync_all_terms()
+    await GlossaryCachePurgeService().purge()
     return SaveKnowledgeTermResp(id="", status=f"synced:{count}")

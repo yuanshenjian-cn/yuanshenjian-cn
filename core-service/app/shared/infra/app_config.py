@@ -192,6 +192,8 @@ class Settings(BaseModel):
     key_value_url: str = ""
     trust_cf_connecting_ip: bool = True
     allow_direct_render_subdomain: bool = False
+    cloudflare_api_token: str = ""
+    cloudflare_zone_id: str = ""
     env_map: dict[str, str] = Field(default_factory=dict, exclude=True, repr=False)
     file_config: AppFileConfig = Field(default_factory=AppFileConfig, exclude=True, repr=False)
     core_service_root: Path = Field(default=CORE_SERVICE_ROOT, exclude=True, repr=False)
@@ -281,6 +283,8 @@ def build_settings_from_env(env_map: dict[str, str]) -> Settings:
             "key_value_url": env_map.get("KEY_VALUE_URL", ""),
             "trust_cf_connecting_ip": _parse_bool(env_map.get("TRUST_CF_CONNECTING_IP"), default=True),
             "allow_direct_render_subdomain": _parse_bool(env_map.get("ALLOW_DIRECT_RENDER_SUBDOMAIN"), default=False),
+            "cloudflare_api_token": env_map.get("CLOUDFLARE_API_TOKEN", ""),
+            "cloudflare_zone_id": env_map.get("CLOUDFLARE_ZONE_ID", ""),
             "env_map": env_map,
             "file_config": file_config,
             "core_service_root": CORE_SERVICE_ROOT,
