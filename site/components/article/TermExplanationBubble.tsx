@@ -12,6 +12,7 @@ interface TermExplanationBubbleProps {
 
 const TYPE_INTERVAL_MS = 18;
 const BUBBLE_WIDTH = 336;
+const VIEWPORT_MARGIN = 12;
 const SECTION_LABEL_CLASS = "text-[12px] font-medium text-foreground";
 
 const KEY_POINTS_LEAD = /(?:关键要点|要点|核心要点|主要特点|关键特征|主要能力)\s*[:：]/;
@@ -120,9 +121,12 @@ export function TermExplanationBubble({
     };
   }, [onClose]);
 
-  const above = anchorRect.top > window.innerHeight * 0.6;
+  const availableAbove = Math.max(0, anchorRect.top - VIEWPORT_MARGIN * 2);
+  const availableBelow = Math.max(0, window.innerHeight - anchorRect.bottom - VIEWPORT_MARGIN * 2);
+  const above = availableBelow < 220 && availableAbove > availableBelow;
   const left = Math.max(12, Math.min(anchorRect.left, window.innerWidth - BUBBLE_WIDTH - 12));
   const top = above ? anchorRect.top - 12 : anchorRect.bottom + 12;
+  const maxHeight = Math.max(120, above ? availableAbove : availableBelow);
   const isDefinitionStreaming = displayedDefinition.length < definition.length;
   const showExplanation = hasExplanation && !isDefinitionStreaming;
   const isDetailStreaming = showExplanation && displayedDetail.length < detailText.length;
@@ -162,10 +166,11 @@ export function TermExplanationBubble({
   return (
     <div
       ref={bubbleRef}
-      className="not-prose fixed z-50 max-h-[70vh] w-80 max-w-[calc(100vw-24px)] origin-top-left animate-in overflow-y-auto rounded-lg border border-border bg-background p-3.5 shadow-lg fade-in zoom-in-95 duration-150"
+      className="not-prose fixed z-50 w-80 max-w-[calc(100vw-24px)] origin-top-left animate-in overflow-y-auto overscroll-contain rounded-lg border border-border bg-background p-3.5 shadow-lg fade-in zoom-in-95 duration-150"
       style={{
         left,
         top,
+        maxHeight,
         transform: above ? "translateY(-100%)" : "none",
       }}
     >
