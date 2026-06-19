@@ -16,6 +16,9 @@ class ListKnowledgeTermsAppService:
         rows, total = await self._query_service.list_terms_page(
             page=request.page,
             page_size=request.page_size,
+            term=request.term,
+            scene=request.scene,
+            domain=request.domain,
         )
         return ListKnowledgeTermsResp(
             items=[ListKnowledgeTermsItemResp.model_validate(item) for item in rows],

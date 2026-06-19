@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.knowledge_base.infra.po.knowledge_term_po import KnowledgeTermPO
@@ -23,11 +23,32 @@ class KnowledgeTermQueryService:
         *,
         page: int,
         page_size: int,
+        term: str | None = None,
+        scene: str | None = None,
+        domain: str | None = None,
     ) -> tuple[list[dict[str, object]], int]:
-        total = await self._session.scalar(select(func.count()).select_from(KnowledgeTermPO))
+        query = select(KnowledgeTermPO)
+        count_query = select(func.count()).select_from(KnowledgeTermPO)
+        filters = []
+
+        if term and term.strip():
+            keyword = f"%{term.strip()}%"
+            filters.append(KnowledgeTermPO.term.ilike(keyword))
+        if scene and scene.strip():
+            keyword = f"%{scene.strip()}%"
+            filters.append(cast(KnowledgeTermPO.scenes, String).ilike(keyword))
+        if domain and domain.strip():
+            keyword = f"%{domain.strip()}%"
+            filters.append(cast(KnowledgeTermPO.domains, String).ilike(keyword))
+
+        if filters:
+            query = query.where(*filters)
+            count_query = count_query.where(*filters)
+
+        total = await self._session.scalar(count_query)
         rows = list(
             await self._session.scalars(
-                select(KnowledgeTermPO)
+                query
                 .order_by(KnowledgeTermPO.updated_at.desc(), KnowledgeTermPO.created_at.desc())
                 .offset((page - 1) * page_size)
                 .limit(page_size)

@@ -4,6 +4,7 @@ import {
   archiveKnowledgeTerm,
   createKnowledgeTerm,
   fetchKnowledgeTerms,
+  type KnowledgeTermFilters,
   rebuildKnowledgeTerms,
   type KnowledgeTermItem,
   type SaveKnowledgeTermPayload,
@@ -24,6 +25,18 @@ const EMPTY_FORM: SaveKnowledgeTermPayload = {
 };
 
 const PAGE_SIZES = [10, 20, 50, 100] as const;
+const EMPTY_FILTERS: KnowledgeTermFilters = { term: "", scene: "", domain: "" };
+const DOMAIN_OPTIONS = ["article", "ai", "health", "investment"] as const;
+const SCENE_OPTIONS = [
+  "article",
+  "author",
+  "ai",
+  "ai-column",
+  "health",
+  "health-column",
+  "investment",
+  "investment-column",
+] as const;
 
 function parseCommaList(value: string): string[] {
   return value
@@ -46,11 +59,13 @@ export function GlossaryPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10);
+  const [filters, setFilters] = useState<KnowledgeTermFilters>({ ...EMPTY_FILTERS });
+  const [termInput, setTermInput] = useState("");
 
   async function load() {
     try {
       setError("");
-      const response = await fetchKnowledgeTerms(page, pageSize);
+      const response = await fetchKnowledgeTerms(page, pageSize, filters);
       setItems(response.items);
       setTotal(response.total);
     } catch (caught) {
@@ -60,7 +75,7 @@ export function GlossaryPage() {
 
   useEffect(() => {
     void load();
-  }, [page, pageSize]);
+  }, [page, pageSize, filters]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total, pageSize]);
   const startItem = useMemo(() => (page - 1) * pageSize + 1, [page, pageSize]);
@@ -137,6 +152,23 @@ export function GlossaryPage() {
     setPage(Math.max(1, Math.min(totalPages, next)));
   }
 
+  function updateFilter(key: keyof KnowledgeTermFilters, value: string) {
+    setPage(1);
+    setFilters((current) => ({ ...current, [key]: value }));
+  }
+
+  function applyTermFilter() {
+    const nextValue = termInput.trim();
+    if ((filters.term ?? "") === nextValue) return;
+    updateFilter("term", nextValue);
+  }
+
+  function resetFilters() {
+    setPage(1);
+    setFilters({ ...EMPTY_FILTERS });
+    setTermInput("");
+  }
+
   return (
     <section>
       <div className="page-header">
@@ -151,6 +183,57 @@ export function GlossaryPage() {
       </div>
 
       {error ? <p className="error">{error}</p> : null}
+
+      <div className="glossary-filters card">
+        <div className="glossary-filters-grid">
+          <label>
+            名称
+            <input
+              value={termInput}
+              onBlur={applyTermFilter}
+              onChange={(event) => setTermInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  applyTermFilter();
+                }
+              }}
+              placeholder="模糊搜索术语名称"
+            />
+          </label>
+          <label>
+            场景
+            <select
+              value={filters.scene ?? ""}
+              onChange={(event) => updateFilter("scene", event.target.value)}
+            >
+              <option value="">全部场景</option>
+              {SCENE_OPTIONS.map((scene) => (
+                <option key={scene} value={scene}>
+                  {scene}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            域
+            <select
+              value={filters.domain ?? ""}
+              onChange={(event) => updateFilter("domain", event.target.value)}
+            >
+              <option value="">全部域</option>
+              {DOMAIN_OPTIONS.map((domain) => (
+                <option key={domain} value={domain}>
+                  {domain}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="glossary-filters-actions">
+            <button type="button" onClick={resetFilters}>清空筛选</button>
+          </div>
+        </div>
+      </div>
 
       <div className="list-toolbar">
         <div className="pagination">

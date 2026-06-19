@@ -183,9 +183,22 @@ export function rebuildKnowledgeSource(id: string) {
   });
 }
 
-export function fetchKnowledgeTerms(page = 1, pageSize = 10) {
+export interface KnowledgeTermFilters {
+  term?: string;
+  scene?: string;
+  domain?: string;
+}
+
+export function fetchKnowledgeTerms(page = 1, pageSize = 10, filters: KnowledgeTermFilters = {}) {
+  const searchParams = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (filters.term?.trim()) searchParams.set("term", filters.term.trim());
+  if (filters.scene?.trim()) searchParams.set("scene", filters.scene.trim());
+  if (filters.domain?.trim()) searchParams.set("domain", filters.domain.trim());
   return request<{ items: KnowledgeTermItem[]; total: number; page: number; page_size: number }>(
-    `/api/v1/admin/knowledge-terms?page=${page}&page_size=${pageSize}`,
+    `/api/v1/admin/knowledge-terms?${searchParams.toString()}`,
   );
 }
 
