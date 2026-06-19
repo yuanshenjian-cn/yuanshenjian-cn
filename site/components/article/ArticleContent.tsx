@@ -7,7 +7,6 @@ import { PostNavigation } from "@/components/PostNavigation";
 import { ShareButtons } from "@/components/ShareButtons";
 import { TermHighlighter } from "@/components/article/TermHighlighter";
 import { TextSelectionAIActions } from "@/components/article/TextSelectionAIActions";
-import { fetchGlossary } from "@/lib/ai/glossary";
 import { config } from "@/lib/config";
 import { resolveAdvisorDomainByPath } from "@/lib/advisor-context";
 import type { Post } from "@/types/blog";
@@ -30,7 +29,6 @@ interface ArticleContentProps {
 export async function ArticleContent({ post, prev, next, slug, showHeader = true, url, shareTitle, shareDescription, columnContext, footerAssistant, turnstileSiteKey = "" }: ArticleContentProps) {
   const shareUrl = url || `/articles/${slug}`;
   const domain = resolveAdvisorDomainByPath(post.relativePath);
-  const terms = await fetchGlossary("article", domain);
 
   return (
     <>
@@ -40,7 +38,7 @@ export async function ArticleContent({ post, prev, next, slug, showHeader = true
         <div id="intro" />
         <Suspense fallback={<div className="text-muted-foreground">加载中...</div>}>
           <MDXRemoteContent source={post.content} />
-          <TermHighlighter terms={terms} />
+          <TermHighlighter scene="article" domain={domain} />
         </Suspense>
       </div>
 

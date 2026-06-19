@@ -248,10 +248,13 @@ async def stream_ai_assistant_chat(
 
 @router.get("/api/v1/ai-assistant/glossary", response_model=ListGlossaryResp)
 async def list_glossary(
+    response: Response,
     scene: str | None = None,
     domain: str | None = None,
     service: ListGlossaryAppService = Depends(get_list_glossary_service),
 ) -> ListGlossaryResp:
+    response.headers["Cache-Control"] = "public, max-age=60, s-maxage=300"
+    response.headers["Vary"] = "Origin"
     return await service.execute(scene, domain)
 
 

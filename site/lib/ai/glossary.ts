@@ -28,7 +28,7 @@ export async function fetchGlossary(scene?: string, domain?: string): Promise<Gl
   const baseUrl = resolveBaseUrl();
   const url = `${baseUrl}/api/v1/ai-assistant/glossary?${params.toString()}`;
 
-  const response = await fetch(url, { credentials: "include" });
+  const response = await fetch(url);
   if (!response.ok) {
     return [];
   }

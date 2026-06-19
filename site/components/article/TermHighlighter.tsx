@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { TermExplanationBubble } from "@/components/article/TermExplanationBubble";
-import type { GlossaryItem } from "@/lib/ai/glossary";
+import { fetchGlossary, type GlossaryItem } from "@/lib/ai/glossary";
 
 interface TermHighlighterProps {
-  terms: GlossaryItem[];
+  scene?: string;
+  domain?: string;
   containerSelector?: string;
 }
 
@@ -72,8 +73,19 @@ interface ActiveBubble {
   rect: DOMRect;
 }
 
-export function TermHighlighter({ terms, containerSelector = ".prose" }: TermHighlighterProps) {
+export function TermHighlighter({ scene, domain, containerSelector = ".prose" }: TermHighlighterProps) {
+  const [terms, setTerms] = useState<GlossaryItem[]>([]);
   const [activeBubble, setActiveBubble] = useState<ActiveBubble | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchGlossary(scene, domain).then((result) => {
+      if (!cancelled && result.length > 0) setTerms(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [scene, domain]);
 
   const handleClick = useCallback((event: MouseEvent) => {
     const target = event.target as HTMLElement;
