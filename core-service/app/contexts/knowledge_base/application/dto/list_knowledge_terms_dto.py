@@ -25,10 +25,11 @@ class ListKnowledgeTermsReq(BaseModel):
     term: str | None = None
     scene: str | None = None
     domain: str | None = None
+    include_total: bool = True
 
 
 class ListKnowledgeTermsResp(BaseModel):
     items: list[ListKnowledgeTermsItemResp]
-    total: int
+    total: int | None
     page: int
     page_size: int

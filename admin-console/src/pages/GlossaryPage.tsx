@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   archiveKnowledgeTerm,
@@ -29,7 +29,6 @@ const EMPTY_FILTERS: KnowledgeTermFilters = { term: "", scene: "", domain: "" };
 const DOMAIN_OPTIONS = ["article", "ai", "health", "investment"] as const;
 const SCENE_OPTIONS = [
   "article",
-  "author",
   "ai",
   "ai-column",
   "health",
@@ -61,13 +60,19 @@ export function GlossaryPage() {
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10);
   const [filters, setFilters] = useState<KnowledgeTermFilters>({ ...EMPTY_FILTERS });
   const [termInput, setTermInput] = useState("");
+  const lastQueryKeyRef = useRef("");
 
   async function load() {
     try {
       setError("");
-      const response = await fetchKnowledgeTerms(page, pageSize, filters);
+      const queryKey = JSON.stringify({ pageSize, filters });
+      const includeTotal = page === 1 || lastQueryKeyRef.current !== queryKey;
+      const response = await fetchKnowledgeTerms(page, pageSize, filters, includeTotal);
       setItems(response.items);
-      setTotal(response.total);
+      if (response.total !== null) {
+        setTotal(response.total);
+      }
+      lastQueryKeyRef.current = queryKey;
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "加载失败");
     }
@@ -202,20 +207,6 @@ export function GlossaryPage() {
             />
           </label>
           <label>
-            场景
-            <select
-              value={filters.scene ?? ""}
-              onChange={(event) => updateFilter("scene", event.target.value)}
-            >
-              <option value="">全部场景</option>
-              {SCENE_OPTIONS.map((scene) => (
-                <option key={scene} value={scene}>
-                  {scene}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
             域
             <select
               value={filters.domain ?? ""}
@@ -225,6 +216,20 @@ export function GlossaryPage() {
               {DOMAIN_OPTIONS.map((domain) => (
                 <option key={domain} value={domain}>
                   {domain}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            场景
+            <select
+              value={filters.scene ?? ""}
+              onChange={(event) => updateFilter("scene", event.target.value)}
+            >
+              <option value="">全部场景</option>
+              {SCENE_OPTIONS.map((scene) => (
+                <option key={scene} value={scene}>
+                  {scene}
                 </option>
               ))}
             </select>
@@ -273,8 +278,8 @@ export function GlossaryPage() {
           <p className="term-meta">
             <span className="term-status">{item.status}</span>
             {item.aliases.length > 0 ? <span>别名：{item.aliases.join(" / ")}</span> : null}
-            <span>域：{item.domains.join(" / ") || "无"}</span>
-            <span>场景：{item.scenes.join(" / ") || "无"}</span>
+            <span>域：{item.domains.join(" / ") || "全域"}</span>
+            <span>场景：{item.scenes.join(" / ") || "全场景"}</span>
             {item.related_article_slugs.length > 0 ? (
               <span>相关文章：{item.related_article_slugs.join(" / ")}</span>
             ) : null}

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from sqlalchemy import String, cast, func, select
+from typing import Any
+
+from sqlalchemy import Text, cast, func, literal, select
+from sqlalchemy.sql.elements import ColumnElement
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.contexts.knowledge_base.infra.po.knowledge_term_po import KnowledgeTermPO
@@ -26,26 +29,25 @@ class KnowledgeTermQueryService:
         term: str | None = None,
         scene: str | None = None,
         domain: str | None = None,
-    ) -> tuple[list[dict[str, object]], int]:
+        include_total: bool = True,
+    ) -> tuple[list[dict[str, object]], int | None]:
         query = select(KnowledgeTermPO)
         count_query = select(func.count()).select_from(KnowledgeTermPO)
-        filters = []
+        filters: list[ColumnElement[bool]] = []
 
         if term and term.strip():
             keyword = f"%{term.strip()}%"
             filters.append(KnowledgeTermPO.term.ilike(keyword))
         if scene and scene.strip():
-            keyword = f"%{scene.strip()}%"
-            filters.append(cast(KnowledgeTermPO.scenes, String).ilike(keyword))
+            filters.append(self._json_array_contains(KnowledgeTermPO.scenes, scene.strip()))
         if domain and domain.strip():
-            keyword = f"%{domain.strip()}%"
-            filters.append(cast(KnowledgeTermPO.domains, String).ilike(keyword))
+            filters.append(self._json_array_contains(KnowledgeTermPO.domains, domain.strip()))
 
         if filters:
             query = query.where(*filters)
             count_query = count_query.where(*filters)
 
-        total = await self._session.scalar(count_query)
+        total = await self._session.scalar(count_query) if include_total else None
         rows = list(
             await self._session.scalars(
                 query
@@ -54,7 +56,10 @@ class KnowledgeTermQueryService:
                 .limit(page_size)
             )
         )
-        return [self._to_dict(item) for item in rows], total or 0
+        return [self._to_dict(item) for item in rows], total
+
+    def _json_array_contains(self, column: Any, value: str) -> ColumnElement[bool]:
+        return cast(column, Text).like(literal(f'%"{value}"%'))
 
     def _to_dict(self, item: KnowledgeTermPO) -> dict[str, object]:
         return {

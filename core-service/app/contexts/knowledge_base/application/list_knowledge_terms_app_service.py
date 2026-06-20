@@ -19,6 +19,7 @@ class ListKnowledgeTermsAppService:
             term=request.term,
             scene=request.scene,
             domain=request.domain,
+            include_total=request.include_total,
         )
         return ListKnowledgeTermsResp(
             items=[ListKnowledgeTermsItemResp.model_validate(item) for item in rows],

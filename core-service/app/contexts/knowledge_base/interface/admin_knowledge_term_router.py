@@ -72,12 +72,20 @@ async def list_knowledge_terms(
     term: str | None = None,
     scene: str | None = None,
     domain: str | None = None,
+    include_total: bool = True,
     guard: AdminRequestGuard = Depends(get_admin_request_guard),
     service: ListKnowledgeTermsAppService = Depends(get_list_knowledge_terms_service),
 ) -> ListKnowledgeTermsResp:
     await guard.require_admin(request)
     return await service.execute(
-        ListKnowledgeTermsReq(page=page, page_size=page_size, term=term, scene=scene, domain=domain)
+        ListKnowledgeTermsReq(
+            page=page,
+            page_size=page_size,
+            term=term,
+            scene=scene,
+            domain=domain,
+            include_total=include_total,
+        )
     )
 
 
