@@ -8,7 +8,17 @@ from app.shared.infra.app_config import settings
 logger = logging.getLogger(__name__)
 
 GLOSSARY_DOMAINS = ["", "article", "ai", "health", "investment"]
-GLOSSARY_SCENES = ["", "article"]
+GLOSSARY_SCENES = [
+    "",
+    "article",
+    "author",
+    "ai",
+    "ai-column",
+    "health",
+    "health-column",
+    "investment",
+    "investment-column",
+]
 
 
 class GlossaryCachePurgeService:

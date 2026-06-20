@@ -56,3 +56,6 @@ class KnowledgeTermDAO:
 
     def add(self, term: KnowledgeTermPO) -> None:
         self._session.add(term)
+
+    async def delete(self, term: KnowledgeTermPO) -> None:
+        await self._session.delete(term)

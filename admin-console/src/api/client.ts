@@ -229,6 +229,12 @@ export function archiveKnowledgeTerm(id: string) {
   });
 }
 
+export function deleteKnowledgeTerm(id: string) {
+  return request<{ id: string; status: string }>(`/api/v1/admin/knowledge-terms/${id}`, {
+    method: "DELETE",
+  });
+}
+
 export function rebuildKnowledgeTerms() {
   return request<{ id: string; status: string }>("/api/v1/admin/knowledge-terms/rebuild", {
     method: "POST",

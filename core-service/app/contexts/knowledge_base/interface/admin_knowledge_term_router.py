@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.contexts.admin_console.infra.admin_request_guard import AdminRequestGuard, get_admin_request_guard
 from app.contexts.knowledge_base.application.archive_knowledge_term_app_service import ArchiveKnowledgeTermAppService
 from app.contexts.knowledge_base.application.create_knowledge_term_app_service import CreateKnowledgeTermAppService
+from app.contexts.knowledge_base.application.delete_knowledge_term_app_service import DeleteKnowledgeTermAppService
 from app.contexts.knowledge_base.application.dto.list_knowledge_terms_dto import ListKnowledgeTermsReq, ListKnowledgeTermsResp
 from app.contexts.knowledge_base.application.dto.save_knowledge_term_dto import SaveKnowledgeTermReq, SaveKnowledgeTermResp
 from app.contexts.knowledge_base.application.list_knowledge_terms_app_service import ListKnowledgeTermsAppService
@@ -54,6 +55,14 @@ def build_archive_knowledge_term_service(session: AsyncSession) -> ArchiveKnowle
 
 def get_archive_knowledge_term_service(session: AsyncSession = Depends(get_session)) -> ArchiveKnowledgeTermAppService:
     return build_archive_knowledge_term_service(session)
+
+
+def build_delete_knowledge_term_service(session: AsyncSession) -> DeleteKnowledgeTermAppService:
+    return DeleteKnowledgeTermAppService(KnowledgeTermDAO(session))
+
+
+def get_delete_knowledge_term_service(session: AsyncSession = Depends(get_session)) -> DeleteKnowledgeTermAppService:
+    return build_delete_knowledge_term_service(session)
 
 
 def _raise_http(error: Exception) -> NoReturn:
@@ -148,6 +157,28 @@ async def archive_knowledge_term(
     try:
         result = await service.execute(term_id)
         term = await KnowledgeTermDAO(session).get_by_id(result.id)
+        if term is not None:
+            await KnowledgeTermSyncService(session).sync_term(term)
+        await GlossaryCachePurgeService().purge()
+        return result
+    except Exception as error:
+        _raise_http(error)
+
+
+@router.delete("/{term_id}", response_model=SaveKnowledgeTermResp)
+async def delete_knowledge_term(
+    term_id: str,
+    request: Request,
+    guard: AdminRequestGuard = Depends(get_admin_request_guard),
+    service: DeleteKnowledgeTermAppService = Depends(get_delete_knowledge_term_service),
+    session: AsyncSession = Depends(get_session),
+) -> SaveKnowledgeTermResp:
+    await guard.require_admin(request)
+    verify_origin(request.headers.get("origin"), settings.allowed_origins)
+    guard.require_csrf(request)
+    try:
+        term = await KnowledgeTermDAO(session).get_by_id(term_id)
+        result = await service.execute(term_id)
         if term is not None:
             await KnowledgeTermSyncService(session).sync_term(term)
         await GlossaryCachePurgeService().purge()

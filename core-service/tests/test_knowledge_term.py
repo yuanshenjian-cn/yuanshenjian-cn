@@ -7,6 +7,7 @@ from app.contexts.ai_assistant.application.list_glossary_app_service import List
 from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader
 from app.contexts.knowledge_base.application.archive_knowledge_term_app_service import ArchiveKnowledgeTermAppService
 from app.contexts.knowledge_base.application.create_knowledge_term_app_service import CreateKnowledgeTermAppService
+from app.contexts.knowledge_base.application.delete_knowledge_term_app_service import DeleteKnowledgeTermAppService
 from app.contexts.knowledge_base.application.dto.save_knowledge_term_dto import SaveKnowledgeTermReq
 from app.contexts.knowledge_base.application.update_knowledge_term_app_service import UpdateKnowledgeTermAppService
 from app.contexts.knowledge_base.domain.exceptions import KnowledgeTermNotFoundError, KnowledgeTermValidationError
@@ -40,6 +41,9 @@ class StubKnowledgeTermDAO:
     def add(self, term: KnowledgeTermPO) -> None:
         self._terms.append(term)
         self.added.append(term)
+
+    async def delete(self, term: KnowledgeTermPO) -> None:
+        self._terms = [item for item in self._terms if item.id != term.id]
 
 
 class StubSession:
@@ -152,6 +156,17 @@ def test_archive_knowledge_term_sets_status() -> None:
 
     assert result.status == "archived"
     assert term.status == "archived"
+
+
+def test_delete_knowledge_term_removes_term() -> None:
+    term = sample_term()
+    dao = StubKnowledgeTermDAO([term])
+    service = DeleteKnowledgeTermAppService(dao)
+
+    result = asyncio.run(service.execute(term.id))
+
+    assert result.status == "deleted"
+    assert dao._terms == []
 
 
 def test_list_glossary_filters_by_scene_and_domain() -> None:

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   archiveKnowledgeTerm,
   createKnowledgeTerm,
+  deleteKnowledgeTerm,
   fetchKnowledgeTerms,
   type KnowledgeTermFilters,
   rebuildKnowledgeTerms,
@@ -10,6 +11,7 @@ import {
   type SaveKnowledgeTermPayload,
   updateKnowledgeTerm,
 } from "../api/client";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 const EMPTY_FORM: SaveKnowledgeTermPayload = {
   term: "",
@@ -60,6 +62,7 @@ export function GlossaryPage() {
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(10);
   const [filters, setFilters] = useState<KnowledgeTermFilters>({ ...EMPTY_FILTERS });
   const [termInput, setTermInput] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; term: string } | null>(null);
   const lastQueryKeyRef = useRef("");
 
   async function load() {
@@ -145,6 +148,13 @@ export function GlossaryPage() {
 
   async function handleArchive(id: string) {
     await archiveKnowledgeTerm(id);
+    await load();
+  }
+
+  async function handleDelete() {
+    if (!pendingDelete) return;
+    await deleteKnowledgeTerm(pendingDelete.id);
+    setPendingDelete(null);
     await load();
   }
 
@@ -270,8 +280,17 @@ export function GlossaryPage() {
           <div className="term-header">
             <h3>{item.term}</h3>
             <div className="term-actions">
-              <button onClick={() => openEdit(item)}>编辑</button>{" "}
+              <button onClick={() => openEdit(item)}>编辑</button>
               <button onClick={() => void handleArchive(item.id)}>归档</button>
+              <button
+                type="button"
+                className="icon-button danger"
+                aria-label={`永久删除术语 ${item.term}`}
+                title="永久删除"
+                onClick={() => setPendingDelete({ id: item.id, term: item.term })}
+              >
+                ×
+              </button>
             </div>
           </div>
           <p className="term-definition">{item.definition}</p>
@@ -287,6 +306,16 @@ export function GlossaryPage() {
           </p>
         </article>
       ))}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="永久删除术语"
+        description={pendingDelete ? `确定永久删除术语“${pendingDelete.term}”吗？该操作不可恢复。` : ""}
+        confirmText="永久删除"
+        confirmTone="danger"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => void handleDelete()}
+      />
 
       {modalOpen ? (
         <div className="modal-overlay" onClick={closeModal}>
