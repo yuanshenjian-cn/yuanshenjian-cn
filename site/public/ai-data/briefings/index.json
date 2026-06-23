@@ -1,6 +1,19 @@
 {
-  "generated": "2026-06-17T00:00:00.000Z",
+  "generated": "2026-06-23T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-23",
+      "title": "AI 简报 · 2026-06-23",
+      "excerpt": "OpenAI 借政府封禁 Anthropic 之机规模化输出网络安全能力，Alphabet 因 AI 人才流失股价大跌，Five Eyes 警告颠覆性网络威胁几个月内到来。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-23"
+    },
     {
       "slug": "2026-06-17",
       "title": "AI 简报 · 2026-06-17",
@@ -901,6 +914,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-23",
+      "title": "AI 简报 · 2026-06-23",
+      "excerpt": "OpenAI 借政府封禁 Anthropic 之机规模化输出网络安全能力，Alphabet 因 AI 人才流失股价大跌，Five Eyes 警告颠覆性网络威胁几个月内到来。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google"
+      ],
+      "date": "2026-06-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-23"
+    },
     {
       "slug": "2026-06-17",
       "title": "AI 简报 · 2026-06-17",
