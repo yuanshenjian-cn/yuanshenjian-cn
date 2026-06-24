@@ -1,6 +1,18 @@
 {
-  "generated": "2026-06-23T00:00:00.000Z",
+  "generated": "2026-06-24T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-24",
+      "title": "AI 简报 · 2026-06-24",
+      "excerpt": "Anthropic 把 Claude 做进 Slack 常驻队友，美国政府把前沿 AI 审查压力转向 Meta，监管与企业协作两条线同时收紧。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-06-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-24"
+    },
     {
       "slug": "2026-06-23",
       "title": "AI 简报 · 2026-06-23",
@@ -914,6 +926,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-24",
+      "title": "AI 简报 · 2026-06-24",
+      "excerpt": "Anthropic 把 Claude 做进 Slack 常驻队友，美国政府把前沿 AI 审查压力转向 Meta，监管与企业协作两条线同时收紧。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-06-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-24"
+    },
     {
       "slug": "2026-06-23",
       "title": "AI 简报 · 2026-06-23",
