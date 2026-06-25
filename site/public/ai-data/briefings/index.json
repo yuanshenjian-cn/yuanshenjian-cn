@@ -1,6 +1,20 @@
 {
-  "generated": "2026-06-24T00:00:00.000Z",
+  "generated": "2026-06-25T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-25",
+      "title": "AI 简报 · 2026-06-25",
+      "excerpt": "OpenAI 发布首款自研推理芯片 Jalapeño；Anthropic 指控阿里巴巴大规模非法访问 Claude；Google 升级 Gemini 3.5 Flash 计算机使用能力却持续流失核心研究员。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Perplexity"
+      ],
+      "date": "2026-06-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-25"
+    },
     {
       "slug": "2026-06-24",
       "title": "AI 简报 · 2026-06-24",
@@ -926,6 +940,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-25",
+      "title": "AI 简报 · 2026-06-25",
+      "excerpt": "OpenAI 发布首款自研推理芯片 Jalapeño；Anthropic 指控阿里巴巴大规模非法访问 Claude；Google 升级 Gemini 3.5 Flash 计算机使用能力却持续流失核心研究员。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Perplexity"
+      ],
+      "date": "2026-06-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-25"
+    },
     {
       "slug": "2026-06-24",
       "title": "AI 简报 · 2026-06-24",
