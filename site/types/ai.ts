@@ -11,7 +11,7 @@ export interface PageReference {
   id: string;
   title: string;
   excerpt: string;
-  sourceType: "article-section" | "author-section" | "health-section" | "ai-section" | "investment-section";
+  sourceType: "article-section" | "author-section" | "health-section" | "ai-section" | "investment-section" | "glossary";
   url?: string;
   anchorId?: string;
 }

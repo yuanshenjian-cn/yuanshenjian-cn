@@ -67,7 +67,8 @@ function isPageReference(value: unknown): value is PageReference {
       value.sourceType === "author-section" ||
       value.sourceType === "health-section" ||
       value.sourceType === "ai-section" ||
-      value.sourceType === "investment-section"
+      value.sourceType === "investment-section" ||
+      value.sourceType === "glossary"
     ) &&
     (value.url === undefined || typeof value.url === "string") &&
     (value.anchorId === undefined || typeof value.anchorId === "string")
@@ -90,7 +91,8 @@ function isAdvisorReference(value: unknown): value is AdvisorReference {
       rawSourceType === "author-section" ||
       rawSourceType === "health-section" ||
       rawSourceType === "ai-section" ||
-      rawSourceType === "investment-section"
+      rawSourceType === "investment-section" ||
+      rawSourceType === "glossary"
     ) &&
     (value.url === undefined || typeof value.url === "string") &&
     (value.anchorId === undefined || typeof value.anchorId === "string")

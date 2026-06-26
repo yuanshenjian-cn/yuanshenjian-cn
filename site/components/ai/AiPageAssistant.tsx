@@ -202,7 +202,11 @@ export function AiPageAssistant({
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="text-sm font-medium text-foreground">{reference.title}</h3>
                         <span className="shrink-0 text-xs text-muted-foreground">
-                          {reference.sourceType === "article-section" ? "文章小节" : "作者模块"}
+                          {reference.sourceType === "article-section"
+                            ? "文章小节"
+                            : reference.sourceType === "glossary"
+                              ? "术语"
+                              : "作者模块"}
                         </span>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-muted-foreground">{reference.excerpt}</p>

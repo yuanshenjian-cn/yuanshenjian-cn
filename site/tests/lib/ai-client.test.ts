@@ -298,6 +298,46 @@ describe("aiContextualAdvisorStream", () => {
     expect(onEvent).toHaveBeenNthCalledWith(2, { type: "done", usage: undefined });
   });
 
+  it("should accept advisor glossary references", async () => {
+    const onEvent = vi.fn();
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      createStreamResponse([
+        'event: references\ndata: {"references":[{"id":"term-1","title":"Scrum","excerpt":"敏捷框架术语","sourceType":"glossary","url":""}]}\n\n',
+        'event: done\ndata: {}\n\n',
+      ]),
+    );
+
+    await aiContextualAdvisorStream({
+      workerUrl: "/api/v1/ai-assistant/",
+      message: "Scrum 是什么",
+      turnstileToken: "token",
+      context: {
+        scene: "author",
+        pageTitle: "简历 | YSJ",
+        pageSlug: "author",
+        articleSlug: undefined,
+        history: [],
+      },
+      onEvent,
+    });
+
+    expect(onEvent).toHaveBeenNthCalledWith(1, {
+      type: "references",
+      references: [
+        {
+          id: "term-1",
+          title: "Scrum",
+          excerpt: "敏捷框架术语",
+          sourceType: "glossary",
+          url: "",
+          anchorId: undefined,
+        },
+      ],
+    });
+    expect(onEvent).toHaveBeenNthCalledWith(2, { type: "done", usage: undefined });
+  });
+
   it("should parse followup-questions event", async () => {
     const onEvent = vi.fn();
 
