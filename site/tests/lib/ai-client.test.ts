@@ -258,6 +258,46 @@ describe("aiContextualAdvisorStream", () => {
     expect(onEvent).toHaveBeenNthCalledWith(3, { type: "done", usage: undefined });
   });
 
+  it("should accept advisor references with source_type and missing id", async () => {
+    const onEvent = vi.fn();
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      createStreamResponse([
+        'event: references\ndata: {"references":[{"title":"作者资料","excerpt":"作者公开资料","source_type":"author-section","url":""}]}\n\n',
+        'event: done\ndata: {}\n\n',
+      ]),
+    );
+
+    await aiContextualAdvisorStream({
+      workerUrl: "/api/v1/ai-assistant/",
+      message: "作者适合什么岗位",
+      turnstileToken: "token",
+      context: {
+        scene: "author",
+        pageTitle: "简历 | YSJ",
+        pageSlug: "author",
+        articleSlug: undefined,
+        history: [],
+      },
+      onEvent,
+    });
+
+    expect(onEvent).toHaveBeenNthCalledWith(1, {
+      type: "references",
+      references: [
+        {
+          id: "作者资料",
+          title: "作者资料",
+          excerpt: "作者公开资料",
+          sourceType: "author-section",
+          url: "",
+          anchorId: undefined,
+        },
+      ],
+    });
+    expect(onEvent).toHaveBeenNthCalledWith(2, { type: "done", usage: undefined });
+  });
+
   it("should parse followup-questions event", async () => {
     const onEvent = vi.fn();
 

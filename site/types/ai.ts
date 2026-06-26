@@ -17,7 +17,7 @@ export interface PageReference {
 }
 
 export interface AdvisorReference {
-  id: string;
+  id?: string;
   title: string;
   excerpt: string;
   sourceType: PageReference["sourceType"];

@@ -75,7 +75,50 @@ function isPageReference(value: unknown): value is PageReference {
 }
 
 function isAdvisorReference(value: unknown): value is AdvisorReference {
-  return isPageReference(value);
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const rawSourceType = value.sourceType ?? value.source_type;
+
+  return (
+    (value.id === undefined || typeof value.id === "string") &&
+    typeof value.title === "string" &&
+    typeof value.excerpt === "string" &&
+    (
+      rawSourceType === "article-section" ||
+      rawSourceType === "author-section" ||
+      rawSourceType === "health-section" ||
+      rawSourceType === "ai-section" ||
+      rawSourceType === "investment-section"
+    ) &&
+    (value.url === undefined || typeof value.url === "string") &&
+    (value.anchorId === undefined || typeof value.anchorId === "string")
+  );
+}
+
+function normalizeAdvisorReference(reference: unknown): AdvisorReference {
+  if (!isRecord(reference)) {
+    throw new Error("Invalid advisor reference payload");
+  }
+
+  const sourceType = (reference.sourceType ?? reference.source_type) as AdvisorReference["sourceType"];
+  const normalizedUrl = typeof reference.url === "string" ? reference.url : undefined;
+  const fallbackId =
+    typeof reference.id === "string" && reference.id.length > 0
+      ? reference.id
+      : normalizedUrl && normalizedUrl.length > 0
+        ? normalizedUrl
+        : (reference.title as string);
+
+  return {
+    id: fallbackId,
+    title: reference.title as string,
+    excerpt: reference.excerpt as string,
+    sourceType,
+    url: normalizedUrl,
+    anchorId: typeof reference.anchorId === "string" ? reference.anchorId : undefined,
+  };
 }
 
 function isRecommendResponse(value: unknown): value is RecommendResponse {
@@ -225,7 +268,7 @@ function parseAdvisorStreamEvent(block: string): AdvisorStreamEvent {
 
       return {
         type: "references",
-        references: payload.references,
+        references: payload.references.map((reference) => normalizeAdvisorReference(reference)),
       };
     case "followup-questions":
       if (!isRecord(payload) || !Array.isArray(payload.questions) || !payload.questions.every((item): item is string => typeof item === "string")) {

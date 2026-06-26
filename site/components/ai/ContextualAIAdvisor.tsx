@@ -366,7 +366,7 @@ export function ContextualAIAdvisor({
                 <div className="flex h-full flex-col items-center justify-center px-4 text-center">
                   <div className="w-full max-w-sm space-y-5">
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-foreground">{getWelcomeMessage(context)}</p>
+                      <p className="text-base font-medium text-foreground">{getWelcomeMessage(context)}</p>
                       <p className="text-xs text-muted-foreground">选一个开始，或者直接输入你的问题</p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-2.5">
@@ -376,7 +376,7 @@ export function ContextualAIAdvisor({
                           type="button"
                           onClick={() => void submitMessage(topic.prompt)}
                           disabled={isStreaming}
-                          className="inline-flex max-w-full items-center rounded-full border border-border/50 bg-muted/35 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-primary/35 hover:bg-muted/55 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex max-w-full items-center rounded-full border border-primary/15 bg-primary/[0.025] px-2.5 py-1 text-[11px] font-medium leading-4 text-foreground/80 transition hover:border-primary/30 hover:bg-primary/[0.07] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {topic.label}
                         </button>
