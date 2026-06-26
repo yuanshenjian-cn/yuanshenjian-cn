@@ -28,9 +28,10 @@ const EMPTY_FORM: SaveKnowledgeTermPayload = {
 
 const PAGE_SIZES = [10, 20, 50, 100] as const;
 const EMPTY_FILTERS: KnowledgeTermFilters = { term: "", scene: "", domain: "" };
-const DOMAIN_OPTIONS = ["article", "ai", "health", "investment"] as const;
+const DOMAIN_OPTIONS = ["article", "author", "ai", "health", "investment"] as const;
 const SCENE_OPTIONS = [
   "article",
+  "author",
   "ai",
   "ai-column",
   "health",

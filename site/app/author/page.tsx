@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
+import { TermHighlighter } from "@/components/article/TermHighlighter";
 import { ResumeEducation } from "@/components/resume/ResumeEducation";
 import { ResumeExperience } from "@/components/resume/ResumeExperience";
 import { ResumeExtras } from "@/components/resume/ResumeExtras";
@@ -23,10 +24,10 @@ export const metadata: Metadata = generateListPageSEO(
 
 export default function ResumePage() {
   return (
-    <main className="min-h-screen">
+    <main className="author-term-content min-h-screen">
       <ResumeHero />
       {config.ai.contextualAdvisorEnabled ? (
-        <section className="py-8 px-6">
+        <section className="term-highlight-ignore py-8 px-6">
           <div className="max-w-2xl mx-auto">
             <ContextualAIAdvisorSurface
               context={buildAdvisorContext({
@@ -53,6 +54,7 @@ export default function ResumePage() {
       <ResumeProjects />
       <ResumeOpenSourceProjects />
       <ResumeExtras />
+      <TermHighlighter scene="author" domain="author" containerSelector=".author-term-content" />
     </main>
   );
 }

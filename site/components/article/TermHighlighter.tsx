@@ -48,7 +48,7 @@ function walkTextNodes(root: HTMLElement, termMap: Map<string, GlossaryItem>) {
     acceptNode: (node) => {
       const parent = node.parentElement;
       if (!parent) return NodeFilter.FILTER_REJECT;
-      if (parent.closest("pre, code, a, .term-highlight")) return NodeFilter.FILTER_REJECT;
+      if (parent.closest("pre, code, a, .term-highlight, .term-highlight-ignore")) return NodeFilter.FILTER_REJECT;
       if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
