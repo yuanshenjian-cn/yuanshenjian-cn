@@ -142,6 +142,10 @@ export function TermExplanationBubble({
   const isDetailStreaming = showExplanation && displayedDetail.length < detailText.length;
   const showPoints = showExplanation && hasPoints && !isDetailStreaming;
   const isPointsStreaming = showPoints && displayedPoints.length < pointsText.length;
+  const showReferences =
+    references.length > 0 &&
+    !isDefinitionStreaming &&
+    (!showExplanation || (!isDetailStreaming && (!showPoints || !isPointsStreaming)));
 
   useEffect(() => {
     setDisplayedDetail("");
@@ -226,7 +230,7 @@ export function TermExplanationBubble({
               </ul>
             </div>
           ) : null}
-          {references.length > 0 ? (
+          {showReferences ? (
             <div className="mt-3 space-y-1.5 border-t border-border/60 pt-3">
               <div className={SECTION_LABEL_CLASS}>参考</div>
               <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] leading-5 text-muted-foreground">
