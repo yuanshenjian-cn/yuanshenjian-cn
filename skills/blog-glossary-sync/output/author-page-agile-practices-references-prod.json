@@ -2,7 +2,7 @@
   "create": [],
   "update": [
     {
-      "id": "d1f73650-cd15-4ea5-96c0-e9e6ec7e926b",
+      "id": "a3649b4f-214e-4faf-b13c-096573fec8b5",
       "term": "研发效能",
       "changes": {
         "term": "研发效能",
@@ -19,7 +19,7 @@
       }
     },
     {
-      "id": "7cb5ecc7-4c66-4f6e-8de1-95eca1fb714a",
+      "id": "f87dc05b-5c35-481b-b7ee-066e9d3179a5",
       "term": "敏捷开发",
       "changes": {
         "term": "敏捷开发",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "id": "d2396d5d-1824-4a1e-8281-0bad5cc8eb8f",
+      "id": "b7e81e7f-f137-4d94-8a55-571d7a8a6c26",
       "term": "Scrum",
       "changes": {
         "term": "Scrum",
@@ -59,7 +59,7 @@
       }
     },
     {
-      "id": "c3634f46-8ac2-4c33-b43c-1851b0530521",
+      "id": "8ac1b057-c441-47a5-b652-b40d3aa4c066",
       "term": "XP",
       "changes": {
         "term": "XP",
@@ -79,7 +79,7 @@
       }
     },
     {
-      "id": "3538fb24-8b8a-46d4-b39b-f6be4f1c5b6d",
+      "id": "92aa7231-b0ac-4de9-ab8f-293923f6cfb2",
       "term": "TDD",
       "changes": {
         "term": "TDD",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "id": "4145e445-0629-495a-88d1-3c03c39f2823",
+      "id": "2b73064a-57ba-465b-8788-1de12e5e95a2",
       "term": "重构",
       "changes": {
         "term": "重构",
@@ -119,7 +119,7 @@
       }
     },
     {
-      "id": "3c3431a1-7467-4086-abd6-e810e1213e6c",
+      "id": "5ec63c70-459c-4b8a-8210-878dbd7b44e7",
       "term": "简单设计",
       "changes": {
         "term": "简单设计",
@@ -139,7 +139,7 @@
       }
     },
     {
-      "id": "8bac0841-43bf-4bf3-8a51-b38eaebafd89",
+      "id": "8e578088-5287-438d-b5e5-d7e38a138932",
       "term": "质量内建",
       "changes": {
         "term": "质量内建",
@@ -159,7 +159,7 @@
       }
     },
     {
-      "id": "624fa4c1-f38f-4656-87a9-e5cd45b97098",
+      "id": "7d4d8114-f276-44d0-b257-22bcf66ad9e3",
       "term": "自动化分层测试策略",
       "changes": {
         "term": "自动化分层测试策略",
@@ -179,7 +179,7 @@
       }
     },
     {
-      "id": "cb35031e-7cfa-4c7f-a96f-85084118518c",
+      "id": "5ec8fb76-cb56-470e-a2a9-9fa50fe1d255",
       "term": "CI/CD",
       "changes": {
         "term": "CI/CD",
