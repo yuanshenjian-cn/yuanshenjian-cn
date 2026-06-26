@@ -34,6 +34,7 @@ function wrapTextNode(node: Text, termMap: Map<string, GlossaryItem>) {
       mark.dataset.term = item.term;
       mark.dataset.definition = item.definition;
       mark.dataset.explanation = item.explanation;
+      mark.dataset.references = JSON.stringify(item.references || []);
       mark.textContent = part;
       fragment.appendChild(mark);
     } else {
@@ -70,6 +71,7 @@ interface ActiveBubble {
   term: string;
   definition: string;
   explanation: string;
+  references: Array<{ label: string; url: string }>;
   rect: DOMRect;
 }
 
@@ -95,8 +97,9 @@ export function TermHighlighter({ scene, domain, containerSelector = ".prose" }:
     const term = target.dataset.term || "";
     const definition = target.dataset.definition || "";
     const explanation = target.dataset.explanation || "";
+    const references = JSON.parse(target.dataset.references || "[]") as Array<{ label: string; url: string }>;
     const rect = target.getBoundingClientRect();
-    setActiveBubble({ term, definition, explanation, rect });
+    setActiveBubble({ term, definition, explanation, references, rect });
   }, []);
 
   useEffect(() => {
@@ -130,6 +133,7 @@ export function TermHighlighter({ scene, domain, containerSelector = ".prose" }:
       term={activeBubble.term}
       definition={activeBubble.definition}
       explanation={activeBubble.explanation}
+      references={activeBubble.references}
       anchorRect={activeBubble.rect}
       onClose={() => setActiveBubble(null)}
     />

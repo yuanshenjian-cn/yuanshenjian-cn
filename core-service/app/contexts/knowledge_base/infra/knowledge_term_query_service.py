@@ -69,6 +69,7 @@ class KnowledgeTermQueryService:
             "definition": item.definition,
             "explanation": item.explanation,
             "related_article_slugs": list(item.related_article_slugs or []),
+            "references": list(item.references or []),
             "domains": list(item.domains or []),
             "scenes": list(item.scenes or []),
             "status": item.status,
@@ -94,6 +95,7 @@ class KnowledgeTermQueryService:
                 "definition": item.definition,
                 "explanation": item.explanation,
                 "related_article_slugs": list(item.related_article_slugs or []),
+                "references": list(item.references or []),
                 "domains": list(item.domains or []),
                 "scenes": list(item.scenes or []),
             }

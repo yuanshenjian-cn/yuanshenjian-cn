@@ -19,6 +19,7 @@ const EMPTY_FORM: SaveKnowledgeTermPayload = {
   definition: "",
   explanation: "",
   related_article_slugs: [],
+  references: [],
   domains: [],
   scenes: [],
   status: "enabled",
@@ -49,6 +50,22 @@ function parseCommaList(value: string): string[] {
 
 function formatCommaList(value: string[]): string {
   return value.join(", ");
+}
+
+function parseReferenceLines(value: string): Array<{ label: string; url: string }> {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label, url] = line.split("|").map((item) => item.trim());
+      return { label: label ?? "", url: url ?? "" };
+    })
+    .filter((item) => item.label && item.url);
+}
+
+function formatReferenceLines(value: Array<{ label: string; url: string }>): string {
+  return value.map((item) => `${item.label} | ${item.url}`).join("\n");
 }
 
 export function GlossaryPage() {
@@ -131,6 +148,7 @@ export function GlossaryPage() {
       definition: item.definition,
       explanation: item.explanation,
       related_article_slugs: item.related_article_slugs,
+      references: item.references,
       domains: item.domains,
       scenes: item.scenes,
       status: item.status,
@@ -303,6 +321,7 @@ export function GlossaryPage() {
             {item.related_article_slugs.length > 0 ? (
               <span>相关文章：{item.related_article_slugs.join(" / ")}</span>
             ) : null}
+            {item.references.length > 0 ? <span>参考：{item.references.map((item) => item.label).join(" / ")}</span> : null}
             {item.notes ? <span>备注：{item.notes}</span> : null}
           </p>
         </article>
@@ -413,6 +432,17 @@ export function GlossaryPage() {
                     value={form.explanation}
                     onChange={(event) => setForm((current) => ({ ...current, explanation: event.target.value }))}
                     rows={5}
+                  />
+                </label>
+                <label>
+                  参考链接（每行一条，格式：名称 | URL）
+                  <textarea
+                    value={formatReferenceLines(form.references)}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, references: parseReferenceLines(event.target.value) }))
+                    }
+                    rows={4}
+                    placeholder={"维基百科 | https://zh.wikipedia.org/wiki/Scrum\nScrum Guide | https://scrumguides.org/"}
                   />
                 </label>
                 <label>

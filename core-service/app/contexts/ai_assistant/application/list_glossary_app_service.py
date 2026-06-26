@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from app.contexts.ai_assistant.application.dto.list_glossary_dto import GlossaryItemResp, ListGlossaryResp
+from app.contexts.ai_assistant.application.dto.list_glossary_dto import (
+    GlossaryItemResp,
+    GlossaryReferenceResp,
+    ListGlossaryResp,
+)
 from app.contexts.knowledge_base.domain.knowledge_term_repository import KnowledgeTermRepository
 
 
@@ -26,6 +30,7 @@ class ListGlossaryAppService:
                     definition=term.definition,
                     explanation=term.explanation,
                     related_article_slugs=list(term.related_article_slugs or []),
+                    references=[GlossaryReferenceResp.model_validate(item) for item in list(term.references or [])],
                 )
             )
         return ListGlossaryResp(items=items)

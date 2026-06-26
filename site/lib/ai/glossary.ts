@@ -7,6 +7,7 @@ export interface GlossaryItem {
   definition: string;
   explanation: string;
   related_article_slugs: string[];
+  references: Array<{ label: string; url: string }>;
 }
 
 function resolveBaseUrl(): string {

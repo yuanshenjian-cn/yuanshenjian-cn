@@ -1,6 +1,19 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, TypedDict
+
+
+class KnowledgeTermReferenceLink(TypedDict):
+    label: str
+    url: str
+
+
+class MatchedKnowledgeTerm(TypedDict):
+    term: str
+    definition: str
+    explanation: str
+    related_article_slugs: str
+    references: list[KnowledgeTermReferenceLink]
 
 
 class KnowledgeTermReader(Protocol):
@@ -10,5 +23,5 @@ class KnowledgeTermReader(Protocol):
         *,
         scene: str | None = None,
         domain: str | None = None,
-    ) -> list[dict[str, str]]:
+    ) -> list[MatchedKnowledgeTerm]:
         ...

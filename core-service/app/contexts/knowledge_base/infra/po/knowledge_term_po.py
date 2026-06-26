@@ -15,6 +15,7 @@ class KnowledgeTermPO(Base, TimestampMixin):
     definition: Mapped[str] = mapped_column(Text, nullable=False)
     explanation: Mapped[str] = mapped_column(Text, nullable=False)
     related_article_slugs: Mapped[list[str]] = mapped_column(JSON, default=list)
+    references: Mapped[list[dict[str, str]]] = mapped_column(JSON, default=list)
     domains: Mapped[list[str]] = mapped_column(JSON, default=list)
     scenes: Mapped[list[str]] = mapped_column(JSON, default=list)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="enabled")

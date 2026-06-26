@@ -6,6 +6,7 @@ interface TermExplanationBubbleProps {
   term: string;
   definition: string;
   explanation: string;
+  references: Array<{ label: string; url: string }>;
   anchorRect: DOMRect;
   onClose: () => void;
 }
@@ -74,6 +75,7 @@ export function TermExplanationBubble({
   term,
   definition,
   explanation,
+  references,
   anchorRect,
   onClose,
 }: TermExplanationBubbleProps) {
@@ -222,6 +224,24 @@ export function TermExplanationBubble({
                   </li>
                 ))}
               </ul>
+            </div>
+          ) : null}
+          {references.length > 0 ? (
+            <div className="mt-3 space-y-1.5 border-t border-border/60 pt-3">
+              <div className={SECTION_LABEL_CLASS}>参考</div>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] leading-5 text-muted-foreground">
+                {references.map((reference) => (
+                  <a
+                    key={`${reference.label}-${reference.url}`}
+                    href={reference.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground/40"
+                  >
+                    {reference.label}
+                  </a>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>

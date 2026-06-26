@@ -97,6 +97,7 @@ def main() -> int:
             "definition": item.get("definition", ""),
             "explanation": item.get("explanation", ""),
             "related_article_slugs": item.get("related_article_slugs", []),
+            "references": item.get("references", []),
             "domains": item.get("domains", []),
             "scenes": item.get("scenes", []),
             "status": item.get("status", "enabled"),

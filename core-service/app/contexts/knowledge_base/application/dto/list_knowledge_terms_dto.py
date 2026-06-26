@@ -3,6 +3,11 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class ListKnowledgeTermReferenceResp(BaseModel):
+    label: str
+    url: str
+
+
 class ListKnowledgeTermsItemResp(BaseModel):
     id: str
     term: str
@@ -10,6 +15,7 @@ class ListKnowledgeTermsItemResp(BaseModel):
     definition: str
     explanation: str
     related_article_slugs: list[str]
+    references: list[ListKnowledgeTermReferenceResp]
     domains: list[str]
     scenes: list[str]
     status: str

@@ -8,6 +8,7 @@ from app.contexts.knowledge_base.domain.knowledge_term import (
     normalize_term_definition,
     normalize_term_domains,
     normalize_term_explanation,
+    normalize_term_references,
     normalize_term_related_slugs,
     normalize_term_scenes,
     normalize_term_status,
@@ -32,6 +33,7 @@ class UpdateKnowledgeTermAppService:
         term.definition = normalize_term_definition(req.definition)
         term.explanation = normalize_term_explanation(req.explanation)
         term.related_article_slugs = normalize_term_related_slugs(req.related_article_slugs)
+        term.references = normalize_term_references([item.model_dump() for item in req.references])
         term.domains = normalize_term_domains(req.domains)
         term.scenes = normalize_term_scenes(req.scenes)
         term.status = status

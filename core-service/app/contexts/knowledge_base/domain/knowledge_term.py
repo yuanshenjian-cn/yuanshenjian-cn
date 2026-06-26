@@ -49,3 +49,21 @@ def normalize_term_scenes(scenes: list[str] | None) -> list[str]:
 
 def normalize_term_related_slugs(slugs: list[str] | None) -> list[str]:
     return normalize_term_list(slugs)
+
+
+def normalize_term_references(references: list[dict[str, str]] | None) -> list[dict[str, str]]:
+    if not references:
+        return []
+    values: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for item in references:
+        label = str(item.get("label", "")).strip()
+        url = str(item.get("url", "")).strip()
+        if not label or not url:
+            continue
+        key = (label, url)
+        if key in seen:
+            continue
+        seen.add(key)
+        values.append({"label": label, "url": url})
+    return values

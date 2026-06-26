@@ -51,6 +51,7 @@ export interface KnowledgeTermItem {
   definition: string;
   explanation: string;
   related_article_slugs: string[];
+  references: Array<{ label: string; url: string }>;
   domains: string[];
   scenes: string[];
   status: string;
@@ -66,6 +67,7 @@ export interface SaveKnowledgeTermPayload {
   definition: string;
   explanation: string;
   related_article_slugs: string[];
+  references: Array<{ label: string; url: string }>;
   domains: string[];
   scenes: string[];
   status: string;
