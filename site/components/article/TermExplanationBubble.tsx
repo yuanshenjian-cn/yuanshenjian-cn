@@ -15,7 +15,7 @@ const BUBBLE_WIDTH = 336;
 const VIEWPORT_MARGIN = 12;
 const SECTION_LABEL_CLASS = "text-[12px] font-medium text-foreground";
 
-const KEY_POINTS_LEAD = /(?:关键要点|要点|核心要点|主要特点|关键特征|主要能力)\s*[:：]/;
+const KEY_POINTS_LEAD = /(?:关键要点|要点|核心要点|主要特点|关键特征|主要能力)(?:包括)?\s*[:：]/;
 const NUMBERED_ITEM = /^[（(]?[0-9一二三四五六七八九十](?:[)）、]\s*|\.\s+)/;
 const BULLET_ITEM = /^[•·\-—]\s*/;
 const POINT_SPLITTER = /(?=(?:[（(]?[0-9一二三四五六七八九十][)）、]\s*)|(?:[0-9一二三四五六七八九十]\.\s+)|(?:[•·\-—]\s))/;
@@ -32,7 +32,7 @@ function parsePoints(text: string): ParsedExplanation {
     return { intro: text, pointTitle: "", points: [] };
   }
   const intro = text.slice(0, leadMatch.index).trim();
-  const pointTitle = leadMatch[0].replace(/[:：]\s*$/, "").trim();
+  const pointTitle = leadMatch[0].replace(/[:：]\s*$/, "").replace(/包括\s*$/, "").trim();
   const rest = text.slice(leadMatch.index + leadMatch[0].length).trim();
   if (!rest) return { intro, pointTitle, points: [] };
 
