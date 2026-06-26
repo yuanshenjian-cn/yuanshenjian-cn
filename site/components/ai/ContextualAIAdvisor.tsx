@@ -369,14 +369,14 @@ export function ContextualAIAdvisor({
                       <p className="text-sm font-medium text-foreground">{getWelcomeMessage(context)}</p>
                       <p className="text-xs text-muted-foreground">选一个开始，或者直接输入你的问题</p>
                     </div>
-                    <div className="space-y-3">
+                    <div className="flex flex-wrap justify-center gap-2.5">
                       {quickTopics.map((topic) => (
                         <button
                           key={topic.label}
                           type="button"
                           onClick={() => void submitMessage(topic.prompt)}
                           disabled={isStreaming}
-                          className="block w-full rounded-2xl border border-border/70 bg-card/80 px-4 py-3 text-left text-sm text-foreground shadow-sm transition hover:border-primary/40 hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex max-w-full items-center rounded-full border border-border/50 bg-muted/35 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-primary/35 hover:bg-muted/55 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {topic.label}
                         </button>

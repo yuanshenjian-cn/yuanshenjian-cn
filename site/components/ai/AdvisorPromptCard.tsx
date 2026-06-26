@@ -18,13 +18,13 @@ export function AdvisorPromptCard({ title, description, quickTopics, onSelect }:
     <section className="mb-8 rounded-2xl border border-border/70 bg-card/70 p-5 shadow-sm">
       <h2 className="text-lg font-medium text-foreground">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2.5">
         {quickTopics.map((topic) => (
           <button
             key={topic.label}
             type="button"
             onClick={() => onSelect(topic)}
-            className="rounded-full border border-border/70 bg-background/70 px-3 py-1 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+            className="inline-flex items-center rounded-full border border-border/50 bg-muted/35 px-2.5 py-1 text-[11px] font-medium leading-5 text-muted-foreground transition hover:border-primary/35 hover:bg-muted/55 hover:text-foreground"
           >
             {topic.label}
           </button>
