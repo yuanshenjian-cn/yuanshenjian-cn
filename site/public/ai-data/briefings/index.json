@@ -1,6 +1,18 @@
 {
-  "generated": "2026-06-26T00:00:00.000Z",
+  "generated": "2026-06-27T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-27",
+      "title": "AI 简报 · 2026-06-27",
+      "excerpt": "同一天，OpenAI GPT-5.6 被限速发布，Anthropic Mythos 5 被美国政府解封——前沿模型发布权已不在实验室手中。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic"
+      ],
+      "date": "2026-06-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-27"
+    },
     {
       "slug": "2026-06-26",
       "title": "AI 简报 · 2026-06-26",
@@ -952,6 +964,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-27",
+      "title": "AI 简报 · 2026-06-27",
+      "excerpt": "同一天，OpenAI GPT-5.6 被限速发布，Anthropic Mythos 5 被美国政府解封——前沿模型发布权已不在实验室手中。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic"
+      ],
+      "date": "2026-06-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-27"
+    },
     {
       "slug": "2026-06-26",
       "title": "AI 简报 · 2026-06-26",
