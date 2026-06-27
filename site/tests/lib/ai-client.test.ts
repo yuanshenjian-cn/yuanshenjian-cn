@@ -338,6 +338,48 @@ describe("aiContextualAdvisorStream", () => {
     expect(onEvent).toHaveBeenNthCalledWith(2, { type: "done", usage: undefined });
   });
 
+  it("should post use_global_glossary when enabled", async () => {
+    const onEvent = vi.fn();
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(createStreamResponse(['event: done\ndata: {}\n\n']));
+
+    await aiContextualAdvisorStream({
+      workerUrl: "/api/v1/ai-assistant/",
+      message: "跟 Scrum 相关的词汇还有哪些",
+      turnstileToken: "token",
+      context: {
+        scene: "author",
+        pageTitle: "简历 | YSJ",
+        pageSlug: "author",
+        articleSlug: undefined,
+        history: [],
+        useGlobalGlossary: true,
+      },
+      onEvent,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith("/api/v1/ai-assistant/advisor/stream", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scene: "author",
+        domain: undefined,
+        page_title: "简历 | YSJ",
+        page_slug: "author",
+        article_slug: undefined,
+        history: [],
+        use_global_glossary: true,
+        entrypoint: "author",
+        message: "跟 Scrum 相关的词汇还有哪些",
+        cf_turnstile_response: "token",
+      }),
+      signal: undefined,
+    });
+    expect(onEvent).toHaveBeenCalledWith({ type: "done", usage: undefined });
+  });
+
   it("should parse followup-questions event", async () => {
     const onEvent = vi.fn();
 

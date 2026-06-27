@@ -190,7 +190,7 @@ export function ContextualAIAdvisor({
   }
 
   const submitMessage = useCallback(
-    async (value: string) => {
+    async (value: string, requestOptions?: { useGlobalGlossary?: boolean }) => {
       const nextMessage = value.trim();
       if (!nextMessage || nextMessage.length > maxInputChars || isStreaming) {
         return;
@@ -223,6 +223,7 @@ export function ContextualAIAdvisor({
             pageSlug: context.pageSlug,
             articleSlug: context.articleSlug,
             history,
+            useGlobalGlossary: requestOptions?.useGlobalGlossary,
           },
           onEvent: (streamEvent: AdvisorStreamEvent) => {
             if (streamEvent.type === "answer-delta") {
@@ -286,8 +287,8 @@ export function ContextualAIAdvisor({
   }, [submitMessage]);
 
   useEffect(() => {
-    return onAskAdvisor((question) => {
-      void submitMessage(question);
+    return onAskAdvisor((request) => {
+      void submitMessage(request.question, { useGlobalGlossary: request.useGlobalGlossary });
     });
   }, [submitMessage]);
 

@@ -439,6 +439,7 @@ export async function aiContextualAdvisorStream(options: ContextualAdvisorStream
       page_slug: options.context.pageSlug,
       article_slug: options.context.articleSlug,
       history: options.context.history,
+      use_global_glossary: options.context.useGlobalGlossary,
       entrypoint: options.context.scene,
       message: options.message,
       cf_turnstile_response: options.turnstileToken,

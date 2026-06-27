@@ -120,7 +120,7 @@
           "agile-growth-assistant",
           "beyond-training",
           "avoid-ineffective-knowledge-management",
-          "swd/xp/simple-design/three-practices-of-simple-design"
+          "three-practices-of-simple-design"
         ],
         "domains": ["article", "author"],
         "scenes": ["article", "author"],
@@ -138,9 +138,9 @@
         "definition": "刚好满足需求、易于变更的代码设计。",
         "explanation": "简单设计是极限编程倡导的设计哲学，强调只为当下真实需求做设计，不为未来可能的需求过度设计，同时保持系统对变化的快速响应力。关键要点：1) 简单不等于容易，是历经复杂后的返璞归真；2) 通过TDD、重构和整洁代码等实践落地。典型场景：当开发者为'万一以后需要'而引入复杂模式时，应回归当下业务价值，删除不必要的抽象。例如，欢欢用策略模式和状态模式预留扩展点，清扬认为属于过度设计，应遵循刚好够用的原则。",
         "related_article_slugs": [
-          "swd/xp/simple-design/simple-design-principles-novel",
-          "swd/xp/simple-design/my-simple-design-perspective",
-          "swd/xp/simple-design/three-practices-of-simple-design"
+          "simple-design-principles-novel",
+          "my-simple-design-perspective",
+          "three-practices-of-simple-design"
         ],
         "domains": ["article", "author"],
         "scenes": ["article", "author"],

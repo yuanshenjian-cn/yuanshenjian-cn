@@ -10,6 +10,7 @@ class KnowledgeTermReferenceLink(TypedDict):
 
 class MatchedKnowledgeTerm(TypedDict):
     term: str
+    aliases: list[str]
     definition: str
     explanation: str
     related_article_slugs: str
@@ -17,6 +18,14 @@ class MatchedKnowledgeTerm(TypedDict):
 
 
 class KnowledgeTermReader(Protocol):
+    async def list_terms(
+        self,
+        *,
+        scene: str | None = None,
+        domain: str | None = None,
+    ) -> list[MatchedKnowledgeTerm]:
+        ...
+
     async def find_matching_terms(
         self,
         query: str,

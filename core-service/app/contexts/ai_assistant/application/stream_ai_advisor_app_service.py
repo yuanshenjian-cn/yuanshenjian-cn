@@ -12,7 +12,7 @@ from app.contexts.ai_assistant.domain.contextual_advisor_prompt import (
     extract_followup_questions,
 )
 from app.contexts.ai_assistant.domain.knowledge_context_reader import KnowledgeContextReader
-from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader
+from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader, MatchedKnowledgeTerm
 from app.contexts.ai_assistant.domain.llm_answer_stream_gateway import LLMAnswerStreamGateway
 from app.contexts.ai_assistant.domain.llm_profile_resolver import LLMProfileResolver
 from app.contexts.ai_assistant.domain.published_ai_asset_reader import PublishedAIAssetReader
@@ -53,6 +53,9 @@ class StreamAIAdvisorAppService:
             link_line = f"链接：{url}\n" if url else ""
             enriched_contexts.append(f"标题：{title}\n{link_line}内容：{context}")
         return enriched_contexts
+
+    def _format_term_context(self, term: MatchedKnowledgeTerm) -> str:
+        return f"术语：{term['term']}\n定义：{term['definition']}\n解释：{term['explanation']}"
 
     async def _stream_with_followup_questions(
         self,
@@ -95,14 +98,12 @@ class StreamAIAdvisorAppService:
                 page_slug=req.page_slug,
             )
             if self._term_reader is not None:
+                if req.use_global_glossary:
+                    glossary_contexts = [self._format_term_context(term) for term in await self._term_reader.list_terms()]
+                    contexts = glossary_contexts + contexts
                 matched_terms = await self._term_reader.find_matching_terms(req.message, scene=scene, domain=domain)
                 for matched_term in matched_terms:
-                    term_content = (
-                        f"术语：{matched_term['term']}\n"
-                        f"定义：{matched_term['definition']}\n"
-                        f"解释：{matched_term['explanation']}"
-                    )
-                    contexts.insert(0, term_content)
+                    contexts.insert(0, self._format_term_context(matched_term))
                     if matched_term.get("related_article_slugs"):
                         db_references.insert(
                             0,
@@ -111,7 +112,7 @@ class StreamAIAdvisorAppService:
                                 "title": f"术语：{matched_term['term']}",
                                 "excerpt": matched_term["definition"],
                                 "url": "",
-                                "source_type": "article-section",
+                                "source_type": "glossary",
                             },
                         )
             references: list[dict[str, str]] = db_references

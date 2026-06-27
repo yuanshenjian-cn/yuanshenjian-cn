@@ -69,6 +69,7 @@ export interface AdvisorStreamContext {
   pageSlug?: string;
   articleSlug?: string;
   history: string[];
+  useGlobalGlossary?: boolean;
 }
 
 export interface ContextualAdvisorStreamOptions extends BaseAIChatStreamOptions {

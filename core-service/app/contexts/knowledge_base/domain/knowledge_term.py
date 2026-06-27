@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from posixpath import basename
 
 
 class KnowledgeTermStatus(StrEnum):
@@ -48,7 +49,20 @@ def normalize_term_scenes(scenes: list[str] | None) -> list[str]:
 
 
 def normalize_term_related_slugs(slugs: list[str] | None) -> list[str]:
-    return normalize_term_list(slugs)
+    if not slugs:
+        return []
+    values: list[str] = []
+    for item in slugs:
+        normalized = item.strip().replace("\\", "/")
+        if not normalized:
+            continue
+        if "/articles/" in normalized:
+            normalized = normalized.split("/articles/", 1)[1]
+        normalized = normalized.split("?", 1)[0].split("#", 1)[0]
+        normalized = basename(normalized)
+        if normalized and normalized not in values:
+            values.append(normalized)
+    return values
 
 
 def normalize_term_references(references: list[dict[str, str]] | None) -> list[dict[str, str]]:

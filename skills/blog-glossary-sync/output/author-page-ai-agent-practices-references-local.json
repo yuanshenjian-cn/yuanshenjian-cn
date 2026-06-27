@@ -1,0 +1,164 @@
+{
+  "create": [],
+  "update": [
+    {
+      "id": "7dc86322-a32f-4a39-98dc-59dab5c9637c",
+      "term": "AI Agent",
+      "changes": {
+        "term": "AI Agent",
+        "aliases": ["Agent", "AI Agent应用", "AI Agent 架构设计"],
+        "definition": "能够围绕目标自主规划、调用工具并执行多步骤任务的 AI 系统。",
+        "explanation": "AI Agent 是一种能围绕目标自主推进任务的 AI 系统。相比一次性问答，它会在执行过程中自己决定下一步是检索、调用工具、读写文件还是请求澄清，并依据环境反馈持续修正计划。关键要点：1）目标驱动，重点不是生成一段回答，而是完成一项可验证任务；2）依赖工具、记忆和外部环境反馈形成闭环；3）通常包含规划、执行、检查、纠错等多步循环；4）自主性越高，越需要清晰的权限边界、停机条件和审计机制。典型场景是代码修复 Agent：先读仓库和报错，再定位文件、修改代码、运行测试，并根据结果继续迭代直到通过。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "Anthropic: Building Effective Agents", "url": "https://www.anthropic.com/engineering/building-effective-agents"},
+          {"label": "AGNTCY", "url": "https://agntcy.org/"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "bca853ce-74ae-4853-8ab7-2eceec0ebca4",
+      "term": "Agent Skills",
+      "changes": {
+        "term": "Agent Skills",
+        "aliases": ["Skills", "agent skills", "AI Agent Skills"],
+        "definition": "为 AI Agent 封装特定任务流程、工具和上下文的可复用能力包。",
+        "explanation": "Agent Skills 是把某类任务的知识、步骤、脚本和约束封装成可复用能力包的方式。它让 Agent 不必每次都从零理解流程，而是在需要时按技能说明执行，减少提示漂移和重复描述。关键要点：1）通常包含名称、触发说明和执行指令，可附带脚本、模板与参考文档；2）采用按需加载，只在相关任务中注入完整内容，降低上下文成本；3）适合沉淀团队规范、发布流程、评审清单等可重复工作；4）一个 Skill 可以跨多个兼容 Agent 平台复用。典型场景是“发布 skill”：统一要求 Agent 先检查版本、生成 changelog、再给出发布命令和回滚注意事项。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "Agent Skills Overview", "url": "https://agentskills.io/"},
+          {"label": "Claude Code Skills", "url": "https://docs.anthropic.com/en/docs/claude-code/skills"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "67b494a7-c13d-42e1-9186-0b9a90e33757",
+      "term": "AI 效率工程",
+      "changes": {
+        "term": "AI 效率工程",
+        "aliases": ["AI提效", "AI 研发提效", "AI辅助研发"],
+        "definition": "把 AI 工具、流程和工程实践结合起来，系统性提升研发效率的工作方向。",
+        "explanation": "AI 效率工程是把模型、工具链、流程设计和质量治理结合起来，系统提升研发产出速度与稳定性的工程实践。它不是单点地“让 AI 帮你写代码”，而是围绕需求、设计、实现、测试、评审、发布与知识沉淀重构整条交付链路。关键要点：1）关注端到端效率，而非单个编码环节的局部提速；2）强调把提示、工具、上下文、质量门禁和反馈回路做成稳定系统；3）既看产出速度，也看返工率、缺陷率、可追溯性和团队采纳成本；4）需要持续评估哪些环节适合自动化，哪些环节保留人工判断。典型场景是把需求拆解、代码生成、测试补齐、Review 建议和交付报告串成一条工作流，用统一数据度量收益。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "DORA", "url": "https://dora.dev/"},
+          {"label": "Anthropic: Building Effective Agents", "url": "https://www.anthropic.com/engineering/building-effective-agents"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "2463157a-5ef3-4dd3-a0ad-3d7ba2e3637c",
+      "term": "SDD",
+      "changes": {
+        "term": "SDD",
+        "aliases": ["Spec-Driven Development", "规格驱动开发", "SDD框架"],
+        "definition": "先明确规格、验收标准和设计约束，再驱动实现与验证的开发方式。",
+        "explanation": "SDD（Spec-Driven Development，规格驱动开发）是一种先把需求、约束、设计和验收标准结构化，再驱动实现和验证的开发方式。它强调先把“要做什么、为什么这样做、怎样算完成”说清楚，再交给人或 Agent 执行，以减少误解和返工。关键要点：1）规格通常覆盖需求边界、接口契约、关键设计决策和验收条件；2）规格既服务实现，也服务测试、评审和后续维护；3）相比直接动手编码，SDD 更重视前置澄清与可追踪性；4）在 AI 辅助研发中，清晰规格能显著降低模型跑偏和多轮返工。典型场景是先产出 story、设计说明和验收清单，再让编码 Agent 分阶段实现并逐项对照验证。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "Kiro", "url": "https://kiro.dev/"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "4585a279-f1cf-4dda-a04a-596f2df34419",
+      "term": "Agentic Agile Delivery",
+      "changes": {
+        "term": "Agentic Agile Delivery",
+        "aliases": ["aa-delivery", "Agentic Agile Delivery process"],
+        "definition": "一种把敏捷交付流程拆解为可编排 Agent 工作单元的 AI 原生交付框架。",
+        "explanation": "Agentic Agile Delivery 是把敏捷交付流程拆成多个可追踪、可协作的 Agent 工作单元的交付方式。它保留敏捷强调的小步交付和反馈回路，同时把需求澄清、设计、实现、验证、验收和报告编排成结构化流程，方便人机协同推进。关键要点：1）按角色或阶段拆分任务，让不同 Agent 聚焦不同职责；2）每个工作单元都应有明确输入、输出和通过门禁；3）通过证据、结果和 gate 决策保证过程可回放、可审计；4）目标不是把人完全移除，而是把人放在关键判断和验收节点。典型场景是一个功能需求先后经过分析 Agent、设计 Agent、实现 Agent 和验证 Agent，各自产出结果，再由人工做最终 acceptance。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "aa-delivery", "url": "https://github.com/ysjai/aa-delivery"},
+          {"label": "Anthropic: Building Effective Agents", "url": "https://www.anthropic.com/engineering/building-effective-agents"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "b54b9c85-e618-4a13-b2fa-8ca038aa6680",
+      "term": "Prompt Engineering",
+      "changes": {
+        "term": "Prompt Engineering",
+        "aliases": ["提示词工程"],
+        "definition": "围绕提示设计、上下文组织和输出约束来提升模型结果质量的方法。",
+        "explanation": "提示词工程是围绕指令、上下文、示例和输出约束来提升模型结果质量的实践。它的核心不是把 prompt 写得越长越好，而是把任务边界、成功标准和可用信息组织得更清晰，让模型更稳定地朝正确方向工作。关键要点：1）常见手段包括角色设定、步骤约束、few-shot 示例、结构化输出和上下文分段；2）好的提示词要兼顾明确性、可执行性和可维护性；3）提示词工程通常需要与工具调用、检索和评测一起使用，而不是孤立存在；4）随着模型与场景变化，提示词需要持续测试和迭代。典型场景是要求模型“只基于给定资料回答，并以 JSON 输出字段、风险和下一步建议”，以便结果可直接进入后续流程。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "OpenAI: Prompt Engineering", "url": "https://platform.openai.com/docs/guides/prompt-engineering"},
+          {"label": "维基百科", "url": "https://en.wikipedia.org/wiki/Prompt_engineering"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "ade66e5b-de3b-4bcc-bba2-2cbee8d3a25a",
+      "term": "MCP",
+      "changes": {
+        "term": "MCP",
+        "aliases": ["Model Context Protocol", "模型上下文协议"],
+        "definition": "让 AI Agent 标准化连接外部工具、数据源和服务的开放协议。",
+        "explanation": "MCP（Model Context Protocol）是一种让 AI 应用或 Agent 以统一方式连接外部工具、数据源和工作流的开放协议。它的作用类似 AI 世界里的通用接口层，减少每个客户端分别适配数据库、文件系统、浏览器或内部平台的成本。关键要点：1）通过标准化协议暴露工具和上下文，客户端可按统一方式发现和调用能力；2）既能连接本地资源，也能连接远程服务；3）提升不同 Agent 与工具生态之间的互操作性；4）协议统一后，安全边界、权限控制和审计也更容易集中治理。典型场景是把数据库查询、文档检索和浏览器操作封装成 MCP server，让多个 AI 客户端都能直接复用。",
+        "related_article_slugs": ["ai-coding-tools-comparison", "codex-configuration-guide", "deepseek-tui-first-look", "claude-code-extension-model-overview", "claude-code-advanced-automation-with-mcp-hooks-and-agents", "claude-code-token-saving-tips", "opencode-efficiency-config-handbook", "opencode-advanced-tips-and-practices"],
+        "references": [
+          {"label": "MCP Introduction", "url": "https://modelcontextprotocol.io/introduction"},
+          {"label": "维基百科", "url": "https://en.wikipedia.org/wiki/Model_Context_Protocol"}
+        ],
+        "domains": ["ai", "article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "8e55d72a-f802-4042-b5bb-bdf2574c23ef",
+      "term": "RAG",
+      "changes": {
+        "term": "RAG",
+        "aliases": ["Retrieval-Augmented Generation", "检索增强生成"],
+        "definition": "一种把外部知识检索与大模型生成结合起来的 AI 应用模式。",
+        "explanation": "RAG（Retrieval-Augmented Generation，检索增强生成）是一种先检索外部知识，再结合模型生成回答的应用模式。它用于弥补模型训练数据过时或缺少私有知识的问题，让回答尽量建立在指定资料之上。关键要点：1）典型流程是切分文档、建立索引、按问题检索相关片段，再把片段与问题一起送入模型；2）优势是更容易接入最新或私有知识，并减少纯参数记忆带来的幻觉；3）效果高度依赖检索质量、切分策略和上下文拼装方式；4）RAG 能降低错误率，但不能保证绝对正确，仍需要来源甄别和结果校验。典型场景是企业知识问答：先检索制度文档或项目资料，再让模型基于这些材料生成可追溯答案。",
+        "related_article_slugs": [],
+        "references": [
+          {"label": "维基百科", "url": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation"},
+          {"label": "RAG Paper", "url": "https://arxiv.org/abs/2005.11401"}
+        ],
+        "domains": ["author"],
+        "scenes": ["author"],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    }
+  ]
+}

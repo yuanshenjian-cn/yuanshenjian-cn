@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { emitAskAdvisor } from "@/lib/ai/advisor-events";
+
 interface TermExplanationBubbleProps {
   term: string;
   definition: string;
@@ -177,6 +179,14 @@ export function TermExplanationBubble({
     return () => window.clearInterval(timer);
   }, [pointsText, showPoints]);
 
+  function handleAskRelatedTerms() {
+    emitAskAdvisor({
+      question: `跟 "${term}" 相关的词汇还有哪些？`,
+      useGlobalGlossary: true,
+    });
+    onClose();
+  }
+
   return (
     <div
       ref={bubbleRef}
@@ -188,9 +198,18 @@ export function TermExplanationBubble({
         transform: above ? "translateY(-100%)" : "none",
       }}
     >
-      <div className="mb-2 flex items-baseline gap-2">
-        <span className="text-sm font-semibold text-foreground">{term}</span>
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">术语</span>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm font-semibold text-foreground">{term}</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">术语</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleAskRelatedTerms}
+          className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+        >
+          相关词汇
+        </button>
       </div>
 
       <div className="mb-2">

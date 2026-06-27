@@ -6,7 +6,13 @@ import { emitAskAdvisor } from "@/lib/ai/advisor-events";
 
 const DEFAULT_MAX_INPUT_CHARS = 200;
 
-const QUICK_ACTIONS = [
+interface TextSelectionQuickAction {
+  label: string;
+  question: string;
+  useGlobalGlossary?: boolean;
+}
+
+const DEFAULT_QUICK_ACTIONS: TextSelectionQuickAction[] = [
   { label: "解释", question: "解释这段话的含义" },
   { label: "上下文", question: "这段话和上下文有什么关系" },
   { label: "相关文章", question: "找和这段话相关的文章" },
@@ -15,6 +21,7 @@ const QUICK_ACTIONS = [
 interface TextSelectionAIActionsProps {
   containerSelector?: string;
   maxInputChars?: number;
+  actions?: TextSelectionQuickAction[];
 }
 
 function getSelectedText(): string {
@@ -36,7 +43,11 @@ function buildAskPrompt(selectedText: string, question: string, maxInputChars: n
   return `"${quote}"\n\n${question}`;
 }
 
-export function TextSelectionAIActions({ containerSelector = ".prose", maxInputChars = DEFAULT_MAX_INPUT_CHARS }: TextSelectionAIActionsProps) {
+export function TextSelectionAIActions({
+  containerSelector = ".prose",
+  maxInputChars = DEFAULT_MAX_INPUT_CHARS,
+  actions = DEFAULT_QUICK_ACTIONS,
+}: TextSelectionAIActionsProps) {
   const [selectedText, setSelectedText] = useState("");
   const [position, setPosition] = useState<{ x: number; y: number; placement: "above" | "below" } | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
@@ -92,16 +103,26 @@ export function TextSelectionAIActions({ containerSelector = ".prose", maxInputC
       }
     }
 
+    function handleScroll() {
+      setSelectedText("");
+      setPosition(null);
+    }
+
     document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("selectionchange", handleSelectionChange);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("selectionchange", handleSelectionChange);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [containerSelector]);
 
-  function ask(question: string) {
-    emitAskAdvisor(buildAskPrompt(selectedText, question, maxInputChars));
+  function ask(action: TextSelectionQuickAction) {
+    emitAskAdvisor({
+      question: buildAskPrompt(selectedText, action.question, maxInputChars),
+      useGlobalGlossary: action.useGlobalGlossary,
+    });
     setSelectedText("");
     setPosition(null);
   }
@@ -118,11 +139,11 @@ export function TextSelectionAIActions({ containerSelector = ".prose", maxInputC
         transform: position.placement === "above" ? "translate(-50%, -100%)" : "translate(-50%, 0)",
       }}
     >
-      {QUICK_ACTIONS.map((action) => (
+      {actions.map((action) => (
         <button
           key={action.label}
           type="button"
-          onClick={() => ask(action.question)}
+          onClick={() => ask(action)}
           className="rounded-full px-2.5 py-1 text-xs text-foreground transition hover:bg-muted"
         >
           {action.label}

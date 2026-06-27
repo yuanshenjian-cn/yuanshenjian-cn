@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import asyncio
+from typing import cast
 from uuid import uuid4
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.contexts.ai_assistant.application.list_glossary_app_service import ListGlossaryAppService
-from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader
+from app.contexts.ai_assistant.domain.knowledge_term_reader import KnowledgeTermReader, MatchedKnowledgeTerm
 from app.contexts.knowledge_base.application.archive_knowledge_term_app_service import ArchiveKnowledgeTermAppService
 from app.contexts.knowledge_base.application.create_knowledge_term_app_service import CreateKnowledgeTermAppService
 from app.contexts.knowledge_base.application.delete_knowledge_term_app_service import DeleteKnowledgeTermAppService
 from app.contexts.knowledge_base.application.dto.save_knowledge_term_dto import SaveKnowledgeTermReq
 from app.contexts.knowledge_base.application.update_knowledge_term_app_service import UpdateKnowledgeTermAppService
 from app.contexts.knowledge_base.domain.exceptions import KnowledgeTermNotFoundError, KnowledgeTermValidationError
+from app.contexts.knowledge_base.domain.knowledge_term import normalize_term_related_slugs
+from app.contexts.knowledge_base.infra.knowledge_term_sync_service import KnowledgeTermSyncService
 from app.contexts.knowledge_base.infra.knowledge_term_query_reader import KnowledgeTermQueryReader
 from app.contexts.knowledge_base.infra.po.knowledge_term_po import KnowledgeTermPO
 
@@ -126,6 +131,57 @@ def test_update_knowledge_term_changes_fields() -> None:
     assert term.explanation == "新解释"
 
 
+def test_normalize_term_related_slugs_extracts_bare_slug() -> None:
+    assert normalize_term_related_slugs(
+        [
+            "swd/xp/simple-design/my-simple-design-perspective",
+            "/articles/simple-design-principles-novel",
+            "https://yuanshenjian.cn/articles/three-practices-of-simple-design?ref=test#part-1",
+            "my-simple-design-perspective",
+        ]
+    ) == [
+        "my-simple-design-perspective",
+        "simple-design-principles-novel",
+        "three-practices-of-simple-design",
+    ]
+
+
+def test_create_knowledge_term_normalizes_related_article_slugs() -> None:
+    dao = StubKnowledgeTermDAO()
+    service = CreateKnowledgeTermAppService(dao)
+
+    asyncio.run(
+        service.execute(
+            SaveKnowledgeTermReq(
+                term="简单设计",
+                aliases=["Simple Design"],
+                definition="定义",
+                explanation="解释",
+                related_article_slugs=["swd/xp/simple-design/my-simple-design-perspective"],
+            )
+        )
+    )
+
+    assert dao.added[0].related_article_slugs == ["my-simple-design-perspective"]
+
+
+def test_knowledge_term_sync_service_uses_normalized_related_article_slugs() -> None:
+    service = KnowledgeTermSyncService(cast(AsyncSession, StubSession()))
+    term = sample_term(
+        term="简单设计",
+        related_article_slugs=[
+            "swd/xp/simple-design/my-simple-design-perspective",
+            "/articles/three-practices-of-simple-design",
+        ],
+    )
+
+    content = service._build_document_content(term)
+
+    assert "/articles/my-simple-design-perspective" in content
+    assert "/articles/three-practices-of-simple-design" in content
+    assert "/articles/swd/xp/simple-design/my-simple-design-perspective" not in content
+
+
 def test_update_knowledge_term_raises_when_missing() -> None:
     dao = StubKnowledgeTermDAO()
     service = UpdateKnowledgeTermAppService(dao)
@@ -211,8 +267,16 @@ def test_list_glossary_empty_scenes_matches_all_scenes() -> None:
 
 
 class FakeTermReader(KnowledgeTermReader):
-    def __init__(self, matches: list[dict[str, str]]) -> None:
+    def __init__(self, matches: list[MatchedKnowledgeTerm]) -> None:
         self._matches = matches
+
+    async def list_terms(
+        self,
+        *,
+        scene: str | None = None,
+        domain: str | None = None,
+    ) -> list[MatchedKnowledgeTerm]:
+        return list(self._matches)
 
     async def find_matching_terms(
         self,
@@ -220,7 +284,7 @@ class FakeTermReader(KnowledgeTermReader):
         *,
         scene: str | None = None,
         domain: str | None = None,
-    ) -> list[dict[str, str]]:
+    ) -> list[MatchedKnowledgeTerm]:
         return list(self._matches)
 
 

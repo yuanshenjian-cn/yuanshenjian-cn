@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 import { ContextualAIAdvisorSurface } from "@/components/ai/ContextualAIAdvisorSurface";
 import { TermHighlighter } from "@/components/article/TermHighlighter";
+import { TextSelectionAIActions } from "@/components/article/TextSelectionAIActions";
 import { ResumeEducation } from "@/components/resume/ResumeEducation";
 import { ResumeExperience } from "@/components/resume/ResumeExperience";
 import { ResumeExtras } from "@/components/resume/ResumeExtras";
@@ -54,6 +55,13 @@ export default function ResumePage() {
       <ResumeProjects />
       <ResumeOpenSourceProjects />
       <ResumeExtras />
+      {config.ai.contextualAdvisorEnabled ? (
+        <TextSelectionAIActions
+          containerSelector=".author-term-content"
+          maxInputChars={config.ai.maxInputChars}
+          actions={[{ label: "问 AI", question: "解释这段话的含义" }]}
+        />
+      ) : null}
       <TermHighlighter scene="author" domain="author" containerSelector=".author-term-content" />
     </main>
   );

@@ -15,4 +15,5 @@ class StreamAIAdvisorReq(BaseModel):
     page_slug: str | None = None
     article_slug: str | None = None
     history: list[str] = Field(default_factory=list)
+    use_global_glossary: bool = False
     cf_turnstile_response: str = ""

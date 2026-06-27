@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.contexts.knowledge_base.domain.knowledge_term import normalize_term_related_slugs
 from app.contexts.knowledge_base.infra.po.knowledge_chunk_po import KnowledgeChunkPO
 from app.contexts.knowledge_base.infra.po.knowledge_document_po import KnowledgeDocumentPO
 from app.contexts.knowledge_base.infra.po.knowledge_source_po import KnowledgeSourcePO
@@ -50,11 +51,13 @@ class KnowledgeTermSyncService:
 
     def _build_document_content(self, term: KnowledgeTermPO) -> str:
         lines = [f"# {term.term}", "", f"定义：{term.definition}", "", term.explanation]
-        if term.aliases:
-            lines.extend(["", f"别名：{', '.join(term.aliases)}"])
-        if term.related_article_slugs:
+        aliases = list(term.aliases or [])
+        related_article_slugs = normalize_term_related_slugs(term.related_article_slugs)
+        if aliases:
+            lines.extend(["", f"别名：{', '.join(aliases)}"])
+        if related_article_slugs:
             lines.extend(["", "相关文章："])
-            for slug in term.related_article_slugs:
+            for slug in related_article_slugs:
                 lines.append(f"- /articles/{slug}")
         return "\n".join(lines)
 
