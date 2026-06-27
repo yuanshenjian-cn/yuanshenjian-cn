@@ -54,10 +54,6 @@ jobs:
             mapfile -t files < <(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" -- 'skills/blog-glossary-sync/output/*-prod.json')
           fi
 
-          if [ ${#files[@]} -eq 0 ]; then
-            mapfile -t files < <(git ls-files 'skills/blog-glossary-sync/output/*-prod.json')
-          fi
-
           printf '%s\n' "${files[@]}" > /tmp/glossary-sync-files.txt
           {
             echo "count=${#files[@]}"

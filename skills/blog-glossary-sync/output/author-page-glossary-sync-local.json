@@ -1,0 +1,792 @@
+{
+  "create": [],
+  "update": [
+    {
+      "id": "27fb9521-6775-4379-bb51-d5764b4344ec",
+      "term": "OpenCode",
+      "changes": {
+        "term": "OpenCode",
+        "aliases": [],
+        "definition": "开源的 AI 编程 Agent，支持 75+ 模型提供商和高度自定义配置。",
+        "explanation": "OpenCode 是一款开源的 AI Coding Agent，通过终端 TUI 与用户交互，能直接读写文件、执行 shell、搜索代码、抓取网页等。核心定位是隐私可控、模型灵活：支持 75+ 提供商，可用 `/connect` 或 `/models` 配置模型。典型场景：在项目中输入自然语言指令，让 AI 完成代码生成、重构、Bug 修复。示例：`opencode` 进入 TUI 后输入 `将 @src/utils.js 中的回调改为 async/await`。",
+        "related_article_slugs": [
+          "ai-coding-tools-comparison",
+          "opencode-ai-coding-agent-getting-started",
+          "opencode-comparison-and-best-practices"
+        ],
+        "domains": [
+          "ai",
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展到作者页术语高亮。",
+        "updated_by": "opencode",
+        "references": []
+      }
+    },
+    {
+      "id": "20dc906d-4a3b-4f47-82d9-c376884a93b8",
+      "term": "Claude Code",
+      "changes": {
+        "term": "Claude Code",
+        "aliases": [
+          "Anthropic Claude Code",
+          "ClaudeCode"
+        ],
+        "definition": "Anthropic 官方推出的跨平台 AI 编码平台，覆盖 CLI/IDE/桌面/移动端。",
+        "explanation": "Claude Code 是 Anthropic 推出的 AI 辅助编程环境，提供 Terminal CLI、VS Code 扩展、JetBrains 插件、Desktop App、Web 和 iOS 多种入口。它不仅能读写文件、执行 Shell 命令，还支持 MCP、Skills、Hooks、Sub-agents 等扩展机制，适合从日常编码到 CI/CD 自动化的完整工作流。例如，在终端输入 `claude` 即可启动交互会话，用自然语言指挥 AI 完成代码修改。",
+        "related_article_slugs": [
+          "2026-04-02-ai-briefing",
+          "2026-04-15-ai-briefing",
+          "ai-coding-tools-comparison",
+          "codex-configuration-guide",
+          "anthropic-model-family-notes",
+          "2026-06-17-ai-briefing",
+          "opencode-to-claude-code-getting-oriented",
+          "claude-code-getting-started"
+        ],
+        "domains": [
+          "ai",
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "ai-briefing",
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展到作者页术语高亮。",
+        "updated_by": "opencode",
+        "references": []
+      }
+    },
+    {
+      "id": "fce30664-634a-4440-82a8-8e0778135725",
+      "term": "Codex",
+      "changes": {
+        "term": "Codex",
+        "aliases": [
+          "OpenAI Codex"
+        ],
+        "definition": "OpenAI 推出的轻量级官方编码 Agent，深度优化 GPT 系列模型。",
+        "explanation": "Codex 是 OpenAI 推出的编码 Agent，提供 CLI、IDE 插件、桌面和 Web 端。核心设计是简洁和官方优化：三级沙箱（read-only/workspace-write/danger-full-access）、`model_reasoning_effort` 六级推理强度、`codex exec` 非交互模式。开源（Apache-2.0）但绑定 OpenAI 模型生态。适合 ChatGPT 订阅用户和需要严格沙盒控制的场景。",
+        "related_article_slugs": [
+          "ai-coding-tools-comparison",
+          "codex-configuration-guide",
+          "2026-06-04-ai-briefing",
+          "2026-06-08-ai-briefing"
+        ],
+        "domains": [
+          "ai",
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "ai-briefing",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展到作者页术语高亮。",
+        "updated_by": "opencode",
+        "references": []
+      }
+    },
+    {
+      "id": "b9d50081-957a-48e2-9026-679439b51cf7",
+      "term": "事件风暴",
+      "changes": {
+        "term": "事件风暴",
+        "aliases": [
+          "Event Storming",
+          "事件建模工作坊"
+        ],
+        "definition": "一种用领域事件梳理业务流程、发现规则和统一建模语言的协作式建模方法。",
+        "explanation": "事件风暴是一种高度协作的业务建模方法，通常通过便利贴或白板把业务过程中已经发生或即将发生的重要事件串起来，帮助团队快速理解流程、识别参与者、发现命令、聚合和边界。它的重点不是把流程图画得漂亮，而是让业务、产品、研发在同一张图上对关键业务变化形成共同理解。关键要点：1）以领域事件作为讨论主线，比直接从页面或接口出发更容易看清业务本质；2）强调跨角色共创，让业务方、产品和工程团队一起暴露分歧；3）适合用来发现流程断点、职责边界和复杂规则；4）既能服务领域建模，也能帮助拆分需求和识别实现范围。典型场景是一个订单或履约系统需求复杂、参与角色多，团队通过梳理“订单已创建、支付已完成、库存已锁定、发货已完成”等事件，逐步看清系统边界和关键规则。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "EventStorming 官网",
+            "url": "https://www.eventstorming.com/"
+          },
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Event_storming"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "新增作者页术语并补充详细解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "c59c45db-99b2-420c-a59f-11436ad37f87",
+      "term": "用户故事",
+      "changes": {
+        "term": "用户故事",
+        "aliases": [
+          "User Story",
+          "故事卡"
+        ],
+        "definition": "一种从用户视角描述需求、价值和目标的轻量需求表达方式。",
+        "explanation": "用户故事是敏捷需求管理里常见的表达方式，用来描述“谁”在什么场景下“想做什么”，以及“为什么这件事有价值”。它的重点不是把实现细节一次写死，而是用足够轻量的方式把需求对齐到用户目标和业务价值上，再由团队通过讨论补全验收条件和实现方案。关键要点：1）关注用户目标和业务价值，而不是直接跳到技术实现；2）通常包含角色、行为、收益三要素，常见表达是 As a... I want... So that...；3）故事应尽量拆到可以在一个迭代内完成并验证；4）用户故事本身不是完整规格，通常需要配合验收条件、示例和团队讨论。典型场景是产品待办列表里先写出“作为一个电商用户，我想按评分排序商品，以便更快找到高口碑商品”，团队再围绕排序规则、边界情况和验收标准展开实现讨论。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "Agile Alliance",
+            "url": "https://www.agilealliance.org/glossary/user-story/"
+          },
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/User_story"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展作者页场景并补充详细解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "d1f73650-cd15-4ea5-96c0-e9e6ec7e926b",
+      "term": "研发效能",
+      "changes": {
+        "term": "研发效能",
+        "aliases": [
+          "Engineering Productivity",
+          "研发提效"
+        ],
+        "definition": "衡量并持续提升研发团队从需求到交付全过程效率与质量的能力。",
+        "explanation": "研发效能关注的不只是“写代码快不快”，而是需求流转、开发、测试、发布、反馈整个链路能否更稳定、更高质量地交付结果。它通常会看交付周期、发布频率、缺陷率、返工率和等待时间等指标。一个典型例子是通过改进需求拆分、自动化测试和发布流水线，把一次功能上线从两周缩短到几天，同时降低回滚和线上故障概率。",
+        "related_article_slugs": [],
+        "references": [],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "合并原研发效能同步脚本到敏捷工程实践脚本。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "7cb5ecc7-4c66-4f6e-8de1-95eca1fb714a",
+      "term": "敏捷开发",
+      "changes": {
+        "term": "敏捷开发",
+        "aliases": [
+          "Agile Development",
+          "敏捷"
+        ],
+        "definition": "通过小步迭代和快速反馈持续交付价值的软件开发方法。",
+        "explanation": "敏捷开发是一类强调迭代、反馈、协作和响应变化的软件开发方法。它不是某一个固定流程，而是一组共同原则的统称，Scrum、XP、Kanban 等都属于这个范畴。相比先把长期计划一次定死、最后集中交付的做法，敏捷开发更强调把工作拆成较小增量，尽早发布、尽早验证、尽早调整。关键要点：1）用短周期迭代持续交付可工作的增量；2）通过反馈而不是假设来修正方向；3）鼓励跨职能协作、透明化进度和持续改进；4）接受需求变化是常态，而不是异常。典型场景是产品方向仍在演进、需要频繁验证用户价值的团队，例如每两周交付一个可用增量，根据用户反馈和业务数据决定下一轮优先级。",
+        "related_article_slugs": [
+          "summary-for-2015",
+          "a-different-journey-in-thoughtworks",
+          "summary-for-2016"
+        ],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Agile_software_development"
+          },
+          {
+            "label": "敏捷宣言",
+            "url": "https://agilemanifesto.org/"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展作者页术语并补参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "d2396d5d-1824-4a1e-8281-0bad5cc8eb8f",
+      "term": "Scrum",
+      "changes": {
+        "term": "Scrum",
+        "aliases": [
+          "敏捷框架",
+          "橄榄球式开发"
+        ],
+        "definition": "一种通过固定节奏迭代、透明检查和持续调整来交付价值的轻量敏捷框架。",
+        "explanation": "Scrum 是一个轻量级框架，用来帮助团队在复杂问题中通过短周期迭代持续交付价值。它不是详细规定每一步怎么做的方法论，而是提供少量明确角色、事件和工件，让团队在固定节奏内透明地计划、执行、检查和调整。关键要点：1）以 Sprint 作为固定时间盒，在一个短周期内完成一批最重要的工作；2）通过 Sprint Planning、Daily Scrum、Sprint Review、Sprint Retrospective 建立规律性的反馈节奏；3）强调 Product Backlog、Sprint Backlog 和 Increment 的透明性；4）依赖经验主义，通过透明、检查、适应持续改进。典型场景是需求复杂且会持续变化的产品团队，例如一个跨职能团队每两周完成一个 Increment，在评审中获取业务和用户反馈，再在回顾中改进协作方式。",
+        "related_article_slugs": [
+          "two-basic-element-of-scrum-team",
+          "my-agile-practice-in-thoughtworks"
+        ],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Scrum_(project_management)"
+          },
+          {
+            "label": "Scrum Guide",
+            "url": "https://scrumguides.org/scrum-guide.html"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "c3634f46-8ac2-4c33-b43c-1851b0530521",
+      "term": "XP",
+      "changes": {
+        "term": "XP",
+        "aliases": [
+          "Extreme Programming",
+          "极限编程"
+        ],
+        "definition": "一种强调工程实践、快速反馈和持续改进的软件开发方法。",
+        "explanation": "XP（Extreme Programming，极限编程）是一种以工程实践为核心的软件开发方法，目标是在需求变化频繁的情况下仍保持高质量和快速交付。它把很多本来就有效的工程做法推到更高频、更严格的程度，例如持续集成、测试先行、频繁发布和紧密协作。关键要点：1）强调测试驱动开发、重构、持续集成、简单设计等工程实践；2）通过小步提交和快速反馈降低修改成本；3）鼓励开发者之间高频协作，例如结对编程和集体代码所有权；4）把“变化”视为默认前提，而不是需要尽量避免的例外。典型场景是业务变化频繁、团队希望靠扎实工程实践保持交付速度和代码质量的项目，例如边开发边不断调整产品细节的业务系统。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Extreme_programming"
+          },
+          {
+            "label": "Martin Fowler: XP",
+            "url": "https://martinfowler.com/bliki/ExtremeProgramming.html"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "3538fb24-8b8a-46d4-b39b-f6be4f1c5b6d",
+      "term": "TDD",
+      "changes": {
+        "term": "TDD",
+        "aliases": [
+          "测试驱动开发",
+          "Test Driven Development"
+        ],
+        "definition": "先写失败测试、再写最少实现、最后重构的开发方式。",
+        "explanation": "TDD（测试驱动开发）是一种用测试来驱动设计和实现的开发方式，通常以“红-绿-重构”循环来执行：先写一个会失败的测试，再写最少代码让测试通过，最后在测试保护下整理代码结构。它的重点不只是“多写测试”，而是通过测试先行迫使开发者先思考接口、行为和边界条件。关键要点：1）每次只推进一个很小的行为；2）先写失败测试，再写实现；3）在测试持续通过的前提下重构代码；4）测试既验证功能，也帮助设计出更清晰、可测试的代码结构。典型场景是实现一段新业务逻辑时，先写一个失败测试定义预期结果，再逐步补实现，最后重构掉重复或混乱的代码。",
+        "related_article_slugs": [
+          "tdd-introduction"
+        ],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Test-driven_development"
+          },
+          {
+            "label": "Martin Fowler: Test Driven Development",
+            "url": "https://martinfowler.com/bliki/TestDrivenDevelopment.html"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "4145e445-0629-495a-88d1-3c03c39f2823",
+      "term": "重构",
+      "changes": {
+        "term": "重构",
+        "aliases": [
+          "Refactoring",
+          "代码重构"
+        ],
+        "definition": "在不改变外部可观察行为的前提下，持续改善代码内部结构的过程。",
+        "explanation": "重构是通过一系列小而安全的代码调整来改善内部结构，同时保持系统对外行为不变。它的目标通常不是增加新功能，而是降低复杂度、提升可读性、减少重复和改善可维护性。重构通常需要测试作为保护网，否则很容易把“改善结构”变成“顺手改坏逻辑”。关键要点：1）外部行为保持不变；2）以小步、可验证的方式持续进行；3）常用来处理重复代码、过长函数、职责混乱等问题；4）通常依赖自动化测试来降低风险。典型例子是把一个几百行的大函数拆成多个命名清晰的小函数，或者把散落在多处的重复逻辑提取成统一方法。",
+        "related_article_slugs": [
+          "agile-growth-assistant",
+          "beyond-training",
+          "avoid-ineffective-knowledge-management",
+          "three-practices-of-simple-design"
+        ],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Code_refactoring"
+          },
+          {
+            "label": "Martin Fowler: Refactoring",
+            "url": "https://martinfowler.com/books/refactoring.html"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "3c3431a1-7467-4086-abd6-e810e1213e6c",
+      "term": "简单设计",
+      "changes": {
+        "term": "简单设计",
+        "aliases": [
+          "Simple Design"
+        ],
+        "definition": "只为当前真实需求设计刚好够用、易读且易改的代码结构。",
+        "explanation": "简单设计强调软件设计应当服务于当前已知需求，而不是为未来可能出现的变化提前堆叠复杂抽象。它追求的是“足够、清晰、可修改”，而不是表面上的少写几行代码。简单设计往往和 TDD、重构、YAGNI 一起工作：先做最直接可用的实现，再在反馈中逐步整理结构。关键要点：1）避免为了假想需求过度设计；2）优先选择当下最清晰、最直接的实现；3）设计应便于理解和修改，而不是追求炫技式抽象；4）配合测试和重构，简单设计是一个持续调整的结果。典型例子是当系统当前只有两种业务分支时，先用清晰条件分支实现，而不是一开始就引入复杂的策略工厂体系。",
+        "related_article_slugs": [
+          "simple-design-principles-novel",
+          "my-simple-design-perspective",
+          "three-practices-of-simple-design"
+        ],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Extreme_programming"
+          },
+          {
+            "label": "Martin Fowler: YAGNI",
+            "url": "https://martinfowler.com/bliki/Yagni.html"
+          }
+        ],
+        "domains": [
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "8bac0841-43bf-4bf3-8a51-b38eaebafd89",
+      "term": "质量内建",
+      "changes": {
+        "term": "质量内建",
+        "aliases": [
+          "Built-in Quality"
+        ],
+        "definition": "把质量保障前移到需求、设计、开发和交付全过程中的实践思路。",
+        "explanation": "质量内建强调质量不是在上线前集中“补出来”的，而是在工作一开始就被设计进流程和产物中。它要求团队在需求澄清、设计、编码、测试和交付的每一步都尽量减少缺陷流入后续阶段。关键要点：1）质量责任由整个团队共同承担，而不是只落在测试阶段；2）通过测试、代码评审、持续集成和明确完成标准尽早暴露问题；3）越早发现问题，修复成本通常越低；4）质量内建依赖稳定的工程习惯，而不是临时救火。典型场景是团队在开发阶段就配套自动化测试和完成定义，避免把大量缺陷积压到联调或上线前才集中发现。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Software_quality"
+          },
+          {
+            "label": "The Scrum Guide",
+            "url": "https://scrumguides.org/scrum-guide.html"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "624fa4c1-f38f-4656-87a9-e5cd45b97098",
+      "term": "自动化分层测试策略",
+      "changes": {
+        "term": "自动化分层测试策略",
+        "aliases": [
+          "分层测试策略",
+          "测试金字塔"
+        ],
+        "definition": "按测试粒度、反馈速度和成本组织单元、集成、端到端等自动化测试的策略。",
+        "explanation": "自动化分层测试策略强调不同层级的测试承担不同责任，而不是把所有验证都堆到最慢、最贵的端到端测试上。底层测试通常数量多、反馈快，用于验证业务逻辑；中层测试验证模块或服务协作；高层测试覆盖关键用户路径。关键要点：1）测试层级越低，反馈通常越快、维护成本越低；2）不同层级关注的问题不同，不应互相替代；3）端到端测试重要但数量应受到控制；4）分层策略的目标是用更均衡的测试组合获得更可靠的质量反馈。典型场景是一个服务端系统用大量单测验证规则，用少量集成测试覆盖数据库或消息队列交互，再用少量端到端测试覆盖核心业务链路。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Software_testing"
+          },
+          {
+            "label": "Martin Fowler: Test Pyramid",
+            "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "cb35031e-7cfa-4c7f-a96f-85084118518c",
+      "term": "CI/CD",
+      "changes": {
+        "term": "CI/CD",
+        "aliases": [
+          "持续集成/持续交付",
+          "持续集成和持续部署"
+        ],
+        "definition": "通过自动化构建、测试和部署，让变更更频繁、更稳定交付的软件工程实践。",
+        "explanation": "CI/CD 由持续集成（CI）和持续交付/持续部署（CD）组成。CI 强调开发者频繁集成代码，并通过自动化构建与测试尽早发现问题；CD 则进一步把通过验证的变更稳定推向测试、预发甚至生产环境。关键要点：1）小批量、频繁集成有助于降低合并和发布风险；2）自动化构建、测试和部署是 CI/CD 的基础；3）流水线越稳定，团队越容易把发布变成日常动作；4）CI/CD 的目标不仅是“发得快”，也包括更可预测、更可回滚。典型场景是开发者提交代码后自动执行 lint、单测、构建、部署测试环境，验证通过后再进入发布流程。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Continuous_integration"
+          },
+          {
+            "label": "Martin Fowler: Continuous Integration",
+            "url": "https://martinfowler.com/articles/continuousIntegration.html"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "补充更完整解释与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "7dc86322-a32f-4a39-98dc-59dab5c9637c",
+      "term": "AI Agent",
+      "changes": {
+        "term": "AI Agent",
+        "aliases": [
+          "Agent",
+          "AI Agent应用",
+          "AI Agent 架构设计"
+        ],
+        "definition": "能够围绕目标自主规划、调用工具并执行多步骤任务的 AI 系统。",
+        "explanation": "AI Agent 是一种能围绕目标自主推进任务的 AI 系统。相比一次性问答，它会在执行过程中自己决定下一步是检索、调用工具、读写文件还是请求澄清，并依据环境反馈持续修正计划。关键要点：1）目标驱动，重点不是生成一段回答，而是完成一项可验证任务；2）依赖工具、记忆和外部环境反馈形成闭环；3）通常包含规划、执行、检查、纠错等多步循环；4）自主性越高，越需要清晰的权限边界、停机条件和审计机制。典型场景是代码修复 Agent：先读仓库和报错，再定位文件、修改代码、运行测试，并根据结果继续迭代直到通过。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "Anthropic: Building Effective Agents",
+            "url": "https://www.anthropic.com/engineering/building-effective-agents"
+          },
+          {
+            "label": "AGNTCY",
+            "url": "https://agntcy.org/"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "bca853ce-74ae-4853-8ab7-2eceec0ebca4",
+      "term": "Agent Skills",
+      "changes": {
+        "term": "Agent Skills",
+        "aliases": [
+          "Skills",
+          "agent skills",
+          "AI Agent Skills"
+        ],
+        "definition": "为 AI Agent 封装特定任务流程、工具和上下文的可复用能力包。",
+        "explanation": "Agent Skills 是把某类任务的知识、步骤、脚本和约束封装成可复用能力包的方式。它让 Agent 不必每次都从零理解流程，而是在需要时按技能说明执行，减少提示漂移和重复描述。关键要点：1）通常包含名称、触发说明和执行指令，可附带脚本、模板与参考文档；2）采用按需加载，只在相关任务中注入完整内容，降低上下文成本；3）适合沉淀团队规范、发布流程、评审清单等可重复工作；4）一个 Skill 可以跨多个兼容 Agent 平台复用。典型场景是“发布 skill”：统一要求 Agent 先检查版本、生成 changelog、再给出发布命令和回滚注意事项。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "Agent Skills Overview",
+            "url": "https://agentskills.io/"
+          },
+          {
+            "label": "Claude Code Skills",
+            "url": "https://docs.anthropic.com/en/docs/claude-code/skills"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "67b494a7-c13d-42e1-9186-0b9a90e33757",
+      "term": "AI 效率工程",
+      "changes": {
+        "term": "AI 效率工程",
+        "aliases": [
+          "AI提效",
+          "AI 研发提效",
+          "AI辅助研发"
+        ],
+        "definition": "把 AI 工具、流程和工程实践结合起来，系统性提升研发效率的工作方向。",
+        "explanation": "AI 效率工程是把模型、工具链、流程设计和质量治理结合起来，系统提升研发产出速度与稳定性的工程实践。它不是单点地“让 AI 帮你写代码”，而是围绕需求、设计、实现、测试、评审、发布与知识沉淀重构整条交付链路。关键要点：1）关注端到端效率，而非单个编码环节的局部提速；2）强调把提示、工具、上下文、质量门禁和反馈回路做成稳定系统；3）既看产出速度，也看返工率、缺陷率、可追溯性和团队采纳成本；4）需要持续评估哪些环节适合自动化，哪些环节保留人工判断。典型场景是把需求拆解、代码生成、测试补齐、Review 建议和交付报告串成一条工作流，用统一数据度量收益。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "DORA",
+            "url": "https://dora.dev/"
+          },
+          {
+            "label": "Anthropic: Building Effective Agents",
+            "url": "https://www.anthropic.com/engineering/building-effective-agents"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "2463157a-5ef3-4dd3-a0ad-3d7ba2e3637c",
+      "term": "SDD",
+      "changes": {
+        "term": "SDD",
+        "aliases": [
+          "Spec-Driven Development",
+          "规格驱动开发",
+          "SDD框架"
+        ],
+        "definition": "先明确规格、验收标准和设计约束，再驱动实现与验证的开发方式。",
+        "explanation": "SDD（Spec-Driven Development，规格驱动开发）是一种先把需求、约束、设计和验收标准结构化，再驱动实现和验证的开发方式。它强调先把“要做什么、为什么这样做、怎样算完成”说清楚，再交给人或 Agent 执行，以减少误解和返工。关键要点：1）规格通常覆盖需求边界、接口契约、关键设计决策和验收条件；2）规格既服务实现，也服务测试、评审和后续维护；3）相比直接动手编码，SDD 更重视前置澄清与可追踪性；4）在 AI 辅助研发中，清晰规格能显著降低模型跑偏和多轮返工。典型场景是先产出 story、设计说明和验收清单，再让编码 Agent 分阶段实现并逐项对照验证。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "Kiro",
+            "url": "https://kiro.dev/"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "4585a279-f1cf-4dda-a04a-596f2df34419",
+      "term": "Agentic Agile Delivery",
+      "changes": {
+        "term": "Agentic Agile Delivery",
+        "aliases": [
+          "aa-delivery",
+          "Agentic Agile Delivery process"
+        ],
+        "definition": "一种把敏捷交付流程拆解为可编排 Agent 工作单元的 AI 原生交付框架。",
+        "explanation": "Agentic Agile Delivery 是把敏捷交付流程拆成多个可追踪、可协作的 Agent 工作单元的交付方式。它保留敏捷强调的小步交付和反馈回路，同时把需求澄清、设计、实现、验证、验收和报告编排成结构化流程，方便人机协同推进。关键要点：1）按角色或阶段拆分任务，让不同 Agent 聚焦不同职责；2）每个工作单元都应有明确输入、输出和通过门禁；3）通过证据、结果和 gate 决策保证过程可回放、可审计；4）目标不是把人完全移除，而是把人放在关键判断和验收节点。典型场景是一个功能需求先后经过分析 Agent、设计 Agent、实现 Agent 和验证 Agent，各自产出结果，再由人工做最终 acceptance。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "aa-delivery",
+            "url": "https://github.com/ysjai/aa-delivery"
+          },
+          {
+            "label": "Anthropic: Building Effective Agents",
+            "url": "https://www.anthropic.com/engineering/building-effective-agents"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "b54b9c85-e618-4a13-b2fa-8ca038aa6680",
+      "term": "Prompt Engineering",
+      "changes": {
+        "term": "Prompt Engineering",
+        "aliases": [
+          "提示词工程"
+        ],
+        "definition": "围绕提示设计、上下文组织和输出约束来提升模型结果质量的方法。",
+        "explanation": "提示词工程是围绕指令、上下文、示例和输出约束来提升模型结果质量的实践。它的核心不是把 prompt 写得越长越好，而是把任务边界、成功标准和可用信息组织得更清晰，让模型更稳定地朝正确方向工作。关键要点：1）常见手段包括角色设定、步骤约束、few-shot 示例、结构化输出和上下文分段；2）好的提示词要兼顾明确性、可执行性和可维护性；3）提示词工程通常需要与工具调用、检索和评测一起使用，而不是孤立存在；4）随着模型与场景变化，提示词需要持续测试和迭代。典型场景是要求模型“只基于给定资料回答，并以 JSON 输出字段、风险和下一步建议”，以便结果可直接进入后续流程。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "OpenAI: Prompt Engineering",
+            "url": "https://platform.openai.com/docs/guides/prompt-engineering"
+          },
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Prompt_engineering"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "ade66e5b-de3b-4bcc-bba2-2cbee8d3a25a",
+      "term": "MCP",
+      "changes": {
+        "term": "MCP",
+        "aliases": [
+          "Model Context Protocol",
+          "模型上下文协议"
+        ],
+        "definition": "让 AI Agent 标准化连接外部工具、数据源和服务的开放协议。",
+        "explanation": "MCP（Model Context Protocol）是一种让 AI 应用或 Agent 以统一方式连接外部工具、数据源和工作流的开放协议。它的作用类似 AI 世界里的通用接口层，减少每个客户端分别适配数据库、文件系统、浏览器或内部平台的成本。关键要点：1）通过标准化协议暴露工具和上下文，客户端可按统一方式发现和调用能力；2）既能连接本地资源，也能连接远程服务；3）提升不同 Agent 与工具生态之间的互操作性；4）协议统一后，安全边界、权限控制和审计也更容易集中治理。典型场景是把数据库查询、文档检索和浏览器操作封装成 MCP server，让多个 AI 客户端都能直接复用。",
+        "related_article_slugs": [
+          "ai-coding-tools-comparison",
+          "codex-configuration-guide",
+          "deepseek-tui-first-look",
+          "claude-code-extension-model-overview",
+          "claude-code-advanced-automation-with-mcp-hooks-and-agents",
+          "claude-code-token-saving-tips",
+          "opencode-efficiency-config-handbook",
+          "opencode-advanced-tips-and-practices"
+        ],
+        "references": [
+          {
+            "label": "MCP Introduction",
+            "url": "https://modelcontextprotocol.io/introduction"
+          },
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Model_Context_Protocol"
+          }
+        ],
+        "domains": [
+          "ai",
+          "article",
+          "author"
+        ],
+        "scenes": [
+          "article",
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "8e55d72a-f802-4042-b5bb-bdf2574c23ef",
+      "term": "RAG",
+      "changes": {
+        "term": "RAG",
+        "aliases": [
+          "Retrieval-Augmented Generation",
+          "检索增强生成"
+        ],
+        "definition": "一种把外部知识检索与大模型生成结合起来的 AI 应用模式。",
+        "explanation": "RAG（Retrieval-Augmented Generation，检索增强生成）是一种先检索外部知识，再结合模型生成回答的应用模式。它用于弥补模型训练数据过时或缺少私有知识的问题，让回答尽量建立在指定资料之上。关键要点：1）典型流程是切分文档、建立索引、按问题检索相关片段，再把片段与问题一起送入模型；2）优势是更容易接入最新或私有知识，并减少纯参数记忆带来的幻觉；3）效果高度依赖检索质量、切分策略和上下文拼装方式；4）RAG 能降低错误率，但不能保证绝对正确，仍需要来源甄别和结果校验。典型场景是企业知识问答：先检索制度文档或项目资料，再让模型基于这些材料生成可追溯答案。",
+        "related_article_slugs": [],
+        "references": [
+          {
+            "label": "维基百科",
+            "url": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation"
+          },
+          {
+            "label": "RAG Paper",
+            "url": "https://arxiv.org/abs/2005.11401"
+          }
+        ],
+        "domains": [
+          "author"
+        ],
+        "scenes": [
+          "author"
+        ],
+        "status": "enabled",
+        "notes": "扩展 AI/Agent 相关术语详解与参考链接。",
+        "updated_by": "opencode"
+      }
+    }
+  ]
+}
