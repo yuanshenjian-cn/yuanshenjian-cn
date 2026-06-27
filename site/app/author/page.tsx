@@ -62,7 +62,7 @@ export default function ResumePage() {
           actions={[{ label: "问 AI", question: "解释这段话的含义" }]}
         />
       ) : null}
-      <TermHighlighter scene="author" domain="author" containerSelector=".author-term-content" />
+      <TermHighlighter containerSelector=".author-term-content" />
     </main>
   );
 }

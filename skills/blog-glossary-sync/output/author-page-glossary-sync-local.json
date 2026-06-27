@@ -191,6 +191,159 @@
       }
     },
     {
+      "id": "8c2fa58e-a715-4b52-bf35-172a85352343",
+      "term": "Code Review",
+      "changes": {
+        "term": "Code Review",
+        "aliases": ["代码审查", "代码评审"],
+        "definition": "开发人员相互检查代码以促进质量与知识共享。",
+        "explanation": "Code Review是敏捷团队中的常规实践，通过多人检查代码来发现坏味道、不合理设计和潜在错误，同时促进知识传递和代码集体所有。关键要点：1) 应问题驱动，避免麦霸跑题；2) 需要有始有终，将共识和行动项落实。典型场景：团队固定时间聚集Review当天提交，检查命名、职责划分和测试有效性。例如，袁帅团队每天下班前Review代码，通过讨论让新人理解Clean Code和简单设计原则。",
+        "related_article_slugs": ["tcr-is-not-best-practice", "three-practices-of-simple-design", "unit-test-from-other-sight"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "47f31abf-aada-46b9-83a4-e132412e56fc",
+      "term": "持续集成",
+      "changes": {
+        "term": "持续集成",
+        "aliases": ["CI", "Continuous Integration"],
+        "definition": "开发人员频繁地将代码集成到主干，并通过自动化构建与测试快速反馈质量。",
+        "explanation": "持续集成是一种软件开发实践，要求开发人员频繁地将代码变更合并到共享主干，每次合并都触发自动构建和测试。关键要点包括：1）提交越频繁，集成冲突和修复成本越低；2）自动化测试是快速发现回归问题的基础；3）「CI红了」意味着集成失败，团队应优先修复。典型场景是多人协作的代码库。例如，一个团队每天多次向Git仓库提交代码，每次提交后CI服务器自动运行单元测试和代码规范检查，若失败则立即通知提交者。",
+        "related_article_slugs": ["my-agile-practice-in-thoughtworks", "avoid-ineffective-knowledge-management", "summary-for-2015", "summary-for-2016"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "60e6b92c-65f7-41e6-bcd4-2b824fccea2f",
+      "term": "验收条件",
+      "changes": {
+        "term": "验收条件",
+        "aliases": ["AC", "Acceptance Criteria", "Story 验收标准"],
+        "definition": "用户故事必须满足的具体条件，用于判断故事是否完成。",
+        "explanation": "AC 把模糊的需求转化为可验证的标准，通常以 Given-When-Then 或清单形式呈现。核心要点：1）AC 应在开发前由 BA、QA、DEV 共同确认；2）必须具体、可测试，避免\"体验良好\"等主观描述；3）AC 通过是故事进入\"完成\"状态的必要依据。典型场景：故事\"用户登录\"的 AC 包括\"用户名密码正确则进入首页\"\"连续 5 次失败则锁定 30 分钟\"。例如，QA 依据 AC 编写验收测试并验证。",
+        "related_article_slugs": ["my-agile-practice-in-thoughtworks", "beyond-training"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "bcf7635e-b539-4a6d-8c9e-2d86be544e90",
+      "term": "Definition of Done",
+      "changes": {
+        "term": "Definition of Done",
+        "aliases": ["DoD", "完成的定义", "验收标准"],
+        "definition": "团队共同约定的、故事或增量达到\"完成\"状态必须满足的标准。",
+        "explanation": "DoD 让团队对\"完成\"有一致理解，避免\"开发写完就叫完成\"。核心要点：1）DoD 应具体、可验证；2）通常包含代码、测试、文档、Code Review、Showcase 等环节；3）团队共同制定并持续改进。典型场景：团队约定\"合并到主干、CI 通过、QA 验收、AC 全部通过\"才算 Done。例如，一个 Story 虽然功能已实现，但未补充测试，仍不算 Done。",
+        "related_article_slugs": ["beyond-training", "my-agile-practice-in-thoughtworks"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "1b213c11-c535-417b-8bff-25d07ef845d6",
+      "term": "代码整洁",
+      "changes": {
+        "term": "代码整洁",
+        "aliases": ["Clean Code", "整洁代码"],
+        "definition": "易于阅读、理解和修改，职责清晰且测试充分的代码风格。",
+        "explanation": "Clean Code 强调命名有意义、函数短小、注释解释\"为什么\"而非\"做什么\"。核心要点：1）代码是写给人读的，只是恰好能运行；2）通过重构和 Code Review 持续保持；3）遵循 SOLID 等设计原则。典型场景：团队制定代码规范并通过 CI 和 Review 强制执行。例如，函数名 getUserById 比 getData 更清晰，if 嵌套不超过 3 层。",
+        "related_article_slugs": ["agile-growth-assistant", "beyond-training", "avoid-ineffective-knowledge-management"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "7f4fcbef-ad9d-40a2-bc47-0ff353c5e682",
+      "term": "敏捷测试四象限",
+      "changes": {
+        "term": "敏捷测试四象限",
+        "aliases": ["Agile Testing Quadrants"],
+        "definition": "从技术和业务、团队和产品维度划分测试类型。",
+        "explanation": "敏捷测试四象限由Brian Marick提出，Lisa Crispin和Janet Gregory扩展，从面向技术/业务和支撑团队/评价产品两个维度将测试分为Q1-Q4。关键要点：1) Q1面向技术支撑团队，帮助快速定位问题；2) Q2面向业务支撑团队，帮助快速发现问题；3) Q3/Q4偏向评价产品，如探索性测试、性能测试。典型场景：制定测试策略时，根据目标选择合适类型。例如，单元测试和组件测试属于Q1，API功能验收测试属于Q2。",
+        "related_article_slugs": ["tdd-introduction"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "e2ec8492-f299-464e-b9aa-63bd3cbf0dc3",
+      "term": "持续交付",
+      "changes": {
+        "term": "持续交付",
+        "aliases": ["Continuous Delivery", "CD"],
+        "definition": "软件随时保持可发布状态，通过自动化流水线将变更快速、安全地交付给用户。",
+        "explanation": "持续交付是在持续集成基础上，将代码变更自动部署到类生产环境并确保随时可以安全发布。关键要点包括：1）部署流水线将构建、测试、发布串联为自动化流程；2）每次通过流水线的版本都应是可发布候选；3）区分持续交付（可手动发布）与持续部署（自动发布）。典型场景是需要快速响应市场的SaaS产品。例如，一个在线教育平台完成新功能后，自动经过测试环境、预发布环境验证，产品经理只需一键即可将版本推向生产环境。",
+        "related_article_slugs": ["agile-growth-assistant", "summary-for-2015"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "fcfe0566-38f2-4e21-907e-e3f41809de72",
+      "term": "结对编程",
+      "changes": {
+        "term": "结对编程",
+        "aliases": ["Pair", "Pair Programming", "Pairing"],
+        "definition": "两名开发人员共用一台机器共同完成编码，实时评审与知识共享。",
+        "explanation": "结对编程中一人敲键盘（Driver），一人观察思考（Navigator），定期轮换。核心要点：1）优先选择技能相当的搭档，避免\"键霸\"；2）新人加入时由经验丰富的老人 Pair，以老带新；3）通过持续思维碰撞提升代码质量、降低缺陷。典型场景：复杂业务逻辑开发或新人 onboarding 时采用 Pair。例如，DEV A 写测试，DEV B 写实现，两人随时讨论边界条件并重构。",
+        "related_article_slugs": ["my-agile-practice-in-thoughtworks", "student-centralized-pdt", "summary-for-2015", "a-different-journey-in-thoughtworks", "tcr-is-not-best-practice", "unit-test-from-other-sight"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
+      "id": "223d5a38-648c-4fb9-87d4-1fa20cf1c09c",
+      "term": "故事开卡",
+      "changes": {
+        "term": "故事开卡",
+        "aliases": ["Story Kick Off", "Kick-off", "Story 启动"],
+        "definition": "开发开始前，BA、QA、DEV 三方对齐故事需求和验收条件的活动。",
+        "explanation": "Story Kick Off 确保开发人员对业务需求理解一致，避免\"猜需求\"导致的返工。核心要点：1）DEV 先自行阅读故事，再向 BA/QA 讲解功能和 AC；2）当场澄清疑惑，不带着假设开发；3）开卡后可拆分任务列表并按优先级执行。典型场景：结对开发前，两位 DEV 与 BA、QA 围站 5 分钟确认需求。例如，BA 解释\"满减券\"规则后，DEV 复述并确认使用门槛和叠加逻辑。",
+        "related_article_slugs": ["my-agile-practice-in-thoughtworks", "student-centralized-pdt"],
+        "references": [],
+        "domains": ["article", "author"],
+        "scenes": ["article", "author"],
+        "status": "enabled",
+        "notes": "扩展作者页场景。",
+        "updated_by": "opencode"
+      }
+    },
+    {
       "id": "7cb5ecc7-4c66-4f6e-8de1-95eca1fb714a",
       "term": "敏捷开发",
       "changes": {

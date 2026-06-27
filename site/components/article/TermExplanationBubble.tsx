@@ -206,7 +206,7 @@ export function TermExplanationBubble({
         <button
           type="button"
           onClick={handleAskRelatedTerms}
-          className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+          className="-mt-1 rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
         >
           相关词汇
         </button>

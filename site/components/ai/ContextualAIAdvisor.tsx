@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { useTurnstileToken } from "@/hooks/ai/use-turnstile-token";
+import { fetchGlossary, type GlossaryItem } from "@/lib/ai/glossary";
 import { type AdvisorSessionMessage, useAdvisorSession } from "@/hooks/ai/use-advisor-session";
 import { aiContextualAdvisorStream } from "@/lib/ai-client";
 import { onAskAdvisor } from "@/lib/ai/advisor-events";
@@ -61,24 +62,50 @@ function hasBookTitleMarks(children: ReactNode): boolean {
   return false;
 }
 
-const advisorMarkdownComponents = {
-  p: ({ children }: { children?: ReactNode }) => <p className="my-2 break-words text-sm leading-6 first:mt-0 last:mb-0">{children}</p>,
-  ul: ({ children }: { children?: ReactNode }) => <ul className="my-2 list-disc space-y-1.5 pl-5 text-sm first:mt-0 last:mb-0">{children}</ul>,
-  ol: ({ children }: { children?: ReactNode }) => <ol className="my-2 list-decimal space-y-1.5 pl-5 text-sm first:mt-0 last:mb-0">{children}</ol>,
-  li: ({ children }: { children?: ReactNode }) => <li className="break-words pl-1 text-sm leading-6">{children}</li>,
-  strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
-  em: ({ children }: { children?: ReactNode }) => <em className="italic">{children}</em>,
-  a: ({ children, href }: { children?: ReactNode; href?: string }) => {
-    const isArticleLink = typeof href === "string" && href.startsWith("/articles/");
-    return (
-      <a href={href} target="_blank" rel="noreferrer" className={`break-all text-primary hover:underline ${isArticleLink ? "italic" : ""}`}>
-        {isArticleLink && !hasBookTitleMarks(children) ? <>《{children}》</> : children}
-      </a>
-    );
-  },
-  code: ({ children }: { children?: ReactNode }) => <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.8rem] text-foreground">{children}</code>,
-  pre: ({ children }: { children?: ReactNode }) => <pre className="my-3 overflow-x-auto rounded-xl bg-muted p-3 text-[0.8rem] text-foreground">{children}</pre>,
-} as const;
+function extractText(children: ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+  if (Array.isArray(children)) {
+    return children.map(extractText).join("");
+  }
+  return "";
+}
+
+function normalizeGlossaryLookupValue(value: string): string {
+  return value.replace(/[《》`*]/g, "").replace(/[\s\-_]+/g, "").trim().toLowerCase();
+}
+
+function slugifyTermLikeValue(value: string): string {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[《》`*]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function extractArticleSlug(href: string): string {
+  if (!href.startsWith("/articles/")) {
+    return "";
+  }
+  return decodeURIComponent(href.slice("/articles/".length)).split("?", 1)[0].split("#", 1)[0].replace(/\/+$/, "");
+}
+
+function isTermLikeArticleLink(href: string | undefined, glossaryItem: GlossaryItem | undefined): boolean {
+  if (!href || !glossaryItem) {
+    return false;
+  }
+  const articleSlug = extractArticleSlug(href);
+  if (!articleSlug || articleSlug.includes("/")) {
+    return false;
+  }
+  const candidates = [glossaryItem.term, ...glossaryItem.aliases]
+    .map(slugifyTermLikeValue)
+    .filter(Boolean);
+  return candidates.includes(articleSlug);
+}
 
 export function ContextualAIAdvisor({
   context,
@@ -97,6 +124,7 @@ export function ContextualAIAdvisor({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [glossaryItems, setGlossaryItems] = useState<GlossaryItem[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const submittedInitialPromptKeyRef = useRef("");
   const submitMessageRef = useRef<(value: string) => void>(() => undefined);
@@ -126,11 +154,58 @@ export function ContextualAIAdvisor({
   const hasMessages = messages.length > 0;
   const thinkingText = "容我思考片刻...";
 
+  const glossaryLookup = useMemo(() => {
+    const lookup = new Map<string, GlossaryItem>();
+    for (const item of glossaryItems) {
+      const candidates = [item.term, ...item.aliases];
+      for (const candidate of candidates) {
+        const normalized = normalizeGlossaryLookupValue(candidate);
+        if (normalized && !lookup.has(normalized)) {
+          lookup.set(normalized, item);
+        }
+      }
+    }
+    return lookup;
+  }, [glossaryItems]);
+
+  const advisorMarkdownComponents = useMemo(() => {
+    return {
+      p: ({ children }: { children?: ReactNode }) => <p className="my-2 break-words text-sm leading-6 first:mt-0 last:mb-0">{children}</p>,
+      ul: ({ children }: { children?: ReactNode }) => <ul className="my-2 list-disc space-y-1.5 pl-5 text-sm first:mt-0 last:mb-0">{children}</ul>,
+      ol: ({ children }: { children?: ReactNode }) => <ol className="my-2 list-decimal space-y-1.5 pl-5 text-sm first:mt-0 last:mb-0">{children}</ol>,
+      li: ({ children }: { children?: ReactNode }) => <li className="break-words pl-1 text-sm leading-6">{children}</li>,
+      strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
+      em: ({ children }: { children?: ReactNode }) => <em className="italic">{children}</em>,
+      a: ({ children, href }: { children?: ReactNode; href?: string }) => {
+        const label = extractText(children).trim();
+        const glossaryPathTerm = typeof href === "string" && href.startsWith("/glossary/") ? decodeURIComponent(href.slice("/glossary/".length)) : "";
+        const glossaryItem = glossaryLookup.get(normalizeGlossaryLookupValue(label)) ?? glossaryLookup.get(normalizeGlossaryLookupValue(glossaryPathTerm));
+        const shouldOpenGlossaryBubble =
+          (typeof href === "string" && href.startsWith("/glossary/")) || isTermLikeArticleLink(href, glossaryItem);
+        if (shouldOpenGlossaryBubble) {
+          return <span className="font-medium text-foreground">{label || glossaryPathTerm || glossaryItem?.term}</span>;
+        }
+        const isArticleLink = typeof href === "string" && href.startsWith("/articles/");
+        return (
+          <a href={href} target="_blank" rel="noreferrer" className={`break-all text-primary hover:underline ${isArticleLink ? "italic" : ""}`}>
+            {isArticleLink && !hasBookTitleMarks(children) ? <>《{children}》</> : children}
+          </a>
+        );
+      },
+      code: ({ children }: { children?: ReactNode }) => <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.8rem] text-foreground">{children}</code>,
+      pre: ({ children }: { children?: ReactNode }) => <pre className="my-3 overflow-x-auto rounded-xl bg-muted p-3 text-[0.8rem] text-foreground">{children}</pre>,
+    } as const;
+  }, [glossaryLookup]);
+
   useEffect(() => {
     const restoredMessages = loadMessages();
     setMessages(restoredMessages);
     messageIdRef.current = restoredMessages.length;
   }, [loadMessages]);
+
+  useEffect(() => {
+    void fetchGlossary().then((items) => setGlossaryItems(items));
+  }, []);
 
   useEffect(() => {
     if (isStreaming || messages.length === 0) {

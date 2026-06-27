@@ -8,7 +8,6 @@ import { ShareButtons } from "@/components/ShareButtons";
 import { TermHighlighter } from "@/components/article/TermHighlighter";
 import { TextSelectionAIActions } from "@/components/article/TextSelectionAIActions";
 import { config } from "@/lib/config";
-import { resolveAdvisorDomainByPath } from "@/lib/advisor-context";
 import type { Post } from "@/types/blog";
 import type { ColumnContext } from "@/lib/columns";
 
@@ -28,7 +27,6 @@ interface ArticleContentProps {
 
 export async function ArticleContent({ post, prev, next, slug, showHeader = true, url, shareTitle, shareDescription, columnContext, footerAssistant, turnstileSiteKey = "" }: ArticleContentProps) {
   const shareUrl = url || `/articles/${slug}`;
-  const domain = resolveAdvisorDomainByPath(post.relativePath);
 
   return (
     <>
@@ -38,7 +36,7 @@ export async function ArticleContent({ post, prev, next, slug, showHeader = true
         <div id="intro" />
         <Suspense fallback={<div className="text-muted-foreground">加载中...</div>}>
           <MDXRemoteContent source={post.content} />
-          <TermHighlighter scene="article" domain={domain} />
+          <TermHighlighter />
         </Suspense>
       </div>
 
