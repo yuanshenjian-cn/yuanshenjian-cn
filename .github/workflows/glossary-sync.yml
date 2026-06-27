@@ -1,0 +1,87 @@
+name: Glossary Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "skills/blog-glossary-sync/output/*-prod.json"
+      - "skills/blog-glossary-sync/scripts/render_sync_script.py"
+      - ".github/workflows/glossary-sync.yml"
+
+concurrency:
+  group: glossary-sync-production
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check glossary sync prerequisites
+        id: prereq
+        env:
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+        run: |
+          if [ -z "$ADMIN_API_KEY" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Python
+        if: ${{ steps.prereq.outputs.ready == 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Detect changed glossary payloads
+        if: ${{ steps.prereq.outputs.ready == 'true' }}
+        id: changed
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          before="$GITHUB_EVENT_BEFORE"
+          if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
+            mapfile -t files < <(git diff --name-only "$before" "$GITHUB_SHA" -- 'skills/blog-glossary-sync/output/*-prod.json')
+          else
+            mapfile -t files < <(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" -- 'skills/blog-glossary-sync/output/*-prod.json')
+          fi
+
+          if [ ${#files[@]} -eq 0 ]; then
+            mapfile -t files < <(git ls-files 'skills/blog-glossary-sync/output/*-prod.json')
+          fi
+
+          printf '%s\n' "${files[@]}" > /tmp/glossary-sync-files.txt
+          {
+            echo "count=${#files[@]}"
+            echo 'files<<EOF'
+            printf '%s\n' "${files[@]}"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Sync production glossary payloads
+        if: ${{ steps.prereq.outputs.ready == 'true' && steps.changed.outputs.count != '0' }}
+        env:
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          CORE_SERVICE_URL: "https://api.yuanshenjian.cn"
+        run: |
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then
+              continue
+            fi
+
+            script_path="${file%.json}.generated.sh"
+            python3 skills/blog-glossary-sync/scripts/render_sync_script.py "$file" --out "$script_path"
+            bash "$script_path"
+            rm -f "$script_path"
+          done < /tmp/glossary-sync-files.txt
+
+      - name: Skip glossary sync
+        if: ${{ steps.prereq.outputs.ready != 'true' }}
+        run: |
+          echo "ADMIN_API_KEY is missing; skip glossary sync gracefully."
