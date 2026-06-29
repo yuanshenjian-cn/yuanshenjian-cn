@@ -1,6 +1,19 @@
 {
-  "generated": "2026-06-27T00:00:00.000Z",
+  "generated": "2026-06-29T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-29",
+      "title": "AI 简报 · 2026-06-29",
+      "excerpt": "Google 因算力短缺限制 Meta 使用 Gemini，奥地利游说欧盟境内托管 Anthropic——算力与模型访问权正同时成为 AI 竞争的瓶颈。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "Anthropic"
+      ],
+      "date": "2026-06-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-29"
+    },
     {
       "slug": "2026-06-27",
       "title": "AI 简报 · 2026-06-27",
@@ -964,6 +977,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-29",
+      "title": "AI 简报 · 2026-06-29",
+      "excerpt": "Google 因算力短缺限制 Meta 使用 Gemini，奥地利游说欧盟境内托管 Anthropic——算力与模型访问权正同时成为 AI 竞争的瓶颈。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "Anthropic"
+      ],
+      "date": "2026-06-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-29"
+    },
     {
       "slug": "2026-06-27",
       "title": "AI 简报 · 2026-06-27",
