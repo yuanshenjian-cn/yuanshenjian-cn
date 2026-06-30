@@ -1,6 +1,19 @@
 {
-  "generated": "2026-06-30T00:00:00.000Z",
+  "generated": "2026-07-01T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-01",
+      "title": "AI 简报 · 2026-07-01",
+      "excerpt": "Anthropic 同日发布 Sonnet 5 与 Claude Science，Meta 推出 Brain2Qwerty v2 实时脑机解码，Google 用 Nano Banana 2 Lite 拼图像生成速度与成本。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "Google"
+      ],
+      "date": "2026-07-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-01"
+    },
     {
       "slug": "2026-06-30",
       "title": "AI 简报 · 2026-06-30",
@@ -989,6 +1002,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-01",
+      "title": "AI 简报 · 2026-07-01",
+      "excerpt": "Anthropic 同日发布 Sonnet 5 与 Claude Science，Meta 推出 Brain2Qwerty v2 实时脑机解码，Google 用 Nano Banana 2 Lite 拼图像生成速度与成本。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "Google"
+      ],
+      "date": "2026-07-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-01"
+    },
     {
       "slug": "2026-06-30",
       "title": "AI 简报 · 2026-06-30",
