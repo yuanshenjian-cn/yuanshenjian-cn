@@ -1,6 +1,18 @@
 {
-  "generated": "2026-06-29T00:00:00.000Z",
+  "generated": "2026-06-30T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-06-30",
+      "title": "AI 简报 · 2026-06-30",
+      "excerpt": "Google 把 Gemini 个性化图像生成免费开放给美国用户，Anthropic 与加州政府达成半价合作，Fable 5 传出 7 月初解封时间表。",
+      "tags": [
+        "AI",
+        "Google",
+        "Anthropic"
+      ],
+      "date": "2026-06-30T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-30"
+    },
     {
       "slug": "2026-06-29",
       "title": "AI 简报 · 2026-06-29",
@@ -977,6 +989,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-06-30",
+      "title": "AI 简报 · 2026-06-30",
+      "excerpt": "Google 把 Gemini 个性化图像生成免费开放给美国用户，Anthropic 与加州政府达成半价合作，Fable 5 传出 7 月初解封时间表。",
+      "tags": [
+        "AI",
+        "Google",
+        "Anthropic"
+      ],
+      "date": "2026-06-30T00:00:00.000Z",
+      "url": "/ai/briefings/2026-06-30"
+    },
     {
       "slug": "2026-06-29",
       "title": "AI 简报 · 2026-06-29",
