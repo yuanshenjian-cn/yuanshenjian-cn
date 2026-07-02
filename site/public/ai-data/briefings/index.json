@@ -1,6 +1,19 @@
 {
-  "generated": "2026-07-01T00:00:00.000Z",
+  "generated": "2026-07-02T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-02",
+      "title": "AI 简报 · 2026-07-02",
+      "excerpt": "Anthropic Fable 5 带着新安全过滤器回归，Google 把 Gemini Spark 推上 Mac 桌面，Meta 要把多余 AI 算力变成云生意。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-07-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-02"
+    },
     {
       "slug": "2026-07-01",
       "title": "AI 简报 · 2026-07-01",
@@ -1002,6 +1015,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-02",
+      "title": "AI 简报 · 2026-07-02",
+      "excerpt": "Anthropic Fable 5 带着新安全过滤器回归，Google 把 Gemini Spark 推上 Mac 桌面，Meta 要把多余 AI 算力变成云生意。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Google",
+        "Meta"
+      ],
+      "date": "2026-07-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-02"
+    },
     {
       "slug": "2026-07-01",
       "title": "AI 简报 · 2026-07-01",
