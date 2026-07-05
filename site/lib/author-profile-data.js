@@ -147,9 +147,10 @@ const authorProfileData = {
         name: "创业项目",
         role: "AI 效率 && Agent 应用 工程师",
         achievements: [
-          { metric: "核心系统", text: "设计与交付" },
-          { metric: "数据资产服务", text: "设计和落地" },
+          { metric: "核心 Agent应用", text: "设计与交付" },
+          { metric: "数据资产服务", text: "设计和实现" },
           { metric: "aa-delivery", text: "设计和实现" },
+          { metric: "LLM 评估 Skill", text: "设计和实现" },
           { metric: "Bug Fixer Skill Framework", text: "设计与实现" },
         ],
         description:
@@ -161,6 +162,9 @@ const authorProfileData = {
           { text: "基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量" },
         ],
         techs: [
+          { name: "Claude Runtime" },
+          { name: "Opencode Serve" },
+          { name: "Codex CLI" },
           { name: "Fast API" },
           { name: "Python3" },
           { name: "Postgres SQL" },
