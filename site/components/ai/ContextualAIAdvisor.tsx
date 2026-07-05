@@ -387,13 +387,13 @@ export function ContextualAIAdvisor({
           type="button"
           onClick={() => setIsOpen(true)}
           aria-expanded="false"
-          className="fixed bottom-24 right-4 z-40 inline-flex items-center gap-3 rounded-2xl border border-border/70 bg-background/95 px-4 py-3 text-left shadow-xl backdrop-blur transition hover:border-primary/40 hover:bg-background md:bottom-28 md:right-6"
+          className="fixed bottom-20 right-3 z-40 inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/95 px-3 py-2 text-left shadow-lg backdrop-blur transition hover:border-primary/40 hover:bg-background md:bottom-24 md:right-4"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <MessageCircle className="h-5 w-5" />
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <MessageCircle className="h-4 w-4" />
           </span>
           <span className="space-y-0.5">
-            <span className="block text-sm font-medium text-foreground">问 AI</span>
+            <span className="block text-xs font-medium text-foreground">问 AI</span>
           </span>
         </button>
       ) : null}
