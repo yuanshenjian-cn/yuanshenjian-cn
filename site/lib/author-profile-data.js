@@ -38,7 +38,7 @@ const authorProfileData = {
       },
       {
         level: "proficient",
-        icon: "架",
+        icon: "设",
         title: "架构设计",
         description: "熟练掌握高可用整洁架构设计，以及DDD实践、微服务设计、AI Agent 架构设计",
       },
@@ -58,8 +58,8 @@ const authorProfileData = {
       },
       {
         level: "proficient",
-        icon: "J",
-        title: "Java技术栈",
+        icon: "服",
+        title: "服务端",
         description:
           "熟练Java、Spring Boot、Spring Cloud、MySQL、Redis、Kafka、RabbitMQ等服务器端技术",
       },
@@ -72,7 +72,7 @@ const authorProfileData = {
       },
       {
         level: "familiar",
-        icon: "P",
+        icon: "Py",
         title: "Python",
         description: "熟悉 Python、FastAPI、Pydantic-ai、LangChain",
       },
