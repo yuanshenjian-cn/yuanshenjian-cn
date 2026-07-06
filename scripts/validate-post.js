@@ -640,7 +640,7 @@ function removeSections(body, headings) {
 
   for (const heading of headings) {
     const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const sectionMatch = result.match(new RegExp(`^##\\s+${escapedHeading}\\s*$[\\s\\S]*?(?=^##\\s+|$)`, "m"));
+    const sectionMatch = result.match(new RegExp(`(?:^|\\n)##\\s+${escapedHeading}\\s*\\n[\\s\\S]*?(?=(?:^|\\n)##\\s+|$)`));
     if (sectionMatch) {
       result = result.replace(sectionMatch[0], "").trim();
     }
