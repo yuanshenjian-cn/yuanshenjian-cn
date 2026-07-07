@@ -1,6 +1,18 @@
 {
-  "generated": "2026-07-03T00:00:00.000Z",
+  "generated": "2026-07-07T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-07",
+      "title": "AI 简报 · 2026-07-07",
+      "excerpt": "Anthropic 发现 Claude 独立推理空间，阿里巴巴全面禁用 Anthropic AI，xAI 并入 SpaceX 重塑为 SpaceXAI。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI"
+      ],
+      "date": "2026-07-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-07"
+    },
     {
       "slug": "2026-07-03",
       "title": "AI 简报 · 2026-07-03",
@@ -1026,6 +1038,18 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-07",
+      "title": "AI 简报 · 2026-07-07",
+      "excerpt": "Anthropic 发现 Claude 独立推理空间，阿里巴巴全面禁用 Anthropic AI，xAI 并入 SpaceX 重塑为 SpaceXAI。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI"
+      ],
+      "date": "2026-07-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-07"
+    },
     {
       "slug": "2026-07-03",
       "title": "AI 简报 · 2026-07-03",
