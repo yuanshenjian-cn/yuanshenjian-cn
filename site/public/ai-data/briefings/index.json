@@ -1,6 +1,19 @@
 {
-  "generated": "2026-07-07T00:00:00.000Z",
+  "generated": "2026-07-08T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-08",
+      "title": "AI 简报 · 2026-07-08",
+      "excerpt": "Anthropic 把 Claude Cowork 推上手机与网页，Meta 用 Muse Image 把 Instagram 用户拉进 AI 照片，DeepSeek 被曝自研推理芯片，北京酝酿限制海外访问中国顶级 AI 模型。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "DeepSeek"
+      ],
+      "date": "2026-07-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-08"
+    },
     {
       "slug": "2026-07-07",
       "title": "AI 简报 · 2026-07-07",
@@ -1038,6 +1051,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-08",
+      "title": "AI 简报 · 2026-07-08",
+      "excerpt": "Anthropic 把 Claude Cowork 推上手机与网页，Meta 用 Muse Image 把 Instagram 用户拉进 AI 照片，DeepSeek 被曝自研推理芯片，北京酝酿限制海外访问中国顶级 AI 模型。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "DeepSeek"
+      ],
+      "date": "2026-07-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-08"
+    },
     {
       "slug": "2026-07-07",
       "title": "AI 简报 · 2026-07-07",
