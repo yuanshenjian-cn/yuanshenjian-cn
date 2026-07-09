@@ -1,6 +1,20 @@
 {
-  "generated": "2026-07-09T00:00:00.000Z",
+  "generated": "2026-07-10T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-10",
+      "title": "AI 简报 · 2026-07-10",
+      "excerpt": "OpenAI GPT-5.6 正式上线并推出 ChatGPT Work，Meta 用 Muse Spark 1.1 杀入编码战场同时自研芯片 Iris 九月投产，Anthropic 给 Claude 加了 Reflection 使用反思工具。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Meta",
+        "Anthropic",
+        "SpaceXAI"
+      ],
+      "date": "2026-07-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-10"
+    },
     {
       "slug": "2026-07-09",
       "title": "AI 简报 · 2026-07-09",
@@ -1064,6 +1078,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-10",
+      "title": "AI 简报 · 2026-07-10",
+      "excerpt": "OpenAI GPT-5.6 正式上线并推出 ChatGPT Work，Meta 用 Muse Spark 1.1 杀入编码战场同时自研芯片 Iris 九月投产，Anthropic 给 Claude 加了 Reflection 使用反思工具。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Meta",
+        "Anthropic",
+        "SpaceXAI"
+      ],
+      "date": "2026-07-10T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-10"
+    },
     {
       "slug": "2026-07-09",
       "title": "AI 简报 · 2026-07-09",
