@@ -8,6 +8,9 @@
 - 官方发布页：`https://openai.com/index/`
 - 官方价格页：`https://openai.com/api/pricing/`
 - 官方开发文档变更：`https://developers.openai.com/api/docs/changelog`
+- GPT-5.6 GA 发布页：`https://openai.com/index/gpt-5-6/`
+- GPT-5.6 Preview 发布页：`https://openai.com/index/previewing-gpt-5-6-sol/`
+- GPT-5.6 System Card：`https://deploymentsafety.openai.com/gpt-5-6`
 
 ## Anthropic
 

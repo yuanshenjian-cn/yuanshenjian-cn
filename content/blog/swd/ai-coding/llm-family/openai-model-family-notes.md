@@ -1,6 +1,6 @@
 ---
-title: "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.5 的主线演进"
-date: '2026-06-28'
+title: "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
+date: '2026-07-10'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 OpenAI 模型档案。首版覆盖从 GPT-4 Turbo 到 GPT-5.5 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。
+  这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-5.6 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。
 ---
 
 > 如果你只想快速判断 OpenAI 这一家最近在往哪里卷，先看结论：它的主线已经从“更强聊天模型”转成“更像专业执行者的工作模型”，最新几代几乎都围着编码、工具调用、电脑操作和长上下文在打。
@@ -34,7 +34,7 @@ brief: >-
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
-| GPT-5.6 Sol / Terra / Luna | 2026-06-26 | Sol $5.00 / Terra $2.50 / Luna $1.00 / 1M | Sol $0.50 / Terra $0.25 / Luna $0.10 / 1M | Sol $30.00 / Terra $15.00 / Luna $6.00 / 1M | 新命名系统（Sol/Terra/Luna 三档），limited preview，安全栈最强化 |
+| GPT-5.6 Sol / Terra / Luna | GA 2026-07-09（preview 2026-06-26） | Sol $5.00 / Terra $2.50 / Luna $1.00 / 1M | Sol $0.50 / Terra $0.25 / Luna $0.10 / 1M | Sol $30.00 / Terra $15.00 / Luna $6.00 / 1M | 已转正式 GA，全面刷新编码/知识工作/网安/科学 SOTA；新增 Sol Pro 档与 ultra 多智能体模式 |
 | GPT-5.5 | 2026-04-23 | $5.00 / 1M | $0.50 / 1M | $30.00 / 1M | OpenAI 当前最强工作模型，重点在长程执行、编码和知识工作 |
 | GPT-5.4 | 2026-03-05 | $2.50 / 1M | $0.25 / 1M | $15.00 / 1M | 1M context + 原生 computer use，开始明显转向专业执行 |
 | GPT-5.3 Instant | 2026-03-03 | 官方未公布 | 官方未公布 | 官方未公布 | 日常对话和搜索优化，幻觉率显著降低 |
@@ -45,9 +45,31 @@ brief: >-
 | GPT-4o | 2024-05-13 | $5.00 / 1M | 官方未公布 | $15.00 / 1M | 真正把原生多模态和实时语音推到主线位置 |
 | GPT-4 Turbo | 2023-11-06 | $10.00 / 1M | 官方未公布 | $30.00 / 1M | 128K context、JSON mode、并行 function calling 的起点 |
 
-<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-06-28。GPT-5.6 系列于 2026-06-26 以 limited preview 形式发布，价格来自官方发布页；截至 2026-06-28，官方 API Pricing 页尚未列出 GPT-5.6，仍以 GPT-5.5 为旗舰档。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-07-10。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；三档 per-1M 价格来自 GA 发布页，与 preview 页一致。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
 
-## GPT-5.6 系列：OpenAI 换了一套命名系统，并把安全栈做到最厚
+## GPT-5.6 系列：从 limited preview 走到正式 GA，主打“每美元性能”
+
+**2026 年 7 月 9 日更新（GA）：** GPT-5.6 系列在 2026 年 6 月 26 日以 limited preview 首发后，于 2026 年 7 月 9 日正式转为 GA，在 ChatGPT、Codex 和 OpenAI API 全面开放，全球范围在约 24 小时内逐步放量。三档 per-1M 价格保持不变（Sol $5 / $30、Terra $2.50 / $15、Luna $1 / $6，缓存读 90% 折扣、缓存写 1.25x、30 分钟最低缓存寿命）。
+
+GA 把 preview 时只给了片段的能力摊成了完整官方基准，并把叙事明确定在“performance per dollar（每美元性能）”上——用更少 token、更短时间、更低成本拿到同级甚至更强的结果。几个官方重点：
+
+- 编码：Sol（max）在 Artificial Analysis Coding Agent Index 上以 80 分刷新 SOTA，Terminal-Bench 2.1 达 88.8%（Sol Ultra 91.9%），DeepSWE 同步领先。
+- 知识工作与电脑操作：BrowseComp Sol 90.4%（Sol Ultra 92.2%）、OSWorld 2.0 62.6%，均为新 SOTA。
+- 网络安全：ExploitBench 73.5%（GPT-5.5 为 47.9%），ExploitGym 峰值近乎翻倍。
+- 长程工作流：在跨 55 个专业领域的 Agents’ Last Exam 上刷新最高分。
+
+GA 还多出两个 preview 阶段没单列的档位 / 模式：
+
+- **GPT-5.6 Sol Pro**：面向 ChatGPT Pro / Enterprise 的最高质量档，用于复杂任务；官方未在 API 定价中单列其 per-token 价格。
+- **ultra 模式**：默认并行协调 4 个智能体（API 中以 multi-agent beta 提供），用更高 token 换更强结果与更短耗时；与已有的 `max` 一起，构成“默认高效、按需拉满”的两档打法。
+
+安全上，GA 版本自称“迄今最稳健的安全栈”：Sol 的网安类拦截量约为旧模型的 10 倍，配套 OpenAI Daybreak 的 Trusted Access for Cyber 向已验证的防御工作放开更多能力，并投入约 70 万 A100e GPU 小时做自动化红队。官方口径也明确：Sol 更擅长“找漏洞、修漏洞”而非可靠地端到端发起攻击，生物与网安两个高风险域均未越过 Critical 阈值。
+
+我的判断：GPT-5.6 GA 不只是“更强一代”，而是 OpenAI 第一次把能力分层（Sol/Terra/Luna）、多智能体（ultra）和强安全栈一起绑成主叙事，并把“更省”和“更强”放到了同等位置。
+
+---
+
+**以下保留 limited preview 首发（2026-06-26）时的原始记录：**
 
 GPT-5.6 系列在 2026 年 6 月 26 日以 limited preview 形式发布。
 
@@ -63,7 +85,7 @@ GPT-5.6 系列在 2026 年 6 月 26 日以 limited preview 形式发布。
 
 但这代真正的重心是安全。OpenAI 把它称作“迄今最稳健的安全栈”：模型层拒绝、实时滥用分类器、账户级审查、差异化访问分层叠加，并用超过 70 万 A100 等效 GPU 小时做自动红队。
 
-也正因如此，GPT-5.6 目前是 limited preview：先开放给一小群可信合作伙伴，OpenAI 与美国政府预览了发布计划，应其要求分阶段放出。官方明确表示不希望这种政府介入流程成为长期默认。
+也正因如此，GPT-5.6 首发时是 limited preview：先开放给一小群可信合作伙伴，OpenAI 与美国政府预览了发布计划，应其要求分阶段放出。官方明确表示不希望这种政府介入流程成为长期默认。
 
 如果你要判断这代的定位，我的理解是：它不只是“更强一代”，而是 OpenAI 第一次把能力分层（Sol/Terra/Luna）和强安全栈绑在一起做成主叙事。
 
@@ -205,10 +227,11 @@ OpenAI 从 GPT-4 Turbo 到 GPT-5.5 的完整主线，我会概括成一句话：
 - GPT-5.3 Instant：日常体验的精细打磨
 - GPT-5.4：把 Agent 和专业工作模型真正做成主模型
 - GPT-5.5：把长程执行和真实工作进一步拉开差距
-- GPT-5.6 系列：新命名系统（Sol/Terra/Luna）+ 最强安全栈，limited preview
+- GPT-5.6 系列：新命名系统（Sol/Terra/Luna）+ 多智能体 ultra + 最强安全栈，已于 2026-07-09 正式 GA
 
 如果你的问题是”现在 OpenAI 这一家里该优先看谁”，我的答案很简单：
 
+- 要最强能力、长任务、复杂攻坚（且能接受 GA 初期更严的安全栈）：看 GPT-5.6 Sol / Sol Pro，需要极限拉满再上 ultra
 - 预算宽松、任务长、要求高：看 GPT-5.5
 - 要主力生产模型，兼顾价格：看 GPT-5.4
 - 中等负载、成本敏感：看 GPT-5.2
@@ -220,6 +243,8 @@ GPT-4o 仍然值得保留在历史档案里，但它更像转型节点，而不�
 ## 官方来源
 
 - OpenAI API Pricing: `https://openai.com/api/pricing/`
+- GPT-5.6 (GA): `https://openai.com/index/gpt-5-6/`
+- GPT-5.6 System Card: `https://deploymentsafety.openai.com/gpt-5-6`
 - Previewing GPT-5.6 Sol: `https://openai.com/index/previewing-gpt-5-6-sol/`
 - Introducing GPT-5.5: `https://openai.com/index/introducing-gpt-5-5/`
 - Introducing GPT-5.4: `https://openai.com/index/introducing-gpt-5-4/`
