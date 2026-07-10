@@ -1,4 +1,4 @@
-name: Monitor · Origin Cert
+name: Monitor · Origin SSL Certificate
 
 on:
   schedule:
@@ -57,7 +57,7 @@ jobs:
 
           ─── 步骤 6：验证 ────────────────────────────────────────
           curl -sI https://<主域名>        # 期望 200 OK
-          手动重跑本 workflow（Actions → Monitor · Origin Cert → Run workflow）
+          手动重跑本 workflow（Actions → Monitor · Origin SSL Certificate → Run workflow）
 
           RUNBOOK
           }

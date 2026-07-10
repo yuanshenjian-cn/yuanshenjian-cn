@@ -397,11 +397,11 @@ prepend_sys_path = .
 
 当运行链路统一切到 `uv --directory core-service`、Render `rootDir=core-service` 或 CI `working-directory: core-service` 后，`alembic.ini` 里的相对路径也必须一起收口，不能继续带 `core-service/` 前缀。
 
-## 2026-06-03 未配置 `CORE_SERVICE_DATABASE_URL` 时，`sync-knowledge-base` 不应把整次 push 标红
+## 2026-06-03 未配置 `CORE_SERVICE_DATABASE_URL` 时，`sync-content` 不应把整次 push 标红
 
 ### 现象
 
-GitHub Actions 的 `Sync · Knowledge Base` workflow 在 `Sync public knowledge base content` 步骤失败，报错类似：
+GitHub Actions 的 `Sync · Content` workflow 在 `Sync public content` 步骤失败，报错类似：
 
 ```text
 sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string
@@ -409,7 +409,7 @@ sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL stri
 
 ### 根因
 
-`sync-knowledge-base.yml` 会把：
+`sync-content.yml` 会把：
 
 - `CORE_SERVICE_DATABASE_URL`
 - `EMBEDDING_BASE_URL`
@@ -426,7 +426,7 @@ create_async_engine(settings.database_url, ...)
 
 ### 修复
 
-给 `sync-knowledge-base.yml` 增加前置检查：
+给 `sync-content.yml` 增加前置检查：
 
 1. 任一必要 secret / variable 缺失时，输出 `ready=false`
 2. 后续数据库 URL 校验和内容同步步骤只在 `ready=true` 时运行
@@ -434,9 +434,9 @@ create_async_engine(settings.database_url, ...)
 
 ### 结论
 
-`Sync · Knowledge Base` 在当前项目里应视为“按需启用”的生产能力，而不是主站/后端基础部署的阻断项。没配 RAG 所需 secrets 时，workflow 应跳过而不是失败。
+`Sync · Content` 在当前项目里应视为“按需启用”的生产能力，而不是主站/后端基础部署的阻断项。没配 RAG 所需 secrets 时，workflow 应跳过而不是失败。
 
-## 2026-06-03 `sync-knowledge-base` 的 `CORE_SERVICE_DATABASE_URL` 必须使用 asyncpg 风格 URL
+## 2026-06-03 `sync-content` 的 `CORE_SERVICE_DATABASE_URL` 必须使用 asyncpg 风格 URL
 
 ### 现象
 
@@ -448,7 +448,7 @@ sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL stri
 
 ### 根因
 
-`sync-knowledge-base` 会导入 `core-service/app/shared/infra/database.py`，当前项目已统一使用 async SQLAlchemy：
+`sync-content` 会导入 `core-service/app/shared/infra/database.py`，当前项目已统一使用 async SQLAlchemy：
 
 ```python
 create_async_engine(settings.database_url, ...)
@@ -493,7 +493,7 @@ abc%23123
 
 ### 防回归
 
-`sync-knowledge-base.yml` 已新增前置校验步骤，会明确阻断以下问题：
+`sync-content.yml` 已新增前置校验步骤，会明确阻断以下问题：
 
 - Secret 为空
 - 驱动不是 `postgresql+asyncpg://`

@@ -1,4 +1,4 @@
-name: Sync · Knowledge Base
+name: Sync · Content
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
       - "site/package-lock.json"
 
 concurrency:
-  group: knowledge-base-sync-production
+  group: content-sync-production
   cancel-in-progress: false
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
         run: uv sync --frozen
         working-directory: core-service
 
-      - name: Check knowledge base sync prerequisites
+      - name: Check content sync prerequisites
         id: prereq
         env:
           DATABASE_URL: ${{ secrets.CORE_SERVICE_DATABASE_URL }}
@@ -84,7 +84,7 @@ jobs:
           PY
         working-directory: core-service
 
-      - name: Sync public knowledge base content
+      - name: Sync public content
         if: ${{ steps.prereq.outputs.ready == 'true' }}
         env:
           APP_ENV: production
@@ -92,7 +92,7 @@ jobs:
         run: uv run --frozen --no-sync python -m app.contexts.knowledge_base.interface.published_content_sync_cli --repo-root .. --commit-sha "$GITHUB_SHA"
         working-directory: core-service
 
-      - name: Skip knowledge base sync
+      - name: Skip content sync
         if: ${{ steps.prereq.outputs.ready != 'true' }}
         run: |
-          echo "CORE_SERVICE_DATABASE_URL is missing; skip knowledge base sync gracefully."
+          echo "CORE_SERVICE_DATABASE_URL is missing; skip content sync gracefully."
