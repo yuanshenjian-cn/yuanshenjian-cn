@@ -1,6 +1,19 @@
 {
-  "generated": "2026-06-28T00:00:00.000Z",
+  "generated": "2026-07-10T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "openai-model-family-notes",
+      "title": "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.6 的主线演进",
+      "excerpt": "这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-5.6 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "OpenAI",
+        "GPT",
+        "模型评测"
+      ],
+      "date": "2026-07-10T00:00:00.000Z"
+    },
     {
       "slug": "anthropic-model-family-notes",
       "title": "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent",
@@ -63,19 +76,6 @@
         "小米MiMo",
         "模型评测",
         "开源权重"
-      ],
-      "date": "2026-06-28T00:00:00.000Z"
-    },
-    {
-      "slug": "openai-model-family-notes",
-      "title": "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.5 的主线演进",
-      "excerpt": "这是一份按代际持续维护的 OpenAI 模型档案。首版覆盖从 GPT-4 Turbo 到 GPT-5.5 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "OpenAI",
-        "GPT",
-        "模型评测"
       ],
       "date": "2026-06-28T00:00:00.000Z"
     },
