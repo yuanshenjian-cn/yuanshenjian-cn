@@ -16,11 +16,12 @@ jobs:
           WARN_DAYS: '10'
         run: |
           set -euo pipefail
+          umask 077
 
           print_runbook() {
-            cat <<'RUNBOOK'
+            cat <<RUNBOOK
           ================================================================
-          GitHub Pages 证书续期处理步骤（Cloudflare + GitHub Pages）
+          源站证书续期处理步骤（Cloudflare + GitHub Pages）
           ================================================================
 
           背景：源站证书快过期或已过期。GitHub Pages 使用 Let's Encrypt
@@ -28,22 +29,21 @@ jobs:
           处理思路：临时切灰云 → 触发 GitHub Pages 重新签发 → 切回橙云。
 
           ─── 步骤 1：Cloudflare DNS 切灰云 ─────────────────────────
-          进入 Cloudflare Dashboard → yuanshenjian.cn → DNS → Records
-          把以下记录的 Proxy status 从「Proxied（橙云）」改为「DNS only（灰云）」：
-            - yuanshenjian.cn 的 4 条 A 记录（185.199.108/109/110/111.153）
-            - yuanshenjian.cn 的 4 条 AAAA 记录（2606:50c0:8000-8003::153）
-          注意：admin / api / www 等子域名不动。
+          进入 Cloudflare Dashboard → 站点 → DNS → Records
+          把主域名的 4 条 A 和 4 条 AAAA 记录（均指向 GitHub Pages 官方 IP 段）
+          的 Proxy status 从「Proxied（橙云）」改为「DNS only（灰云）」。
+          子域名（admin / api / www 等）保持不动。
 
           ─── 步骤 2：等 DNS 传播（5-10 分钟）─────────────────────
-          本地验证已生效（应返回 4 个 185.199.x.153，不能有 Cloudflare 的 104.x/172.x）：
-            dig +short yuanshenjian.cn @1.1.1.1
-            dig +short yuanshenjian.cn @8.8.8.8
+          本地验证已生效（应返回 GitHub Pages 官方 IP，非 Cloudflare IP）：
+            dig +short <主域名> @1.1.1.1
+            dig +short <主域名> @8.8.8.8
 
           ─── 步骤 3：GitHub Pages 重新签发证书 ───────────────────
-          进入 https://github.com/yuanshenjian-cn/yuanshenjian-cn/settings/pages
+          进入 本仓库 → Settings → Pages
           在「Custom domain」处：
             1. 点 Remove
-            2. 重新输入 yuanshenjian.cn → Save
+            2. 重新输入主域名 → Save
             3. 等待 "DNS check successful" 出现
             4. 等待 "TLS certificate is being provisioned"（最长 15 分钟）
             5. 出现 "Your site is published at ..." 且 Enforce HTTPS 可勾选 → 勾上
@@ -56,7 +56,7 @@ jobs:
           应为「Full」（非 Full strict，非 Automatic），否则下次续期抖动仍会 526。
 
           ─── 步骤 6：验证 ────────────────────────────────────────
-          curl -sI https://yuanshenjian.cn        # 200 OK
+          curl -sI https://<主域名>        # 期望 200 OK
           手动重跑本 workflow（Actions → Origin Cert Check → Run workflow）
 
           RUNBOOK
