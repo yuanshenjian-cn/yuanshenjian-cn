@@ -220,7 +220,7 @@ test-core-service: _ensure_core_venv
 
 # 同步 content/ 公开内容到 core-service 知识库。
 # 需要在仓库根目录 .env 或 core-service/.env.local 中配置 DATABASE_URL。
-sync-knowledge-base: _ensure_core_venv
+sync-content: _ensure_core_venv
     @bash -c 'set -a; [ -f .env ] && source .env; set +a; uv --directory core-service run --no-sync python -m app.contexts.knowledge_base.interface.published_content_sync_cli --repo-root "$(pwd)"'
 
 # 查看当前 Alembic 迁移版本。
