@@ -156,9 +156,9 @@ const authorProfileData = {
         description:
           "我们做的是创业项目，主要聚焦在核心系统的交付，以及 AI 赋能提效。作为资深AI 应用 & 效率工程师，负责核心系统的方案设计和交付，以及 AI 工作流设计和开发。",
         highlights: [
-          { text: "深度参用产品需求的梳理，引入用户旅程和用户故事和看板管理提升协作效率" },
-          { text: "负责架构设计，采用DDD分层架构，设计和交付资产服务和 LLM网关" },
+          { text: "深度参用产品需求分析和梳理，负责架构设计，采用DDD分层架构，设计和交付核心系统和资产服务" },
           { text: "设计AI Agent Skill 可扩展的架构，集成Claude CLI Runtime 能力" },
+          { text: "设计和研发AI workflow skill和框架来提升开发和修复Bug的效率" },
           { text: "基于OpenCode深度定制 Agentic Agile Delivery process，提升 AI 的产出质量" },
         ],
         techs: [
