@@ -510,9 +510,9 @@ Vercel Production Env：
 | `VITE_CORE_SERVICE_URL` | `https://api.yuanshenjian.cn` |
 | `VITE_TURNSTILE_SITE_KEY` | Turnstile Site Key |
 
-## RAG Sync
+## Knowledge Base Sync
 
-RAG Sync workflow 当前已经切到新的 DDD CLI：
+`Sync · Knowledge Base` workflow 当前已经切到新的 DDD CLI：
 
 ```bash
 python -m app.contexts.knowledge_base.interface.published_content_sync_cli --repo-root .. --commit-sha "$GITHUB_SHA"
@@ -529,22 +529,22 @@ GitHub Secrets / Variables：
 
 这些值当前都按“可选”处理：
 
-- 如果你还没启用生产 RAG sync，不配置它们也没关系
-- `rag-sync.yml` 现在会在缺少任一必要 secret / variable 时自动跳过，不再把整次 push 标红
-- 一旦你准备启用生产 RAG sync，再把这 4 个值补齐即可
+- 如果你还没启用生产知识库同步，不配置它们也没关系
+- `sync-knowledge-base.yml` 现在会在缺少任一必要 secret / variable 时自动跳过，不再把整次 push 标红
+- 一旦你准备启用生产知识库同步，再把这 4 个值补齐即可
 
 为什么 `CORE_SERVICE_DATABASE_URL` 要配在 GitHub Secret：
 
-- `rag-sync.yml` 不是调用 Render 上的后端接口，而是直接在 GitHub Actions runner 里执行 `published_content_sync_cli`
+- `sync-knowledge-base.yml` 不是调用 Render 上的后端接口，而是直接在 GitHub Actions runner 里执行 `published_content_sync_cli`
 - 这条 CLI 会直接连接生产数据库写入 RAG 文档和 chunk，因此谁执行，谁就必须拿到数据库凭证
 - Render 环境变量只对 Render 上运行的后端服务可见，GitHub Actions 读不到 Render 的 `DATABASE_URL`
 - 因为连接串包含数据库账号密码，所以必须放 GitHub Secret，而不是 GitHub Variable
 
 当前项目建议：
 
-1. 如果还没启用生产 RAG sync，不需要先配置这些 GitHub secrets
+1. 如果还没启用生产知识库同步，不需要先配置这些 GitHub secrets
 2. 先把主站 GitHub Pages 和 Render 后端部署跑通
-3. 后续决定启用生产 RAG sync 时，再补齐 `CORE_SERVICE_DATABASE_URL` 和 embedding 相关配置
+3. 后续决定启用生产知识库同步时，再补齐 `CORE_SERVICE_DATABASE_URL` 和 embedding 相关配置
 
 其中 `CORE_SERVICE_DATABASE_URL` 必须与 `core-service` 运行时使用的 async SQLAlchemy 驱动保持一致，推荐格式：
 
@@ -554,20 +554,20 @@ postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?ssl=require
 
 注意：
 
-- 不要写成 `postgresql+psycopg://...` 或 `postgresql://...`，当前 `core-service` 与 `rag-sync` 都使用 async SQLAlchemy
+- 不要写成 `postgresql+psycopg://...` 或 `postgresql://...`，当前 `core-service` 与 `sync-knowledge-base` 都使用 async SQLAlchemy
 - 不要写成 `?sslmode=require`，asyncpg 会把它原样传给 `asyncpg.connect()` 并报 `unexpected keyword argument 'sslmode'`
 - 如果密码里包含 `#`、`@`、`%`、`:` 等特殊字符，必须先做 URL encode，例如 `# -> %23`
 
-当前 RAG sync 服务会先写入文档与 chunk；embedding 生成能力后续可以继续增强。
+当前知识库同步服务会先写入文档与 chunk；embedding 生成能力后续可以继续增强。
 
 ## GitHub Actions 当前状态
 
 | Workflow | 状态 |
 |---|---|
-| `.github/workflows/site-ci.yml` | GitHub Pages 主站构建与部署，已适配 `site/` |
-| `.github/workflows/core-service-ci.yml` | 后端 Ruff、mypy、pytest、migration smoke、Render deploy hook |
-| `.github/workflows/admin-console-ci.yml` | 管理后台 typecheck/build，main 分支可触发 Vercel deploy hook |
-| `.github/workflows/rag-sync.yml` | 已切到新的 `knowledge_base` CLI |
+| `.github/workflows/deploy-site.yml` | GitHub Pages 主站构建与部署，已适配 `site/` |
+| `.github/workflows/deploy-core-service.yml` | 后端 Ruff、mypy、pytest、migration smoke、Render deploy hook |
+| `.github/workflows/deploy-admin-console.yml` | 管理后台 typecheck/build，main 分支可触发 Vercel deploy hook |
+| `.github/workflows/sync-knowledge-base.yml` | 已切到新的 `knowledge_base` CLI |
 
 ## 上线顺序
 

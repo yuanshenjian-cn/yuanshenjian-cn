@@ -1,4 +1,4 @@
-name: Glossary Sync
+name: Sync · Glossary
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
     paths:
       - "skills/blog-glossary-sync/output/*-prod.json"
       - "skills/blog-glossary-sync/scripts/render_sync_script.py"
-      - ".github/workflows/glossary-sync.yml"
+      - ".github/workflows/sync-glossary.yml"
 
 concurrency:
   group: glossary-sync-production

@@ -1,15 +1,15 @@
-name: Admin Console CI
+name: Deploy · Admin Console
 
 on:
   pull_request:
     paths:
       - "admin-console/**"
-      - ".github/workflows/admin-console-ci.yml"
+      - ".github/workflows/deploy-admin-console.yml"
   push:
     branches: [main]
     paths:
       - "admin-console/**"
-      - ".github/workflows/admin-console-ci.yml"
+      - ".github/workflows/deploy-admin-console.yml"
   workflow_dispatch:
 
 jobs:

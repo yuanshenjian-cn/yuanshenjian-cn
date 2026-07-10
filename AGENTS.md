@@ -94,7 +94,7 @@ cp .env.example .env.local
 
 - **平台**：GitHub Pages + Cloudflare CDN
 - **域名**：yuanshenjian.cn
-- **工作流**：`.github/workflows/site-ci.yml`
+- **工作流**：`.github/workflows/deploy-site.yml`
 - **触发**：推送到 `main` 分支
 - **Node.js**：20.x
 

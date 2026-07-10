@@ -1,15 +1,15 @@
-name: Core Service CI
+name: Deploy · Core Service
 
 on:
   pull_request:
     paths:
       - "core-service/**"
-      - ".github/workflows/core-service-ci.yml"
+      - ".github/workflows/deploy-core-service.yml"
   push:
     branches: [main]
     paths:
       - "core-service/**"
-      - ".github/workflows/core-service-ci.yml"
+      - ".github/workflows/deploy-core-service.yml"
   workflow_dispatch:
 
 jobs:
