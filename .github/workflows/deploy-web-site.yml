@@ -150,7 +150,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           before="$GITHUB_EVENT_BEFORE"
-          last_successful_sha="$(gh api "/repos/$GITHUB_REPOSITORY/actions/workflows/deploy-site.yml/runs?branch=$GITHUB_REF_NAME&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""')"
+          last_successful_sha="$(gh api "/repos/$GITHUB_REPOSITORY/actions/workflows/deploy-web-site.yml/runs?branch=$GITHUB_REF_NAME&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""')"
 
           if [ -n "$last_successful_sha" ] && git cat-file -e "$last_successful_sha^{commit}" 2>/dev/null; then
             before="$last_successful_sha"

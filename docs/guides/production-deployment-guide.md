@@ -564,7 +564,7 @@ postgresql+asyncpg://USER:PASSWORD@HOST:PORT/postgres?ssl=require
 
 | Workflow | 状态 |
 |---|---|
-| `.github/workflows/deploy-site.yml` | GitHub Pages 主站构建与部署，已适配 `site/` |
+| `.github/workflows/deploy-web-site.yml` | GitHub Pages 主站构建与部署，已适配 `site/` |
 | `.github/workflows/deploy-core-service.yml` | 后端 Ruff、mypy、pytest、migration smoke、Render deploy hook |
 | `.github/workflows/deploy-admin-console.yml` | 管理后台 typecheck/build，main 分支可触发 Vercel deploy hook |
 | `.github/workflows/sync-content.yml` | 已切到新的 `knowledge_base` CLI |
