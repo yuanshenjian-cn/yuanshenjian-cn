@@ -13,9 +13,54 @@ jobs:
         env:
           DOMAIN: yuanshenjian.cn
           ORIGIN_HOST: yuanshenjian-cn.github.io
-          WARN_DAYS: '20'
+          WARN_DAYS: '10'
         run: |
           set -euo pipefail
+
+          print_runbook() {
+            cat <<'RUNBOOK'
+          ================================================================
+          GitHub Pages 证书续期处理步骤（Cloudflare + GitHub Pages）
+          ================================================================
+
+          背景：源站证书快过期或已过期。GitHub Pages 使用 Let's Encrypt
+          通过 HTTP-01 challenge 自动续期，被 Cloudflare 橙云代理拦截时会失败。
+          处理思路：临时切灰云 → 触发 GitHub Pages 重新签发 → 切回橙云。
+
+          ─── 步骤 1：Cloudflare DNS 切灰云 ─────────────────────────
+          进入 Cloudflare Dashboard → yuanshenjian.cn → DNS → Records
+          把以下记录的 Proxy status 从「Proxied（橙云）」改为「DNS only（灰云）」：
+            - yuanshenjian.cn 的 4 条 A 记录（185.199.108/109/110/111.153）
+            - yuanshenjian.cn 的 4 条 AAAA 记录（2606:50c0:8000-8003::153）
+          注意：admin / api / www 等子域名不动。
+
+          ─── 步骤 2：等 DNS 传播（5-10 分钟）─────────────────────
+          本地验证已生效（应返回 4 个 185.199.x.153，不能有 Cloudflare 的 104.x/172.x）：
+            dig +short yuanshenjian.cn @1.1.1.1
+            dig +short yuanshenjian.cn @8.8.8.8
+
+          ─── 步骤 3：GitHub Pages 重新签发证书 ───────────────────
+          进入 https://github.com/yuanshenjian-cn/yuanshenjian-cn/settings/pages
+          在「Custom domain」处：
+            1. 点 Remove
+            2. 重新输入 yuanshenjian.cn → Save
+            3. 等待 "DNS check successful" 出现
+            4. 等待 "TLS certificate is being provisioned"（最长 15 分钟）
+            5. 出现 "Your site is published at ..." 且 Enforce HTTPS 可勾选 → 勾上
+
+          ─── 步骤 4：Cloudflare 切回橙云 ─────────────────────────
+          回到 Cloudflare DNS，把步骤 1 中改的 8 条记录改回「Proxied（橙云）」。
+
+          ─── 步骤 5：确认 Cloudflare SSL/TLS 模式 ────────────────
+          Cloudflare → SSL/TLS → Overview → Encryption mode
+          应为「Full」（非 Full strict，非 Automatic），否则下次续期抖动仍会 526。
+
+          ─── 步骤 6：验证 ────────────────────────────────────────
+          curl -sI https://yuanshenjian.cn        # 200 OK
+          手动重跑本 workflow（Actions → Origin Cert Check → Run workflow）
+
+          RUNBOOK
+          }
 
           cert_pem=$(echo | openssl s_client -servername "$DOMAIN" \
             -connect "$ORIGIN_HOST:443" -showcerts 2>/dev/null \
@@ -23,6 +68,7 @@ jobs:
 
           if [ -z "$cert_pem" ]; then
             echo "::error::Failed to fetch certificate from $ORIGIN_HOST for SNI $DOMAIN"
+            print_runbook
             exit 1
           fi
 
@@ -43,15 +89,31 @@ jobs:
             echo "- Issuer: \`${issuer#issuer=}\`"
             echo "- Expires: \`$end_date\`"
             echo "- Days left: **$days_left**"
+            echo "- Warn threshold: \`$WARN_DAYS\` days"
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$days_left" -lt 0 ]; then
             echo "::error::Certificate for $DOMAIN has EXPIRED ($end_date)"
+            print_runbook
+            {
+              echo ""
+              echo "## ⚠️ Action Required"
+              echo ""
+              echo "Certificate has **expired**. See job log for the full runbook."
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
           if [ "$days_left" -lt "$WARN_DAYS" ]; then
             echo "::error::Certificate for $DOMAIN expires in $days_left day(s), below threshold $WARN_DAYS"
+            print_runbook
+            {
+              echo ""
+              echo "## ⚠️ Action Required"
+              echo ""
+              echo "Certificate expires in **$days_left day(s)** (threshold: $WARN_DAYS)."
+              echo "See job log for the full runbook."
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
