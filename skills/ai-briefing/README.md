@@ -1,248 +1,100 @@
 # ai-briefing
 
-`ai-briefing` 是一个面向博客的 AI 简报工作流 skill，用来追踪重点 LLM 厂商近期确定性动态，并根据用户意图执行：
+`ai-briefing` 用于查询、起草和发布博客 AI 简报。默认只查询；明确要求“写/起草”才成稿，明确要求“发布/commit/push”才进入发布链路。
 
-- **查询**：只回答最近发生了什么
-- **成稿**：生成可审阅的简报草稿
-- **发布**：完成审核后自动发布到博客
+## 三种模式
 
-它适合这类需求：
+- 查询：只回答，不落盘，不 commit，不 push。
+- 成稿：返回 Markdown 草稿和审核摘要，不写入 `content/`。
+- 发布：独立 reviewer 与确定性门禁全部通过后才允许发布。
 
-- `OpenAI 最近发了什么？`
-- `今天 AI 厂商发布了什么？`
-- `帮我起草今天的 AI 简报`
-- `生成并发布今天的 AI 简报`
+`scripts/ai-briefing.sh` 还有一个外层编排模式：主 agent 只生成正式候选文件和 agent 证据，独立 reviewer、Git 与远端验证全部由 shell 接管。
 
----
+## 所有模式都先采集
 
-## 快速理解：三种模式
-
-### 1. 查询模式（默认）
-
-如果你的话更像“查动态”，skill 默认只会查询，不会写文件，也不会发布。
-
-例如：
-
-- `今天 AI 厂商发布了什么？`
-- `最近 3 天 Anthropic 和 OpenAI 有什么更新？`
-- `帮我看看 GPT-5.5 和 Gemini API 最近有什么变化`
-
-行为：
-
-- 只输出查询结果
-- 不落盘
-- 不 commit
-- 不 push
-
-### 2. 成稿模式
-
-如果你明确要求“写 / 起草 / 生成简报”，skill 会进入成稿模式。
-
-例如：
-
-- `帮我起草今天的 AI 简报`
-- `生成一篇今天的 AI 简报，但不要发布`
-
-行为：
-
-- 生成完整 Markdown 草稿
-- 返回内部审核摘要
-- 在内部审核摘要完成后，再调用项目级 `ai-briefing-reviewer` 做第二道复审
-- **本轮不会落盘**
-- 不 commit
-- 不 push
-
-### 3. 发布模式
-
-如果你明确要求“发布 / commit / push / 生成并发布”，skill 才会进入发布模式。
-
-例如：
-
-- `生成并发布今天的 AI 简报`
-- `今天的 AI 简报审核通过后直接发布`
-
-行为：
-
-- 查询 → 成稿 → 最终审核 → 仓库门禁 → 自动发布
-- 只有全部通过才会 commit / push
-
----
-
-## 最常用触发方式
-
-### 默认查动态
+查询、成稿和普通发布不能只靠临时网页搜索。若外层未提供 `runDir`、`window.json` 和 `collection.json`，模式开始时必须创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，冻结一次 `issueDate/windowEnd`，依次运行：
 
 ```text
-今天 AI 厂商发布了什么？
+node scripts/ai-briefing-window.js --issue-date <date> --window-end <iso> --output <runDir>/window.json
+node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json
 ```
+
+查询和成稿只可在 `.local` runDir 写证据，不写 `content/` 或 Git；普通发布完成相同初始化后继续走现有发布门禁。外层已提供窗口和采集结果时禁止重复计算或覆盖。
+
+`scripts/ai-briefing.sh` 对 collector 另加默认 120 秒外层超时，可用 `AI_BRIEFING_COLLECTOR_TIMEOUT_SECONDS` 调整。
+
+## 日期差窗口
+
+窗口以 Asia/Shanghai 的本期日期和上一篇 `published: true` 简报日期计算：相差 N 个自然日就回溯 `N × 24` 小时。没有历史时回溯 24 小时，区间为 `(windowStart, windowEnd]`。
+
+例如上一篇是昨天/前天/三天前，本期窗口分别是 24/48/72 小时。0 条确定事件时不创建简报，下一次仍从上一篇已发布日期计算，因此窗口继续扩大。公开 frontmatter 不新增 `publishedAt`。
+
+## 候选采集
+
+来源地址和确认策略以 `config/source-registry.json` 为程序真源。发现顺序是：
+
+1. 官方 RSS/Atom、GitHub Release、Hugging Face。
+2. 官方页面、changelog、release notes。
+3. 按厂商和事件类型定向搜索。
+4. 媒体 Feed 与权威媒体补漏。
+5. 回溯原始源或双源确认。
+
+Feed 的 `partial/unknown` coverage 或成功但零候选不能证明没有更新，重点厂商必须补检；registry 为重点厂商启用的每条配置路径都要有明确结果。所有路径失败时阻断。
+
+## 事件与来源
+
+确定性聚类先按 GUID、规范 URL、官方落地页合并，再由 agent 做有记录的语义复核。不同版本、价格、开放范围和弃用不能因为厂商相同而误合并。
+
+来源标签固定为 `[官方]`、`[原始文件]`、`[媒体报道]`。媒体默认需要官方源或第二家独立 publisher；同一 publisher 的两个入口不算双源。媒体只有日期而无时间时不能确认正文事实。
+
+## Markdown V2
+
+从 `contentRulesV2EffectiveDate: 2026-07-15` 起：
+
+- 一个事件对应一个速览 bullet、一个正文 `###`、一个同名来源分组。
+- 次级确定事件可进入 `## 补充更新`。
+- `## 为什么值得关注` 不参与事件计数。
+- 0 条事件不发布，不拆事件凑数。
+
+动态正文汉字数不含 `## 来源`：
+
+- 1 条：450~800
+- 2~3 条：750~1300
+- 4~6 条：1100~1800
+- 7+ 条：1500~2200
+
+7 条以上时重点展开 3~5 条，其余放入补充更新，保留全部合格事件。
+
+## 证据与 reviewer
+
+运行证据保存在被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，包括 `window.json`、`collection.json`、`discovery.json`、`selection.json`、`self-review.json`、主 agent 和 reviewer 原始结构化输出，以及 `verification.json`。
+
+独立 reviewer 具有受限只读 WebFetch/WebSearch，禁止编辑和 Bash。它只访问 registry/证据包列出的 URL，网络不可用时不得伪称验证成功。
+
+Reviewer 只运行一轮；不是 `可进入发布门禁` 就立即停止，不自动修稿，不 commit，不 push。
+
+## 发布成功条件
+
+发布必须同时满足：内容校验、AI 索引构建、来源策略、不可变哈希、reviewer approved、精确 stage、commit diff-tree 文件集、push 后 fetch + merge-base 远端包含验证，以及干净工作区。
+
+自动提交信息：
 
 ```text
-最近 24 小时 OpenAI 和 Anthropic 有什么确定性更新？
+docs(ai-briefing): 发布 YYYY-MM-DD AI 简报
 ```
 
-### 只起草，不发布
-
-```text
-帮我起草今天的 AI 简报，不要发布
-```
-
-### 直接走发布链路
-
-```text
-生成并发布今天的 AI 简报
-```
-
----
-
-## 重点能力
-
-### 时间窗口
-
-- 默认以 **Asia/Shanghai** 为准
-- 默认统计窗口为：**当前执行时刻向前 24 小时**
-- 不是按来源页面显示的本地日期直接判断
-
-### 正文字数
-
-- 正文长度为 **900~1300 个中文汉字**
-- **不统计 `## 来源` 章节下的字数**
-- frontmatter 和内部审核摘要也不计入正文长度
-
-### 写作节奏
-
-- 开篇导语也要短句、短段落，不要一段塞完所有主线
-- 章节正文必须小段落、多段落；单段目标控制在 **80~120 个中文汉字** 内，信息密集时主动换段
-- 每个自然段只承载一个意思，不把事实、解释和影响塞进同一长段
-- AI 简报保持 `速览` / `重点动态` / `为什么值得关注` / `来源` 结构，不套用投资简报结构
-- `## 重点动态` 下优先使用多个 `###` 子标题，每个子标题提炼一个判断
-- 主体内容不要依赖长列表堆叠；列表主要用于速览、来源和内部审核摘要
-
-### 重点厂商覆盖
-
-skill 会重点关注这些厂商：
-
-- OpenAI
-- Anthropic
-- Google/DeepMind/Gemini
-- xAI
-- Meta AI
-- Perplexity
-- Mistral
-- 月之暗面/Kimi
-- 小米 MiMo
-- DeepSeek
-- 智谱 AI
-
-对这些重点厂商，会要求逐一覆盖检查，避免漏掉重大模型/API/平台更新。
-
-补充说明：`MiniMax` 仍在默认跟踪范围内，但已不属于重点补检名单，因此默认会查，但不要求每期做逐一重点补检。
-
-### 高价值源补检
-
-对于重大更新，skill 会优先补检：
-
-- changelog
-- release notes
-- 官方发布页
-- 官方博客 / 公告
-
-相关来源映射见：
-
-- `references/source-map.md`
-
----
-
-## 自动发布前会做什么
-
-只有在**发布模式**下，skill 才会继续做这些事情：
-
-1. 事实核验
-2. 与最近 5 期简报去重（不足 5 期按已有历史检查）
-3. 重点厂商覆盖检查
-4. 项目级 `ai-briefing-reviewer` 二次复审
-5. 成稿质量审核
-6. `just validate-content`
-7. `just build-site-ai-data`
-8. git 安全检查
-9. commit / push
-
-任一检查失败：
-
-- 停止发布
-- 不 commit
-- 不 push
-
----
-
-## 新用户最需要知道的边界
-
-### 1. 默认不会自动发布
-
-即使你提到：
-
-- `AI 简报`
-- `AI 雷达`
-- `AI 前沿雷达`
-- `厂商动态汇总`
-
-只要你没有明确说“发布”，默认都按**查询模式**处理。
-
-### 2. 成稿模式本轮不落盘
-
-当前版本里：
-
-- 成稿模式只返回草稿文本
-- 不会把草稿直接写进 `content/ai-briefings/`
-
-只有发布模式审核通过后，才会写正式文件。
-
-### 3. 内部审核摘要不会混进最终简报
-
-成稿/发布过程中会有内部审核信息，但这些内容：
-
-- 不能进入 frontmatter
-- 不能进入正文
-- 不能进入 `## 来源`
-
-### 4. 自审通过后还会再走一轮 subagent 复审
-
-当前工程里已经有项目级 `ai-briefing-reviewer`。
-
-skill 在成稿和发布链路里，都会先完成自己的内部审核摘要，再把草稿交给 `ai-briefing-reviewer` 做第二道阻断式复审。
-
----
-
-## 目录说明
+## 目录
 
 ```text
 ai-briefing/
-├── SKILL.md                # 核心规则与工作流
-├── README.md               # 新用户快速上手说明
+├── SKILL.md
+├── README.md
 ├── config/
-│   ├── briefing.json       # 时区、字数、去重窗口、章节门禁
-│   └── focus-companies.json # 默认跟踪厂商与重点补检名单
-├── references/
-│   └── source-map.md       # 官方源 / 补检源地图
-└── evals/                  # skill 评估材料
+│   ├── briefing.json
+│   ├── focus-companies.json
+│   ├── source-registry.json
+│   ├── generator-result.schema.json
+│   └── reviewer-result.schema.json
+├── references/source-map.md
+└── evals/evals.json
 ```
-
----
-
-## 建议的阅读顺序
-
-如果你是第一次接触这个 skill，建议按这个顺序看：
-
-1. `README.md`：先理解三种模式和使用方法
-2. `SKILL.md`：再看详细规则、审核门禁、触发逻辑
-3. `config/*.json`：看默认厂商、去重窗口与章节门禁配置
-4. `references/source-map.md`：最后看来源地图和重点厂商官方源
-
----
-
-## 一句话总结
-
-把它理解成一个“带审核门禁的 AI 简报编辑部”更准确：
-
-- 平时先帮你查
-- 需要时帮你起草
-- 明确要求后才帮你发布

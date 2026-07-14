@@ -13,6 +13,9 @@ function loadAiBriefingSkillConfig() {
   return {
     briefing: readJsonConfig(AI_BRIEFING_SKILL_CONFIG_ROOT, "briefing.json"),
     focusCompanies: readJsonConfig(AI_BRIEFING_SKILL_CONFIG_ROOT, "focus-companies.json"),
+    sourceRegistry: readJsonConfig(AI_BRIEFING_SKILL_CONFIG_ROOT, "source-registry.json"),
+    generatorResultSchema: readJsonConfig(AI_BRIEFING_SKILL_CONFIG_ROOT, "generator-result.schema.json"),
+    reviewerResultSchema: readJsonConfig(AI_BRIEFING_SKILL_CONFIG_ROOT, "reviewer-result.schema.json"),
   };
 }
 

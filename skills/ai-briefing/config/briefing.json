@@ -1,6 +1,43 @@
 {
   "timezone": "Asia/Shanghai",
-  "defaultWindowHours": 24,
+  "windowStrategy": "calendar-day-gap-hours",
+  "initialLookbackHours": 24,
+  "contentRulesV2EffectiveDate": "2026-07-15",
+  "dynamicBodyLengthRules": [
+    {
+      "minEvents": 1,
+      "maxEvents": 1,
+      "min": 450,
+      "max": 800
+    },
+    {
+      "minEvents": 2,
+      "maxEvents": 3,
+      "min": 750,
+      "max": 1300
+    },
+    {
+      "minEvents": 4,
+      "maxEvents": 6,
+      "min": 1100,
+      "max": 1800
+    },
+    {
+      "minEvents": 7,
+      "maxEvents": null,
+      "min": 1500,
+      "max": 2200
+    }
+  ],
+  "evidenceRoot": ".local/ai-briefing/runs",
+  "feedCacheRoot": ".local/ai-briefing/cache",
+  "feedLimits": {
+    "timeoutMs": 10000,
+    "maxResponseBytes": 2097152,
+    "maxItemsPerFeed": 100,
+    "maxRedirects": 3,
+    "concurrency": 4
+  },
   "bodyLengthRules": [
     {
       "effectiveFrom": "0000-01-01",

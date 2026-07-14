@@ -1,0 +1,33 @@
+{
+  "draft_ready": {
+    "structured_output": {
+      "status": "draft_ready",
+      "issueDate": "2026-07-15",
+      "filePath": "content/ai-briefings/2026/07/2026-07-15-ai-briefing.md",
+      "selectionPath": ".local/ai-briefing/runs/test/selection.json",
+      "selfReviewConclusion": "通过"
+    }
+  },
+  "no_events": {
+    "structured_output": {
+      "status": "no_events",
+      "issueDate": "2026-07-15",
+      "reason": "本窗口没有可发布的确定性事件"
+    }
+  },
+  "blocked": {
+    "structured_output": {
+      "status": "blocked",
+      "issueDate": "2026-07-15",
+      "reason": "重点厂商覆盖失败",
+      "blockers": ["Anthropic 所有路径失败"]
+    }
+  },
+  "failed": {
+    "structured_output": {
+      "status": "failed",
+      "issueDate": "2026-07-15",
+      "reason": "生成器异常"
+    }
+  }
+}

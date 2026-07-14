@@ -1,0 +1,38 @@
+{
+  "approved": {
+    "structured_output": {
+      "status": "approved",
+      "conclusion": "可进入发布门禁",
+      "evidenceQuality": {
+        "authority": "通过",
+        "authenticity": "通过",
+        "timeliness": "通过"
+      }
+    }
+  },
+  "needs_changes": {
+    "structured_output": {
+      "status": "needs_changes",
+      "conclusion": "需修改后复审",
+      "blockers": ["来源映射不完整"],
+      "requiredChanges": ["补齐来源分组"],
+      "evidenceQuality": {
+        "authority": "部分通过",
+        "authenticity": "待补证",
+        "timeliness": "通过"
+      }
+    }
+  },
+  "blocked": {
+    "structured_output": {
+      "status": "blocked",
+      "conclusion": "阻断发布",
+      "reason": "关键事实无法独立核验",
+      "evidenceQuality": {
+        "authority": "失败",
+        "authenticity": "失败",
+        "timeliness": "未知"
+      }
+    }
+  }
+}

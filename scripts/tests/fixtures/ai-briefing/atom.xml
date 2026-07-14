@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>SDK releases</title>
+  <entry>
+    <title>v6.0.0</title>
+    <id>tag:github.com,2008:Repository/123/v6.0.0</id>
+    <link rel="alternate" href="https://github.com/openai/openai-python/releases/tag/v6.0.0?utm_campaign=release" />
+    <published>2026-07-14T02:00:00Z</published>
+    <updated>2026-07-14T03:00:00Z</updated>
+    <summary type="html">&lt;p&gt;New SDK release&lt;/p&gt;</summary>
+    <author><name>OpenAI</name></author>
+  </entry>
+</feed>

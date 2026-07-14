@@ -89,6 +89,50 @@ ${body}`,
   );
 }
 
+function buildV2AiBody(
+  eventCount: number,
+  options: {
+    headings?: string[];
+    sourceHeading?: string;
+    sourceLabel?: string;
+    sourceUrl?: string;
+    overviewCount?: number;
+  } = {},
+) {
+  const headings = options.headings ?? Array.from({ length: eventCount }, (_, index) => `测试事件${index + 1}`);
+  const targetBodyCharacters = eventCount === 1 ? 520 : eventCount <= 3 ? 900 : eventCount <= 6 ? 1300 : 1700;
+  const perEventRepeats = Math.ceil(targetBodyCharacters / eventCount / 20);
+  const eventBody = "这是用于验证动态篇幅规则的确定性正文内容".repeat(perEventRepeats);
+  const primaryCount = eventCount >= 7 ? 4 : eventCount;
+  const renderEvents = (items: string[]) => items.map((heading) => `### ${heading}\n\n${eventBody}`).join("\n\n");
+  const overviewHeadings = headings.slice(0, options.overviewCount ?? headings.length);
+  const supplemental = headings.slice(primaryCount);
+  const sourceGroups = headings.map((heading, index) => {
+    const groupHeading = index === 0 && options.sourceHeading ? options.sourceHeading : heading;
+    const label = index === 0 && options.sourceLabel ? options.sourceLabel : "官方";
+    const url = index === 0 && options.sourceUrl ? options.sourceUrl : `https://openai.com/index/test-${index + 1}/`;
+    return `### ${groupHeading}\n\n- [${label}] [OpenAI 测试来源](${url})`;
+  });
+
+  return `## 速览
+
+${overviewHeadings.map((heading) => `- ${heading}。`).join("\n")}
+
+## 重点动态
+
+${renderEvents(headings.slice(0, primaryCount))}
+${supplemental.length > 0 ? `\n\n## 补充更新\n\n${renderEvents(supplemental)}` : ""}
+
+## 为什么值得关注
+
+这些事件共同说明平台能力、开放范围与开发者生态正在同步变化。
+
+## 来源
+
+${sourceGroups.join("\n\n")}
+`;
+}
+
 describe("validate-post investment briefing guards", () => {
   beforeEach(() => {
     fs.mkdirSync(investmentBriefingsDir, { recursive: true });
@@ -335,58 +379,64 @@ describe("validate-post ai briefing guards", () => {
     fs.rmSync(path.join(aiBriefingsDir, "2099"), { recursive: true, force: true });
   });
 
+  it.each([1, 2, 4, 7])("accepts V2 structure and dynamic length for %s events", (eventCount) => {
+    writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(eventCount));
+
+    expect(() => runValidateSuccess(relativeAiTestFile)).not.toThrow();
+  });
+
+  it.each([
+    [buildV2AiBody(1, { overviewCount: 0 }), "速览条目数必须等于正文事件数"],
+    [buildV2AiBody(1, { sourceHeading: "错误来源分组" }), "来源分组标题必须与正文事件标题完全一致"],
+    [buildV2AiBody(1, { sourceLabel: "待核验" }), "来源标签只允许"],
+    [buildV2AiBody(1, { sourceUrl: "http://openai.com/index/test/" }), "来源链接必须使用 HTTPS"],
+    [buildV2AiBody(1, { sourceUrl: "https://unknown.example.com/test" }), "来源域名未在 source registry 中登记"],
+  ])("rejects invalid V2 source/event mapping: %s", (body, expectedMessage) => {
+    writeAiBriefing(aiTestFile, "2099-01-06", body);
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain(expectedMessage);
+    }
+  });
+
+  it("rejects duplicate overview titles that replace a distinct event", () => {
+    const body = buildV2AiBody(2).replace("- 测试事件2。", "- 测试事件1。");
+    writeAiBriefing(aiTestFile, "2099-01-06", body);
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain("速览条目数必须等于正文事件数，且标题必须一一对应");
+    }
+  });
+
+  it("rejects a V2 path that disagrees with frontmatter date", () => {
+    writeAiBriefing(aiTestFile, "2099-01-07", buildV2AiBody(1));
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain("AI 简报路径日期与 frontmatter date 不一致");
+    }
+  });
+
   it("rejects duplicate events from recent five ai briefings", () => {
     const dates = ["2099-01-05", "2099-01-04", "2099-01-03", "2099-01-02", "2099-01-01"];
+    const duplicateHeading = "OpenAI 推出 Realtime API 新语音矩阵";
     previousAiFiles.forEach((file, index) => {
       writeAiBriefing(
         file,
         dates[index],
-        `## 速览
-
-- OpenAI 推出 Realtime API 新语音矩阵。
-
-## 重点动态
-
-### OpenAI 推出 Realtime API 新语音矩阵
-
-OpenAI 在 1 月 5 日把 Realtime API 升级为完整的语音模型矩阵，覆盖实时对话、翻译与长时段流式转写，面向呼叫中心、车载语音与跨语言会议场景。
-
-## 为什么值得关注
-
-### 语音入口竞争加剧
-
-这意味着语音交互已经不再只是演示功能，而是直接进入平台级基础能力竞争。
-
-## 来源
-
-- https://example.com/${dates[index]}
-`,
+        buildV2AiBody(1, { headings: [duplicateHeading] }),
       );
     });
 
     writeAiBriefing(
       aiTestFile,
       "2099-01-06",
-      `## 速览
-
-- OpenAI 推出 Realtime API 新语音矩阵。
-
-## 重点动态
-
-### OpenAI 推出 Realtime API 新语音矩阵
-
-OpenAI 在 1 月 6 日把 Realtime API 升级为完整的语音模型矩阵，覆盖实时对话、翻译与长时段流式转写，面向呼叫中心、车载语音与跨语言会议场景。
-
-## 为什么值得关注
-
-### 语音入口竞争加剧
-
-这意味着语音交互已经不再只是演示功能，而是直接进入平台级基础能力竞争。
-
-## 来源
-
-- https://example.com/2099-01-06
-`,
+      buildV2AiBody(1, { headings: [duplicateHeading] }),
       "测试 AI 最近 5 期去重",
     );
 
@@ -477,31 +527,14 @@ ${"如果这条路线继续推进，未来大家评估 AI 硬件时就不能只�
   });
 
   it("enforces stricter ai body length on or after effective date", () => {
+    const body = buildV2AiBody(1).replace(
+      /这是用于验证动态篇幅规则的确定性正文内容(?:这是用于验证动态篇幅规则的确定性正文内容)+/,
+      "正文过短",
+    );
     writeAiBriefing(
       aiTestFile,
       "2099-01-06",
-      `## 速览
-
-- OpenAI 把语音模型能力继续向平台层开放。
-
-## 重点动态
-
-### OpenAI 继续扩展语音接口
-
-OpenAI 在 1 月 6 日继续扩展语音接口能力，对外强调实时对话、跨语言转写和多场景接入的一体化平台方向。
-
-这让语音不再只是单点功能，而更像平台级入口，开发者接入后可以更快把客服、助手和会议场景连到同一套模型能力。
-
-## 为什么值得关注
-
-### 平台入口竞争继续前移
-
-如果语音接口继续标准化，未来竞争点会更早前移到开发者生态和产品接入效率，而不是只比拼单模型性能。
-
-## 来源
-
-- https://example.com/2099-01-06
-`,
+      body,
       "测试新 AI 字数门槛生效",
     );
 
@@ -509,7 +542,7 @@ OpenAI 在 1 月 6 日继续扩展语音接口能力，对外强调实时对话�
       runValidate(relativeAiTestFile);
     } catch (error) {
       const output = getStderr(error);
-      expect(output).toContain("AI 简报正文汉字数（不含来源章节）应为 900~1300");
+      expect(output).toContain("AI 简报正文汉字数（不含来源章节，1 个事件）应为 450~800");
     }
   });
 });

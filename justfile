@@ -159,6 +159,10 @@ validate-content:
 validate-content-file path:
     @node scripts/validate-post.js "{{path}}"
 
+# 实时检查 AI 简报启用 Feed 的健康状态。
+smoke-ai-briefing-feeds: _check_node
+    @node scripts/collect-ai-briefing-feeds.js --health-check
+
 # 仅校验文章路径合法性与 slug 唯一性。
 validate-content-path path:
     @node scripts/validate-post.js --check-path "{{path}}"

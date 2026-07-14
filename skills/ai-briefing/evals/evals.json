@@ -3,38 +3,51 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "生成今天的 AI 简报，默认厂商，发布到博客。",
-      "expected_output": "生成 content/ai-briefings 下的 .md 文件，published: true，正文 900~1300 汉字（不统计 ## 来源 章节），完成两轮审核并在通过后 commit/push。",
-      "files": [],
-      "expectations": [
-        "文件扩展名是 .md 而不是 .mdx",
-        "frontmatter 包含 published: true",
-        "发布前执行最终审核",
-        "审核失败不得 commit 或 push"
-      ]
+      "prompt": "昨天没有发布 AI 简报。上一篇是前天，请起草今天的简报。",
+      "expected_behavior": "按本期日期与上一篇 published:true 简报的两天自然日差使用 48 小时窗口，不新增 publishedAt；成稿模式只返回草稿，不落盘。",
+      "files": []
     },
     {
       "id": 2,
-      "prompt": "只生成不发布，帮我做最近三天 OpenAI 和 Anthropic 的 AI 简报。",
-      "expected_output": "只生成本地稿件与审核报告，不 commit 不 push，并只覆盖指定厂商与时间窗口。",
-      "files": [],
-      "expectations": [
-        "尊重只生成不发布选项",
-        "只覆盖 OpenAI 和 Anthropic",
-        "正文确定区只包含有时间证据和可靠来源的信息",
-        "待核验线索不进入正文确定区"
-      ]
+      "prompt": "OpenAI 官方 RSS、GitHub Release 和两家媒体都报道了同一个 API 发布，生成今天的 AI 简报。",
+      "expected_behavior": "先按 GUID、规范 URL或官方落地页聚类，同一事件只生成一个速览 bullet、一个正文标题和一个来源分组。",
+      "files": []
     },
     {
       "id": 3,
-      "prompt": "起草今天的 AI 简报，但如果和最近 5 期里任何一期是同一新闻事件且没有新的可核验增量，就不要重复写进正文。",
-      "expected_output": "对照最近 5 期已发布 AI 简报做去重，不足 5 期则按已有全部历史检查；无新增增量的旧事件不得再次作为当天独立新闻条目入稿。",
-      "files": [],
-      "expectations": [
-        "对照最近 5 期已发布 AI 简报做去重",
-        "不足 5 期时按已有全部历史检查",
-        "无新增增量的重复事件不得进入正文确定区"
-      ]
+      "prompt": "只有一家媒体说某模型涨价，registry 对 pricing 配置 needs-corroboration。起草简报。",
+      "expected_behavior": "单一媒体不能确认 pricing 事件；缺少官方源或第二家独立 publisher 时不得入稿。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "某重点厂商 Feed 抓取失败，但官方 changelog 可访问且已记录时间证据。",
+      "expected_behavior": "覆盖状态标记 degraded，披露 Feed 失败并使用官方补检继续；不能把 Feed 失败改写为成功。",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Anthropic 的 Feed、News、GitHub 和搜索路径全部失败，请生成并发布简报。",
+      "expected_behavior": "重点厂商所有路径失败时阻断，不生成正式稿、不调用发布门禁、不 commit、不 push。",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "今天只有一条可确认事件，请生成简报。",
+      "expected_behavior": "生成 450~800 汉字的单事件短稿，不拆分事实与影响凑多个标题；成稿模式不落盘。",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "今天有八条互相独立且都满足来源策略的事件，请生成简报。",
+      "expected_behavior": "正文使用 1500~2200 汉字，重点展开 3~5 条，其余进入补充更新，保留全部合格事件及一一对应来源分组。",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "先起草今天的 AI 简报，再说明如果我明确发布会发生什么。",
+      "expected_behavior": "当前成稿只在对话返回且不写 content；只有明确发布模式才创建正式文件，并且独立 reviewer 只运行一轮，非 approved 时停止。",
+      "files": []
     }
   ]
 }

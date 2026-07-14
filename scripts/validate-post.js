@@ -31,6 +31,13 @@ const INVESTMENT_BRIEFINGS_ROOT = investmentBriefingsDir;
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
+  contentRulesV2EffectiveDate: "2026-07-15",
+  dynamicBodyLengthRules: [
+    { minEvents: 1, maxEvents: 1, min: 450, max: 800 },
+    { minEvents: 2, maxEvents: 3, min: 750, max: 1300 },
+    { minEvents: 4, maxEvents: 6, min: 1100, max: 1800 },
+    { minEvents: 7, maxEvents: null, min: 1500, max: 2200 },
+  ],
   bodyLengthRules: [
     {
       effectiveFrom: "0000-01-01",
@@ -119,6 +126,7 @@ const errors = [];
 let aiFocusCompanies = [];
 
 let aiBriefingConfig = { ...DEFAULT_AI_BRIEFING_CONFIG };
+let aiSourceRegistry = { sources: [] };
 let investmentBriefingConfig = { ...DEFAULT_INVESTMENT_BRIEFING_CONFIG };
 
 /** @type {{ name: string; aliases?: string[] }[]} */
@@ -131,6 +139,7 @@ try {
     ...(aiSkillConfig.briefing ?? {}),
   };
   aiFocusCompanies = Array.isArray(aiSkillConfig.focusCompanies) ? aiSkillConfig.focusCompanies : [];
+  aiSourceRegistry = aiSkillConfig.sourceRegistry ?? { sources: [] };
 } catch (error) {
   console.warn("[validate-post] Failed to load AI briefing skill config:", error);
 }
@@ -279,6 +288,166 @@ function resolveAiBodyLengthRule(dateText) {
     aiBriefingConfig.bodyLengthRules,
     DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules,
   );
+}
+
+function normalizeAiEventTitle(value) {
+  return value.trim().replace(/[。.!！?？]+$/u, "").trim();
+}
+
+function extractSubsections(body, sectionHeading) {
+  const section = getSectionContent(body, sectionHeading);
+  const matches = [...section.matchAll(/^###\s+(.+?)\s*$/gm)];
+  return matches.map((match, index) => {
+    const start = match.index + match[0].length;
+    const end = index + 1 < matches.length ? matches[index + 1].index : section.length;
+    return {
+      heading: match[1].trim(),
+      content: section.slice(start, end).trim(),
+    };
+  });
+}
+
+function extractOverviewItems(body, sectionHeading) {
+  return getSectionContent(body, sectionHeading)
+    .split(/\r?\n/)
+    .map((line) => /^-\s+(.+?)\s*$/.exec(line)?.[1])
+    .filter(Boolean)
+    .map(normalizeAiEventTitle);
+}
+
+function extractAiSourceGroups(body, sourceSectionHeading) {
+  return extractSubsections(body, sourceSectionHeading).map((section) => {
+    const sources = [];
+    const invalidLines = [];
+    for (const line of section.content.split(/\r?\n/).map((item) => item.trim()).filter(Boolean)) {
+      const match = /^-\s+\[([^\]]+)\]\s+\[([^\]]+)\]\(([^)\s]+)\)\s*$/.exec(line);
+      if (!match) {
+        invalidLines.push(line);
+        continue;
+      }
+      sources.push({ label: match[1], title: match[2], url: match[3] });
+    }
+    return { heading: section.heading, sources, invalidLines };
+  });
+}
+
+function getAiEventHeadings(body) {
+  return [
+    ...extractSubsections(body, "重点动态"),
+    ...extractSubsections(body, "补充更新"),
+  ].map((section) => section.heading);
+}
+
+function resolveDynamicAiBodyLengthRule(eventCount) {
+  const rules = Array.isArray(aiBriefingConfig.dynamicBodyLengthRules)
+    ? aiBriefingConfig.dynamicBodyLengthRules
+    : DEFAULT_AI_BRIEFING_CONFIG.dynamicBodyLengthRules;
+  return rules.find((rule) => eventCount >= rule.minEvents && (rule.maxEvents === null || eventCount <= rule.maxEvents));
+}
+
+function getAiRegistryHosts() {
+  const hosts = new Set();
+  for (const source of aiSourceRegistry.sources || []) {
+    if (source.url) {
+      try {
+        hosts.add(new URL(source.url).hostname.toLowerCase());
+      } catch {
+        // Dedicated registry tests report malformed optional URLs.
+      }
+    }
+    for (const host of [...(source.allowedArticleHosts || []), ...(source.allowedRedirectHosts || [])]) {
+      hosts.add(host.toLowerCase());
+    }
+  }
+  return hosts;
+}
+
+function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
+  const pathMatch = /^content\/ai-briefings\/(\d{4})\/(\d{2})\/(\d{4}-\d{2}-\d{2})-ai-briefing\.md$/.exec(relativeFile);
+  const expectedPath = `content/ai-briefings/${dateClean.slice(0, 4)}/${dateClean.slice(5, 7)}/${dateClean}-ai-briefing.md`;
+  if (!pathMatch || pathMatch[3] !== dateClean || relativeFile !== expectedPath) {
+    addError(
+      `AI 简报路径日期与 frontmatter date 不一致（期望：${expectedPath}，实际：${relativeFile}）`,
+      relativeFile,
+      1,
+    );
+  }
+
+  const overviewItems = extractOverviewItems(parsed.body, "速览");
+  const eventHeadings = getAiEventHeadings(parsed.body);
+  const sourceGroups = extractAiSourceGroups(
+    parsed.body,
+    aiBriefingConfig.sourceSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.sourceSectionHeading,
+  );
+  const uniqueOverviewItems = new Set(overviewItems);
+  const uniqueEventHeadings = new Set(eventHeadings);
+
+  if (eventHeadings.length === 0) {
+    addError("V2 AI 简报至少需要一个正文事件标题", relativeFile, 1);
+  }
+  if (uniqueEventHeadings.size !== eventHeadings.length) {
+    addError("同一事件标题不得同时或重复出现在重点动态与补充更新", relativeFile, 1);
+  }
+  if (
+    uniqueOverviewItems.size !== overviewItems.length ||
+    overviewItems.length !== eventHeadings.length ||
+    overviewItems.some((item) => !uniqueEventHeadings.has(item)) ||
+    eventHeadings.some((heading) => !uniqueOverviewItems.has(heading))
+  ) {
+    addError("V2 AI 简报速览条目数必须等于正文事件数，且标题必须一一对应", relativeFile, 1);
+  }
+
+  const sourceGroupHeadings = sourceGroups.map((group) => group.heading);
+  if (
+    new Set(sourceGroupHeadings).size !== sourceGroupHeadings.length ||
+    sourceGroupHeadings.length !== eventHeadings.length ||
+    sourceGroupHeadings.some((heading) => !uniqueEventHeadings.has(heading))
+  ) {
+    addError("V2 AI 简报来源分组标题必须与正文事件标题完全一致", relativeFile, 1);
+  }
+
+  const allowedLabels = new Set(["官方", "原始文件", "媒体报道"]);
+  const allowedHosts = getAiRegistryHosts();
+  for (const group of sourceGroups) {
+    if (group.sources.length === 0) {
+      addError(`V2 AI 简报事件 \`${group.heading}\` 至少需要一个来源条目`, relativeFile, 1);
+    }
+    for (const invalidLine of group.invalidLines) {
+      addError(`V2 AI 简报来源条目格式不合法：${invalidLine}`, relativeFile, 1);
+    }
+    for (const source of group.sources) {
+      if (!allowedLabels.has(source.label)) {
+        addError(`V2 AI 简报来源标签只允许 [官方]、[原始文件]、[媒体报道]（当前：${source.label}）`, relativeFile, 1);
+      }
+      let url;
+      try {
+        url = new URL(source.url);
+      } catch {
+        addError(`V2 AI 简报来源链接不合法：${source.url}`, relativeFile, 1);
+        continue;
+      }
+      if (url.protocol !== "https:") {
+        addError(`V2 AI 简报来源链接必须使用 HTTPS：${source.url}`, relativeFile, 1);
+      }
+      if (!allowedHosts.has(url.hostname.toLowerCase())) {
+        addError(`V2 AI 简报来源域名未在 source registry 中登记：${url.hostname}`, relativeFile, 1);
+      }
+    }
+  }
+
+  const bodyRange = resolveDynamicAiBodyLengthRule(eventHeadings.length);
+  const chineseCharacters = countChineseCharacters(
+    removeSections(parsed.body, [aiBriefingConfig.sourceSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.sourceSectionHeading]),
+  );
+  if (bodyRange && (chineseCharacters < bodyRange.min || chineseCharacters > bodyRange.max)) {
+    addError(
+      `AI 简报正文汉字数（不含来源章节，${eventHeadings.length} 个事件）应为 ${bodyRange.min}~${bodyRange.max}（当前：${chineseCharacters}）`,
+      relativeFile,
+      1,
+    );
+  }
+
+  return { overviewItems, eventHeadings, sourceGroups, file };
 }
 
 /**
@@ -792,15 +961,20 @@ function validateBriefingFile(file, slugs) {
     addError("AI 简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
   }
 
-  const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
-  const aiBodyRange = normalizeAiBodyLengthRule(resolveAiBodyLengthRule(dateClean));
+  const v2EffectiveDate = aiBriefingConfig.contentRulesV2EffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.contentRulesV2EffectiveDate;
+  if (dateClean && dateClean >= v2EffectiveDate) {
+    validateAiBriefingV2({ file, relativeFile, parsed, dateClean });
+  } else {
+    const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
+    const aiBodyRange = normalizeAiBodyLengthRule(resolveAiBodyLengthRule(dateClean));
 
-  if (chineseCharacters < aiBodyRange.min || chineseCharacters > aiBodyRange.max) {
-    addError(
-      `AI 简报正文汉字数（不含来源章节）应为 ${aiBodyRange.min}~${aiBodyRange.max}（当前：${chineseCharacters}）`,
-      relativeFile,
-      1,
-    );
+    if (chineseCharacters < aiBodyRange.min || chineseCharacters > aiBodyRange.max) {
+      addError(
+        `AI 简报正文汉字数（不含来源章节）应为 ${aiBodyRange.min}~${aiBodyRange.max}（当前：${chineseCharacters}）`,
+        relativeFile,
+        1,
+      );
+    }
   }
 
   if (dateClean) {

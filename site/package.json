@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.0",
+    "fast-xml-parser": "5.10.0",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.563.0",

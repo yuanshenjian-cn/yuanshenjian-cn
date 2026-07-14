@@ -1,62 +1,86 @@
 [
   {
+    "id": "openai",
     "name": "OpenAI",
-    "aliases": ["ChatGPT"],
+    "aliases": ["ChatGPT", "Open AI"],
+    "eventTypeKeywords": ["model", "API", "SDK", "Agent", "pricing", "deprecation"],
     "priorityFocus": true
   },
   {
+    "id": "anthropic",
     "name": "Anthropic",
     "aliases": ["Claude"],
+    "eventTypeKeywords": ["model", "API", "SDK", "Agent", "pricing", "context window"],
     "priorityFocus": true
   },
   {
+    "id": "google",
     "name": "Google/DeepMind/Gemini",
-    "aliases": ["Google", "DeepMind", "Gemini", "Google DeepMind"],
+    "aliases": ["Google", "DeepMind", "Gemini", "Google DeepMind", "Google AI"],
+    "eventTypeKeywords": ["model", "Gemini API", "SDK", "Agent", "pricing", "context window"],
     "priorityFocus": true
   },
   {
+    "id": "xai",
     "name": "xAI",
-    "aliases": ["Grok"],
+    "aliases": ["xAI", "Grok", "SpaceXAI"],
+    "eventTypeKeywords": ["model", "API", "Agent", "pricing", "availability"],
     "priorityFocus": true
   },
   {
+    "id": "meta",
     "name": "Meta AI",
     "aliases": ["Meta", "Llama"],
+    "eventTypeKeywords": ["model", "Llama", "open source", "API", "safety"],
     "priorityFocus": true
   },
   {
+    "id": "perplexity",
     "name": "Perplexity",
     "aliases": [],
+    "eventTypeKeywords": ["model", "API", "Agent", "product", "pricing"],
     "priorityFocus": true
   },
   {
+    "id": "mistral",
     "name": "Mistral",
     "aliases": [],
+    "eventTypeKeywords": ["model", "API", "SDK", "Agent", "open source"],
     "priorityFocus": true
   },
   {
+    "id": "kimi",
     "name": "月之暗面/Kimi",
-    "aliases": ["月之暗面", "Kimi"],
+    "aliases": ["月之暗面", "Kimi", "Moonshot AI"],
+    "eventTypeKeywords": ["模型", "API", "Agent", "产品", "开放范围"],
     "priorityFocus": true
   },
   {
+    "id": "mimo",
     "name": "小米 MiMo",
-    "aliases": ["小米", "MiMo", "Xiaomi"],
+    "aliases": ["小米", "MiMo", "Xiaomi", "Xiaomi MiMo"],
+    "eventTypeKeywords": ["模型", "API", "开源", "Hugging Face", "技术报告"],
     "priorityFocus": true
   },
   {
+    "id": "deepseek",
     "name": "DeepSeek",
-    "aliases": [],
+    "aliases": ["深度求索"],
+    "eventTypeKeywords": ["模型", "API", "价格", "开源", "上下文窗口"],
     "priorityFocus": true
   },
   {
+    "id": "zhipu",
     "name": "智谱 AI",
     "aliases": ["智谱", "Zhipu", "GLM"],
+    "eventTypeKeywords": ["模型", "API", "Agent", "开放平台", "开源"],
     "priorityFocus": true
   },
   {
+    "id": "minimax",
     "name": "MiniMax",
-    "aliases": [],
+    "aliases": ["MiniMax AI", "海螺 AI", "Hailuo AI"],
+    "eventTypeKeywords": ["模型", "API", "Agent", "产品", "价格"],
     "priorityFocus": false
   }
 ]

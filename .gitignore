@@ -18,6 +18,7 @@
 # Misc
 .DS_Store
 .local/investment-audits/
+.local/ai-briefing/
 *.pem
 
 # Debug

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>OpenAI News</title>
+    <item>
+      <title>OpenAI launches a new API</title>
+      <link>https://openai.com/index/new-api/?utm_source=rss#details</link>
+      <guid isPermaLink="false">openai-new-api</guid>
+      <pubDate>Tue, 14 Jul 2026 01:00:00 GMT</pubDate>
+      <description><![CDATA[<p>A deterministic API release.</p>]]></description>
+      <author>OpenAI</author>
+    </item>
+    <item>
+      <title>Older item</title>
+      <link>https://openai.com/index/older-item/</link>
+      <guid>openai-older-item</guid>
+      <pubDate>Mon, 13 Jul 2026 01:00:00 GMT</pubDate>
+      <description>Older release.</description>
+    </item>
+  </channel>
+</rss>

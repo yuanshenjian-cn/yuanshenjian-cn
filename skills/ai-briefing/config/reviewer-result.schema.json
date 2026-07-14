@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "evidenceQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "authenticity", "timeliness"],
+      "properties": {
+        "authority": { "type": "string", "minLength": 1 },
+        "authenticity": { "type": "string", "minLength": 1 },
+        "timeliness": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "conclusion", "evidenceQuality"],
+      "properties": {
+        "status": { "const": "approved" },
+        "conclusion": { "const": "可进入发布门禁" },
+        "evidenceQuality": { "$ref": "#/$defs/evidenceQuality" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "conclusion", "blockers", "requiredChanges", "evidenceQuality"],
+      "properties": {
+        "status": { "const": "needs_changes" },
+        "conclusion": { "const": "需修改后复审" },
+        "blockers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "requiredChanges": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evidenceQuality": { "$ref": "#/$defs/evidenceQuality" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "conclusion", "reason", "evidenceQuality"],
+      "properties": {
+        "status": { "const": "blocked" },
+        "conclusion": { "const": "阻断发布" },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidenceQuality": { "$ref": "#/$defs/evidenceQuality" }
+      }
+    }
+  ]
+}
