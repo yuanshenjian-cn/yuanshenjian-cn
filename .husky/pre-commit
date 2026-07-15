@@ -1,1 +1,4 @@
-just check-site && just test-workspace
+npm --prefix site run typecheck \
+  && npm --prefix site run lint \
+  && npm --prefix site run test \
+  && ./site/node_modules/.bin/vitest run -c site/vitest.workspace.config.ts

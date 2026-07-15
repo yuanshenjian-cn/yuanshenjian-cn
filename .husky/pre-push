@@ -1,1 +1,1 @@
-INCREMENTAL_BUILD=true just build-site-prod
+SITE_INCREMENTAL_BUILD=true npm --prefix site run build:prod
