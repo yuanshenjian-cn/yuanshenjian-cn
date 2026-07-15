@@ -121,13 +121,76 @@ describe("AI briefing feed parsing and clustering", () => {
       sourceId: rssSource.id,
       companyId: "openai",
       canonicalUrl: "https://openai.com/index/new-api/",
-      publishedAt: "2026-07-14T01:00:00.000Z",
+      eventAt: "2026-07-14T01:00:00.000Z",
+      eventDate: "2026-07-14",
       timePrecision: "timestamp",
       authority: "official",
     });
     expect(rss[0].candidateId).toMatch(/^sha256:/);
     expect(atom[0].contentHash).toMatch(/^sha256:/);
     expect(atom[0].canonicalUrl).toBe("https://github.com/openai/openai-python/releases/tag/v6.0.0");
+  });
+
+  it("keeps date-only values as source dates", () => {
+    const candidate = collector.normalizeFeedItem(
+      {
+        title: "Date only",
+        link: "https://openai.com/news/date-only",
+        guid: "date-only",
+        pubDate: "2026-07-14",
+      },
+      rssSource,
+    );
+
+    expect(candidate).toMatchObject({
+      timePrecision: "date",
+      sourceDate: "2026-07-14",
+      sourceTimezone: "UTC",
+    });
+    expect(candidate).not.toHaveProperty("eventAt");
+  });
+
+  it("does not use updatedAt when published time is missing", () => {
+    const candidate = collector.normalizeFeedItem(
+      {
+        title: "Updated only",
+        link: [{ "@_href": "https://openai.com/news/updated-only" }],
+        id: "updated-only",
+        updated: "2026-07-14T12:00:00Z",
+      },
+      atomSource,
+    );
+
+    expect(candidate.timePrecision).toBe("unknown");
+    expect(candidate.updatedAt).toBe("2026-07-14T12:00:00.000Z");
+    expect(candidate).not.toHaveProperty("eventAt");
+  });
+
+  it("uses source-scoped candidate ids and cross-source cluster keys", () => {
+    const item = {
+      title: "Shared release",
+      link: "https://openai.com/news/shared",
+      guid: "shared-guid",
+      pubDate: "2026-07-14T01:00:00Z",
+    };
+    const first = collector.normalizeFeedItem(item, rssSource);
+    const second = collector.normalizeFeedItem(item, { ...rssSource, id: "second-source" });
+
+    expect(first.candidateId).not.toBe(second.candidateId);
+    expect(collector.clusterDeterministicCandidates([first, second])).toHaveLength(1);
+  });
+
+  it("rejects a bad item without dropping valid candidates", () => {
+    const xml = `<?xml version="1.0"?><rss version="2.0"><channel><title>Test</title>
+      <item><title>Valid</title><link>https://openai.com/news/valid</link><guid>valid</guid><pubDate>2026-07-14T01:00:00Z</pubDate></item>
+      <item><title>Missing URL</title><guid>bad</guid><pubDate>2026-07-14T02:00:00Z</pubDate></item>
+    </channel></rss>`;
+    const parsed = collector.parseFeedXmlWithMetadata(xml, rssSource);
+
+    expect(parsed.items).toHaveLength(1);
+    expect(parsed.rejectedItems).toEqual([
+      expect.objectContaining({ sourceId: rssSource.id, reasonCode: "missing-url" }),
+    ]);
   });
 
   it("rejects DOCTYPE before XML parsing", () => {
@@ -177,26 +240,22 @@ describe("AI briefing feed parsing and clustering", () => {
 
   it("marks incomplete feed history without guessing coverage", () => {
     const complete = [
-      { effectiveAt: "2026-07-12T00:00:00.000Z" },
-      { effectiveAt: "2026-07-14T00:00:00.000Z" },
+      { eventDate: "2026-07-12" },
+      { eventDate: "2026-07-14" },
     ];
-    const partial = [{ effectiveAt: "2026-07-14T00:00:00.000Z" }];
+    const partial = [{ eventDate: "2026-07-14" }];
 
-    expect(collector.computeWindowCoverage(complete, "2026-07-13T00:00:00.000Z", 100)).toMatchObject({
+    expect(collector.computeWindowCoverage(complete, "2026-07-13", 100)).toMatchObject({
       windowCoverage: "complete",
-      oldestVisibleAt: "2026-07-12T00:00:00.000Z",
+      oldestVisibleDate: "2026-07-12",
     });
-    expect(collector.computeWindowCoverage(partial, "2026-07-13T00:00:00.000Z", 100).windowCoverage).toBe(
-      "partial",
-    );
-    expect(collector.computeWindowCoverage([{ effectiveAt: null }], "2026-07-13T00:00:00.000Z", 100).windowCoverage).toBe(
-      "partial",
-    );
-    expect(collector.computeWindowCoverage([], "2026-07-13T00:00:00.000Z", 100).windowCoverage).toBe("unknown");
+    expect(collector.computeWindowCoverage(partial, "2026-07-13", 100).windowCoverage).toBe("partial");
+    expect(collector.computeWindowCoverage([{ eventDate: null }], "2026-07-13", 100).windowCoverage).toBe("partial");
+    expect(collector.computeWindowCoverage([], "2026-07-13", 100).windowCoverage).toBe("unknown");
     expect(
       collector.computeWindowCoverage(
-        Array.from({ length: 100 }, (_, index) => ({ effectiveAt: `2026-07-14T00:00:${String(index % 60).padStart(2, "0")}.000Z` })),
-        "2026-07-13T00:00:00.000Z",
+        Array.from({ length: 100 }, () => ({ eventDate: "2026-07-14" })),
+        "2026-07-13",
         100,
       ).windowCoverage,
     ).toBe("partial");
@@ -223,7 +282,11 @@ describe("AI briefing feed parsing and clustering", () => {
     const result = await collector.collectSingleFeed(
       { ...rssSource, filterKeywords: ["keep"] },
       {
-        window: { windowStart: "2026-07-01T00:00:00.000Z", windowEnd: "2026-07-15T00:00:00.000Z" },
+        window: {
+          coverageStartDate: "2026-07-01",
+          coverageEndDate: "2026-07-15",
+          observedAt: "2026-07-15T00:00:00.000Z",
+        },
         cacheRoot: path.join(tempRoot, "cache"),
         limits,
       },
@@ -408,8 +471,9 @@ describe("AI briefing feed network safety and cache", () => {
   it("keeps a successful cache when a later fetch fails", async () => {
     const cacheRoot = path.join(tempRoot, "cache");
     const window = {
-      windowStart: "2026-07-13T00:00:00.000Z",
-      windowEnd: "2026-07-15T00:00:00.000Z",
+      coverageStartDate: "2026-07-13",
+      coverageEndDate: "2026-07-15",
+      observedAt: "2026-07-15T00:00:00.000Z",
     };
     await collector.collectSingleFeed(
       rssSource,
@@ -443,8 +507,9 @@ describe("AI briefing feed network safety and cache", () => {
       {
         sources: [rssSource, { ...atomSource, url: "https://feed.example.com/atom.xml" }],
         window: {
-          windowStart: "2026-07-13T00:00:00.000Z",
-          windowEnd: "2026-07-15T00:00:00.000Z",
+          coverageStartDate: "2026-07-13",
+          coverageEndDate: "2026-07-15",
+          observedAt: "2026-07-15T00:00:00.000Z",
         },
         cacheRoot: path.join(tempRoot, "cache"),
         limits,

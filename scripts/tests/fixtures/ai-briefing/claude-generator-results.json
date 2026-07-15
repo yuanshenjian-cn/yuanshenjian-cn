@@ -3,8 +3,10 @@
     "structured_output": {
       "status": "draft_ready",
       "issueDate": "2026-07-15",
-      "filePath": "content/ai-briefings/2026/07/2026-07-15-ai-briefing.md",
+      "candidatePath": ".local/ai-briefing/runs/test/candidate.md",
       "selectionPath": ".local/ai-briefing/runs/test/selection.json",
+      "selfReviewPath": ".local/ai-briefing/runs/test/self-review.json",
+      "coverageConclusion": "degraded",
       "selfReviewConclusion": "通过"
     }
   },
@@ -12,6 +14,9 @@
     "structured_output": {
       "status": "no_events",
       "issueDate": "2026-07-15",
+      "selectionPath": ".local/ai-briefing/runs/test/selection.json",
+      "selfReviewPath": ".local/ai-briefing/runs/test/self-review.json",
+      "coverageConclusion": "sufficient",
       "reason": "本窗口没有可发布的确定性事件"
     }
   },

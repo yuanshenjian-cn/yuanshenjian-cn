@@ -3,6 +3,9 @@
     "structured_output": {
       "status": "approved",
       "conclusion": "可进入发布门禁",
+      "networkStatus": "online",
+      "checkedEvidenceIds": ["page:openai"],
+      "uncheckedHighRiskItems": [],
       "evidenceQuality": {
         "authority": "通过",
         "authenticity": "通过",
@@ -14,6 +17,9 @@
     "structured_output": {
       "status": "needs_changes",
       "conclusion": "需修改后复审",
+      "networkStatus": "partial",
+      "checkedEvidenceIds": [],
+      "uncheckedHighRiskItems": ["event:openai"],
       "blockers": ["来源映射不完整"],
       "requiredChanges": ["补齐来源分组"],
       "evidenceQuality": {
@@ -27,6 +33,9 @@
     "structured_output": {
       "status": "blocked",
       "conclusion": "阻断发布",
+      "networkStatus": "offline",
+      "checkedEvidenceIds": [],
+      "uncheckedHighRiskItems": ["event:critical"],
       "reason": "关键事实无法独立核验",
       "evidenceQuality": {
         "authority": "失败",

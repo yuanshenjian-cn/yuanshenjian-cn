@@ -10,6 +10,7 @@
       "format": "rss",
       "url": "https://openai.com/news/rss.xml",
       "authority": "official",
+      "coverageRole": "supplemental",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "product", "pricing", "availability", "safety", "company"],
       "sourceTimezone": "America/Los_Angeles",
@@ -26,6 +27,7 @@
       "format": "rss",
       "url": "https://blog.google/technology/ai/rss/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "product", "research", "safety", "company"],
       "sourceTimezone": "America/Los_Angeles",
@@ -42,6 +44,7 @@
       "format": "rss",
       "url": "https://deepmind.google/blog/rss.xml",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "research", "product", "safety", "company"],
       "sourceTimezone": "Europe/London",
@@ -58,6 +61,7 @@
       "format": "rss",
       "url": "https://research.google/blog/rss/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "research", "safety"],
       "sourceTimezone": "America/Los_Angeles",
@@ -74,6 +78,7 @@
       "format": "rss",
       "url": "https://about.fb.com/news/feed/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "product", "research", "safety", "company"],
       "filterKeywords": ["AI", "artificial intelligence", "Llama", "Meta AI"],
@@ -91,11 +96,13 @@
       "format": "atom",
       "url": "https://github.com/openai/openai-python/releases.atom",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["api", "sdk", "deprecation"],
       "sourceTimezone": "UTC",
       "allowedRedirectHosts": ["github.com"],
       "allowedArticleHosts": ["github.com"],
+      "allowedUrlPrefixes": ["https://github.com/openai/openai-python/"],
       "enabled": true
     },
     {
@@ -107,11 +114,13 @@
       "format": "atom",
       "url": "https://github.com/anthropics/anthropic-sdk-python/releases.atom",
       "authority": "official",
+      "coverageRole": "supplemental",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["api", "sdk", "deprecation"],
       "sourceTimezone": "UTC",
       "allowedRedirectHosts": ["github.com"],
       "allowedArticleHosts": ["github.com"],
+      "allowedUrlPrefixes": ["https://github.com/anthropics/anthropic-sdk-python/"],
       "enabled": true
     },
     {
@@ -123,11 +132,13 @@
       "format": "atom",
       "url": "https://github.com/googleapis/python-genai/releases.atom",
       "authority": "official",
+      "coverageRole": "supplemental",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["api", "sdk", "deprecation"],
       "sourceTimezone": "UTC",
       "allowedRedirectHosts": ["github.com"],
       "allowedArticleHosts": ["github.com"],
+      "allowedUrlPrefixes": ["https://github.com/googleapis/python-genai/"],
       "enabled": true
     },
     {
@@ -139,6 +150,7 @@
       "format": "rss",
       "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
       "authority": "media",
+      "coverageRole": "discovery",
       "confirmationPolicy": {
         "default": "needs-corroboration",
         "byCategory": {
@@ -163,6 +175,7 @@
       "format": "rss",
       "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
       "authority": "media",
+      "coverageRole": "discovery",
       "confirmationPolicy": {
         "default": "needs-corroboration",
         "byCategory": {
@@ -187,11 +200,16 @@
       "format": "html",
       "url": "https://platform.openai.com/docs/changelog",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "pricing", "availability", "deprecation"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["platform.openai.com", "developers.openai.com"],
       "allowedArticleHosts": ["platform.openai.com", "developers.openai.com"],
+      "allowedUrlPrefixes": [
+        "https://platform.openai.com/docs/changelog",
+        "https://developers.openai.com/"
+      ],
       "enabled": true
     },
     {
@@ -203,11 +221,17 @@
       "format": "html",
       "url": "https://www.anthropic.com/news",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "pricing", "availability", "safety", "company"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["www.anthropic.com", "anthropic.com"],
       "allowedArticleHosts": ["www.anthropic.com", "anthropic.com", "docs.anthropic.com"],
+      "allowedUrlPrefixes": [
+        "https://www.anthropic.com/news",
+        "https://anthropic.com/news",
+        "https://docs.anthropic.com/"
+      ],
       "enabled": true
     },
     {
@@ -219,11 +243,13 @@
       "format": "html",
       "url": "https://ai.google.dev/gemini-api/docs/changelog",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "pricing", "availability", "deprecation"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["ai.google.dev"],
       "allowedArticleHosts": ["ai.google.dev"],
+      "allowedUrlPrefixes": ["https://ai.google.dev/gemini-api/docs/changelog"],
       "enabled": true
     },
     {
@@ -235,11 +261,13 @@
       "format": "html",
       "url": "https://x.ai/news",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "agent", "product", "pricing", "availability", "company"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["x.ai"],
       "allowedArticleHosts": ["x.ai", "docs.x.ai"],
+      "allowedUrlPrefixes": ["https://x.ai/news", "https://docs.x.ai/"],
       "enabled": true
     },
     {
@@ -251,11 +279,13 @@
       "format": "html",
       "url": "https://ai.meta.com/blog/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "product", "research", "safety", "availability"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["ai.meta.com"],
-      "allowedArticleHosts": ["ai.meta.com", "about.fb.com", "huggingface.co", "github.com"],
+      "allowedArticleHosts": ["ai.meta.com", "about.fb.com"],
+      "allowedUrlPrefixes": ["https://ai.meta.com/blog/", "https://about.fb.com/news/"],
       "enabled": true
     },
     {
@@ -267,11 +297,13 @@
       "format": "html",
       "url": "https://docs.perplexity.ai/changelog",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "product", "pricing", "availability"],
       "sourceTimezone": "America/Los_Angeles",
       "allowedRedirectHosts": ["docs.perplexity.ai"],
       "allowedArticleHosts": ["docs.perplexity.ai", "www.perplexity.ai"],
+      "allowedUrlPrefixes": ["https://docs.perplexity.ai/changelog", "https://www.perplexity.ai/"],
       "enabled": true
     },
     {
@@ -283,11 +315,17 @@
       "format": "html",
       "url": "https://mistral.ai/news/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "sdk", "agent", "pricing", "availability", "company"],
       "sourceTimezone": "Europe/Paris",
       "allowedRedirectHosts": ["mistral.ai", "www.mistral.ai"],
-      "allowedArticleHosts": ["mistral.ai", "www.mistral.ai", "docs.mistral.ai", "huggingface.co", "github.com"],
+      "allowedArticleHosts": ["mistral.ai", "www.mistral.ai", "docs.mistral.ai"],
+      "allowedUrlPrefixes": [
+        "https://mistral.ai/news/",
+        "https://www.mistral.ai/news/",
+        "https://docs.mistral.ai/"
+      ],
       "enabled": true
     },
     {
@@ -299,11 +337,18 @@
       "format": "html",
       "url": "https://www.kimi.com/blog",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "agent", "product", "pricing", "availability", "company"],
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["www.kimi.com", "kimi.com"],
       "allowedArticleHosts": ["www.kimi.com", "kimi.com", "www.moonshot.cn", "moonshot.cn"],
+      "allowedUrlPrefixes": [
+        "https://www.kimi.com/blog",
+        "https://kimi.com/blog",
+        "https://www.moonshot.cn/",
+        "https://moonshot.cn/"
+      ],
       "enabled": true
     },
     {
@@ -315,11 +360,13 @@
       "format": "html",
       "url": "https://mimo.xiaomi.com/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "research", "availability", "company"],
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["mimo.xiaomi.com"],
-      "allowedArticleHosts": ["mimo.xiaomi.com", "github.com", "huggingface.co"],
+      "allowedArticleHosts": ["mimo.xiaomi.com"],
+      "allowedUrlPrefixes": ["https://mimo.xiaomi.com/"],
       "enabled": true
     },
     {
@@ -331,11 +378,13 @@
       "format": "api",
       "url": "https://huggingface.co/XiaomiMiMo",
       "authority": "official",
+      "coverageRole": "supplemental",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "research", "availability"],
       "sourceTimezone": "UTC",
       "allowedRedirectHosts": ["huggingface.co"],
       "allowedArticleHosts": ["huggingface.co"],
+      "allowedUrlPrefixes": ["https://huggingface.co/XiaomiMiMo"],
       "enabled": true
     },
     {
@@ -347,11 +396,13 @@
       "format": "html",
       "url": "https://api-docs.deepseek.com/news/",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "pricing", "availability", "deprecation", "company"],
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["api-docs.deepseek.com"],
-      "allowedArticleHosts": ["api-docs.deepseek.com", "www.deepseek.com", "github.com", "huggingface.co"],
+      "allowedArticleHosts": ["api-docs.deepseek.com", "www.deepseek.com"],
+      "allowedUrlPrefixes": ["https://api-docs.deepseek.com/news/", "https://www.deepseek.com/"],
       "enabled": true
     },
     {
@@ -363,11 +414,17 @@
       "format": "html",
       "url": "https://www.zhipuai.cn/news",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "agent", "product", "pricing", "availability", "company"],
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["www.zhipuai.cn", "zhipuai.cn"],
-      "allowedArticleHosts": ["www.zhipuai.cn", "zhipuai.cn", "open.bigmodel.cn", "github.com", "huggingface.co"],
+      "allowedArticleHosts": ["www.zhipuai.cn", "zhipuai.cn", "open.bigmodel.cn"],
+      "allowedUrlPrefixes": [
+        "https://www.zhipuai.cn/news",
+        "https://zhipuai.cn/news",
+        "https://open.bigmodel.cn/"
+      ],
       "enabled": true
     },
     {
@@ -379,11 +436,18 @@
       "format": "html",
       "url": "https://www.minimaxi.com/news",
       "authority": "official",
+      "coverageRole": "primary",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["model", "api", "agent", "product", "pricing", "availability", "company"],
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["www.minimaxi.com", "minimaxi.com"],
       "allowedArticleHosts": ["www.minimaxi.com", "minimaxi.com", "api.minimax.chat", "hailuoai.com"],
+      "allowedUrlPrefixes": [
+        "https://www.minimaxi.com/news",
+        "https://minimaxi.com/news",
+        "https://api.minimax.chat/",
+        "https://hailuoai.com/"
+      ],
       "enabled": true
     },
     {
@@ -395,6 +459,7 @@
       "format": "auto",
       "queryTemplates": ["site:reuters.com {company} {category} after:{windowStartDate} before:{windowEndDate}"],
       "authority": "media",
+      "coverageRole": "discovery",
       "confirmationPolicy": {
         "default": "needs-corroboration",
         "byCategory": {
@@ -419,6 +484,7 @@
       "format": "auto",
       "queryTemplates": ["site:bloomberg.com {company} {category} after:{windowStartDate} before:{windowEndDate}"],
       "authority": "media",
+      "coverageRole": "discovery",
       "confirmationPolicy": {
         "default": "needs-corroboration",
         "byCategory": {
@@ -443,6 +509,7 @@
       "format": "auto",
       "queryTemplates": ["site:36kr.com {company} {category} {windowStartDate} {windowEndDate}"],
       "authority": "media",
+      "coverageRole": "discovery",
       "confirmationPolicy": {
         "default": "needs-corroboration",
         "byCategory": {

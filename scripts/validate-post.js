@@ -33,10 +33,10 @@ const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
   contentRulesV2EffectiveDate: "2026-07-15",
   dynamicBodyLengthRules: [
-    { minEvents: 1, maxEvents: 1, min: 450, max: 800 },
-    { minEvents: 2, maxEvents: 3, min: 750, max: 1300 },
-    { minEvents: 4, maxEvents: 6, min: 1100, max: 1800 },
-    { minEvents: 7, maxEvents: null, min: 1500, max: 2200 },
+    { minEvents: 1, maxEvents: 1, recommendedMin: 450, recommendedMax: 800, hardMax: 1200 },
+    { minEvents: 2, maxEvents: 3, recommendedMin: 750, recommendedMax: 1300, hardMax: 1800 },
+    { minEvents: 4, maxEvents: 6, recommendedMin: 1100, recommendedMax: 1800, hardMax: 2400 },
+    { minEvents: 7, maxEvents: null, recommendedMin: 1500, recommendedMax: 2200, hardMax: 3200 },
   ],
   bodyLengthRules: [
     {
@@ -98,17 +98,28 @@ const MARKDOWN_LINK_RE = /(?<!!)\[[^\]]+\]\(([^)\s]+)(?:\s+['"][^'"]*['"])?\)/g;
 /** @type {string[]} */
 const args = process.argv.slice(2);
 let checkPathOnly = false;
+let checkReplaceable = false;
 let strictWriting = false;
 /** @type {string | null} */
 let targetPath = null;
+/** @type {string | null} */
+let logicalPath = null;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--check-path") {
     checkPathOnly = true;
     targetPath = args[i + 1];
     i++;
+  } else if (args[i] === "--check-replaceable") {
+    checkReplaceable = true;
   } else if (args[i] === "--strict-writing") {
     strictWriting = true;
+  } else if (args[i] === "--path") {
+    targetPath = args[i + 1];
+    i++;
+  } else if (args[i] === "--logical-path") {
+    logicalPath = args[i + 1];
+    i++;
   } else if (!args[i].startsWith("-")) {
     targetPath = args[i];
   }
@@ -116,6 +127,14 @@ for (let i = 0; i < args.length; i++) {
 
 if (checkPathOnly && !targetPath) {
   console.error("❌ --check-path 需要提供目标文件路径");
+  process.exit(1);
+}
+if (logicalPath && !targetPath) {
+  console.error("❌ --logical-path 必须与 --path 一起使用");
+  process.exit(1);
+}
+if (checkReplaceable && !targetPath) {
+  console.error("❌ --check-replaceable 必须与 --path 一起使用");
   process.exit(1);
 }
 
@@ -388,13 +407,18 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
   if (uniqueEventHeadings.size !== eventHeadings.length) {
     addError("同一事件标题不得同时或重复出现在重点动态与补充更新", relativeFile, 1);
   }
+  if (uniqueOverviewItems.size !== overviewItems.length || overviewItems.length !== eventHeadings.length) {
+    addError("V2 AI 简报速览条目数必须等于正文事件数，且每条摘要必须唯一并按正文顺序排列", relativeFile, 1);
+  }
+  const requiredSections = Array.isArray(aiBriefingConfig.requiredSections)
+    ? aiBriefingConfig.requiredSections
+    : DEFAULT_AI_BRIEFING_CONFIG.requiredSections;
   if (
-    uniqueOverviewItems.size !== overviewItems.length ||
-    overviewItems.length !== eventHeadings.length ||
-    overviewItems.some((item) => !uniqueEventHeadings.has(item)) ||
-    eventHeadings.some((heading) => !uniqueOverviewItems.has(heading))
+    eventHeadings.length > 1 &&
+    requiredSections.includes("为什么值得关注") &&
+    !findHeading(parsed.body, "为什么值得关注")
   ) {
-    addError("V2 AI 简报速览条目数必须等于正文事件数，且标题必须一一对应", relativeFile, 1);
+    addError("AI 简报缺少 `## 为什么值得关注` 章节", relativeFile, 1);
   }
 
   const sourceGroupHeadings = sourceGroups.map((group) => group.heading);
@@ -439,9 +463,9 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
   const chineseCharacters = countChineseCharacters(
     removeSections(parsed.body, [aiBriefingConfig.sourceSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.sourceSectionHeading]),
   );
-  if (bodyRange && (chineseCharacters < bodyRange.min || chineseCharacters > bodyRange.max)) {
+  if (bodyRange && chineseCharacters > bodyRange.hardMax) {
     addError(
-      `AI 简报正文汉字数（不含来源章节，${eventHeadings.length} 个事件）应为 ${bodyRange.min}~${bodyRange.max}（当前：${chineseCharacters}）`,
+      `AI 简报正文汉字数（不含来源章节，${eventHeadings.length} 个事件）超过硬上限 ${bodyRange.hardMax}（当前：${chineseCharacters}）`,
       relativeFile,
       1,
     );
@@ -667,6 +691,19 @@ function validateContentPath(filePath) {
     addError(`目标目录不存在：${toPosixPath(path.relative(ROOT, targetDir))}`, filePath);
   }
 
+  return absolutePath;
+}
+
+function validateAiBriefingCandidatePath(filePath) {
+  const absolutePath = path.resolve(ROOT, filePath);
+  const runsRoot = path.join(ROOT, ".local", "ai-briefing", "runs");
+  const relativeToRunsRoot = path.relative(runsRoot, absolutePath);
+  if (relativeToRunsRoot.startsWith("..") || path.isAbsolute(relativeToRunsRoot)) {
+    addError(`AI 简报 candidate 必须位于 .local/ai-briefing/runs/ 下（当前：${filePath}）`, filePath);
+  }
+  if (!BRIEFING_EXT_RE.test(filePath)) {
+    addError(`AI 简报 candidate 扩展名必须是 .md（当前：${path.extname(filePath) || "无扩展名"}）`, filePath);
+  }
   return absolutePath;
 }
 
@@ -896,8 +933,8 @@ function validatePostFile(file, slugs) {
  * @param {string} file
  * @param {Set<string>} slugs
  */
-function validateBriefingFile(file, slugs) {
-  const relativeFile = toPosixPath(path.relative(ROOT, file));
+function validateBriefingFile(file, slugs, logicalFile = file) {
+  const relativeFile = toPosixPath(path.relative(ROOT, logicalFile));
   const content = fs.readFileSync(file, "utf-8");
   const parsed = parseFrontmatter(content);
   const genericAiHeadingSet = buildGenericHeadingSet(aiFocusCompanies);
@@ -946,10 +983,13 @@ function validateBriefingFile(file, slugs) {
     addError("frontmatter 缺少 brief 或 brief 为空", relativeFile, 1);
   }
 
+  const v2EffectiveDate = aiBriefingConfig.contentRulesV2EffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.contentRulesV2EffectiveDate;
+  const usesV2Rules = Boolean(dateClean && dateClean >= v2EffectiveDate);
   const requiredSections = Array.isArray(aiBriefingConfig.requiredSections)
     ? aiBriefingConfig.requiredSections
     : DEFAULT_AI_BRIEFING_CONFIG.requiredSections;
   for (const section of requiredSections) {
+    if (usesV2Rules && section === "为什么值得关注") continue;
     if (!findHeading(parsed.body, section)) {
       addError(`AI 简报缺少 \`## ${section}\` 章节`, relativeFile, 1);
     }
@@ -961,8 +1001,7 @@ function validateBriefingFile(file, slugs) {
     addError("AI 简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
   }
 
-  const v2EffectiveDate = aiBriefingConfig.contentRulesV2EffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.contentRulesV2EffectiveDate;
-  if (dateClean && dateClean >= v2EffectiveDate) {
+  if (usesV2Rules) {
     validateAiBriefingV2({ file, relativeFile, parsed, dateClean });
   } else {
     const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
@@ -989,7 +1028,7 @@ function validateBriefingFile(file, slugs) {
     );
   }
 
-  validateLinksAndImages(parsed.body, file, slugs);
+  validateLinksAndImages(parsed.body, logicalFile, slugs);
 }
 
 /**
@@ -1205,7 +1244,10 @@ function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sec
     return;
   }
 
-  const currentEntries = extractDedupeEntries(parsedCurrent.body, sectionHeading, genericHeadingSet);
+  const dedupeHeadings = label === "AI 简报" ? [...new Set([sectionHeading, "补充更新"])] : [sectionHeading];
+  const extractEntries = (body) =>
+    dedupeHeadings.flatMap((heading) => extractDedupeEntries(body, heading, genericHeadingSet));
+  const currentEntries = extractEntries(parsedCurrent.body);
   if (currentEntries.length === 0) {
     return;
   }
@@ -1218,7 +1260,7 @@ function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sec
     .filter((entry) => !dedupeEffectiveFrom || entry.date >= dedupeEffectiveFrom)
     .sort((left, right) => (right.date > left.date ? 1 : right.date < left.date ? -1 : 0))
     .slice(0, lookbackIssues)
-    .flatMap((entry) => extractDedupeEntries(entry.body, sectionHeading, genericHeadingSet).map((item) => ({
+    .flatMap((entry) => extractEntries(entry.body).map((item) => ({
       ...item,
       file: entry.file,
     })));
@@ -1418,25 +1460,41 @@ const slugUsage = collectSlugUsage(allFiles);
 const slugSet = new Set(slugUsage.keys());
 
 if (targetPath) {
-  const absolutePath = validateContentPath(targetPath);
-  const relativeTarget = toPosixPath(path.relative(ROOT, absolutePath));
-  const targetSlug = path.basename(targetPath).replace(MARKDOWN_EXT_RE, "");
+  const logicalAbsolutePath = logicalPath ? validateContentPath(logicalPath) : null;
+  const absolutePath = logicalPath ? validateAiBriefingCandidatePath(targetPath) : validateContentPath(targetPath);
+  const effectivePath = logicalAbsolutePath || absolutePath;
+  const relativeTarget = toPosixPath(path.relative(ROOT, effectivePath));
+  const targetSlug = path.basename(relativeTarget).replace(MARKDOWN_EXT_RE, "");
   const conflicts = (slugUsage.get(targetSlug) ?? []).filter((file) => file !== relativeTarget);
 
-  if (checkPathOnly && fs.existsSync(absolutePath)) {
+  if (checkReplaceable) {
+    if (!relativeTarget.startsWith("content/ai-briefings/")) {
+      addError("--check-replaceable 只允许 AI 简报正式路径", targetPath);
+    } else if (!fs.existsSync(absolutePath)) {
+      addError("待替换的 AI 简报不存在", targetPath);
+    } else {
+      const parsed = parseFrontmatter(fs.readFileSync(absolutePath, "utf8"));
+      const publishedRaw = parsed ? extractField(parsed.raw, "published") : null;
+      if (!parsed) {
+        addError("待替换的 AI 简报缺少 frontmatter", targetPath);
+      } else if (publishedRaw !== null && unquote(publishedRaw) === "true") {
+        addError("published: true 的 AI 简报禁止替换", targetPath);
+      }
+    }
+  } else if (checkPathOnly && fs.existsSync(absolutePath)) {
     addError(`文件已存在：${targetPath}`, targetPath);
   }
 
-  if (conflicts.length > 0) {
+  if (!checkReplaceable && conflicts.length > 0) {
     addError(`Slug 冲突：slug "${targetSlug}" 已被 ${conflicts.join(", ")} 使用`, targetPath);
   }
 
-  if (!checkPathOnly) {
+  if (!checkPathOnly && !checkReplaceable) {
     if (!fs.existsSync(absolutePath)) {
       addError(`文件不存在，无法校验：${targetPath}`, targetPath);
     } else {
       if (relativeTarget.startsWith("content/ai-briefings/")) {
-        validateBriefingFile(absolutePath, slugSet);
+        validateBriefingFile(absolutePath, slugSet, effectivePath);
       } else if (relativeTarget.startsWith("content/investment-briefings/")) {
         validateInvestmentBriefingFile(absolutePath, slugSet);
       } else {

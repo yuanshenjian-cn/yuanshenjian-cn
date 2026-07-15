@@ -31,6 +31,12 @@ function differenceInCalendarDays(laterDate, earlierDate) {
   return (parseCalendarDate(laterDate).timestamp - parseCalendarDate(earlierDate).timestamp) / DAY_MS;
 }
 
+function addCalendarDays(value, days) {
+  if (!Number.isInteger(days)) throw new Error(`days 必须为整数：${days}`);
+  const { timestamp } = parseCalendarDate(value);
+  return new Date(timestamp + days * DAY_MS).toISOString().slice(0, 10);
+}
+
 function getShanghaiDate(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Shanghai",
@@ -82,31 +88,32 @@ function findPreviousPublishedBriefing({ issueDate, briefingsRoot }) {
 
 function calculateBriefingWindow({
   issueDate,
-  windowEnd,
+  observedAt,
   briefingsRoot,
-  initialLookbackHours = 24,
+  initialLookbackDays = 1,
 }) {
   parseCalendarDate(issueDate);
-  const windowEndDate = new Date(windowEnd);
-  if (Number.isNaN(windowEndDate.getTime())) throw new Error(`windowEnd 不是合法时间：${windowEnd}`);
-  if (!Number.isFinite(initialLookbackHours) || initialLookbackHours <= 0) {
-    throw new Error("initialLookbackHours 必须为正数");
+  const observedAtDate = new Date(observedAt);
+  if (Number.isNaN(observedAtDate.getTime())) throw new Error(`observedAt 不是合法时间：${observedAt}`);
+  if (!Number.isInteger(initialLookbackDays) || initialLookbackDays <= 0) {
+    throw new Error("initialLookbackDays 必须为正整数");
   }
 
   const previous = findPreviousPublishedBriefing({ issueDate, briefingsRoot });
-  const calendarDayDifference = previous ? differenceInCalendarDays(issueDate, previous.date) : null;
-  const windowHours = previous ? calendarDayDifference * 24 : initialLookbackHours;
-  const windowStart = new Date(windowEndDate.getTime() - windowHours * 60 * 60 * 1000).toISOString();
+  const nominalDays = previous ? differenceInCalendarDays(issueDate, previous.date) : initialLookbackDays;
+  const coverageStartDate = previous?.date || addCalendarDays(issueDate, -initialLookbackDays);
 
   return {
     issueDate,
     previousIssueDate: previous?.date || null,
-    calendarDayDifference,
-    windowHours,
-    windowStart,
-    windowEnd: windowEndDate.toISOString(),
+    nominalDays,
+    coverageStartDate,
+    coverageEndDate: issueDate,
+    observedAt: observedAtDate.toISOString(),
+    searchStartDate: addCalendarDays(coverageStartDate, -1),
+    searchEndDateExclusive: addCalendarDays(issueDate, 2),
     timezone: "Asia/Shanghai",
-    strategy: previous ? "calendar-day-gap-hours" : "initial-lookback",
+    strategy: previous ? "calendar-date-overlap" : "initial-calendar-date-lookback",
   };
 }
 
@@ -131,18 +138,18 @@ function main() {
   const config = loadAiBriefingSkillConfig().briefing;
   const result = calculateBriefingWindow({
     issueDate: args["issue-date"] || getShanghaiDate(now),
-    windowEnd: args["window-end"] || now.toISOString(),
+    observedAt: args["observed-at"] || now.toISOString(),
     briefingsRoot: args["briefings-root"] || path.resolve(__dirname, "..", "content", "ai-briefings"),
-    initialLookbackHours: args["initial-lookback-hours"]
-      ? Number(args["initial-lookback-hours"])
-      : config.initialLookbackHours,
+    initialLookbackDays: args["initial-lookback-days"]
+      ? Number(args["initial-lookback-days"])
+      : config.initialLookbackDays,
   });
 
   const output = path.resolve(args.output);
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`);
   process.stdout.write(
-    `AI 简报窗口：${result.issueDate}，回溯 ${result.windowHours} 小时，${result.windowStart} -> ${result.windowEnd}\n`,
+    `AI 简报窗口：${result.issueDate}，名义 ${result.nominalDays} 天，${result.coverageStartDate} -> ${result.coverageEndDate}\n`,
   );
 }
 
@@ -156,6 +163,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  addCalendarDays,
   calculateBriefingWindow,
   differenceInCalendarDays,
   findPreviousPublishedBriefing,

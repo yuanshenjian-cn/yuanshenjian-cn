@@ -6,19 +6,21 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 interface BriefingWindow {
   previousIssueDate: string | null;
-  calendarDayDifference: number | null;
-  windowHours: number;
-  windowStart: string;
-  windowEnd: string;
-  strategy: string;
+  nominalDays: number;
+  coverageStartDate: string;
+  coverageEndDate: string;
+  observedAt: string;
+  searchStartDate: string;
+  searchEndDateExclusive: string;
+  strategy: "calendar-date-overlap" | "initial-calendar-date-lookback";
 }
 
 let tempRoot: string;
 let calculateBriefingWindow: (input: {
   issueDate: string;
-  windowEnd: string;
+  observedAt: string;
   briefingsRoot: string;
-  initialLookbackHours?: number;
+  initialLookbackDays?: number;
 }) => BriefingWindow;
 
 function writeBriefing(date: string, published = true, extension = ".md") {
@@ -38,22 +40,25 @@ afterEach(() => {
 
 describe("AI briefing calendar-day window", () => {
   it.each([
-    ["2026-07-14", 1, 24],
-    ["2026-07-13", 2, 48],
-    ["2026-07-12", 3, 72],
-  ])("uses the calendar-day gap from %s", (previousDate, dayDifference, windowHours) => {
+    ["2026-07-14", 1],
+    ["2026-07-13", 2],
+    ["2026-07-12", 3],
+  ])("uses an inclusive calendar-date overlap from %s", (previousDate, nominalDays) => {
     writeBriefing(previousDate);
 
     const result = calculateBriefingWindow({
       issueDate: "2026-07-15",
-      windowEnd: "2026-07-15T00:00:00.000Z",
+      observedAt: "2026-07-15T12:00:00.000Z",
       briefingsRoot: tempRoot,
-      initialLookbackHours: 24,
+      initialLookbackDays: 1,
     });
 
     expect(result.previousIssueDate).toBe(previousDate);
-    expect(result.calendarDayDifference).toBe(dayDifference);
-    expect(result.windowHours).toBe(windowHours);
+    expect(result.nominalDays).toBe(nominalDays);
+    expect(result.coverageStartDate).toBe(previousDate);
+    expect(result.coverageEndDate).toBe("2026-07-15");
+    expect(result.observedAt).toBe("2026-07-15T12:00:00.000Z");
+    expect(result).not.toHaveProperty("windowStart");
   });
 
   it("uses the initial lookback without published history", () => {
@@ -62,16 +67,19 @@ describe("AI briefing calendar-day window", () => {
 
     const result = calculateBriefingWindow({
       issueDate: "2026-07-15",
-      windowEnd: "2026-07-15T00:00:00.000Z",
+      observedAt: "2026-07-15T00:00:00.000Z",
       briefingsRoot: tempRoot,
-      initialLookbackHours: 24,
+      initialLookbackDays: 1,
     });
 
     expect(result).toMatchObject({
       previousIssueDate: null,
-      calendarDayDifference: null,
-      windowHours: 24,
-      strategy: "initial-lookback",
+      nominalDays: 1,
+      coverageStartDate: "2026-07-14",
+      coverageEndDate: "2026-07-15",
+      searchStartDate: "2026-07-13",
+      searchEndDateExclusive: "2026-07-17",
+      strategy: "initial-calendar-date-lookback",
     });
   });
 
@@ -81,7 +89,7 @@ describe("AI briefing calendar-day window", () => {
     expect(() =>
       calculateBriefingWindow({
         issueDate: "2026-07-15",
-        windowEnd: "2026-07-15T00:00:00.000Z",
+        observedAt: "2026-07-15T00:00:00.000Z",
         briefingsRoot: tempRoot,
       }),
     ).toThrow("已存在同日或未来日期的已发布 AI 简报");
@@ -96,7 +104,7 @@ describe("AI briefing calendar-day window", () => {
         "scripts/ai-briefing-window.js",
         "--issue-date",
         "2026-07-15",
-        "--window-end",
+        "--observed-at",
         "2026-07-15T00:00:00.000Z",
         "--briefings-root",
         tempRoot,
@@ -108,10 +116,13 @@ describe("AI briefing calendar-day window", () => {
 
     expect(result.status).toBe(0);
     expect(JSON.parse(fs.readFileSync(output, "utf8"))).toMatchObject({
-      strategy: "calendar-day-gap-hours",
-      windowHours: 48,
-      windowStart: "2026-07-13T00:00:00.000Z",
-      windowEnd: "2026-07-15T00:00:00.000Z",
+      strategy: "calendar-date-overlap",
+      nominalDays: 2,
+      coverageStartDate: "2026-07-13",
+      coverageEndDate: "2026-07-15",
+      observedAt: "2026-07-15T00:00:00.000Z",
+      searchStartDate: "2026-07-12",
+      searchEndDateExclusive: "2026-07-17",
     });
   });
 });

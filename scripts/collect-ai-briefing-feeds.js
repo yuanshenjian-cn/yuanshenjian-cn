@@ -62,9 +62,36 @@ function normalizeUrl(value) {
 
 function normalizeTimestamp(value) {
   const text = sanitizeText(value, 200);
-  if (!text) return null;
+  if (!text || !/(?:Z|[+-]\d{2}:?\d{2}|GMT|UTC)$/i.test(text)) return null;
   const parsed = new Date(text);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function formatDateInTimezone(value, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${byType.year}-${byType.month}-${byType.day}`;
+}
+
+function classifySourceTime(value, sourceTimezone) {
+  const text = sanitizeText(value, 200);
+  if (!text) return { timePrecision: "unknown", sourceTimezone };
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return { timePrecision: "date", sourceDate: text, sourceTimezone };
+  }
+  const eventAt = normalizeTimestamp(text);
+  if (!eventAt) return { timePrecision: "unknown", sourceTimezone };
+  return {
+    timePrecision: "timestamp",
+    eventAt,
+    eventDate: formatDateInTimezone(eventAt, "Asia/Shanghai"),
+    sourceTimezone,
+  };
 }
 
 function extractAtomLink(item) {
@@ -81,31 +108,27 @@ function normalizeFeedItem(item, source) {
   const rawUrl = isAtom ? extractAtomLink(item) : getText(item.link);
   const canonicalUrl = normalizeUrl(rawUrl);
   const guid = sanitizeText(isAtom ? item.id : item.guid, 1000) || null;
-  const publishedAt = normalizeTimestamp(item.published ?? item.pubDate ?? item.date);
+  const publishedTime = classifySourceTime(item.published ?? item.pubDate ?? item.date, source.sourceTimezone);
   const updatedAt = normalizeTimestamp(item.updated ?? item.lastBuildDate);
-  const effectiveAt = publishedAt || updatedAt;
   const summary = sanitizeText(item.summary ?? item.description ?? item.content, 4000);
   const author = sanitizeText(item.author?.name ?? item.author ?? item.creator, 500) || null;
   const officialLandingUrl = normalizeUrl(
     item.officialLandingUrl ?? item.official_link ?? item["official-landing-url"],
   );
-  const stableIdentity = guid || canonicalUrl || `${source.id}\n${title}\n${effectiveAt || ""}`;
-  const contentHash = sha256(JSON.stringify({ title, canonicalUrl, publishedAt, updatedAt, summary, author }));
+  const sourceItemIdentity = guid || canonicalUrl || `${title}\n${publishedTime.eventAt || publishedTime.sourceDate || ""}`;
+  const contentHash = sha256(JSON.stringify({ title, canonicalUrl, publishedTime, updatedAt, summary, author }));
 
   return {
-    candidateId: sha256(stableIdentity),
+    candidateId: sha256(`${source.id}\n${sourceItemIdentity}`),
     sourceId: source.id,
     companyId: source.companyId,
     title,
     canonicalUrl,
     officialLandingUrl,
     guid,
-    publishedAt,
+    publishedAt: publishedTime.eventAt || null,
     updatedAt,
-    effectiveAt,
-    timePrecision: effectiveAt ? "timestamp" : "unknown",
-    sourceTimezone: source.sourceTimezone,
-    timeConvention: effectiveAt ? "exact" : "unknown",
+    ...publishedTime,
     authority: source.authority,
     confirmationPolicy: source.confirmationPolicy,
     summary,
@@ -135,17 +158,51 @@ function parseFeedXmlWithMetadata(xml, source, options = {}) {
     strictReservedNames: true,
   });
   const parsed = parser.parse(xml);
-  const rawItems = parsed.rss?.channel?.item ?? parsed.feed?.entry ?? [];
+  const rawItems = asArray(parsed.rss?.channel?.item ?? parsed.feed?.entry ?? []);
   const maxItems = options.maxItems ?? Number.POSITIVE_INFINITY;
-  const normalized = asArray(rawItems).map((item, index) => ({ candidate: normalizeFeedItem(item, source), index }));
+  const normalized = rawItems.map((item, index) => ({ candidate: normalizeFeedItem(item, source), index }));
   normalized.sort((left, right) => {
-    const leftTime = left.candidate.effectiveAt ? new Date(left.candidate.effectiveAt).getTime() : Number.NEGATIVE_INFINITY;
-    const rightTime = right.candidate.effectiveAt ? new Date(right.candidate.effectiveAt).getTime() : Number.NEGATIVE_INFINITY;
+    const leftTime = left.candidate.eventAt
+      ? new Date(left.candidate.eventAt).getTime()
+      : left.candidate.sourceDate
+        ? new Date(`${left.candidate.sourceDate}T00:00:00Z`).getTime()
+        : Number.NEGATIVE_INFINITY;
+    const rightTime = right.candidate.eventAt
+      ? new Date(right.candidate.eventAt).getTime()
+      : right.candidate.sourceDate
+        ? new Date(`${right.candidate.sourceDate}T00:00:00Z`).getTime()
+        : Number.NEGATIVE_INFINITY;
     return rightTime - leftTime || left.index - right.index;
   });
   const rawItemCount = normalized.length;
   const itemLimitReached = Number.isFinite(maxItems) && rawItemCount >= maxItems;
-  let candidates = normalized.slice(0, maxItems).map(({ candidate }) => candidate);
+  const rejectedItems = [];
+  let candidates = [];
+
+  for (const { candidate, index } of normalized.slice(0, maxItems)) {
+    let reasonCode = null;
+    let reason = null;
+    if (!candidate.title) {
+      reasonCode = "missing-title";
+      reason = "候选缺少标题";
+    } else if (!candidate.canonicalUrl) {
+      reasonCode = "missing-url";
+      reason = "候选缺少可验证 URL";
+    } else if (candidate.timePrecision === "unknown") {
+      reasonCode = "unknown-time";
+      reason = "候选缺少可比较的发布时间";
+    }
+    if (reasonCode) {
+      rejectedItems.push({
+        sourceId: source.id,
+        itemIdentity: candidate.guid || candidate.candidateId || `item-${index}`,
+        reasonCode,
+        reason,
+      });
+    } else {
+      candidates.push(candidate);
+    }
+  }
 
   if (Array.isArray(source.filterKeywords) && source.filterKeywords.length > 0) {
     const keywords = source.filterKeywords.map((keyword) => keyword.toLowerCase());
@@ -155,7 +212,7 @@ function parseFeedXmlWithMetadata(xml, source, options = {}) {
     });
   }
 
-  return { items: candidates, rawItemCount, itemLimitReached };
+  return { items: candidates, rejectedItems, rawItemCount, itemLimitReached };
 }
 
 function parseFeedXml(xml, source, options = {}) {
@@ -494,17 +551,17 @@ async function fetchSourceXml(source, cacheEntry, dependencies = {}) {
   return requestUrl(source.url, 0, false);
 }
 
-function computeWindowCoverage(candidates, windowStart, maxItemsPerFeed, metadata = {}) {
-  const comparable = candidates.map((candidate) => candidate.effectiveAt).filter(Boolean);
-  const oldestVisibleAt = comparable.length > 0 ? comparable.sort()[0] : null;
+function computeWindowCoverage(candidates, coverageStartDate, maxItemsPerFeed, metadata = {}) {
+  const comparable = candidates.map((candidate) => candidate.eventDate || candidate.sourceDate).filter(Boolean);
+  const oldestVisibleDate = comparable.length > 0 ? comparable.sort()[0] : null;
   const itemLimitReached = metadata.itemLimitReached ?? candidates.length >= maxItemsPerFeed;
   if (itemLimitReached || comparable.length !== candidates.length) {
-    return { windowCoverage: "partial", oldestVisibleAt };
+    return { windowCoverage: "partial", oldestVisibleDate };
   }
-  if (candidates.length === 0) return { windowCoverage: "unknown", oldestVisibleAt: null };
+  if (candidates.length === 0) return { windowCoverage: "unknown", oldestVisibleDate: null };
   return {
-    windowCoverage: oldestVisibleAt <= windowStart ? "complete" : "partial",
-    oldestVisibleAt,
+    windowCoverage: oldestVisibleDate <= coverageStartDate ? "complete" : "partial",
+    oldestVisibleDate,
   };
 }
 
@@ -536,19 +593,29 @@ async function collectSingleFeed(source, input, dependencies = {}) {
   const parsed = fetched.fromCache
     ? {
         items: fetched.items,
+        rejectedItems: fetched.rejectedItems || [],
         rawItemCount: Number.isInteger(fetched.rawItemCount) ? fetched.rawItemCount : null,
         itemLimitReached: typeof fetched.itemLimitReached === "boolean" ? fetched.itemLimitReached : true,
       }
     : parseFeedXmlWithMetadata(fetched.xml, source, { maxItems: input.limits.maxItemsPerFeed });
-  const cachedOrParsedItems = parsed.items;
-  const candidates = cachedOrParsedItems.map((candidate) => ({
+  const candidates = parsed.items.map((candidate) => ({
     ...candidate,
-    effectiveAt: candidate.publishedAt || candidate.updatedAt || candidate.effectiveAt || null,
-    withinWindow: candidate.effectiveAt
-      ? candidate.effectiveAt > input.window.windowStart && candidate.effectiveAt <= input.window.windowEnd
-      : false,
+    withinWindow:
+      candidate.timePrecision === "timestamp"
+        ? candidate.eventAt <= input.window.observedAt &&
+          candidate.eventDate >= input.window.coverageStartDate &&
+          candidate.eventDate <= input.window.coverageEndDate
+        : candidate.timePrecision === "date"
+          ? candidate.sourceDate >= input.window.coverageStartDate &&
+            candidate.sourceDate <= input.window.coverageEndDate
+          : false,
   }));
-  const coverage = computeWindowCoverage(candidates, input.window.windowStart, input.limits.maxItemsPerFeed, parsed);
+  const coverage = computeWindowCoverage(
+    candidates,
+    input.window.coverageStartDate,
+    input.limits.maxItemsPerFeed,
+    parsed,
+  );
 
   if (!fetched.fromCache) {
     writeCache(cachePath, {
@@ -557,8 +624,9 @@ async function collectSingleFeed(source, input, dependencies = {}) {
       lastSuccessAt: checkedAt,
       rawItemCount: parsed.rawItemCount,
       itemLimitReached: parsed.itemLimitReached,
-      items: cachedOrParsedItems,
-      itemIds: cachedOrParsedItems.map((candidate) => ({
+      items: parsed.items,
+      rejectedItems: parsed.rejectedItems,
+      itemIds: parsed.items.map((candidate) => ({
         candidateId: candidate.candidateId,
         contentHash: candidate.contentHash,
       })),
@@ -575,6 +643,7 @@ async function collectSingleFeed(source, input, dependencies = {}) {
     fromCache: Boolean(fetched.fromCache),
     rawItemCount: parsed.rawItemCount,
     itemLimitReached: parsed.itemLimitReached,
+    rejectedItems: parsed.rejectedItems,
     candidates,
   };
 }
@@ -608,10 +677,11 @@ async function collectFeedSources(input, dependencies = {}) {
       checkedAt: new Date().toISOString(),
       error: result.reason?.message || String(result.reason),
       windowCoverage: "unknown",
-      oldestVisibleAt: null,
+      oldestVisibleDate: null,
       fromCache: false,
       rawItemCount: null,
       itemLimitReached: false,
+      rejectedItems: [],
       candidates: [],
     };
   });
@@ -619,8 +689,9 @@ async function collectFeedSources(input, dependencies = {}) {
 
   return {
     generatedAt: new Date().toISOString(),
-    windowStart: input.window.windowStart,
-    windowEnd: input.window.windowEnd,
+    coverageStartDate: input.window.coverageStartDate,
+    coverageEndDate: input.window.coverageEndDate,
+    observedAt: input.window.observedAt,
     sources: results,
     candidates,
     clusters: clusterDeterministicCandidates(candidates),
@@ -629,6 +700,7 @@ async function collectFeedSources(input, dependencies = {}) {
       successCount: results.filter((result) => result.status === "success").length,
       failureCount: results.filter((result) => result.status === "failed").length,
       candidateCount: candidates.length,
+      rejectedItemCount: results.reduce((total, result) => total + result.rejectedItems.length, 0),
     },
   };
 }
@@ -656,10 +728,14 @@ async function main() {
   const cacheRoot = path.resolve(args["cache-root"] || config.briefing.feedCacheRoot);
   let window;
   if (args.healthCheck) {
-    const windowEnd = new Date();
+    const observedAt = new Date();
+    const coverageEndDate = formatDateInTimezone(observedAt, "Asia/Shanghai");
+    const coverageStartDate = new Date(`${coverageEndDate}T00:00:00Z`);
+    coverageStartDate.setUTCDate(coverageStartDate.getUTCDate() - 1);
     window = {
-      windowStart: new Date(windowEnd.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-      windowEnd: windowEnd.toISOString(),
+      coverageStartDate: coverageStartDate.toISOString().slice(0, 10),
+      coverageEndDate,
+      observedAt: observedAt.toISOString(),
     };
   } else {
     if (!args["window-file"] || !args.output) throw new Error("常规采集需要 --window-file 和 --output");
@@ -682,7 +758,8 @@ async function main() {
           itemCount: source.candidates.length,
           rawItemCount: source.rawItemCount,
           itemLimitReached: source.itemLimitReached,
-          oldestVisibleAt: source.oldestVisibleAt,
+          oldestVisibleDate: source.oldestVisibleDate,
+          rejectedItemCount: source.rejectedItems.length,
           error: source.error,
         })}\n`,
       );
@@ -697,7 +774,7 @@ async function main() {
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, `${JSON.stringify(collection, null, 2)}\n`);
   process.stdout.write(
-    `Feed 采集完成：${collection.summary.successCount}/${collection.summary.sourceCount} 成功，${collection.summary.candidateCount} 条候选\n`,
+    `Feed 采集完成：${collection.summary.successCount}/${collection.summary.sourceCount} 成功，${collection.summary.candidateCount} 条候选，${collection.summary.rejectedItemCount} 条拒绝\n`,
   );
 }
 

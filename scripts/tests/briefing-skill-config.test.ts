@@ -9,6 +9,10 @@ interface SourceDefinition {
   url?: string;
   queryTemplates?: string[];
   sourceTimezone: string;
+  authority: string;
+  coverageRole: "primary" | "supplemental" | "discovery";
+  allowedArticleHosts: string[];
+  allowedUrlPrefixes?: string[];
   enabled: boolean;
 }
 
@@ -31,6 +35,8 @@ describe("AI briefing machine configuration", () => {
     const config = loadAiBriefingSkillConfig();
 
     expect(config.briefing.contentRulesV2EffectiveDate).toBe("2026-07-15");
+    expect(config.briefing.windowStrategy).toBe("calendar-date-overlap");
+    expect(config.briefing.initialLookbackDays).toBe(1);
     expect(config.sourceRegistry.version).toBe(1);
     expect(config.generatorResultSchema.anyOf).toBeInstanceOf(Array);
     expect(config.reviewerResultSchema.anyOf).toBeInstanceOf(Array);
@@ -44,6 +50,7 @@ describe("AI briefing machine configuration", () => {
 
     for (const source of sources) {
       expect(source.publisherId).not.toBe("");
+      expect(["primary", "supplemental", "discovery"]).toContain(source.coverageRole);
       expect(() => new Intl.DateTimeFormat("en-US", { timeZone: source.sourceTimezone })).not.toThrow();
       if (source.enabled && source.url) {
         expect(new URL(source.url).protocol).toBe("https:");
@@ -85,20 +92,49 @@ describe("AI briefing machine configuration", () => {
     for (const id of requiredIds) expect(ids).toContain(id);
   });
 
-  it("gives every priority company an official non-search path and a search fallback", () => {
+  it("gives every priority company an official primary path", () => {
     const config = loadAiBriefingSkillConfig();
-    const genericSearchSources = config.sourceRegistry.sources.filter(
-      (source) => source.method === "search" && source.companyId === null && source.queryTemplates?.length,
-    );
-
-    expect(genericSearchSources.length).toBeGreaterThan(0);
     for (const company of config.focusCompanies.filter((entry) => entry.priorityFocus)) {
       expect(
         config.sourceRegistry.sources.some(
-          (source) => source.companyId === company.id && source.method !== "search",
+          (source) =>
+            source.companyId === company.id &&
+            source.authority === "official" &&
+            source.coverageRole === "primary" &&
+            source.enabled,
         ),
       ).toBe(true);
     }
+  });
+
+  it("does not grant page sources blanket GitHub or Hugging Face authority", () => {
+    const pageSources = loadAiBriefingSkillConfig().sourceRegistry.sources.filter(
+      (source) => source.method === "page" && source.authority === "official",
+    );
+
+    for (const source of pageSources) {
+      expect(source.allowedArticleHosts).not.toContain("github.com");
+      expect(source.allowedArticleHosts).not.toContain("huggingface.co");
+      expect(source.allowedUrlPrefixes?.length ?? 0).toBeGreaterThan(0);
+    }
+  });
+
+  it("only documents registered sources as independent check paths", () => {
+    const sourceMap = fs.readFileSync("skills/ai-briefing/references/source-map.md", "utf8");
+    const section = sourceMap.match(
+      /## Registry 中的独立路径([\s\S]*?)(?=\n## |$)/,
+    )?.[1];
+    expect(section).toBeTruthy();
+
+    const documentedIds = [...(section ?? "").matchAll(/`([a-z0-9][a-z0-9-]+)`/g)].map(
+      (match) => match[1],
+    );
+    const registeredIds = new Set(
+      loadAiBriefingSkillConfig().sourceRegistry.sources.map((source) => source.id),
+    );
+
+    expect(documentedIds.length).toBeGreaterThan(0);
+    for (const id of documentedIds) expect(registeredIds).toContain(id);
   });
 
   it("pins fast-xml-parser 5.10.0 in package metadata", () => {

@@ -81,6 +81,6 @@
     "name": "MiniMax",
     "aliases": ["MiniMax AI", "海螺 AI", "Hailuo AI"],
     "eventTypeKeywords": ["模型", "API", "Agent", "产品", "价格"],
-    "priorityFocus": false
+    "priorityFocus": true
   }
 ]

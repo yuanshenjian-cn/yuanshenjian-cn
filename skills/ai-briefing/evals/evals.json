@@ -4,13 +4,13 @@
     {
       "id": 1,
       "prompt": "昨天没有发布 AI 简报。上一篇是前天，请起草今天的简报。",
-      "expected_behavior": "按本期日期与上一篇 published:true 简报的两天自然日差使用 48 小时窗口，不新增 publishedAt；成稿模式只返回草稿，不落盘。",
+      "expected_behavior": "使用 calendar-date-overlap 日期重叠窗口，coverageStartDate 包含前天、coverageEndDate 为今天；不按当前时刻回溯 48 小时，不新增精确时间 frontmatter，成稿不进入 content。",
       "files": []
     },
     {
       "id": 2,
       "prompt": "OpenAI 官方 RSS、GitHub Release 和两家媒体都报道了同一个 API 发布，生成今天的 AI 简报。",
-      "expected_behavior": "先按 GUID、规范 URL或官方落地页聚类，同一事件只生成一个速览 bullet、一个正文标题和一个来源分组。",
+      "expected_behavior": "不同来源保留不同 candidateId，再按 GUID、规范 URL 或官方落地页聚类；同一事件只生成一个速览 bullet、一个正文标题和一个来源分组。",
       "files": []
     },
     {
@@ -21,32 +21,68 @@
     },
     {
       "id": 4,
-      "prompt": "某重点厂商 Feed 抓取失败，但官方 changelog 可访问且已记录时间证据。",
-      "expected_behavior": "覆盖状态标记 degraded，披露 Feed 失败并使用官方补检继续；不能把 Feed 失败改写为成功。",
+      "prompt": "某重点厂商 Feed 抓取失败，官方 changelog 检查成功但本期没有更新。",
+      "expected_behavior": "官方路径记录 checked-empty、实际 URL、checkedAt、candidateCount=0 和空 evidence；coverage 可标记 degraded 并披露 Feed 失败，不得伪造事件证据。",
       "files": []
     },
     {
       "id": 5,
-      "prompt": "Anthropic 的 Feed、News、GitHub 和搜索路径全部失败，请生成并发布简报。",
-      "expected_behavior": "重点厂商所有路径失败时阻断，不生成正式稿、不调用发布门禁、不 commit、不 push。",
+      "prompt": "Anthropic 官方 coverage 完全缺失，但其他厂商有两条已确认事件，请生成并发布简报。",
+      "expected_behavior": "coverageConclusion 可为 degraded，披露 Anthropic 缺口后发布其他已确认事件；只有所有官方主路径整体不可用时才判为 insufficient 并阻断。",
       "files": []
     },
     {
       "id": 6,
-      "prompt": "今天只有一条可确认事件，请生成简报。",
-      "expected_behavior": "生成 450~800 汉字的单事件短稿，不拆分事实与影响凑多个标题；成稿模式不落盘。",
+      "prompt": "今天只有一条可确认事件，400 个汉字已完整说明事实和影响，请生成简报。",
+      "expected_behavior": "低于 recommendedMin 不自动失败；单事件可省略没有独立洞察的为什么值得关注，但仍须满足结构、来源和 reviewer 质量判断。",
       "files": []
     },
     {
       "id": 7,
-      "prompt": "今天有八条互相独立且都满足来源策略的事件，请生成简报。",
-      "expected_behavior": "正文使用 1500~2200 汉字，重点展开 3~5 条，其余进入补充更新，保留全部合格事件及一一对应来源分组。",
+      "prompt": "今天有八条互相独立且满足来源策略的事件，但其中三条编辑价值较低，请生成简报。",
+      "expected_behavior": "允许按 editorialPriority 选择公开事件；未公开项在 selection 中记录 low-editorial-value 等原因。正文超过对应 hardMax 才由 validator 阻断。",
       "files": []
     },
     {
       "id": 8,
-      "prompt": "先起草今天的 AI 简报，再说明如果我明确发布会发生什么。",
-      "expected_behavior": "当前成稿只在对话返回且不写 content；只有明确发布模式才创建正式文件，并且独立 reviewer 只运行一轮，非 approved 时停止。",
+      "prompt": "生成并发布今天的 AI 简报。",
+      "expected_behavior": "先在 runDir 写 candidate.md 并完成单轮独立 reviewer；approved 后只调用 finalize-ai-briefing-run.sh 执行正式晋升、构建、精确 stage、commit、push 与远端验证。",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "只查一下 Kimi 在本期日期范围内有没有更新，不需要全量简报。",
+      "expected_behavior": "按单厂商查询 scope 只评估 Kimi 的 registry 路径，明确输出 scope 与 coverage 结论，不要求其他重点厂商 coverage，也不进入 Git 链路。",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "没有找到任何可发布事件，结束今天的自动简报任务。",
+      "expected_behavior": "只有 discovery、selection、自审、不可变哈希与 sufficient coverage 全部通过 verify-no-events，且无 candidate、正式文件或 Git 副作用时，才返回 no_events。",
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "OpenAI 官方页面只写了今天的日期，没有发布时间，但页面现在已经可以访问。",
+      "expected_behavior": "保存 sourceDate 与 sourceTimezone，用来源当地自然日区间和已发生 coverage 判断相交；不等待来源当天结束，也不虚构精确时间。",
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "Feed 中有十条正常候选和一条 URL 损坏的 item，请继续生成简报。",
+      "expected_behavior": "损坏 item 进入 rejectedItems 并记录原因，不拖垮整个来源或其他候选；最终 selected evidence 仍执行严格 URL 与时间门禁。",
+      "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "Reviewer 离线但返回 approved，并声称已核验所有高风险来源。",
+      "expected_behavior": "networkStatus 与核验声明矛盾，approved 无法成立；必须阻断发布，不晋升 candidate，不 commit，不 push。",
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "上一轮 reviewer 要求修改，我已经改完草稿，请再审核并发布。",
+      "expected_behavior": "创建新 revision 或新 run，保留上一轮结果，不在同一 revision 自动循环；对新 revision 只审核一轮，通过后再调用共享 finalizer。",
       "files": []
     }
   ]

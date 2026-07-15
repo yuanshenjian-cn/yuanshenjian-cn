@@ -9,8 +9,14 @@ type VerifierModule = typeof import("../verify-ai-briefing-run.js");
 
 const fixturesRoot = path.join(process.cwd(), "scripts/tests/fixtures/ai-briefing");
 const window = {
-  windowStart: "2026-07-14T00:00:00.000Z",
-  windowEnd: "2026-07-15T00:00:00.000Z",
+  issueDate: "2026-07-15",
+  previousIssueDate: "2026-07-14",
+  nominalDays: 1,
+  coverageStartDate: "2026-07-14",
+  coverageEndDate: "2026-07-15",
+  observedAt: "2026-07-15T12:00:00.000Z",
+  timezone: "Asia/Shanghai",
+  strategy: "calendar-date-overlap",
 };
 const sources = [
   {
@@ -20,11 +26,29 @@ const sources = [
     method: "feed",
     url: "https://openai.com/feed.xml",
     authority: "official",
+    coverageRole: "primary",
     confirmationPolicy: { default: "standalone", byCategory: {} },
     categories: ["api"],
     sourceTimezone: "America/Los_Angeles",
     allowedRedirectHosts: ["openai.com"],
     allowedArticleHosts: ["openai.com"],
+    allowedUrlPrefixes: ["https://openai.com/release"],
+    enabled: true,
+  },
+  {
+    id: "official-page",
+    companyId: "openai",
+    publisherId: "openai",
+    method: "page",
+    url: "https://openai.com/news",
+    authority: "official",
+    coverageRole: "primary",
+    confirmationPolicy: { default: "standalone", byCategory: {} },
+    categories: ["api"],
+    sourceTimezone: "America/Los_Angeles",
+    allowedRedirectHosts: ["openai.com"],
+    allowedArticleHosts: ["openai.com"],
+    allowedUrlPrefixes: ["https://openai.com/news"],
     enabled: true,
   },
   {
@@ -33,6 +57,7 @@ const sources = [
     publisherId: "reuters",
     method: "search",
     authority: "media",
+    coverageRole: "discovery",
     confirmationPolicy: { default: "needs-corroboration", byCategory: {} },
     categories: ["*"],
     sourceTimezone: "UTC",
@@ -46,6 +71,7 @@ const sources = [
     publisherId: "reuters",
     method: "search",
     authority: "media",
+    coverageRole: "discovery",
     confirmationPolicy: { default: "needs-corroboration", byCategory: {} },
     categories: ["*"],
     sourceTimezone: "UTC",
@@ -59,6 +85,7 @@ const sources = [
     publisherId: "bloomberg",
     method: "search",
     authority: "media",
+    coverageRole: "discovery",
     confirmationPolicy: { default: "needs-corroboration", byCategory: {} },
     categories: ["*"],
     sourceTimezone: "UTC",
@@ -74,6 +101,17 @@ let tempRoot: string;
 
 function readJsonFixture(name: string) {
   return JSON.parse(fs.readFileSync(path.join(fixturesRoot, name), "utf8"));
+}
+
+function timestampEvidence(sourceId: string, eventAt = "2026-07-14T12:00:00.000Z") {
+  return {
+    sourceId,
+    timePrecision: "timestamp",
+    eventAt,
+    eventDate: "2026-07-14",
+    sourceTimezone: sourceById.get(sourceId)?.sourceTimezone ?? "UTC",
+    withinWindow: true,
+  };
 }
 
 beforeAll(async () => {
@@ -117,10 +155,13 @@ describe("Claude structured output contracts", () => {
     expect(() =>
       verifier.validateReviewerResult({
         status: "approved",
-        conclusion: "通过",
+        conclusion: "可进入发布门禁",
+        networkStatus: "online",
+        checkedEvidenceIds: ["one"],
+        uncheckedHighRiskItems: ["event"],
         evidenceQuality: { authority: "通过", authenticity: "通过", timeliness: "通过" },
       }),
-    ).toThrow("可进入发布门禁");
+    ).toThrow("高风险未核验项");
   });
 
   it("supports the parse-generator CLI without reading natural language output", () => {
@@ -147,45 +188,60 @@ describe("Claude structured output contracts", () => {
   });
 });
 
-describe("evidence time and confirmation policy", () => {
-  it("uses an open-start closed-end window", () => {
-    expect(verifier.isWithinWindow(window.windowStart, window)).toBe(false);
-    expect(verifier.isWithinWindow(window.windowEnd, window)).toBe(true);
+describe("date coverage and confirmation policy", () => {
+  it("accepts an observed official date without waiting for source day end", () => {
+    expect(
+      verifier.isEvidenceWithinCoverage(
+        {
+          timePrecision: "date",
+          sourceDate: "2026-07-14",
+          sourceTimezone: "America/Los_Angeles",
+        },
+        sources[0],
+        window,
+      ),
+    ).toBe(true);
   });
 
-  it("converts source-local dates to DST-aware local day end", () => {
-    expect(verifier.computeDateEndEffectiveAt("2026-07-14", "America/Los_Angeles")).toBe(
-      "2026-07-15T06:59:59.999Z",
-    );
-    expect(verifier.computeDateEndEffectiveAt("2026-07-14", "Asia/Shanghai")).toBe(
-      "2026-07-14T15:59:59.999Z",
-    );
+  it("rejects timestamps after observedAt", () => {
+    expect(
+      verifier.isEvidenceWithinCoverage(
+        {
+          timePrecision: "timestamp",
+          eventAt: "2026-07-15T12:00:00.001Z",
+          eventDate: "2026-07-15",
+          sourceTimezone: "America/Los_Angeles",
+        },
+        sources[0],
+        window,
+      ),
+    ).toBe(false);
+  });
+
+  it("uses source-local midnight ranges across DST", () => {
+    const interval = verifier.sourceLocalDateInterval("2026-03-08", "America/Los_Angeles");
+    expect(new Date(interval.end).getTime() - new Date(interval.start).getTime()).toBe(23 * 60 * 60 * 1000);
   });
 
   it("requires two independent publishers for corroboration", () => {
     const base = { eventType: "api", sourceRefs: [] as Array<Record<string, unknown>> };
-    const exactTime = { timePrecision: "timestamp", effectiveAt: "2026-07-14T12:00:00.000Z" };
 
     expect(
       verifier.isConfirmedEvent(
-        { ...base, sourceRefs: [{ sourceId: "reuters-one", ...exactTime }, { sourceId: "reuters-two", ...exactTime }] },
+        { ...base, sourceRefs: [timestampEvidence("reuters-one"), timestampEvidence("reuters-two")] },
         sourceById,
         window,
       ),
     ).toBe(false);
     expect(
       verifier.isConfirmedEvent(
-        { ...base, sourceRefs: [{ sourceId: "reuters-one", ...exactTime }, { sourceId: "bloomberg", ...exactTime }] },
+        { ...base, sourceRefs: [timestampEvidence("reuters-one"), timestampEvidence("bloomberg")] },
         sourceById,
         window,
       ),
     ).toBe(true);
     expect(
-      verifier.isConfirmedEvent(
-        { ...base, sourceRefs: [{ sourceId: "official", ...exactTime }] },
-        sourceById,
-        window,
-      ),
+      verifier.isConfirmedEvent({ ...base, sourceRefs: [timestampEvidence("official")] }, sourceById, window),
     ).toBe(true);
   });
 
@@ -193,8 +249,14 @@ describe("evidence time and confirmation policy", () => {
     const event = {
       eventType: "api",
       sourceRefs: [
-        { sourceId: "reuters-one", timePrecision: "date", effectiveAt: "2026-07-14T23:59:59.999Z" },
-        { sourceId: "bloomberg", timePrecision: "timestamp", effectiveAt: "2026-07-14T12:00:00.000Z" },
+        {
+          sourceId: "reuters-one",
+          timePrecision: "date",
+          sourceDate: "2026-07-14",
+          sourceTimezone: "UTC",
+          withinWindow: true,
+        },
+        timestampEvidence("bloomberg"),
       ],
     };
 
@@ -212,65 +274,92 @@ describe("evidence time and confirmation policy", () => {
 });
 
 describe("evidence contracts and coverage", () => {
-  it("validates collection, discovery, self-review, and selection evidence contracts", () => {
-    const collection = {
-      sources: [
-        {
-          sourceId: "official",
-          companyId: "openai",
-          status: "success",
-          checkedAt: "2026-07-15T00:00:00.000Z",
-          windowCoverage: "complete",
-          candidates: [
-            {
-              candidateId: "candidate-1",
-              sourceId: "official",
-              canonicalUrl: "https://openai.com/release",
-              effectiveAt: "2026-07-14T12:00:00.000Z",
-              timePrecision: "timestamp",
-              sourceTimezone: "America/Los_Angeles",
-              timeConvention: "exact",
-              withinWindow: true,
-            },
-          ],
+  const collection = {
+    coverageStartDate: "2026-07-14",
+    coverageEndDate: "2026-07-15",
+    observedAt: "2026-07-15T12:00:00.000Z",
+    sources: [
+      {
+        sourceId: "official",
+        companyId: "openai",
+        status: "success",
+        checkedAt: "2026-07-15T12:01:00.000Z",
+        windowCoverage: "complete",
+        rejectedItems: [],
+        candidates: [
+          {
+            candidateId: "candidate-1",
+            sourceId: "official",
+            canonicalUrl: "https://openai.com/release",
+            eventAt: "2026-07-14T12:00:00.000Z",
+            eventDate: "2026-07-14",
+            timePrecision: "timestamp",
+            sourceTimezone: "America/Los_Angeles",
+            withinWindow: true,
+          },
+        ],
+      },
+    ],
+  };
+  const discovery = {
+    paths: [
+      {
+        sourceId: "official-page",
+        companyId: "openai",
+        method: "page",
+        status: "checked-empty",
+        checkedAt: "2026-07-15T12:02:00.000Z",
+        request: { url: "https://openai.com/news", query: null },
+        candidateCount: 0,
+        error: null,
+        evidence: [],
+      },
+    ],
+  };
+  const selection = {
+    events: [
+      {
+        eventId: "event-1",
+        title: "OpenAI 更新 API",
+        eventType: "api",
+        included: true,
+        editorialPriority: "high",
+        candidateIds: ["candidate-1"],
+        sourceRefs: [
+          {
+            sourceId: "official",
+            evidenceId: "candidate-1",
+            url: "https://openai.com/release",
+            label: "官方",
+          },
+        ],
+        materialDelta: {
+          kind: "new-event",
+          summary: "新增可核验 API 能力",
+          evidenceIds: ["candidate-1"],
         },
-      ],
-    };
-    const discovery = { paths: [] };
-    const selection = {
-      events: [
-        {
-          eventId: "event-1",
-          title: "OpenAI 更新 API",
-          eventType: "api",
-          included: true,
-          candidateIds: ["candidate-1"],
-          sourceRefs: [
-            {
-              sourceId: "official",
-              evidenceId: "candidate-1",
-              url: "https://openai.com/release",
-              label: "官方",
-            },
-          ],
-          materialDelta: "新增可核验 API 能力",
-          historyMatches: [],
-        },
-      ],
-      coverage: [],
-    };
+        historyMatches: [],
+      },
+    ],
+    coverage: [],
+  };
 
-    expect(() => verifier.validateCollectionContract(collection)).not.toThrow();
-    expect(() => verifier.validateDiscoveryContract(discovery)).not.toThrow();
+  it("validates collection, checked-empty discovery, self-review, and selection", () => {
+    expect(() => verifier.validateCollectionContract(collection, { sources }, window)).not.toThrow();
+    expect(() => verifier.validateDiscoveryContract(discovery, { sources }, window)).not.toThrow();
     expect(() =>
       verifier.validateSelfReviewContract({
         windowChecked: true,
         recentFiveChecked: true,
         priorityCoverageChecked: true,
+        coverageConclusion: "sufficient",
+        coverageGaps: [],
+        candidateDisposition: { included: 1, excluded: 0, rejected: 0 },
         highRiskUnconfirmedItems: [],
         conclusion: "通过",
       }),
     ).not.toThrow();
+    expect(() => verifier.validateSelectionContract(selection)).not.toThrow();
     expect(() =>
       verifier.validateSelectionEvidence({
         selection,
@@ -283,273 +372,235 @@ describe("evidence contracts and coverage", () => {
         ],
       }),
     ).not.toThrow();
+  });
 
-    const missingWithinWindow = structuredClone(collection);
-    Reflect.deleteProperty(missingWithinWindow.sources[0].candidates[0], "withinWindow");
-    expect(() => verifier.validateCollectionContract(missingWithinWindow)).toThrow("withinWindow");
-    expect(() => verifier.validateDiscoveryContract({ paths: [{ status: "success", evidence: [] }] })).toThrow();
-
-    const crossSourceCollection = structuredClone(collection);
-    crossSourceCollection.sources[0].candidates[0].canonicalUrl = "https://reuters.com/release";
-    const crossSourceSelection = structuredClone(selection);
-    crossSourceSelection.events[0].sourceRefs[0].url = "https://reuters.com/release";
+  it("rejects source URLs outside the configured prefix", () => {
+    const forgedCollection = structuredClone(collection);
+    forgedCollection.sources[0].candidates[0].canonicalUrl = "https://openai.com/unrelated/release";
+    const forgedSelection = structuredClone(selection);
+    forgedSelection.events[0].sourceRefs[0].url = "https://openai.com/unrelated/release";
     expect(() =>
       verifier.validateSelectionEvidence({
-        selection: crossSourceSelection,
-        collection: crossSourceCollection,
+        selection: forgedSelection,
+        collection: forgedCollection,
         discovery,
         window,
         sourceRegistry: { sources },
         publicSourceGroups: [
-          { heading: "OpenAI 更新 API", sources: [{ label: "官方", url: "https://reuters.com/release" }] },
+          { heading: "OpenAI 更新 API", sources: [{ label: "官方", url: "https://openai.com/unrelated/release" }] },
         ],
       }),
-    ).toThrow("URL 主机不属于 source official");
+    ).toThrow("URL 不匹配 source official 的允许前缀");
   });
 
-  it("binds discovery paths and evidence to enabled registry sources", () => {
-    const pageSource = {
-      id: "openai-page",
-      companyId: "openai",
-      publisherId: "openai",
-      method: "page",
-      url: "https://openai.com/news",
-      authority: "official",
-      confirmationPolicy: { default: "standalone", byCategory: {} },
-      categories: ["api"],
-      sourceTimezone: "America/Los_Angeles",
-      allowedRedirectHosts: ["openai.com"],
-      allowedArticleHosts: ["openai.com"],
-      enabled: true,
-    };
-    const registry = { sources: [pageSource, sources[1]] };
-    const pagePath = {
-      sourceId: "openai-page",
-      companyId: "openai",
-      method: "page",
-      status: "success",
-      checkedAt: "2026-07-15T00:00:00.000Z",
-      error: null,
-      evidence: [
-        {
-          evidenceId: "page:openai",
-          sourceId: "openai-page",
-          url: "https://openai.com/news/release",
-          effectiveAt: "2026-07-14T12:00:00.000Z",
-          timePrecision: "timestamp",
-          sourceTimezone: "America/Los_Angeles",
-          timeConvention: "exact",
-          withinWindow: true,
-        },
-      ],
-    };
-    const globalSearchPath = {
-      sourceId: "reuters-one",
-      companyId: "openai",
-      method: "search",
-      status: "success",
-      checkedAt: "2026-07-15T00:00:00.000Z",
-      error: null,
-      evidence: [
-        {
-          evidenceId: "search:reuters-openai",
-          sourceId: "reuters-one",
-          url: "https://reuters.com/technology/openai",
-          effectiveAt: "2026-07-14T12:00:00.000Z",
-          timePrecision: "timestamp",
-          sourceTimezone: "UTC",
-          timeConvention: "exact",
-          withinWindow: true,
-        },
-      ],
-    };
+  it("requires structured material deltas and history matches", () => {
+    const invalidDelta = structuredClone(selection);
+    invalidDelta.events[0].materialDelta = "新增能力" as unknown as typeof invalidDelta.events[0]["materialDelta"];
+    expect(() => verifier.validateSelectionContract(invalidDelta)).toThrow("materialDelta");
 
-    expect(() => verifier.validateDiscoveryContract({ paths: [pagePath, globalSearchPath] }, registry, window)).not.toThrow();
-    expect(() =>
-      verifier.validateDiscoveryContract(
-        { paths: [{ ...pagePath, sourceId: "forged-source", evidence: [{ ...pagePath.evidence[0], sourceId: "forged-source" }] }] },
-        registry,
-        window,
-      ),
-    ).toThrow("未知 sourceId");
-    expect(() =>
-      verifier.validateDiscoveryContract({ paths: [{ ...pagePath, method: "search" }] }, registry, window),
-    ).toThrow("method 与 registry 不一致");
-    expect(() =>
-      verifier.validateDiscoveryContract({ paths: [{ ...pagePath, companyId: "anthropic" }] }, registry, window),
-    ).toThrow("companyId 与 registry 不一致");
-    expect(() =>
-      verifier.validateDiscoveryContract({ paths: [{ ...pagePath, checkedAt: "not-a-time" }] }, registry, window),
-    ).toThrow("checkedAt 必须是合法 ISO 时间");
-    expect(() =>
-      verifier.validateDiscoveryContract(
-        { paths: [{ ...pagePath, checkedAt: "2026-07-14T23:59:59.999Z" }] },
-        registry,
-        window,
-      ),
-    ).toThrow("checkedAt 早于冻结 windowEnd");
-    expect(() =>
-      verifier.validateDiscoveryContract(
-        { paths: [{ ...pagePath, evidence: [{ ...pagePath.evidence[0], withinWindow: false }] }]},
-        registry,
-        window,
-      ),
-    ).toThrow("withinWindow 与冻结窗口不一致");
-    expect(() =>
-      verifier.validateDiscoveryContract(
-        { paths: [{ ...pagePath, evidence: [{ ...pagePath.evidence[0], url: "https://reuters.com/openai" }] }] },
-        registry,
-        window,
-      ),
-    ).toThrow("URL 主机不属于 source openai-page");
-    expect(() =>
-      verifier.validateDiscoveryContract({ paths: [{ ...pagePath, status: "unknown" }] }, registry, window),
-    ).toThrow("status 不合法");
+    const invalidHistory = structuredClone(selection);
+    invalidHistory.events[0].historyMatches = [{ eventTitle: "旧事件" }] as unknown as [];
+    expect(() => verifier.validateSelectionContract(invalidHistory)).toThrow("historyMatches");
   });
 
   it("rejects duplicate included candidate ownership", () => {
-    expect(() =>
-      verifier.validateSelectionContract({
-        events: [
-          {
-            eventId: "one",
-            title: "事件一",
-            eventType: "api",
-            included: true,
-            candidateIds: ["candidate-1"],
-            sourceRefs: [],
-            materialDelta: "新增能力",
-            historyMatches: [],
-          },
-          {
-            eventId: "two",
-            title: "事件二",
-            eventType: "api",
-            included: true,
-            candidateIds: ["candidate-1"],
-            sourceRefs: [],
-            materialDelta: "新增价格",
-            historyMatches: [],
-          },
-        ],
-        coverage: [],
-      }),
-    ).toThrow("重复归属");
+    const duplicated = structuredClone(selection);
+    duplicated.events.push({ ...structuredClone(duplicated.events[0]), eventId: "event-2", title: "另一个事件" });
+    expect(() => verifier.validateSelectionContract(duplicated)).toThrow("重复归属");
   });
 
-  it("blocks all-path failure and partial feed without a successful supplement", () => {
-    const focusCompanies = [{ id: "openai", priorityFocus: true }];
-    const registry = {
-      sources: [
-        { id: "feed", companyId: "openai", method: "feed", enabled: true },
-        { id: "page", companyId: "openai", method: "page", enabled: true },
-      ],
-    };
-    const failedCollection = {
-      sources: [{ sourceId: "feed", companyId: "openai", status: "failed", windowCoverage: "unknown" }],
-    };
-    const failedDiscovery = {
-      paths: [{ sourceId: "page", companyId: "openai", method: "page", status: "failed", error: "down", evidence: [] }],
-    };
-
-    expect(() => verifier.validateCoverage(failedCollection, failedDiscovery, focusCompanies, registry)).toThrow(
-      "所有采集路径均失败",
+  it("accepts a checked-empty primary check as sufficient coverage", () => {
+    const result = verifier.evaluateCoverage(
+      { sources: [] },
+      discovery,
+      [{ id: "openai", priorityFocus: true }],
+      { sources },
     );
-    expect(() =>
-      verifier.validateCoverage(
-        { sources: [{ sourceId: "feed", companyId: "openai", status: "success", windowCoverage: "partial", candidates: [] }] },
-        failedDiscovery,
-        focusCompanies,
-        registry,
-      ),
-    ).toThrow("Feed coverage 不完整");
-    expect(() =>
-      verifier.validateCoverage(
-        { sources: [{ sourceId: "feed", companyId: "openai", status: "success", windowCoverage: "partial", candidates: [] }] },
-        {
-          paths: [
-            {
-              sourceId: "page",
-              companyId: "openai",
-              method: "page",
-              status: "success",
-              error: null,
-              evidence: [{ evidenceId: "page:one" }],
-            },
-          ],
-        },
-        focusCompanies,
-        registry,
-      ),
-    ).not.toThrow();
+    expect(result.status).toBe("sufficient");
+    expect(() => verifier.validateCoverageForStatus("no_events", result)).not.toThrow();
   });
 
-  it("requires an explicit result for every configured priority path", () => {
+  it("allows degraded coverage for drafts but not no_events", () => {
+    const result = verifier.evaluateCoverage(
+      { sources: [] },
+      { paths: [] },
+      [{ id: "openai", priorityFocus: true }],
+      { sources },
+    );
+    expect(result.status).toBe("insufficient");
+    expect(() => verifier.validateCoverageForStatus("draft_ready", result)).toThrow("insufficient");
+
+    const degraded = { status: "degraded", companies: [] };
+    expect(() => verifier.validateCoverageForStatus("draft_ready", degraded)).not.toThrow();
+    expect(() => verifier.validateCoverageForStatus("no_events", degraded)).toThrow("no_events 要求 sufficient coverage");
+  });
+
+  it("does not require global media searches for every company", () => {
     expect(() =>
-      verifier.validateCoverage(
-        {
-          sources: [
-            {
-              sourceId: "feed",
-              companyId: "openai",
-              status: "success",
-              windowCoverage: "complete",
-              candidates: [{ candidateId: "one" }],
-            },
-          ],
-        },
+      verifier.evaluateCoverage(
+        collection,
         { paths: [] },
         [{ id: "openai", priorityFocus: true }],
-        {
-          sources: [
-            { id: "feed", companyId: "openai", method: "feed", enabled: true },
-            { id: "page", companyId: "openai", method: "page", enabled: true },
-          ],
-        },
-      ),
-    ).toThrow("配置路径 page 缺少明确采集结果");
-  });
-
-  it("requires a successful non-Feed supplement for complete feeds with zero candidates", () => {
-    const collection = {
-      sources: [
-        { sourceId: "feed", companyId: "openai", status: "success", windowCoverage: "complete", candidates: [] },
-      ],
-    };
-    const failedPage = {
-      paths: [{ sourceId: "page", companyId: "openai", method: "page", status: "failed", error: "down", evidence: [] }],
-    };
-    const registry = {
-      sources: [
-        { id: "feed", companyId: "openai", method: "feed", enabled: true },
-        { id: "page", companyId: "openai", method: "page", enabled: true },
-      ],
-    };
-
-    expect(() =>
-      verifier.validateCoverage(collection, failedPage, [{ id: "openai", priorityFocus: true }], registry),
-    ).toThrow("零候选");
-    expect(() =>
-      verifier.validateCoverage(
-        collection,
-        {
-          paths: [
-            {
-              sourceId: "page",
-              companyId: "openai",
-              method: "page",
-              status: "success",
-              error: null,
-              evidence: [{ evidenceId: "page:checked" }],
-            },
-          ],
-        },
-        [{ id: "openai", priorityFocus: true }],
-        registry,
+        { sources },
       ),
     ).not.toThrow();
   });
 });
+
+describe("no_events evidence gate", () => {
+  it("rejects no_events when coverage is degraded", () => {
+    expect(() => verifier.validateCoverageForStatus("no_events", { status: "degraded", companies: [] })).toThrow(
+      "no_events 要求 sufficient coverage",
+    );
+  });
+
+  it("requires every candidate to be excluded or rejected", () => {
+    expect(() =>
+      verifier.validateNoEventsDisposition(
+        { sources: [{ candidates: [{ candidateId: "one" }], rejectedItems: [] }] },
+        { events: [], coverage: [] },
+        { candidateDisposition: { included: 0, excluded: 0, rejected: 0 } },
+      ),
+    ).toThrow("候选处置数量不一致");
+  });
+});
+
+describe("verify-no-events command", () => {
+  it("blocks insufficient coverage through the CLI", () => {
+    const runDir = path.join(tempRoot, "no-events-cli");
+    fs.mkdirSync(runDir);
+    const frozenWindow = {
+      ...window,
+      issueDate: "2099-01-02",
+      previousIssueDate: "2099-01-01",
+      coverageStartDate: "2099-01-01",
+      coverageEndDate: "2099-01-02",
+      observedAt: "2099-01-02T12:00:00.000Z",
+    };
+    const files = {
+      window: frozenWindow,
+      collection: {
+        coverageStartDate: frozenWindow.coverageStartDate,
+        coverageEndDate: frozenWindow.coverageEndDate,
+        observedAt: frozenWindow.observedAt,
+        sources: [],
+      },
+      discovery: { paths: [] },
+      selection: { events: [], coverage: [] },
+      "self-review": {
+        windowChecked: true,
+        recentFiveChecked: true,
+        priorityCoverageChecked: true,
+        coverageConclusion: "sufficient",
+        coverageGaps: [],
+        candidateDisposition: { included: 0, excluded: 0, rejected: 0 },
+        highRiskUnconfirmedItems: [],
+        conclusion: "本期无可发布事件",
+      },
+    };
+    for (const [name, value] of Object.entries(files)) {
+      fs.writeFileSync(path.join(runDir, `${name}.json`), `${JSON.stringify(value)}\n`);
+    }
+
+    const result = spawnSync(
+      "node",
+      [
+        "scripts/verify-ai-briefing-run.js",
+        "verify-no-events",
+        "--run-dir",
+        runDir,
+        "--expected-window-hash",
+        verifier.sha256File(path.join(runDir, "window.json")),
+        "--expected-collection-hash",
+        verifier.sha256File(path.join(runDir, "collection.json")),
+      ],
+      { cwd: process.cwd(), encoding: "utf8" },
+    );
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("no_events 要求 sufficient coverage");
+    expect(fs.existsSync(path.join(runDir, "verification.json"))).toBe(false);
+  });
+
+  it("blocks candidate and public-file side effects", () => {
+    const runDir = path.join(tempRoot, "no-events-side-effects");
+    fs.mkdirSync(runDir);
+    const collection = {
+      coverageStartDate: window.coverageStartDate,
+      coverageEndDate: window.coverageEndDate,
+      observedAt: window.observedAt,
+      sources: [],
+    };
+    const selfReview = {
+      windowChecked: true,
+      recentFiveChecked: true,
+      priorityCoverageChecked: true,
+      coverageConclusion: "sufficient",
+      coverageGaps: [],
+      candidateDisposition: { included: 0, excluded: 0, rejected: 0 },
+      highRiskUnconfirmedItems: [],
+      conclusion: "本期无可发布事件",
+    };
+    const sideEffectDiscovery = {
+      paths: [
+        {
+          sourceId: "official-page",
+          companyId: "openai",
+          method: "page",
+          status: "checked-empty",
+          checkedAt: "2026-07-15T12:02:00.000Z",
+          request: { url: "https://openai.com/news", query: null },
+          candidateCount: 0,
+          error: null,
+          evidence: [],
+        },
+      ],
+    };
+    const files = {
+      window,
+      collection,
+      discovery: sideEffectDiscovery,
+      selection: { events: [], coverage: [] },
+      "self-review": selfReview,
+    };
+    for (const [name, value] of Object.entries(files)) {
+      fs.writeFileSync(path.join(runDir, `${name}.json`), `${JSON.stringify(value)}\n`);
+    }
+    const expectedHashes = {
+      window: verifier.sha256File(path.join(runDir, "window.json")),
+      collection: verifier.sha256File(path.join(runDir, "collection.json")),
+    };
+    const dependencies = {
+      config: {
+        focusCompanies: [{ id: "openai", priorityFocus: true }],
+        sourceRegistry: { sources: [sources[1]] },
+      },
+      runGit: () => ({ status: 0, stdout: "", stderr: "" }),
+      briefingFile: path.join(tempRoot, "public-briefing.md"),
+    };
+
+    fs.writeFileSync(path.join(runDir, "candidate.md"), "candidate");
+    expect(() => verifier.verifyNoEventsRun(runDir, expectedHashes, dependencies)).toThrow(
+      "no_events 不得产生 candidate.md",
+    );
+    fs.rmSync(path.join(runDir, "candidate.md"));
+    fs.writeFileSync(dependencies.briefingFile, "public");
+    expect(() => verifier.verifyNoEventsRun(runDir, expectedHashes, dependencies)).toThrow(
+      "no_events 不得产生正式简报文件",
+    );
+
+    const replacementHashes = {
+      ...expectedHashes,
+      briefing: verifier.sha256File(dependencies.briefingFile),
+    };
+    expect(() => verifier.verifyNoEventsRun(runDir, replacementHashes, dependencies)).not.toThrow();
+    fs.writeFileSync(dependencies.briefingFile, "modified");
+    expect(() => verifier.verifyNoEventsRun(runDir, replacementHashes, dependencies)).toThrow(
+      "no_events 修改了替换前的正式简报文件",
+    );
+  });
+});
+
 
 describe("immutable files and Git publication proof", () => {
   it("detects immutable evidence mutations", () => {

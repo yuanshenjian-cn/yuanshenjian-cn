@@ -4,22 +4,27 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "issueDate", "filePath", "selectionPath", "selfReviewConclusion"],
+      "required": ["status", "issueDate", "candidatePath", "selectionPath", "selfReviewPath", "coverageConclusion", "selfReviewConclusion"],
       "properties": {
         "status": { "const": "draft_ready" },
         "issueDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "filePath": { "type": "string", "minLength": 1 },
+        "candidatePath": { "type": "string", "minLength": 1 },
         "selectionPath": { "type": "string", "minLength": 1 },
+        "selfReviewPath": { "type": "string", "minLength": 1 },
+        "coverageConclusion": { "enum": ["sufficient", "degraded"] },
         "selfReviewConclusion": { "type": "string", "minLength": 1 }
       }
     },
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "issueDate", "reason"],
+      "required": ["status", "issueDate", "selectionPath", "selfReviewPath", "coverageConclusion", "reason"],
       "properties": {
         "status": { "const": "no_events" },
         "issueDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "selectionPath": { "type": "string", "minLength": 1 },
+        "selfReviewPath": { "type": "string", "minLength": 1 },
+        "coverageConclusion": { "const": "sufficient" },
         "reason": { "type": "string", "minLength": 1 }
       }
     },

@@ -1,32 +1,41 @@
 {
   "timezone": "Asia/Shanghai",
-  "windowStrategy": "calendar-day-gap-hours",
-  "initialLookbackHours": 24,
+  "windowStrategy": "calendar-date-overlap",
+  "initialLookbackDays": 1,
+  "coveragePolicy": {
+    "requiredPrimaryChecksPerPriorityCompany": 1,
+    "allowDegradedDraft": true,
+    "requireSufficientForNoEvents": true
+  },
   "contentRulesV2EffectiveDate": "2026-07-15",
   "dynamicBodyLengthRules": [
     {
       "minEvents": 1,
       "maxEvents": 1,
-      "min": 450,
-      "max": 800
+      "recommendedMin": 450,
+      "recommendedMax": 800,
+      "hardMax": 1200
     },
     {
       "minEvents": 2,
       "maxEvents": 3,
-      "min": 750,
-      "max": 1300
+      "recommendedMin": 750,
+      "recommendedMax": 1300,
+      "hardMax": 1800
     },
     {
       "minEvents": 4,
       "maxEvents": 6,
-      "min": 1100,
-      "max": 1800
+      "recommendedMin": 1100,
+      "recommendedMax": 1800,
+      "hardMax": 2400
     },
     {
       "minEvents": 7,
       "maxEvents": null,
-      "min": 1500,
-      "max": 2200
+      "recommendedMin": 1500,
+      "recommendedMax": 2200,
+      "hardMax": 3200
     }
   ],
   "evidenceRoot": ".local/ai-briefing/runs",

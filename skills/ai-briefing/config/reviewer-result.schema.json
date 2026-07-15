@@ -16,20 +16,31 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "conclusion", "evidenceQuality"],
+      "required": ["status", "conclusion", "networkStatus", "checkedEvidenceIds", "uncheckedHighRiskItems", "evidenceQuality"],
       "properties": {
         "status": { "const": "approved" },
         "conclusion": { "const": "可进入发布门禁" },
+        "networkStatus": { "enum": ["online", "partial", "offline"] },
+        "checkedEvidenceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "uncheckedHighRiskItems": { "type": "array", "maxItems": 0 },
         "evidenceQuality": { "$ref": "#/$defs/evidenceQuality" }
       }
     },
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "conclusion", "blockers", "requiredChanges", "evidenceQuality"],
+      "required": ["status", "conclusion", "networkStatus", "checkedEvidenceIds", "uncheckedHighRiskItems", "blockers", "requiredChanges", "evidenceQuality"],
       "properties": {
         "status": { "const": "needs_changes" },
         "conclusion": { "const": "需修改后复审" },
+        "networkStatus": { "enum": ["online", "partial", "offline"] },
+        "checkedEvidenceIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "uncheckedHighRiskItems": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "blockers": {
           "type": "array",
           "minItems": 1,
@@ -46,10 +57,13 @@
     {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "conclusion", "reason", "evidenceQuality"],
+      "required": ["status", "conclusion", "networkStatus", "checkedEvidenceIds", "uncheckedHighRiskItems", "reason", "evidenceQuality"],
       "properties": {
         "status": { "const": "blocked" },
         "conclusion": { "const": "阻断发布" },
+        "networkStatus": { "enum": ["online", "partial", "offline"] },
+        "checkedEvidenceIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "uncheckedHighRiskItems": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "reason": { "type": "string", "minLength": 1 },
         "evidenceQuality": { "$ref": "#/$defs/evidenceQuality" }
       }

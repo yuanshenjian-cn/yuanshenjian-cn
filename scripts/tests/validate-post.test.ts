@@ -19,6 +19,8 @@ const previousInvestmentFiles = [
 const aiBriefingsDir = path.join(process.cwd(), "content", "ai-briefings");
 const aiTestFile = path.join(aiBriefingsDir, "2099", "01", "2099-01-06-ai-briefing.md");
 const relativeAiTestFile = "content/ai-briefings/2099/01/2099-01-06-ai-briefing.md";
+const aiCandidateFile = path.join(process.cwd(), ".local", "ai-briefing", "runs", "validate-post-test", "candidate.md");
+const relativeAiCandidateFile = ".local/ai-briefing/runs/validate-post-test/candidate.md";
 const previousAiFiles = [
   path.join(aiBriefingsDir, "2099", "01", "2099-01-05-ai-briefing.md"),
   path.join(aiBriefingsDir, "2099", "01", "2099-01-04-ai-briefing.md"),
@@ -27,9 +29,15 @@ const previousAiFiles = [
   path.join(aiBriefingsDir, "2099", "01", "2099-01-01-ai-briefing.md"),
 ];
 
-function runValidate(relativePath: string): never {
+function validatorArgs(relativePath: string, logicalPath?: string): string[] {
+  return logicalPath
+    ? ["scripts/validate-post.js", "--path", relativePath, "--logical-path", logicalPath]
+    : ["scripts/validate-post.js", relativePath];
+}
+
+function runValidate(relativePath: string, logicalPath?: string): never {
   try {
-    execFileSync("node", ["scripts/validate-post.js", relativePath], {
+    execFileSync("node", validatorArgs(relativePath, logicalPath), {
       cwd: process.cwd(),
       encoding: "utf8",
       stdio: "pipe",
@@ -40,8 +48,8 @@ function runValidate(relativePath: string): never {
   }
 }
 
-function runValidateSuccess(relativePath: string): string {
-  return execFileSync("node", ["scripts/validate-post.js", relativePath], {
+function runValidateSuccess(relativePath: string, logicalPath?: string): string {
+  return execFileSync("node", validatorArgs(relativePath, logicalPath), {
     cwd: process.cwd(),
     encoding: "utf8",
     stdio: "pipe",
@@ -97,15 +105,19 @@ function buildV2AiBody(
     sourceLabel?: string;
     sourceUrl?: string;
     overviewCount?: number;
+    overviewItems?: string[];
+    includeWhy?: boolean;
+    eventBody?: string;
   } = {},
 ) {
   const headings = options.headings ?? Array.from({ length: eventCount }, (_, index) => `测试事件${index + 1}`);
   const targetBodyCharacters = eventCount === 1 ? 520 : eventCount <= 3 ? 900 : eventCount <= 6 ? 1300 : 1700;
   const perEventRepeats = Math.ceil(targetBodyCharacters / eventCount / 20);
-  const eventBody = "这是用于验证动态篇幅规则的确定性正文内容".repeat(perEventRepeats);
+  const eventBody = options.eventBody ?? "这是用于验证动态篇幅规则的确定性正文内容".repeat(perEventRepeats);
   const primaryCount = eventCount >= 7 ? 4 : eventCount;
   const renderEvents = (items: string[]) => items.map((heading) => `### ${heading}\n\n${eventBody}`).join("\n\n");
-  const overviewHeadings = headings.slice(0, options.overviewCount ?? headings.length);
+  const overviewItems =
+    options.overviewItems ?? headings.slice(0, options.overviewCount ?? headings.length).map((heading) => `${heading}。`);
   const supplemental = headings.slice(primaryCount);
   const sourceGroups = headings.map((heading, index) => {
     const groupHeading = index === 0 && options.sourceHeading ? options.sourceHeading : heading;
@@ -116,16 +128,13 @@ function buildV2AiBody(
 
   return `## 速览
 
-${overviewHeadings.map((heading) => `- ${heading}。`).join("\n")}
+${overviewItems.map((item) => `- ${item}`).join("\n")}
 
 ## 重点动态
 
 ${renderEvents(headings.slice(0, primaryCount))}
 ${supplemental.length > 0 ? `\n\n## 补充更新\n\n${renderEvents(supplemental)}` : ""}
-
-## 为什么值得关注
-
-这些事件共同说明平台能力、开放范围与开发者生态正在同步变化。
+${options.includeWhy === false ? "" : "\n\n## 为什么值得关注\n\n这些事件共同说明平台能力、开放范围与开发者生态正在同步变化。"}
 
 ## 来源
 
@@ -373,6 +382,7 @@ describe("validate-post ai briefing guards", () => {
 
   afterEach(() => {
     fs.rmSync(aiTestFile, { force: true });
+    fs.rmSync(path.dirname(aiCandidateFile), { recursive: true, force: true });
     for (const file of previousAiFiles) {
       fs.rmSync(file, { force: true });
     }
@@ -383,6 +393,52 @@ describe("validate-post ai briefing guards", () => {
     writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(eventCount));
 
     expect(() => runValidateSuccess(relativeAiTestFile)).not.toThrow();
+  });
+
+  it("allows a concise one-event briefing below the recommended minimum without a why section", () => {
+    writeAiBriefing(
+      aiTestFile,
+      "2099-01-06",
+      buildV2AiBody(1, { includeWhy: false, eventBody: "简洁正文明确说明已确认的新能力与开放范围。".repeat(8) }),
+    );
+
+    expect(() => runValidateSuccess(relativeAiTestFile)).not.toThrow();
+  });
+
+  it("rejects content above the configured hard maximum", () => {
+    writeAiBriefing(
+      aiTestFile,
+      "2099-01-06",
+      buildV2AiBody(1, { eventBody: "超出硬上限的确定性正文内容".repeat(130) }),
+    );
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain("硬上限 1200");
+    }
+  });
+
+  it("accepts independent overview summaries with matching event count", () => {
+    writeAiBriefing(
+      aiTestFile,
+      "2099-01-06",
+      buildV2AiBody(2, {
+        overviewItems: ["OpenAI 扩大首项能力的可用范围。", "第二项更新降低开发者接入成本。"],
+      }),
+    );
+
+    expect(() => runValidateSuccess(relativeAiTestFile)).not.toThrow();
+  });
+
+  it("still requires the cross-event why section for multiple events", () => {
+    writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(2, { includeWhy: false }));
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain("AI 简报缺少 `## 为什么值得关注` 章节");
+    }
   });
 
   it.each([
@@ -408,7 +464,7 @@ describe("validate-post ai briefing guards", () => {
     try {
       runValidate(relativeAiTestFile);
     } catch (error) {
-      expect(getStderr(error)).toContain("速览条目数必须等于正文事件数，且标题必须一一对应");
+      expect(getStderr(error)).toContain("速览条目数必须等于正文事件数，且每条摘要必须唯一");
     }
   });
 
@@ -447,6 +503,64 @@ describe("validate-post ai briefing guards", () => {
       expect(output).toContain("AI 简报 最近 5 期存在疑似重复事件");
       expect(output).toContain("OpenAI 推出 Realtime API 新语音矩阵");
       expect(output).toContain("content/ai-briefings/2099/01/2099-01-05-ai-briefing.md");
+    }
+  });
+
+  it("includes supplemental updates in recent briefing dedupe", () => {
+    const duplicateHeading = "OpenAI 扩大 Realtime API 新语音矩阵";
+    const previousHeadings = [
+      "历史重点事件一",
+      "历史重点事件二",
+      "历史重点事件三",
+      "历史重点事件四",
+      duplicateHeading,
+      "历史补充事件二",
+      "历史补充事件三",
+    ];
+    writeAiBriefing(previousAiFiles[0], "2099-01-05", buildV2AiBody(7, { headings: previousHeadings }));
+    writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(1, { headings: [duplicateHeading] }));
+
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      const output = getStderr(error);
+      expect(output).toContain("AI 简报 最近 5 期存在疑似重复事件");
+      expect(output).toContain(duplicateHeading);
+    }
+  });
+
+  it("validates a run directory candidate against its logical final path", () => {
+    fs.mkdirSync(path.dirname(aiTestFile), { recursive: true });
+    writeAiBriefing(aiCandidateFile, "2099-01-06", buildV2AiBody(1));
+
+    expect(() => runValidateSuccess(relativeAiCandidateFile, relativeAiTestFile)).not.toThrow();
+  });
+
+  it("allows replacement checks for an unpublished AI briefing", () => {
+    writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(1));
+    fs.writeFileSync(aiTestFile, fs.readFileSync(aiTestFile, "utf8").replace("published: true", "published: false"));
+
+    expect(() =>
+      execFileSync("node", ["scripts/validate-post.js", "--check-replaceable", "--path", relativeAiTestFile], {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        stdio: "pipe",
+      }),
+    ).not.toThrow();
+  });
+
+  it("rejects replacement checks for a published AI briefing", () => {
+    writeAiBriefing(aiTestFile, "2099-01-06", buildV2AiBody(1));
+
+    try {
+      execFileSync("node", ["scripts/validate-post.js", "--check-replaceable", "--path", relativeAiTestFile], {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        stdio: "pipe",
+      });
+      throw new Error("replaceable check should have failed");
+    } catch (error) {
+      expect(getStderr(error)).toContain("published: true 的 AI 简报禁止替换");
     }
   });
 
@@ -526,23 +640,4 @@ ${"如果这条路线继续推进，未来大家评估 AI 硬件时就不能只�
     expect(() => runValidateSuccess(relativeAiTestFile)).not.toThrow();
   });
 
-  it("enforces stricter ai body length on or after effective date", () => {
-    const body = buildV2AiBody(1).replace(
-      /这是用于验证动态篇幅规则的确定性正文内容(?:这是用于验证动态篇幅规则的确定性正文内容)+/,
-      "正文过短",
-    );
-    writeAiBriefing(
-      aiTestFile,
-      "2099-01-06",
-      body,
-      "测试新 AI 字数门槛生效",
-    );
-
-    try {
-      runValidate(relativeAiTestFile);
-    } catch (error) {
-      const output = getStderr(error);
-      expect(output).toContain("AI 简报正文汉字数（不含来源章节，1 个事件）应为 450~800");
-    }
-  });
 });
