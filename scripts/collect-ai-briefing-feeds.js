@@ -304,7 +304,7 @@ function embeddedIpv4Address(hextets) {
   return [value >>> 24, (value >>> 16) & 255, (value >>> 8) & 255, value & 255].join(".");
 }
 
-function isPublicIp(address) {
+function isPublicIp(address, trustFakeIpRange = false) {
   const family = net.isIP(address);
   if (family === 4) {
     const octets = address.split(".").map(Number);
@@ -314,7 +314,8 @@ function isPublicIp(address) {
     if (first === 169 && second === 254) return false;
     if (first === 172 && second >= 16 && second <= 31) return false;
     if (first === 192 && [0, 2, 168].includes(second)) return false;
-    if (first === 198 && [18, 19, 51].includes(second)) return false;
+    if (first === 198 && second === 51) return false;
+    if (first === 198 && (second === 18 || second === 19)) return trustFakeIpRange;
     if (first === 203 && second === 0) return false;
     return true;
   }
@@ -326,7 +327,7 @@ function isPublicIp(address) {
     if ((a & 0xfe00) === 0xfc00 || (a & 0xffc0) === 0xfe80 || (a & 0xff00) === 0xff00) return false;
 
     const compatibleOrMapped = a === 0 && b === 0 && c === 0 && d === 0 && e === 0 && (f === 0 || f === 0xffff);
-    if (compatibleOrMapped) return isPublicIp(embeddedIpv4Address(hextets));
+    if (compatibleOrMapped) return isPublicIp(embeddedIpv4Address(hextets), trustFakeIpRange);
 
     // Reject well-known transition, translation, documentation, benchmarking, and discard-only ranges.
     if (a === 0x0064 && b === 0xff9b) return false;
@@ -361,13 +362,13 @@ function validateRequestUrl(value, source, isRedirect) {
   return url;
 }
 
-async function resolvePublicAddress(hostname, resolveHost) {
+async function resolvePublicAddress(hostname, resolveHost, trustFakeIpRange = false) {
   const resolved = await resolveHost(hostname, { all: true, verbatim: true });
   const entries = asArray(resolved).map((entry) =>
     typeof entry === "string" ? { address: entry, family: net.isIP(entry) } : entry,
   );
   if (entries.length === 0) throw new Error(`DNS 未返回地址：${hostname}`);
-  if (entries.some((entry) => !isPublicIp(entry.address))) {
+  if (entries.some((entry) => !isPublicIp(entry.address, trustFakeIpRange))) {
     throw new Error(`主机 ${hostname} 解析到非公网地址`);
   }
   return entries[0];
@@ -424,6 +425,7 @@ async function fetchSourceXml(source, cacheEntry, dependencies = {}) {
   const resolveHost = dependencies.resolveHost || dns.promises.lookup;
   const requestImpl = dependencies.requestImpl || https.request;
   const limits = dependencies.limits;
+  const trustFakeIpRange = dependencies.trustFakeIpRange === true;
   if (!limits) throw new Error("缺少 Feed 网络限制配置");
 
   async function requestUrl(value, redirectCount, isRedirect) {
@@ -451,7 +453,7 @@ async function fetchSourceXml(source, cacheEntry, dependencies = {}) {
 
       Promise.resolve()
         .then(async () => {
-          const selectedAddress = await resolvePublicAddress(url.hostname, resolveHost);
+          const selectedAddress = await resolvePublicAddress(url.hostname, resolveHost, trustFakeIpRange);
           if (settled) return;
           const lookup = (_hostname, options, callback) => {
             const done = typeof options === "function" ? options : callback;
@@ -742,12 +744,16 @@ async function main() {
     window = JSON.parse(fs.readFileSync(path.resolve(args["window-file"]), "utf8"));
   }
 
-  const collection = await collectFeedSources({
-    sources: config.sourceRegistry.sources,
-    window,
-    cacheRoot,
-    limits: config.briefing.feedLimits,
-  });
+  const trustFakeIpRange = process.env.AI_BRIEFING_TRUST_FAKE_IP_RANGE === "1";
+  const collection = await collectFeedSources(
+    {
+      sources: config.sourceRegistry.sources,
+      window,
+      cacheRoot,
+      limits: config.briefing.feedLimits,
+    },
+    { trustFakeIpRange },
+  );
 
   if (args.healthCheck) {
     for (const source of collection.sources) {

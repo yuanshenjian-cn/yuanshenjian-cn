@@ -319,6 +319,41 @@ describe("AI briefing feed network safety and cache", () => {
     }
   });
 
+  it("only trusts the fake-ip benchmarking range when explicitly opted in", () => {
+    for (const address of ["198.18.0.1", "198.19.255.255"]) {
+      expect(collector.isPublicIp(address), address).toBe(false);
+      expect(collector.isPublicIp(address, true), address).toBe(true);
+    }
+    for (const address of ["198.51.100.1", "10.0.0.1", "172.16.0.1", "192.168.1.1", "127.0.0.1"]) {
+      expect(collector.isPublicIp(address, true), address).toBe(false);
+    }
+  });
+
+  it("proceeds past DNS validation for fake-ip answers when trustFakeIpRange is enabled", async () => {
+    const invocations: Array<Record<string, unknown>> = [];
+    const requestImpl = createRequestImpl(
+      [{ statusCode: 200, body: readFixture("rss.xml"), headers: { etag: '"v1"' } }],
+      invocations,
+    );
+
+    await expect(
+      collector.fetchSourceXml(rssSource, null, {
+        limits,
+        resolveHost: async () => [{ address: "198.18.0.77", family: 4 }],
+        requestImpl,
+        trustFakeIpRange: true,
+      }),
+    ).resolves.toMatchObject({ fromCache: false });
+
+    await expect(
+      collector.fetchSourceXml(rssSource, null, {
+        limits,
+        resolveHost: async () => [{ address: "198.18.0.77", family: 4 }],
+        requestImpl,
+      }),
+    ).rejects.toThrow("解析到非公网地址");
+  });
+
   it("applies the per-hop timeout to DNS resolution", async () => {
     await expect(
       collector.fetchSourceXml(rssSource, null, {

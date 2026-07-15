@@ -21,17 +21,17 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 - 查询模式：只回答，不写公开内容，不 commit，不 push。
 - 成稿模式：返回完整 Markdown 草稿和内部审核摘要，不写入 `content/`，不 commit，不 push。
 - 普通发布模式：明确发布意图后才允许写正式文件，并在独立 reviewer 与确定性门禁通过后发布。
-- 外层编排发布候选模式：只有 `scripts/ai-briefing.sh` 明确提供 `runDir`、窗口和 `$RUN_DIR/candidate.md`，并声明外层接管 reviewer/finalizer 时启用。主 agent 只写 runDir 中的候选与 `discovery.json`、`selection.json`、`self-review.json`，不得写正式 `content/` 路径、执行 Git 写操作或写 `reviewer-output.json`。
+
+发布由当前会话 agent 驱动确定性脚本完成，不存在独立的外层编排脚本，也不再 fork 单独的 generator/reviewer 子进程。
 
 ## 所有模式的确定性初始化
 
-查询、成稿、普通发布和外层编排发布候选模式都必须先具备冻结日期 coverage 与确定性 Feed 采集结果：
+查询、成稿和普通发布模式都必须先具备冻结日期 coverage 与确定性 Feed 采集结果：
 
-1. 若外层已经提供 `runDir`、`window.json` 和 `collection.json`，直接使用，禁止重新计算或覆盖。
-2. 若外层未提供，则在任何模式开始时创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`。
-3. 运行 `node scripts/ai-briefing-window.js --output <runDir>/window.json`，在一次调用中冻结 `issueDate` 与 `observedAt`；只有显式指定日期时才附加 `--issue-date <date> --observed-at <iso>`。
-4. 再运行 `node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json`。
-5. 查询和成稿模式只允许在该 `.local` runDir 写证据，不得写 `content/` 或产生 Git 副作用；发布模式完成相同初始化后才允许进入 finalizer。
+1. 在任何模式开始时创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`。
+2. 运行 `node scripts/ai-briefing-window.js --output <runDir>/window.json`，在一次调用中冻结 `issueDate` 与 `observedAt`；只有显式指定日期时才附加 `--issue-date <date> --observed-at <iso>`。
+3. 再运行 `node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json`。
+4. 查询和成稿模式只允许在该 `.local` runDir 写证据，不得写 `content/` 或产生 Git 副作用；发布模式完成相同初始化后才允许进入 finalizer。
 
 不得跳过 window CLI 或 collector CLI 后直接搜索、成稿或发布。
 
@@ -51,7 +51,7 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 
 固定按以下顺序执行：
 
-1. 读取初始化阶段生成或外层提供的 `collection.json`，优先处理官方 RSS/Atom、GitHub Release 和 Hugging Face 候选。
+1. 读取初始化阶段生成的 `collection.json`，优先处理官方 RSS/Atom、GitHub Release 和 Hugging Face 候选。
 2. 使用只读 WebFetch 检查官方页面、changelog、release notes 和发布页，把结果写入 `discovery.json`。
 3. 按 `focus-companies.json` 的厂商别名和事件类型关键词执行定向搜索，记录查询串、时间、结果 URL 和失败原因。
 4. 使用媒体 Feed 与权威媒体搜索补漏。
@@ -99,14 +99,13 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 
 每次运行使用 `.local/ai-briefing/runs/<run-id>/`：
 
-- `window.json`：外层提供或本模式初始化阶段写入的冻结窗口。
-- `collection.json`：外层提供或本模式初始化阶段写入的确定性采集结果、候选、cluster 和 Feed coverage。
+- `window.json`：初始化阶段写入的冻结窗口。
+- `collection.json`：初始化阶段写入的确定性采集结果、候选、cluster 和 Feed coverage。
 - `discovery.json`：主 agent 写入的 page/Hugging Face/search 覆盖与证据。
 - `selection.json`：主 agent 写入的事件聚类、eventType、candidateIds、sourceRefs、历史匹配和取舍原因。
 - `self-review.json`：主 agent 自审。
 - `candidate.md`：成稿或发布模式的候选 Markdown；reviewer 前不得写入正式目录。
-- `claude-output.json`：外层直接保存的主 agent 原始结构化输出。
-- `reviewer-output.json`：外层独立 reviewer 的原始结构化输出，主 agent 禁止写入。
+- `reviewer-output.json`：发布模式下保存独立 reviewer 子代理的结构化输出，供 finalizer 校验；主 agent 不得篡改。
 - `verification.json`：独立 verifier 的门禁结果。
 
 发布模式必须保持 `window.json` 与 `collection.json` 的启动前 SHA-256 不变。证据包不得进入公开正文、stage 或 commit。
@@ -177,17 +176,9 @@ Reviewer 结论只允许：`可进入发布门禁`、`需修改后复审`、`阻
 4. 可按用户要求对该 revision 调用一次独立 reviewer。
 5. 不晋升到 `content/`，不执行发布 preflight、commit 或 push。
 
-### 外层编排发布候选模式
-
-1. 只使用外层给定的 issueDate、日期 coverage、runDir、registry 和 collection。
-2. 只写 `$RUN_DIR/candidate.md`、`discovery.json`、`selection.json`、`self-review.json`。
-3. 返回 `generator-result.schema.json` 规定的 `structured_output`，其中包含 `coverageConclusion` 和证据路径。
-4. 不调用 reviewer，不执行 Bash/Git，不写正式路径，不 commit，不 push。
-5. `no_events` 时不得创建 candidate 或正式文件；外层必须在 `verify-no-events` 成功后才返回无事件状态。
-
 ### 普通发布模式
 
-明确发布意图后，先完成初始化、候选、证据和单轮 reviewer。Reviewer approved 后只调用共享 `scripts/finalize-ai-briefing-run.sh`：由 finalizer 独占 Git preflight、证据与 reviewer 校验、使用逻辑正式路径的 candidate 内容校验、原子晋升、AI index 构建、精确 stage、commit/push 和远端包含验证。普通发布入口不得复制 Git 状态机。
+明确发布意图后，先完成初始化、候选、证据和单轮 reviewer，并把 reviewer 子代理的原始结构化输出保存到 `$RUN_DIR/reviewer-output.json` 供 finalizer 校验。Reviewer approved 后只调用共享 `scripts/finalize-ai-briefing-run.sh`：由 finalizer 独占 Git preflight、证据与 reviewer 校验、使用逻辑正式路径的 candidate 内容校验、原子晋升、AI index 构建、精确 stage、commit/push 和远端包含验证。普通发布入口不得复制 Git 状态机。
 
 正式路径存在时默认阻断；只有用户显式要求替换、原文件不是 `published: true` 且 finalizer 支持恢复原文件时，才可传入替换选项。自动提交信息为：
 

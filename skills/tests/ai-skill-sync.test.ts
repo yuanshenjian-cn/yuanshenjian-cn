@@ -96,7 +96,7 @@ describe("ai skill mirror sync", () => {
     expect(readme).toContain("finalize-ai-briefing-run.sh");
     expect(readme).toContain("hardMax");
     const openCodeCommand = fs.readFileSync(".opencode/commands/publish-ai-briefing.md", "utf8");
-    expect(openCodeCommand).toContain("不得调用 `scripts/ai-briefing.sh`");
+    expect(openCodeCommand).not.toContain("ai-briefing.sh");
     expect(openCodeCommand).toContain("scripts/finalize-ai-briefing-run.sh");
     expect(openCodeCommand).not.toContain("git commit");
     expect(openCodeCommand).not.toContain("git push");

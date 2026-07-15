@@ -8,20 +8,20 @@
 - 成稿：返回 Markdown 草稿和审核摘要，不写入 `content/`。
 - 发布：独立 reviewer 与确定性门禁全部通过后才允许发布。
 
-`scripts/ai-briefing.sh` 还有一个外层编排模式：主 agent 只在 runDir 生成 `candidate.md` 和 agent 证据；独立 reviewer 通过后，由共享 `scripts/finalize-ai-briefing-run.sh` 独占正式晋升、Git 与远端验证。
+发布模式由当前会话 agent 驱动：在被忽略的 runDir 生成 `candidate.md` 和 agent 证据，独立 reviewer 子代理通过后，由共享 `scripts/finalize-ai-briefing-run.sh` 独占正式晋升、Git 与远端验证。不再存在 fork 独立 generator/reviewer 子进程的外层编排脚本。
 
 ## 所有模式都先采集
 
-查询、成稿和普通发布不能只靠临时网页搜索。若外层未提供 `runDir`、`window.json` 和 `collection.json`，模式开始时必须创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，先在一次 window CLI 调用中冻结 `issueDate/observedAt`，再采集 Feed：
+查询、成稿和普通发布不能只靠临时网页搜索。模式开始时必须创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，先在一次 window CLI 调用中冻结 `issueDate/observedAt`，再采集 Feed：
 
 ```text
 node scripts/ai-briefing-window.js --output <runDir>/window.json
 node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json
 ```
 
-显式指定日期时，window CLI 可附加 `--issue-date <date> --observed-at <iso>`。查询和成稿只可在 `.local` runDir 写证据，不写 `content/` 或 Git；普通发布完成相同初始化后才进入 finalizer。外层已提供窗口和采集结果时禁止重复计算或覆盖。
+显式指定日期时，window CLI 可附加 `--issue-date <date> --observed-at <iso>`。查询和成稿只可在 `.local` runDir 写证据，不写 `content/` 或 Git；普通发布完成相同初始化后才进入 finalizer。
 
-`scripts/ai-briefing.sh` 对 collector 另加默认 120 秒外层超时，可用 `AI_BRIEFING_COLLECTOR_TIMEOUT_SECONDS` 调整。
+collector 默认拒绝 DNS 解析到私网或 `198.18.0.0/15`（Clash/Surge/Mihomo 等透明代理 fake-ip 段）的来源域名。若本机代理确认使用系统级 TUN/透明代理（而非仅浏览器 PAC），设置 `AI_BRIEFING_TRUST_FAKE_IP_RANGE=1` 可放行该段，其余私网段不受影响。
 
 ## 日期覆盖窗口
 
