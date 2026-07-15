@@ -1,7 +1,7 @@
 ---
 description: AI 简报阻断式独立复审代理。读取公开稿与证据包，执行只读联网核验，不代写、不编辑、不运行命令。
 mode: subagent
-model: tencent-tokenhub-china/glm-5.2
+model: aijws/gpt-5.4
 permission:
   task: deny
   edit: deny
