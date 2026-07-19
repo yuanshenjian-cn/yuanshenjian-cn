@@ -1,27 +1,6 @@
 {
-  "generated": "2026-07-19T00:00:00.000Z",
+  "generated": "2026-07-10T00:00:00.000Z",
   "posts": [
-    {
-      "slug": "investment-concepts-beginners",
-      "title": "投资入门：搞懂这些概念再拿真金白银进场",
-      "excerpt": "用大白话把投资最核心的概念讲清楚：风险和收益的关系、股票和债券分别是什么、为什么说复利是第八大奇迹、定投到底有没有用、普通人该怎么分配自己的钱。适合零基础想了解投资的读者。",
-      "tags": [
-        "投资理财",
-        "投资入门"
-      ],
-      "date": "2026-07-19T00:00:00.000Z"
-    },
-    {
-      "slug": "codex-plugin-and-mcp-configuration",
-      "title": "Codex 插件与 MCP 的五层配置哲学",
-      "excerpt": "在大语言模型应用与 Agent 辅助编码中，工具能力如何注入模型是决定开发效能的关键。分析 Codex 从本地 Skill 到远程 MCP Server 的五层异构能力架构，剖析多源重合的工具生态，对比官方 GitHub 插件与原生 MCP 的选型利弊，阐明精细化禁用插件与 Skill 的区别联系，并提供一份兼顾 Token 经济性、环境隔离与执行安全的 config.toml 高阶配置指南。",
-      "tags": [
-        "AI 编程",
-        "Codex",
-        "MCP"
-      ],
-      "date": "2026-07-19T00:00:00.000Z"
-    },
     {
       "slug": "openai-model-family-notes",
       "title": "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.6 的主线演进",
