@@ -7,7 +7,7 @@
     "allowDegradedDraft": true,
     "requireSufficientForNoEvents": true
   },
-  "contentRulesV2EffectiveDate": "2026-07-15",
+  "contentRulesV2EffectiveDate": "2026-08-15",
   "dynamicBodyLengthRules": [
     {
       "minEvents": 1,
@@ -63,7 +63,12 @@
   ],
   "dedupeLookbackIssues": 5,
   "dedupeEffectiveFrom": "2026-05-14",
-  "requiredSections": ["速览", "重点动态", "为什么值得关注", "来源"],
+  "requiredSections": [
+    "速览",
+    "重点动态",
+    "为什么值得关注",
+    "来源"
+  ],
   "dedupeSectionHeading": "重点动态",
   "sourceSectionHeading": "来源"
 }

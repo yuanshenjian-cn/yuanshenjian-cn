@@ -31,7 +31,7 @@ const INVESTMENT_BRIEFINGS_ROOT = investmentBriefingsDir;
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
-  contentRulesV2EffectiveDate: "2026-07-15",
+  contentRulesV2EffectiveDate: "2026-08-15",
   dynamicBodyLengthRules: [
     { minEvents: 1, maxEvents: 1, recommendedMin: 450, recommendedMax: 800, hardMax: 1200 },
     { minEvents: 2, maxEvents: 3, recommendedMin: 750, recommendedMax: 1300, hardMax: 1800 },

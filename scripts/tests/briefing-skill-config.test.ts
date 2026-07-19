@@ -34,7 +34,7 @@ describe("AI briefing machine configuration", () => {
   it("loads the complete configuration", () => {
     const config = loadAiBriefingSkillConfig();
 
-    expect(config.briefing.contentRulesV2EffectiveDate).toBe("2026-07-15");
+    expect(config.briefing.contentRulesV2EffectiveDate).toBe("2026-08-15");
     expect(config.briefing.windowStrategy).toBe("calendar-date-overlap");
     expect(config.briefing.initialLookbackDays).toBe(1);
     expect(config.sourceRegistry.version).toBe(1);

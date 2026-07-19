@@ -1,6 +1,20 @@
 {
-  "generated": "2026-07-14T00:00:00.000Z",
+  "generated": "2026-07-16T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-16",
+      "title": "AI 简报 · 2026-07-16",
+      "excerpt": "月之暗面于 7 月 16 日正式发布全球首个 3T 级开源大模型 Kimi K3，API 缓存命中输入仅为 ¥2.00/百万 token；Meta AI 推出青少年危机预警系统；Google DeepMind 公布生物防御联合安全方法；xAI 起诉违规 Grok 用户；欧盟勒令谷歌向竞争对手开放 Android 与搜索数据。",
+      "tags": [
+        "AI",
+        "Kimi",
+        "Google",
+        "Meta",
+        "xAI"
+      ],
+      "date": "2026-07-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-16"
+    },
     {
       "slug": "2026-07-14",
       "title": "AI 简报 · 2026-07-14",
@@ -1102,6 +1116,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-16",
+      "title": "AI 简报 · 2026-07-16",
+      "excerpt": "月之暗面于 7 月 16 日正式发布全球首个 3T 级开源大模型 Kimi K3，API 缓存命中输入仅为 ¥2.00/百万 token；Meta AI 推出青少年危机预警系统；Google DeepMind 公布生物防御联合安全方法；xAI 起诉违规 Grok 用户；欧盟勒令谷歌向竞争对手开放 Android 与搜索数据。",
+      "tags": [
+        "AI",
+        "Kimi",
+        "Google",
+        "Meta",
+        "xAI"
+      ],
+      "date": "2026-07-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-16"
+    },
     {
       "slug": "2026-07-14",
       "title": "AI 简报 · 2026-07-14",
