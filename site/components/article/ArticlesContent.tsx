@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Post } from "@/types/blog";
-import { Calendar, Clock, Rss } from "lucide-react";
+import { Calendar, Clock, FileText, Rss } from "lucide-react";
+import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { Pagination } from "@/components/article/Pagination";
 
 interface ArticlesContentProps {
@@ -144,18 +145,25 @@ export function ArticlesContent({
                   <h2 className="text-xl font-medium mb-2 group-hover:text-primary transition-colors">
                     {post.title}
                   </h2>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                    <span className="flex items-center gap-1">
+                  <div className="mb-2 flex items-center gap-3 overflow-x-auto pb-1 text-xs text-muted-foreground whitespace-nowrap">
+                    <span className="flex flex-shrink-0 items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       <time dateTime={post.date}>
                         {new Date(post.date).toLocaleDateString("zh-CN")}
                       </time>
                     </span>
                     <span>·</span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex flex-shrink-0 items-center gap-1">
+                      <FileText className="w-3 h-3" />
+                      {post.wordCount.toLocaleString("zh-CN")} 字
+                    </span>
+                    <span>·</span>
+                    <span className="flex flex-shrink-0 items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {post.readingTime} 分钟
                     </span>
+                    <span>·</span>
+                    <ArticleStatsBadge slug={post.slug} />
                   </div>
                   <p className="text-muted-foreground leading-relaxed mb-3">
                     {post.excerpt}

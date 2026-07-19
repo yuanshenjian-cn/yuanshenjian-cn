@@ -20,7 +20,7 @@ export function ArticleViewTracker({ slug }: { slug: string }) {
   if (!stats) return null;
 
   return (
-    <>
+    <span className="inline-flex flex-shrink-0 items-center gap-3 whitespace-nowrap">
       <span>·</span>
       <span className="flex items-center gap-1">
         <Eye className="w-4 h-4" />
@@ -30,6 +30,6 @@ export function ArticleViewTracker({ slug }: { slug: string }) {
         <Users className="w-4 h-4" />
         {stats.uv}
       </span>
-    </>
+    </span>
   );
 }

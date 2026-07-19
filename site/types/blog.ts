@@ -10,6 +10,7 @@ export interface Post {
   tags: string[];
   published: boolean;
   readingTime: number;
+  wordCount: number;
   category?: string;
   relativePath: string;
 }

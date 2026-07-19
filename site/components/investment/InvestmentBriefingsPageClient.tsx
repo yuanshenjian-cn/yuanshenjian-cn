@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Clock, FileText } from "lucide-react";
 import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { InvestmentBriefingRecommendWidget } from "@/components/investment/InvestmentBriefingRecommendWidget";
 import type { InvestmentBriefing } from "@/types/investment";
@@ -92,7 +93,19 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
                   </time>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
-                <ArticleStatsBadge slug={`investment-briefing-${briefing.slug}`} className="mt-3" />
+                <div className="mt-3 flex items-center gap-3 overflow-x-auto pb-1 text-xs text-muted-foreground whitespace-nowrap">
+                  <span className="flex flex-shrink-0 items-center gap-1">
+                    <FileText className="w-3.5 h-3.5" />
+                    {briefing.wordCount.toLocaleString("zh-CN")} 字
+                  </span>
+                  <span>·</span>
+                  <span className="flex flex-shrink-0 items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {briefing.readingTime} 分钟
+                  </span>
+                  <span>·</span>
+                  <ArticleStatsBadge slug={`investment-briefing-${briefing.slug}`} />
+                </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {briefing.tags.map((tag) => (
                     <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">

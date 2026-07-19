@@ -35,13 +35,13 @@ export function ArticleStatsBadge({ slug, className }: ArticleStatsBadgeProps) {
   }
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-3 text-xs text-muted-foreground", className)}>
+    <div className={cn("flex flex-nowrap items-center gap-3 whitespace-nowrap text-xs text-muted-foreground", className)}>
       <span className="flex items-center gap-1">
-        <Eye className="w-4 h-4" />
+        <Eye className="w-3.5 h-3.5" />
         {stats.pv}
       </span>
       <span className="flex items-center gap-1">
-        <Users className="w-4 h-4" />
+        <Users className="w-3.5 h-3.5" />
         {stats.uv}
       </span>
     </div>

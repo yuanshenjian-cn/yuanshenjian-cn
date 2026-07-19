@@ -11,7 +11,7 @@ import {
   parseBriefingDateParts,
   parseBriefingTags,
 } from "@/lib/briefing-core";
-import { cleanContent } from "@/lib/utils";
+import { calculateWordCount, cleanContent } from "@/lib/utils";
 import type {
   InvestmentBriefing,
   InvestmentBriefingArchiveItem,
@@ -65,6 +65,8 @@ function parseInvestmentBriefingFile(filePath: string): InvestmentBriefing | nul
 
     const slug = data.date;
     const dateParts = parseBriefingDateParts(data.date);
+    const cleanText = cleanContent(content);
+    const wordCount = calculateWordCount(content);
 
     return {
       slug,
@@ -75,7 +77,8 @@ function parseInvestmentBriefingFile(filePath: string): InvestmentBriefing | nul
       tags,
       excerpt,
       content,
-      readingTime: calculateBriefingReadingTime(cleanContent(content)),
+      readingTime: calculateBriefingReadingTime(cleanText),
+      wordCount,
       relativePath: path.relative(investmentBriefingsDirectory, filePath).split(path.sep).join("/"),
       url: `/investment/briefings/${slug}`,
       ...dateParts,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FloatingTocButton } from "@/components/FloatingTocButton";
@@ -121,9 +121,14 @@ export default async function InvestmentBriefingDetailPage({ params }: Props) {
             <header className="mb-10">
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Briefing</p>
               <h1 className="text-3xl font-medium tracking-tight leading-tight">{briefing.title}</h1>
-              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <time dateTime={briefing.date}>{new Date(briefing.date).toLocaleDateString("zh-CN")}</time>
-                <span className="flex items-center gap-1">
+              <div className="mt-4 flex items-center gap-3 overflow-x-auto pb-1 text-sm text-muted-foreground whitespace-nowrap">
+                <time className="flex-shrink-0" dateTime={briefing.date}>{new Date(briefing.date).toLocaleDateString("zh-CN")}</time>
+                <span className="flex flex-shrink-0 items-center gap-1">
+                  <FileText className="w-4 h-4" />
+                  {briefing.wordCount.toLocaleString("zh-CN")} 字
+                </span>
+                <span>·</span>
+                <span className="flex flex-shrink-0 items-center gap-1">
                   <Clock className="w-4 h-4" />
                   {briefing.readingTime} 分钟
                 </span>

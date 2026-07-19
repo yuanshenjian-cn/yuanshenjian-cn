@@ -1,6 +1,5 @@
 import { config } from "./config";
-import { Post } from "@/types/blog";
-import { cleanContent } from "@/lib/utils";
+import type { Post } from "@/types/blog";
 
 /**
  * 生成文章（BlogPosting）结构化数据
@@ -35,7 +34,7 @@ export function generateArticleStructuredData(post: Post, url: string) {
     },
     keywords: post.tags.join(", "),
     articleSection: post.category || "技术",
-    wordCount: cleanContent(post.content).length,
+    wordCount: post.wordCount,
     timeRequired: `PT${post.readingTime}M`,
     inLanguage: "zh-CN",
     isAccessibleForFree: true,

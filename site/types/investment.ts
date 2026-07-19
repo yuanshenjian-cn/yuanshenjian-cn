@@ -20,6 +20,7 @@ export interface InvestmentBriefing extends InvestmentBriefingFrontmatter {
   excerpt: string;
   content: string;
   readingTime: number;
+  wordCount: number;
   relativePath: string;
   url: string;
 }

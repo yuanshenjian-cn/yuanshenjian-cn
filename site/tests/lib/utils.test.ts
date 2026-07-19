@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cleanContent, calculateReadingTime } from "@/lib/utils";
+import { calculateReadingTime, calculateWordCount, cleanContent } from "@/lib/utils";
 
 describe("cleanContent", () => {
   it("should remove code blocks", () => {
@@ -20,9 +20,35 @@ describe("cleanContent", () => {
     expect(result).toBe("TitleBoldanditalic");
   });
 
+  it("should keep punctuation for reading-time cleaning", () => {
+    const content = "Hello, world!";
+    const result = cleanContent(content);
+    expect(result).toBe("Hello,world!");
+  });
+
   it("should handle empty string", () => {
     const result = cleanContent("");
     expect(result).toBe("");
+  });
+});
+
+describe("calculateWordCount", () => {
+  it("should exclude punctuation from word count", () => {
+    const content = "你好，世界！Hello, world!";
+    const result = calculateWordCount(content);
+    expect(result).toBe(14);
+  });
+
+  it("should keep visible link text and exclude url", () => {
+    const content = "查看[官方文档](https://example.com/docs_(v2))";
+    const result = calculateWordCount(content);
+    expect(result).toBe(6);
+  });
+
+  it("should not treat plain bracket text as markdown link", () => {
+    const content = "这里有普通文本 ](补充说明) 继续";
+    const result = calculateWordCount(content);
+    expect(result).toBe(13);
   });
 });
 

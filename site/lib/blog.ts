@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import { Post, PostFrontmatter, SearchPost } from "@/types/blog";
 import { PaginatedPosts } from "@/types/pagination";
 import { config, POSTS_PER_PAGE, EXCERPT_LENGTH } from "@/lib/config";
-import { cleanContent } from "@/lib/utils";
+import { calculateWordCount, cleanContent } from "@/lib/utils";
 import { blogContentDir, repoRoot } from "@/lib/workspace-paths";
 
 const postsDirectory = blogContentDir;
@@ -146,8 +146,9 @@ function parsePostFile(filePath: string): Post | null {
     }
 
     const cleanText = cleanContent(content);
-    const charCount = cleanText.length;
-    const readingTime = Math.max(1, Math.ceil(charCount / config.readingTime.charactersPerMinute));
+    const readingCharCount = cleanText.length;
+    const readingTime = Math.max(1, Math.ceil(readingCharCount / config.readingTime.charactersPerMinute));
+    const wordCount = calculateWordCount(content);
 
     const slug = generateSlug(filePath);
     const dateObj = parseDate(frontmatter.date!);
@@ -170,6 +171,7 @@ function parsePostFile(filePath: string): Post | null {
       tags: parseTags(frontmatter.tags),
       published: frontmatter.published !== false,
       readingTime,
+      wordCount,
       category,
       relativePath: posixRelativePath,
     };

@@ -20,6 +20,7 @@ export interface Briefing {
   published: boolean;
   content: string;
   readingTime: number;
+  wordCount: number;
   relativePath: string;
   url: string;
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Clock, FileText } from "lucide-react";
 import { ArticleStatsBadge } from "@/components/article/ArticleStatsBadge";
 import { BriefingRecommendWidget } from "@/components/briefings/BriefingRecommendWidget";
 import { BRIEFING_FILTER_OPTIONS, isBriefingInRange } from "@/lib/briefing-ranges";
@@ -80,7 +81,19 @@ export function BriefingsPageClient({ briefings, totalBriefings, aiConfig }: Bri
                   </time>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{briefing.excerpt}</p>
-                <ArticleStatsBadge slug={`ai-briefing-${briefing.slug}`} className="mt-3" />
+                <div className="mt-3 flex items-center gap-3 overflow-x-auto pb-1 text-xs text-muted-foreground whitespace-nowrap">
+                  <span className="flex flex-shrink-0 items-center gap-1">
+                    <FileText className="w-3.5 h-3.5" />
+                    {briefing.wordCount.toLocaleString("zh-CN")} 字
+                  </span>
+                  <span>·</span>
+                  <span className="flex flex-shrink-0 items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {briefing.readingTime} 分钟
+                  </span>
+                  <span>·</span>
+                  <ArticleStatsBadge slug={`ai-briefing-${briefing.slug}`} />
+                </div>
                 {briefing.tags.length > 0 ? (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {briefing.tags.map((tag) => (

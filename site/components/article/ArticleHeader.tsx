@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, FileText } from "lucide-react";
 import type { Post } from "@/types/blog";
 
 interface ArticleHeaderProps {
@@ -22,15 +22,20 @@ export function ArticleHeader({ post, statsSlot }: ArticleHeaderProps) {
         <h1 className="text-2xl md:text-3xl font-medium mb-4">
           {post.title}
         </h1>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
+        <div className="flex items-center gap-3 overflow-x-auto pb-1 text-sm text-muted-foreground whitespace-nowrap">
+          <span className="flex flex-shrink-0 items-center gap-1">
             <Calendar className="w-4 h-4" />
             <time dateTime={post.date}>
               {new Date(post.date).toLocaleDateString("zh-CN")}
             </time>
           </span>
           <span>·</span>
-          <span className="flex items-center gap-1">
+          <span className="flex flex-shrink-0 items-center gap-1">
+            <FileText className="w-4 h-4" />
+            {post.wordCount.toLocaleString("zh-CN")} 字
+          </span>
+          <span>·</span>
+          <span className="flex flex-shrink-0 items-center gap-1">
             <Clock className="w-4 h-4" />
             {post.readingTime} 分钟
           </span>

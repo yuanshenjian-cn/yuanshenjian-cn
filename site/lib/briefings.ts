@@ -13,7 +13,7 @@ import {
   parseBriefingDateParts,
   parseBriefingTags,
 } from "@/lib/briefing-core";
-import { cleanContent } from "@/lib/utils";
+import { calculateWordCount, cleanContent } from "@/lib/utils";
 import { aiBriefingsDir, repoRoot } from "@/lib/workspace-paths";
 
 const briefingsDirectory = aiBriefingsDir;
@@ -60,6 +60,8 @@ function parseBriefingFile(filePath: string): Briefing | null {
 
     const slug = data.date;
     const dateParts = parseBriefingDateParts(data.date);
+    const cleanText = cleanContent(content);
+    const wordCount = calculateWordCount(content);
 
     return {
       slug,
@@ -70,7 +72,8 @@ function parseBriefingFile(filePath: string): Briefing | null {
       tags,
       published,
       content,
-      readingTime: calculateBriefingReadingTime(cleanContent(content)),
+      readingTime: calculateBriefingReadingTime(cleanText),
+      wordCount,
       relativePath: path.relative(briefingsDirectory, filePath).split(path.sep).join("/"),
       url: `/ai/briefings/${slug}`,
     };
