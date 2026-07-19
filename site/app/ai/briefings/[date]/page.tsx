@@ -123,7 +123,7 @@ export default async function BriefingDetailPage({ params }: Props) {
                 <span>·</span>
                 <span className="flex flex-shrink-0 items-center gap-1">
                   <FileText className="w-4 h-4" />
-                  {briefing.wordCount.toLocaleString("zh-CN")} 字
+                  {Math.floor(briefing.wordCount / 100) * 100}+ 字
                 </span>
                 <span>·</span>
                 <span className="flex flex-shrink-0 items-center gap-1">

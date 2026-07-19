@@ -1,6 +1,6 @@
 ---
 mode: subagent
-model: openai/gpt-5.5
+model: cpa/gpt-5.6-luna
 reasoningEffort: xhigh
 tools:
   write: false

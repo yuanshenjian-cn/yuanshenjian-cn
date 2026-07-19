@@ -25,7 +25,7 @@ const briefings: InvestmentBriefing[] = [
     published: true,
     content: "正文",
     readingTime: 2,
-    wordCount: 2,
+    wordCount: 200,
     relativePath: "2026-05-09-investment-briefing.md",
     url: "/investment/briefings/2026-05-09",
   },
@@ -42,7 +42,7 @@ const briefings: InvestmentBriefing[] = [
     published: true,
     content: "正文",
     readingTime: 2,
-    wordCount: 2,
+    wordCount: 200,
     relativePath: "2026-04-15-investment-briefing.md",
     url: "/investment/briefings/2026-04-15",
   },
@@ -70,7 +70,7 @@ describe("InvestmentBriefingsPageClient", () => {
     expect(screen.getByTestId("investment-recommend-widget")).toBeInTheDocument();
     expect(screen.getByTestId("stats-investment-briefing-2026-05-09")).toBeInTheDocument();
     expect(screen.getByTestId("stats-investment-briefing-2026-04-15")).toBeInTheDocument();
-    expect(screen.getAllByText("2 字")).toHaveLength(2);
+    expect(screen.getAllByText("200+ 字")).toHaveLength(2);
     expect(screen.getAllByText("2 分钟")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "近 3 天" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 14 天" })).toBeInTheDocument();

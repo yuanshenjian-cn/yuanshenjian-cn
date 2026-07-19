@@ -155,7 +155,7 @@ export function ArticlesContent({
                     <span>·</span>
                     <span className="flex flex-shrink-0 items-center gap-1">
                       <FileText className="w-3 h-3" />
-                      {post.wordCount.toLocaleString("zh-CN")} 字
+                      {Math.floor(post.wordCount / 100) * 100}+ 字
                     </span>
                     <span>·</span>
                     <span className="flex flex-shrink-0 items-center gap-1">

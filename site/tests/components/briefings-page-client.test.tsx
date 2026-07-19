@@ -67,7 +67,7 @@ describe("BriefingsPageClient", () => {
     expect(screen.getByTestId("recommend-widget")).toBeInTheDocument();
     expect(screen.getByTestId("stats-ai-briefing-2026-05-08")).toBeInTheDocument();
     expect(screen.getByTestId("stats-ai-briefing-2026-05-01")).toBeInTheDocument();
-    expect(screen.getAllByText("2 字")).toHaveLength(2);
+    expect(screen.getAllByText("0+ 字")).toHaveLength(2);
     expect(screen.getAllByText("1 分钟")).toHaveLength(2);
     expect(screen.queryByRole("button", { name: "今天" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "近 30 天" })).toBeInTheDocument();

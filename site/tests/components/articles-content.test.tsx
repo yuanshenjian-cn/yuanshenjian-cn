@@ -43,7 +43,7 @@ describe("ArticlesContent", () => {
     render(<ArticlesContent allPosts={posts} tags={["测试"]} postsPerPage={10} />);
 
     expect(screen.getByRole("heading", { name: "Hello World" })).toBeInTheDocument();
-    expect(screen.getByText("1,234 字")).toBeInTheDocument();
+    expect(screen.getByText("1200+ 字")).toBeInTheDocument();
     expect(screen.getByText("3 分钟")).toBeInTheDocument();
     expect(screen.getByTestId("stats-hello-world")).toBeInTheDocument();
   });

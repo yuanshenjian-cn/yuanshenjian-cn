@@ -96,7 +96,7 @@ export function InvestmentBriefingsPageClient({ aiConfig, briefings, totalBriefi
                 <div className="mt-3 flex items-center gap-3 overflow-x-auto pb-1 text-xs text-muted-foreground whitespace-nowrap">
                   <span className="flex flex-shrink-0 items-center gap-1">
                     <FileText className="w-3.5 h-3.5" />
-                    {briefing.wordCount.toLocaleString("zh-CN")} 字
+                    {Math.floor(briefing.wordCount / 100) * 100}+ 字
                   </span>
                   <span>·</span>
                   <span className="flex flex-shrink-0 items-center gap-1">
