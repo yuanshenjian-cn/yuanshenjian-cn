@@ -1,18 +1,6 @@
 {
-  "generated": "2026-07-15T00:00:00.000Z",
+  "generated": "2026-07-14T00:00:00.000Z",
   "items": [
-    {
-      "slug": "2026-07-15",
-      "title": "AI 简报 · 2026-07-15",
-      "excerpt": "过去 24 小时，Google 用一条带官方 RSS 精确发布时间的更新，把 Google Images 的新版可视浏览首页和 Search 内 AI 图像生成入口一起推到了公开台前。",
-      "tags": [
-        "AI",
-        "Google",
-        "Search"
-      ],
-      "date": "2026-07-15T00:00:00.000Z",
-      "url": "/ai/briefings/2026-07-15"
-    },
     {
       "slug": "2026-07-14",
       "title": "AI 简报 · 2026-07-14",
@@ -1114,18 +1102,6 @@
     }
   ],
   "briefings": [
-    {
-      "slug": "2026-07-15",
-      "title": "AI 简报 · 2026-07-15",
-      "excerpt": "过去 24 小时，Google 用一条带官方 RSS 精确发布时间的更新，把 Google Images 的新版可视浏览首页和 Search 内 AI 图像生成入口一起推到了公开台前。",
-      "tags": [
-        "AI",
-        "Google",
-        "Search"
-      ],
-      "date": "2026-07-15T00:00:00.000Z",
-      "url": "/ai/briefings/2026-07-15"
-    },
     {
       "slug": "2026-07-14",
       "title": "AI 简报 · 2026-07-14",
