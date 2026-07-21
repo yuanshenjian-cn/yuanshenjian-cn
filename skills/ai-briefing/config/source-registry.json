@@ -235,6 +235,24 @@
       "enabled": true
     },
     {
+      "id": "eu-dma-google",
+      "companyId": "google",
+      "publisherId": "european-commission",
+      "name": "EU Digital Markets Act — Google Decisions",
+      "method": "page",
+      "format": "html",
+      "url": "https://digital-markets-act.ec.europa.eu/",
+      "authority": "government",
+      "coverageRole": "supplemental",
+      "confirmationPolicy": { "default": "standalone", "byCategory": {} },
+      "categories": ["*"],
+      "sourceTimezone": "Europe/Brussels",
+      "allowedRedirectHosts": ["digital-markets-act.ec.europa.eu"],
+      "allowedArticleHosts": ["digital-markets-act.ec.europa.eu"],
+      "allowedUrlPrefixes": ["https://digital-markets-act.ec.europa.eu/"],
+      "enabled": true
+    },
+    {
       "id": "google-blog",
       "companyId": "google",
       "publisherId": "google",
