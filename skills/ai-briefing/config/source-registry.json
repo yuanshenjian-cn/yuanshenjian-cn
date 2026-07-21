@@ -235,6 +235,24 @@
       "enabled": true
     },
     {
+      "id": "google-blog",
+      "companyId": "google",
+      "publisherId": "google",
+      "name": "Google Blog (Technology/AI)",
+      "method": "page",
+      "format": "html",
+      "url": "https://blog.google/technology/ai/",
+      "authority": "official",
+      "coverageRole": "primary",
+      "confirmationPolicy": { "default": "standalone", "byCategory": {} },
+      "categories": ["model", "api", "agent", "product", "research", "safety", "company"],
+      "sourceTimezone": "America/Los_Angeles",
+      "allowedRedirectHosts": ["blog.google"],
+      "allowedArticleHosts": ["blog.google"],
+      "allowedUrlPrefixes": ["https://blog.google/"],
+      "enabled": true
+    },
+    {
       "id": "google-gemini-api-changelog",
       "companyId": "google",
       "publisherId": "google",
