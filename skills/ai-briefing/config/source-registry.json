@@ -551,7 +551,7 @@
       "method": "page",
       "format": "html",
       "url": "https://assets-us-01.kc-usercontent.com/1eeb16db-4934-006e-40a6-38fa91285ebb/",
-      "authority": "official",
+      "authority": "primary-record",
       "coverageRole": "supplemental",
       "confirmationPolicy": { "default": "standalone", "byCategory": {} },
       "categories": ["legal", "company"],
