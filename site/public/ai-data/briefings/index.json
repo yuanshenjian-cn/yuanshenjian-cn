@@ -1,6 +1,21 @@
 {
-  "generated": "2026-07-16T00:00:00.000Z",
+  "generated": "2026-07-21T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-21",
+      "title": "AI 简报 · 2026-07-21",
+      "excerpt": "特朗普政府拟推「金鹰」计划收紧前沿 AI 模型访问审批；OpenAI 披露长时运行模型安全事件；Anthropic 15 亿美元版权和解获法院最终批准；法国竞争局称 OpenAI、Google、Anthropic 占据 84% 以上 AI Agent 市场；Meta 考虑向 Anthropic 出租百亿美元算力；Google Gemini 3.5 Pro 因编码能力未达标再度延期。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Regulation"
+      ],
+      "date": "2026-07-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-21"
+    },
     {
       "slug": "2026-07-16",
       "title": "AI 简报 · 2026-07-16",
@@ -1116,6 +1131,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-21",
+      "title": "AI 简报 · 2026-07-21",
+      "excerpt": "特朗普政府拟推「金鹰」计划收紧前沿 AI 模型访问审批；OpenAI 披露长时运行模型安全事件；Anthropic 15 亿美元版权和解获法院最终批准；法国竞争局称 OpenAI、Google、Anthropic 占据 84% 以上 AI Agent 市场；Meta 考虑向 Anthropic 出租百亿美元算力；Google Gemini 3.5 Pro 因编码能力未达标再度延期。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Regulation"
+      ],
+      "date": "2026-07-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-21"
+    },
     {
       "slug": "2026-07-16",
       "title": "AI 简报 · 2026-07-16",
