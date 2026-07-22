@@ -12,7 +12,7 @@
 
 ## 所有模式都先采集
 
-查询、成稿和普通发布不能只靠临时网页搜索。模式开始时必须创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，先在一次 window CLI 调用中冻结 `issueDate/observedAt`，再采集 Feed：
+查询、成稿和普通发布不能只靠临时网页搜索。模式开始时必须创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，先在一次 window CLI 调用中冻结 `issueDate/observedAt`，再采集 Feed。`runDir` 必须从仓库根目录解析并保持在 `.local/ai-briefing/runs/` 内，不能简写为根目录下的 `runs/`：
 
 ```text
 node scripts/ai-briefing-window.js --output <runDir>/window.json
@@ -21,7 +21,7 @@ node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --o
 
 显式指定日期时，window CLI 可附加 `--issue-date <date> --observed-at <iso>`。查询和成稿只可在 `.local` runDir 写证据，不写 `content/` 或 Git；普通发布完成相同初始化后才进入 finalizer。
 
-collector 默认拒绝 DNS 解析到私网或 `198.18.0.0/15`（Clash/Surge/Mihomo 等透明代理 fake-ip 段）的来源域名。若本机代理确认使用系统级 TUN/透明代理（而非仅浏览器 PAC），设置 `AI_BRIEFING_TRUST_FAKE_IP_RANGE=1` 可放行该段，其余私网段不受影响。
+collector 默认拒绝 DNS 解析到私网或 `198.18.0.0/15`（Clash/Surge/Mihomo 等透明代理 Fake-IP 段）的来源域名。Skill 会在默认采集后读取 `collection.json`：只有全部来源均因“解析到非公网地址”失败时，才自动设置 `AI_BRIEFING_TRUST_FAKE_IP_RANGE=1`，使用同一冻结窗口重试一次。该开关只放行 collector 明确限定的 `198.18.0.0/15`，其他私网地址仍会被拒绝；重试后仍为 0 个成功来源时必须停止并报告逐源错误，不能把采集故障当作“本期无事件”。
 
 ## 日期覆盖窗口
 

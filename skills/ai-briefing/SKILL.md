@@ -28,10 +28,12 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 
 查询、成稿和普通发布模式都必须先具备冻结日期 coverage 与确定性 Feed 采集结果：
 
-1. 在任何模式开始时创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`。
+1. 在任何模式开始时创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`。`runDir` 必须从仓库根目录解析，规范化后的相对路径必须仍以 `.local/ai-briefing/runs/` 开头；禁止使用根目录 `runs/<run-id>`、当前目录相对的 `runs/<run-id>` 或其他替代路径。路径校验失败时立即停止，不得创建目录或运行 CLI。
 2. 运行 `node scripts/ai-briefing-window.js --output <runDir>/window.json`，在一次调用中冻结 `issueDate` 与 `observedAt`；只有显式指定日期时才附加 `--issue-date <date> --observed-at <iso>`。
-3. 再运行 `node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json`。
-4. 查询和成稿模式只允许在该 `.local` runDir 写证据，不得写 `content/` 或产生 Git 副作用；发布模式完成相同初始化后才允许进入 finalizer。
+3. 先按默认安全策略运行 `node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json`，随后读取 `collection.json` 的 `summary` 与逐源 `error`，不得只依据终端汇总判断采集成功。
+4. 若且仅若 `successCount === 0`、`failureCount === sourceCount`，并且所有失败原因都包含 `解析到非公网地址`，视为本机 Clash/Surge/Mihomo 等透明代理可能返回 `198.18.0.0/15` Fake-IP。此时使用完全相同的 window 与 output，带 `AI_BRIEFING_TRUST_FAKE_IP_RANGE=1` 自动重试一次。该开关只放行 collector 内明确限定的 Fake-IP 网段，不得用于放行其他私网地址，也不得重复重试。
+5. 重试后重新读取 `collection.json`。若仍然 `successCount === 0`，初始化失败：列出逐源错误并停止，不得把“0 条候选”解释为“本期无事件”，不得继续搜索、成稿或发布。部分来源成功时按后续 coverage 规则标记缺口，不得伪装为完整覆盖。
+6. 查询和成稿模式只允许在该 `.local` runDir 写证据，不得写 `content/` 或产生 Git 副作用；发布模式完成相同初始化后才允许进入 finalizer。
 
 不得跳过 window CLI 或 collector CLI 后直接搜索、成稿或发布。
 

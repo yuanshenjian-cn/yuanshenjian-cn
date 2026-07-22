@@ -77,8 +77,12 @@ describe("ai skill mirror sync", () => {
     expect(skill).toContain("selection.json");
     expect(skill).toContain("只运行一轮");
     expect(skill).toContain("所有模式的确定性初始化");
+    expect(skill).toContain("禁止使用根目录 `runs/<run-id>`");
     expect(skill).toContain("node scripts/ai-briefing-window.js");
     expect(skill).toContain("node scripts/collect-ai-briefing-feeds.js");
+    expect(skill).toContain("AI_BRIEFING_TRUST_FAKE_IP_RANGE=1");
+    expect(skill).toContain("successCount === 0");
+    expect(skill).toContain("不得把“0 条候选”解释为“本期无事件”");
     expect(skill).toContain("查询和成稿模式只允许在该 `.local` runDir 写证据");
     expect(skill).toContain("定向单厂商查询");
     expect(skill).toContain("verify-no-events");
@@ -91,10 +95,13 @@ describe("ai skill mirror sync", () => {
     expect(readme).toContain("450~800");
     expect(readme).toContain("1500~2200");
     expect(readme).toContain("所有模式都先采集");
+    expect(readme).toContain("不能简写为根目录下的 `runs/`");
     expect(readme).toContain("calendar-date-overlap");
     expect(readme).toContain("candidate.md");
     expect(readme).toContain("finalize-ai-briefing-run.sh");
     expect(readme).toContain("hardMax");
+    expect(readme).toContain("AI_BRIEFING_TRUST_FAKE_IP_RANGE=1");
+    expect(readme).toContain("重试一次");
     const openCodeCommand = fs.readFileSync(".opencode/commands/publish-ai-briefing.md", "utf8");
     expect(openCodeCommand).not.toContain("ai-briefing.sh");
     expect(openCodeCommand).not.toContain("scripts/finalize-ai-briefing-run.sh");
