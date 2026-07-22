@@ -1,6 +1,6 @@
 ---
 title: "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent"
-date: '2026-06-28'
+date: '2026-07-22'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 Anthropic 模型档案。首版覆盖 Claude Opus 4.7、Claude Opus 4.6、Claude Opus 4、Claude 3.7 Sonnet、Claude 3.5 Sonnet 和 Claude 3 Opus 等最近几代主力，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续追加维护规则。
+   这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Sonnet 5、Fable 5 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。
 ---
 
 > 如果 OpenAI 这条线给人的感觉是“越来越会干活”，那 Anthropic 这条线更像“越来越能把长活干稳”。Claude 这几年最明显的差异，不是某一个跑分突然炸裂，而是它在长任务、长上下文和代码 Agent 上的稳定性一路被做厚了。
@@ -36,7 +36,8 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中/读 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
-| Claude Fable 5 / Mythos 5 | 2026-06-09 | $10 / 1M | $1 / 1M（读） | $50 / 1M | Mythos-class 新模型线，高于 Opus；2026-06-12 起被美国政府指令暂停访问 |
+| Claude Sonnet 5 | 2026-06-30 | $2 / 1M（intro 至 08-31）标准 $3 / 1M | $0.20 / 1M（读，intro）标准 $0.30 / 1M | $10 / 1M（intro）标准 $15 / 1M | 迄今最 Agentic 的 Sonnet，能力接近 Opus 4.8 但价格更低 |
+| Claude Fable 5 / Mythos 5 | 2026-06-09 | $10 / 1M | $1 / 1M（读） | $50 / 1M | Mythos-class 新模型线，高于 Opus；2026-06-12 起被美国政府指令暂停，2026-07-01 恢复 |
 | Claude Opus 4.8 | 2026-05-28 | $5 / 1M | $0.50 / 1M | $25 / 1M | Opus 旗舰小幅但扎实的升级，更诚实、更稳的长程 Agent 协作 |
 | Claude Opus 4.7 | 2026-04-16 | $5 / 1M | $0.50 / 1M | $25 / 1M | 当前 Claude 主力旗舰，继续强化长程编码和高分辨率视觉 |
 | Claude Opus 4.6 | 2026-02-05 | $5 / 1M | $0.50 / 1M | $25 / 1M | 1M context + Adaptive Thinking + Agent Teams 预览 |
@@ -48,7 +49,26 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 | Claude 3.5 Sonnet | 2024-06-20 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
 | Claude 3 Opus | 2024-03-04 | $15 / 1M | 官方未公布 | $75 / 1M | Claude 3 家族旗舰，把长上下文和多模态能力打进前沿区 |
 
-<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面与官方 Release Notes，查询日期 2026-06-28。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方 pricing 页；Sonnet 4.5 的缓存读价格官方发布页未单列，按“官方未公布”处理。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面与官方 Release Notes，查询日期 2026-07-22。Claude Sonnet 5 价格为 intro 定价（截至 2026-08-31）与标准定价；缓存读 $0.20/1M intro、$0.30/1M 标准；缓存写 $2.50/1M intro、$3.75/1M 标准，来自官方 pricing 页。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问，2026-06-30 指令解除，2026-07-01 恢复全球访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方定价页；Sonnet 4.5 的缓存读价格官方发布页未单列，按“官方未公布”处理。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+
+## Claude Sonnet 5：迄今最 Agentic 的 Sonnet，用 Sonnet 的价格逼近 Opus 的能力
+
+Claude Sonnet 5 在 2026 年 6 月 30 日发布，Anthropic 官方定位是“迄今最 Agentic 的 Sonnet 模型”。
+
+它的核心信号很清晰：Sonnet 线正在快速缩小与 Opus 线的能力差距。Sonnet 5 在推理、工具使用、编码和知识工作等 Agentic 关键维度上大幅超越 Sonnet 4.6，在高 effort 设置下部分任务可匹配 Opus 4.8 的水平。
+
+官方给出的关键数据点：
+
+- **编码**：SWE-bench Verified 和 Coding Agent 评测全面超越 Sonnet 4.6，接近 Opus 4.8
+- **Agentic Search**：BrowseComp 上 Sonnet 5（高 effort）可匹配 Opus 4.8
+- **Computer Use**：OSWorld-Verified 上同样接近 Opus 4.8
+- **安全**：不良行为率整体低于 Sonnet 4.6，网安能力显著弱于 Opus 系列
+
+价格上，Sonnet 5 采用了 intro 定价策略：$2/$10 每百万 token（截至 2026-08-31），之后恢复 $3/$15 标准定价。缓存读 $0.20/1M（intro）、$0.30/1M（标准）。由于 tokenizer 变化，相同输入可能映射为 1.0~1.35× 的 token 数，但 intro 定价使得整体迁移成本大致中性。
+
+Sonnet 5 也是 Sonnet 线第一个在发布时就同时覆盖所有 plan（Free、Pro、Max、Team、Enterprise）以及 Claude Code 和 Claude Platform 的版本。
+
+我对 Sonnet 5 的理解是：它标志着 Anthropic 正在把此前集中在 Opus 线的 Agentic 能力下放到更广泛可及的价位段。如果你此前因为 Opus 的价格门槛而选择 Sonnet 4.6，Sonnet 5 是一次不需要犹豫的升级——它在几乎相同价位上把能力拉到了接近 Opus 4.8 的水平。
 
 ## Claude Fable 5 / Mythos 5：Anthropic 第一次把“高于 Opus”的模型线放出来——然后又被叫停
 
@@ -65,7 +85,7 @@ Anthropic 在 2026 年 6 月 9 日发布 Claude Fable 5 和 Claude Mythos 5，�
 
 但这件事最戏剧性的部分是：发布仅三天后，2026 年 6 月 12 日，美国政府下达出口管制指令，暂停了 Fable 5 和 Mythos 5 的所有访问。Anthropic 在官方页面标注“Claude Fable 5 is unavailable”。
 
-所以这代的记录有点特殊：它是 Anthropic 能力上限的一次代际级跃升，但当前实际可用性被政府指令冻结。我把它记进档案，是因为 skill 的原则是只追加不删历史——这次发布确实发生了，它的能力定位和价格结构都是后续要参照的基线。
+所以这代的记录有点特殊：它是 Anthropic 能力上限的一次代际级跃升，但发布仅三天后（2026-06-12）被美国政府出口管制指令冻结。2026-06-30 指令解除，2026-07-01 起 Fable 5 恢复全球访问，Mythos 5 也恢复对已获美国批准的国内组织开放。我把它记进档案，是因为 skill 的原则是只追加不删历史——这次发布和后续的政策变化都真实发生了，它的能力定位和价格结构仍然是后续要参照的基线。
 
 ## Claude Opus 4.8：把“诚实”和“长程稳定”继续做厚的一代
 
@@ -236,8 +256,9 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 - Claude Opus 4.6：1M context + 自适应思考 + Agent Teams 预览
 - Claude Sonnet 4.6：Sonnet 线最新主力，1M context GA，agentic search 提升
 - Claude Opus 4.7：继续推高长程编码和视觉分辨率
+- Claude Sonnet 5：Sonnet 线迄今最 Agentic 版本，能力接近 Opus 4.8，intro 定价 $2/$10
 - Claude Opus 4.8：继续加厚诚实性与长程 Agent 稳定性
-- Claude Fable 5 / Mythos 5：Mythos-class 新模型线，能力上限代际级跃升，但当前被政府指令暂停
+- Claude Fable 5 / Mythos 5：Mythos-class 新模型线，能力上限代际级跃升；2026-06-12 被政府指令暂停，2026-07-01 恢复访问
 
 所以如果你的问题是”Claude 这家最适合拿来干嘛”，我的答案会很集中：
 
@@ -253,6 +274,8 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 ## 官方来源
 
 - Anthropic Pricing: `https://claude.com/pricing#api`
+- Introducing Claude Sonnet 5: `https://www.anthropic.com/news/claude-sonnet-5`
+- Redeploying Fable 5: `https://www.anthropic.com/news/redeploying-fable-5`
 - Claude Fable 5 and Claude Mythos 5: `https://www.anthropic.com/news/claude-fable-5-mythos-5`
 - Statement on Fable 5 / Mythos 5 access suspension: `https://www.anthropic.com/news/fable-mythos-access`
 - Introducing Claude Opus 4.8: `https://www.anthropic.com/news/claude-opus-4-8`

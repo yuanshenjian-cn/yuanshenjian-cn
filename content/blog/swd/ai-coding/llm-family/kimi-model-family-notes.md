@@ -1,6 +1,6 @@
 ---
 title: "Kimi 模型谱系档案：月之暗面这条线最特别的地方，是 Agent 味越来越重"
-date: '2026-06-28'
+date: '2026-07-22'
 tags:
   - AI前沿
   - LLM
@@ -32,6 +32,7 @@ Kimi 的问题不是能力不够，而是官方代际资料在不同页面分散
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
+| Kimi K3 | 2026-07-16 | ¥20.00 / 1M | ¥2.00 / 1M | ¥100.00 / 1M | 2.8T 参数，首个开源 3T 级模型；Kimi Delta Attention，1M context；前沿级长程编码与知识工作 |
 | Kimi K2.7 Code | 2026-06-25 | ¥6.50 / 1M | ¥1.30 / 1M | ¥27.00 / 1M | Kimi 迄今最智能的 Coding 模型，仅思考模式，支持文本/图片/视频输入，thinking token 减少 30% |
 | Kimi K2.6 | 2026-04-20 | ¥6.50 / 1M | ¥1.10 / 1M | ¥27.00 / 1M | 当前主力开源 coding/agent 模型，长程执行能力明显拉升 |
 | Kimi K2.5 | 2026-01-27 | ¥4.00 / 1M | ¥0.70 / 1M | ¥21.00 / 1M | 视觉 Agent 与多步工具能力成型，Agent Swarm 100 并行 |
@@ -41,7 +42,35 @@ Kimi 的问题不是能力不够，而是官方代际资料在不同页面分散
 | Kimi K2-0711 | 2025-07-11 | 官方页面未保留 | 官方页面未保留 | 官方页面未保留 | K2 基础模型预览版，128K context（2026-05-25 已下线） |
 | Moonshot V1 | 官方页面未直接标注 | ¥2 / ¥5 / ¥10 每 1M | 官方未公布 | ¥10 / ¥20 / ¥30 每 1M | K 系列之前的经典生成线，更像老一代基础盘 |
 
-<small>*数据来源：Kimi 官方平台文档、官方 pricing 页面、官方博客与官方资源页，查询日期 2026-06-28。Kimi K2.7 Code 的官方发布日期 2026-06-25 来自官方资源页（kimi.com/resources/kimi-k2-7-code）标注的“8 min read 2026-06-25”。K2 系列（kimi-k2、kimi-k2-0905-preview、kimi-k2-0711-preview 等）已于 2026-05-25 下线。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。*</small>
+<small>*数据来源：Kimi 官方平台文档、官方 pricing 页面、官方博客与官方资源页，查询日期 2026-07-22。Kimi K3 的发布日期 2026-07-16 与定价 $0.30/$3.00/$15.00（缓存命中/未命中输入/输出，约合 ¥2/¥20/¥100）来自 K3 发布博客。Kimi K2.7 Code 的官方发布日期 2026-06-25 来自官方资源页（kimi.com/resources/kimi-k2-7-code）标注的“8 min read 2026-06-25”。K2 系列（kimi-k2、kimi-k2-0905-preview、kimi-k2-0711-preview 等）已于 2026-05-25 下线。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。*</small>
+
+## Kimi K3：首个开源的 3T 级模型，Kimi 迄今最强大的旗舰
+
+Kimi K3 在 2026 年 7 月 16 日发布，官方定位是“Open Frontier Intelligence”。
+
+这是一个标志性的发布：2.8T 总参数（896 专家，16 激活），1M token 上下文，是全球首个开源 3T 级模型。官方承诺完整权重将于 2026-07-27 前开放。
+
+K3 在架构上有两个重要的新设计：
+
+- **Kimi Delta Attention（KDA）**：一种高效的注意力机制扩展，为长上下文场景下的缩放提供更优的基础
+- **Attention Residuals（AttnRes）**：选择性跨层检索表示，而非均匀累积，解决了深层网络中信息衰减的问题
+
+配合 Stable LatentMoE 框架（激活 16/896 专家）、Per-Head Muon 优化器和 Quantile Balancing 路由策略，K3 的整体缩放效率相比 K2 提升了约 2.5 倍。
+
+能力层面，K3 在多个维度展现了前沿级表现：
+
+- **编码**：DeepSWE 67.3、Terminal-Bench 2.1 上表现强劲；能独立的完整 GPU 编译器开发、芯片设计、kernel 优化等长程工程任务
+- **知识工作**：在 BrowseComp、OfficeQA Pro、MCP Atlas 等 agentic 评测上表现优秀；可生成交互式研究报告、行业分析可视化
+- **多模态**：原生视觉能力，支持图文理解、视频编辑、游戏开发等需要“视觉在环”的任务
+
+价格方面，K3 的定价显著高于 K2.7 Code：输入 ¥20.00/1M（缓存未命中）、¥2.00/1M（缓存命中），输出 ¥100.00/1M。官方 API 在编码工作负载下缓存命中率超过 90%。
+
+需要留意的局限性（官方自述）：
+
+1. **思考历史敏感性**：如果 Agent harness 未能正确回传历史 thinking 内容，生成质量可能极不稳定
+2. **过度主动**：在长程困难任务训练偏好下，遇到模糊意图时可能做出越权决策，需要在 system prompt 中明确约束
+
+我对 K3 的理解是：它不是 Kimi 对头部闭源模型的全面超越，而是一次“把 3T 级模型做成开源”的能力宣言。它的整体能力仍落后于 Claude Fable 5 和 GPT-5.6 Sol，但它是开源阵营里第一个真正站到 3T 参数级的模型，对后续开源生态和推理成本的竞争格局有标志性意义。
 
 ## Kimi K2.7 Code：Kimi 把 Coding 专门模型推到新高点
 
@@ -183,6 +212,8 @@ Kimi 这条线最特别的地方，是它越来越不像单纯对话模型。
 
 ## 官方来源
 
+- Kimi K3: `https://www.kimi.com/blog/kimi-k3`
+- Kimi K3 Pricing: `https://platform.kimi.com/docs/pricing/chat-k3.md`
 - Kimi Models: `https://platform.kimi.com/docs/models.md`
 - Kimi K2.7 Code Resource: `https://www.kimi.com/resources/kimi-k2-7-code`
 - Kimi K2.7 Code Pricing: `https://platform.kimi.com/docs/pricing/chat-k27-code`
