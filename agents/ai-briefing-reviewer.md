@@ -2,7 +2,7 @@
 description: AI 简报阻断式独立复审代理。读取公开稿与证据包，执行只读联网核验，不代写、不编辑、不运行命令。
 mode: subagent
 # model: cpa/gpt-5.6-luna
-model: cpa/gemini-3.5-flash-low
+model: opencode/deepseek-v4-flash-free
 reasoningEffort: xhigh
 permission:
   task: deny
