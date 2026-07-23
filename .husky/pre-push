@@ -1,1 +1,13 @@
+#!/usr/bin/env sh
+
+# Git provides one line per ref update. No input means the remote is already up to date.
+if ! IFS= read -r first_ref; then
+  exit 0
+fi
+
+{
+  printf '%s\n' "$first_ref"
+  cat
+} >/dev/null
+
 SITE_INCREMENTAL_BUILD=true npm --prefix site run build:prod
