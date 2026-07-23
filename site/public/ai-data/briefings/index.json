@@ -1,6 +1,22 @@
 {
-  "generated": "2026-07-21T00:00:00.000Z",
+  "generated": "2026-07-23T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-23",
+      "title": "AI 简报 · 2026-07-23",
+      "excerpt": "Google 发布 Gemini 3.6 Flash、3.5 Flash-Lite 和 3.5 Flash Cyber 三款新模型；AMD 向 Anthropic 投资最高 50 亿美元并供应 2GW GPU 算力；美国财政部威胁制裁，白宫指控月之暗面蒸馏 Anthropic Fable；OpenAI 发布 Presence 企业 AI Agent 平台。",
+      "tags": [
+        "AI",
+        "Google",
+        "Anthropic",
+        "AMD",
+        "OpenAI",
+        "月之暗面",
+        "Regulation"
+      ],
+      "date": "2026-07-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-23"
+    },
     {
       "slug": "2026-07-21",
       "title": "AI 简报 · 2026-07-21",
@@ -1131,6 +1147,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-23",
+      "title": "AI 简报 · 2026-07-23",
+      "excerpt": "Google 发布 Gemini 3.6 Flash、3.5 Flash-Lite 和 3.5 Flash Cyber 三款新模型；AMD 向 Anthropic 投资最高 50 亿美元并供应 2GW GPU 算力；美国财政部威胁制裁，白宫指控月之暗面蒸馏 Anthropic Fable；OpenAI 发布 Presence 企业 AI Agent 平台。",
+      "tags": [
+        "AI",
+        "Google",
+        "Anthropic",
+        "AMD",
+        "OpenAI",
+        "月之暗面",
+        "Regulation"
+      ],
+      "date": "2026-07-23T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-23"
+    },
     {
       "slug": "2026-07-21",
       "title": "AI 简报 · 2026-07-21",
