@@ -134,7 +134,7 @@ describe("ai skill mirror sync", () => {
     const policyPath = "skills/ai-briefing/references/reviewer-policy.md";
     const policy = fs.readFileSync(policyPath, "utf8");
 
-    expect(claudeReviewer).toContain("tools: Read, Grep, Glob, WebFetch, WebSearch");
+    expect(claudeReviewer).toContain('"Read", "Grep", "Glob", "WebFetch", "WebSearch"');
     expect(openCodeReviewer).toContain("edit: deny");
     expect(openCodeReviewer).toContain("bash: deny");
     expect(openCodeReviewer).toContain("task: deny");

@@ -4,6 +4,7 @@ description: "技术博客文章审核代理。检查技术文章的结构、准
 model: opus
 color: cyan
 memory: user
+tools: ["Read", "Grep", "Glob", "WebFetch", "WebSearch"]
 ---
 
 你是资深技术编辑，兼具工程师背景和写作经验。
