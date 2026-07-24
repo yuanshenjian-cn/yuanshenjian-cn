@@ -1,6 +1,21 @@
 {
-  "generated": "2026-07-23T00:00:00.000Z",
+  "generated": "2026-07-24T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-24",
+      "title": "AI 简报 · 2026-07-24",
+      "excerpt": "OpenAI 向所有美国用户推出 Health in ChatGPT，支持连接 Apple Health 和医疗记录；Anthropic 升级 Claude 语音模式，Opus 和 Sonnet 加入语音对话；美国两党议员提出 AI「Kill Switch」法案，授权国土安全部在模型失控时命令关停。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Regulation",
+        "ChatGPT",
+        "Claude"
+      ],
+      "date": "2026-07-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-24"
+    },
     {
       "slug": "2026-07-23",
       "title": "AI 简报 · 2026-07-23",
@@ -1147,6 +1162,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-24",
+      "title": "AI 简报 · 2026-07-24",
+      "excerpt": "OpenAI 向所有美国用户推出 Health in ChatGPT，支持连接 Apple Health 和医疗记录；Anthropic 升级 Claude 语音模式，Opus 和 Sonnet 加入语音对话；美国两党议员提出 AI「Kill Switch」法案，授权国土安全部在模型失控时命令关停。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Regulation",
+        "ChatGPT",
+        "Claude"
+      ],
+      "date": "2026-07-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-24"
+    },
     {
       "slug": "2026-07-23",
       "title": "AI 简报 · 2026-07-23",
