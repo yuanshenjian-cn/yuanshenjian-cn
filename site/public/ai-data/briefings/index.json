@@ -1,6 +1,20 @@
 {
-  "generated": "2026-07-24T00:00:00.000Z",
+  "generated": "2026-07-25T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-25",
+      "title": "AI 简报 · 2026-07-25",
+      "excerpt": "Anthropic 发布 Opus 5，接近 Fable 5 能力但价格减半；Meta AI 升级 Muse Spark 1.1，从思考走向主动规划与执行。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "Claude",
+        "Opus 5"
+      ],
+      "date": "2026-07-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-25"
+    },
     {
       "slug": "2026-07-24",
       "title": "AI 简报 · 2026-07-24",
@@ -1162,6 +1176,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-25",
+      "title": "AI 简报 · 2026-07-25",
+      "excerpt": "Anthropic 发布 Opus 5，接近 Fable 5 能力但价格减半；Meta AI 升级 Muse Spark 1.1，从思考走向主动规划与执行。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Meta",
+        "Claude",
+        "Opus 5"
+      ],
+      "date": "2026-07-25T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-25"
+    },
     {
       "slug": "2026-07-24",
       "title": "AI 简报 · 2026-07-24",
