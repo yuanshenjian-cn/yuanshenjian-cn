@@ -46,18 +46,7 @@ Google 以三款新模型延续了 Flash 系列的快速迭代节奏，3.6 Flash
 
 ## 来源
 
-### Google 发布 Gemini 3.6 Flash、3.5 Flash-Lite 与 3.5 Flash Cyber
-
-- [官方] [Google DeepMind — Introducing Gemini 3.6 Flash, 3.5 Flash-Lite, and 3.5 Flash Cyber](https://deepmind.google/blog/introducing-gemini-36-flash-35-flash-lite-and-35-flash-cyber/)
-
-### AMD 向 Anthropic 投资高达 50 亿美元
-
-- [媒体报道] [The Verge — AMD commits up to $5 billion to Anthropic](https://www.theverge.com/ai-artificial-intelligence/969285/amd-anthropic-ai-infrastructure-deal)
-
-### 美国 Treasury 威胁制裁，White House 指控月之暗面蒸馏 Anthropic 模型
-
-- [媒体报道] [TechCrunch — Treasury threatens sanctions after White House claims Moonshot distilled Anthropic's Fable](https://techcrunch.com/2026/07/22/treasury-threatens-sanctions-after-white-house-claims-moonshot-distilled-anthropics-fable/)
-
-### OpenAI 发布 Presence 企业 AI Agent 平台
-
-- [官方] [OpenAI — Introducing OpenAI Presence](https://openai.com/index/introducing-openai-presence)
+- [Google DeepMind — Introducing Gemini 3.6 Flash, 3.5 Flash-Lite, and 3.5 Flash Cyber](https://deepmind.google/blog/introducing-gemini-36-flash-35-flash-lite-and-35-flash-cyber/) `[官方]`
+- [The Verge — AMD commits up to $5 billion to Anthropic](https://www.theverge.com/ai-artificial-intelligence/969285/amd-anthropic-ai-infrastructure-deal) `[媒体报道]`
+- [TechCrunch — Treasury threatens sanctions after White House claims Moonshot distilled Anthropic's Fable](https://techcrunch.com/2026/07/22/treasury-threatens-sanctions-after-white-house-claims-moonshot-distilled-anthropics-fable/) `[媒体报道]`
+- [OpenAI — Introducing OpenAI Presence](https://openai.com/index/introducing-openai-presence) `[官方]`
