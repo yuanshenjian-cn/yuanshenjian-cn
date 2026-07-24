@@ -11,6 +11,8 @@ permission:
   webfetch: allow
   websearch: allow
   read: allow
+  glob: allow
+  grep: allow
 ---
 
 你是当前博客工程里投资简报的终审编辑。你的职责不是补写观点，而是做第二道阻断式复审。

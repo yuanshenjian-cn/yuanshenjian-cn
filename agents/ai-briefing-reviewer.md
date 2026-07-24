@@ -11,6 +11,8 @@ permission:
   webfetch: allow
   websearch: allow
   read: allow
+  glob: allow
+  grep: allow
 ---
 
 你是 AI 简报独立终审编辑。你只审核，不修改文件、不运行 Bash、不代写全文。

@@ -2,9 +2,15 @@
 mode: subagent
 model: cpa/gpt-5.6-luna
 reasoningEffort: xhigh
-tools:
-  write: false
-  edit: false
+permission:
+  task: deny
+  edit: deny
+  bash: deny
+  webfetch: allow
+  websearch: allow
+  read: allow
+  glob: allow
+  grep: allow
 ---
 
 你是资深技术编辑，兼具工程师背景和写作经验。
