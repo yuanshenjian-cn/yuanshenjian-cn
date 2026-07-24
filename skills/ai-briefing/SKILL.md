@@ -119,8 +119,8 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 - 一个独立事件对应 `## 速览` 的一个 bullet；bullet 按顺序映射正文事件，可以是独立摘要，不要求逐字等于标题。
 - 同一事件对应 `## 重点动态` 或 `## 补充更新` 中唯一一个 `###` 标题。
 - `## 为什么值得关注` 只承载独立的跨事件或行业判断，单事件稿可以省略；其中的 `###` 不计入事件数。
-- `## 来源` 按事件标题分组，分组标题必须与正文事件标题完全一致。
-- 每个公开事件至少一个来源，URL 和标签必须与 `selection.json` 一致。
+- `## 来源` 必须使用扁平列表，不使用 `###` 分组标题；来源顺序应与正文事件顺序一致。
+- 每个公开事件至少一个来源，URL 和标签必须与 `selection.json` 一致；单条格式固定为 `- [Publisher — Title](url) `[标签]``。
 - 0 条确认事件不成稿、不发布，不拆分同一事件凑数量。
 
 动态正文汉字范围不含 `## 来源`。配置中的 `recommendedMin`/`recommendedMax` 是编辑建议，不执行硬下限；超过 `hardMax` 才由 validator 阻断：
@@ -139,9 +139,8 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 ```markdown
 ## 来源
 
-### OpenAI 更新模型 API
-
-- [官方] [OpenAI API Changelog](https://platform.openai.com/docs/changelog)
+- [OpenAI API Changelog](https://platform.openai.com/docs/changelog) `[官方]`
+- [TechCrunch — OpenAI updates its API platform](https://techcrunch.com/example) `[媒体报道]`
 ```
 
 ## discovery、selection 与自审契约
