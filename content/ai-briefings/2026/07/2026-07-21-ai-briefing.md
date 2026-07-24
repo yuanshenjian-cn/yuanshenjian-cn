@@ -57,29 +57,12 @@ OpenAI 据此暂停了内部部署，构建了基于整体行为轨迹而非单�
 
 ## 来源
 
-### OpenAI 披露长时运行模型安全事件与防护体系
-
-- [官方] [OpenAI — Safety and alignment in an era of long-horizon models](https://openai.com/index/safety-alignment-long-horizon-models/)
-
-### Anthropic 版权案 15 亿美元和解获法院最终批准
-
-- [原始文件] [Bartz v. Anthropic — Order Granting Final Approval](https://assets-us-01.kc-usercontent.com/1eeb16db-4934-006e-40a6-38fa91285ebb/dd3b72fc-bbfb-47cc-ba05-10c0ffd0bac1/ANT_proposed_order_granting_final_approval.pdf)
-
-### 特朗普政府拟推「金鹰」计划收紧前沿 AI 模型访问审批
-
-- [媒体报道] [CNBC — Trump administration is dictating access to frontier AI models](https://www.cnbc.com/2026/07/17/white-house-ai-access-anthropic-openai.html)
-- [媒体报道] [TNW — The White House is now deciding who gets access to frontier AI models](https://thenextweb.com/news/white-house-dictating-frontier-ai-model-access-anthropic-openai)
-
-### 法国竞争管理局发布 AI Agent 市场集中度意见
-
-- [官方] [Autorité de la concurrence — Press release on AI agents opinion](https://www.autoritedelaconcurrence.fr/en/press-release/ai-agents-autorite-de-la-concurrence-issues-its-opinion-competitive-functioning-ai)
-
-### Meta 考虑向 Anthropic 出租 AI 算力，潜在交易达百亿美元
-
-- [媒体报道] [NYT — Meta in Talks to Lease Computing Power to Anthropic](https://www.nytimes.com/2026/07/17/technology/meta-anthropic-ai-computing-power.html)
-- [媒体报道] [CNN — Meta in talks to rent AI infrastructure to Anthropic](https://www.cnn.com/2026/07/17/tech/meta-anthropic-ai-cloud-computing)
-
-### Google Gemini 3.5 Pro 因编码能力未达标准再次延期
-
-- [媒体报道] [Bloomberg — Google Gemini Launch Delayed](https://www.bloomberg.com/news/articles/2026-07-16/google-gemini-launch-delayed-as-tech-falls-short-of-internal-goals)
-- [媒体报道] [CNBC — Alphabet shares fall on Gemini delay](https://www.cnbc.com/2026/07/16/alphabet-stock-gemini-3-5-pro-ai.html)
+- [OpenAI — Safety and alignment in an era of long-horizon models](https://openai.com/index/safety-alignment-long-horizon-models/) `[官方]`
+- [Bartz v. Anthropic — Order Granting Final Approval](https://assets-us-01.kc-usercontent.com/1eeb16db-4934-006e-40a6-38fa91285ebb/dd3b72fc-bbfb-47cc-ba05-10c0ffd0bac1/ANT_proposed_order_granting_final_approval.pdf) `[原始文件]`
+- [CNBC — Trump administration is dictating access to frontier AI models](https://www.cnbc.com/2026/07/17/white-house-ai-access-anthropic-openai.html) `[媒体报道]`
+- [TNW — The White House is now deciding who gets access to frontier AI models](https://thenextweb.com/news/white-house-dictating-frontier-ai-model-access-anthropic-openai) `[媒体报道]`
+- [Autorité de la concurrence — Press release on AI agents opinion](https://www.autoritedelaconcurrence.fr/en/press-release/ai-agents-autorite-de-la-concurrence-issues-its-opinion-competitive-functioning-ai) `[官方]`
+- [NYT — Meta in Talks to Lease Computing Power to Anthropic](https://www.nytimes.com/2026/07/17/technology/meta-anthropic-ai-computing-power.html) `[媒体报道]`
+- [CNN — Meta in talks to rent AI infrastructure to Anthropic](https://www.cnn.com/2026/07/17/tech/meta-anthropic-ai-cloud-computing) `[媒体报道]`
+- [Bloomberg — Google Gemini Launch Delayed](https://www.bloomberg.com/news/articles/2026-07-16/google-gemini-launch-delayed-as-tech-falls-short-of-internal-goals) `[媒体报道]`
+- [CNBC — Alphabet shares fall on Gemini delay](https://www.cnbc.com/2026/07/16/alphabet-stock-gemini-3-5-pro-ai.html) `[媒体报道]`
