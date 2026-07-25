@@ -551,7 +551,7 @@ export function ContextualAIAdvisor({
                 </div>
               </form>
             </div>
-            <div ref={containerRef} aria-hidden="true" className="h-0 overflow-hidden" />
+            <div ref={containerRef} className="flex justify-center" />
           </section>
         </div>
       ) : null}

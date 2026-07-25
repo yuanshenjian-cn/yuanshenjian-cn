@@ -28,12 +28,16 @@ class CreateKnowledgeTermAppService:
         if status not in {item.value for item in KnowledgeTermStatus}:
             raise KnowledgeTermValidationError("knowledge_term_status_invalid", "术语状态不合法")
         term_text = req.term.strip()
-        if await self._term_dao.get_by_term(term_text) is not None:
-            raise KnowledgeTermValidationError("knowledge_term_conflict", "术语已存在")
+        aliases = [alias for alias in normalize_term_aliases(req.aliases) if alias != term_text]
+        requested_keys = {term_text, *aliases}
+        for existing in await self._term_dao.list_all():
+            existing_keys = {existing.term, *(existing.aliases or [])}
+            if requested_keys.intersection(existing_keys):
+                raise KnowledgeTermValidationError("knowledge_term_match_key_conflict", "术语或别名已被其他术语使用")
         term = KnowledgeTermPO(
             id=str(uuid4()),
             term=term_text,
-            aliases=normalize_term_aliases(req.aliases),
+            aliases=aliases,
             definition=normalize_term_definition(req.definition),
             explanation=normalize_term_explanation(req.explanation),
             related_article_slugs=normalize_term_related_slugs(req.related_article_slugs),

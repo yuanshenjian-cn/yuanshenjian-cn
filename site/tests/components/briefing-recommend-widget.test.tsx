@@ -94,4 +94,36 @@ describe("BriefingRecommendWidget", () => {
     expect(screen.getByText("推荐今日简报")).toBeInTheDocument();
     expect(screen.getByText("AI 简报 · 2026-05-08")).toBeInTheDocument();
   });
+
+  it("保留可见容器以展示需要人工交互的验证", async () => {
+    let turnstileElement: HTMLElement | null = null;
+
+    window.turnstile = {
+      render: (element) => {
+        turnstileElement = element;
+        return "widget-id";
+      },
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <BriefingRecommendWidget
+        enabled
+        workerUrl="/api/v1/ai-assistant"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={60000}
+        maxInputChars={200}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("输入主题，例如 OpenAI 发布、Agent 动态、多模态"), {
+      target: { value: "OpenAI" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await waitFor(() => expect(turnstileElement).not.toBeNull());
+    expect(turnstileElement).not.toHaveClass("h-0");
+    expect(turnstileElement).not.toHaveClass("overflow-hidden");
+  });
 });

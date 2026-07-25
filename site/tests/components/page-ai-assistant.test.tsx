@@ -494,4 +494,42 @@ describe("PageAIAssistantProvider", () => {
     });
     expect(screen.getByText("现在有点忙，请稍后再试。")).toBeInTheDocument();
   });
+
+  it("使用可见容器承载需要人工交互的 Turnstile 验证", async () => {
+    let turnstileElement: HTMLElement | null = null;
+    let widgetOptions: Record<string, unknown> | null = null;
+
+    window.turnstile = {
+      render: (element, options) => {
+        turnstileElement = element;
+        widgetOptions = options;
+        return "widget-id";
+      },
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <PageAIAssistantProvider
+        scene="article"
+        context={{ slug: "tdd-introduction" }}
+        workerUrl="/api/v1/ai-assistant"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={60000}
+        maxInputChars={200}
+      >
+        <ArticleAiAssistant />
+      </PageAIAssistantProvider>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想快速了解这篇文章？直接问我"), {
+      target: { value: "总结文章" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await waitFor(() => expect(turnstileElement).not.toBeNull());
+    expect(turnstileElement).not.toHaveClass("h-0");
+    expect(turnstileElement).not.toHaveClass("overflow-hidden");
+    expect(widgetOptions).toMatchObject({ appearance: "interaction-only", size: "flexible" });
+  });
 });

@@ -64,7 +64,7 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
           action: TURNSTILE_ACTIONS[scene],
-          size: "invisible",
+          size: "flexible",
           execution: "execute",
           appearance: "interaction-only",
           callback: (token) => {
@@ -83,6 +83,19 @@ export function useTurnstileToken(scene: AdvisorScene, siteKey: string, timeoutM
             const reject = rejectRef.current;
             clearWaiters();
             reject?.(new Error("当前浏览器或网络不支持人机验证，请换浏览器或网络再试。"));
+          },
+          "timeout-callback": () => {
+            const reject = rejectRef.current;
+            clearWaiters();
+            if (widgetIdRef.current) {
+              window.turnstile?.reset(widgetIdRef.current);
+            }
+            reject?.(new Error("安全验证超时，请稍后再试。"));
+          },
+          "expired-callback": () => {
+            const reject = rejectRef.current;
+            clearWaiters();
+            reject?.(new Error("安全验证已过期，请重新试一次。"));
           },
         });
         console.warn("[Turnstile] widget rendered", { widgetId: widgetIdRef.current, scene });

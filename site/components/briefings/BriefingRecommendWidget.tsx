@@ -324,7 +324,7 @@ export function BriefingRecommendWidget({
         </div>
       ) : null}
 
-      <div ref={turnstileContainerRef} aria-hidden="true" className="h-0 overflow-hidden" />
+      <div ref={turnstileContainerRef} className="flex justify-center" />
     </section>
   );
 }

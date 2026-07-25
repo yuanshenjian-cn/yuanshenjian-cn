@@ -1,0 +1,27 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "blog-db-local": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "universal-db-mcp",
+        "--type",
+        "postgres",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5437",
+        "--user",
+        "postgres",
+        "--password",
+        "postgres",
+        "--database",
+        "ysj_blog"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}

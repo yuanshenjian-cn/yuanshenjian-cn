@@ -89,6 +89,24 @@ def test_create_knowledge_term_saves_term() -> None:
     assert dao.added[0].term == "TDD"
 
 
+def test_create_knowledge_term_removes_alias_that_equals_its_term() -> None:
+    dao = StubKnowledgeTermDAO()
+    service = CreateKnowledgeTermAppService(dao)
+
+    asyncio.run(
+        service.execute(
+            SaveKnowledgeTermReq(
+                term="MCP",
+                aliases=["MCP", "Model Context Protocol"],
+                definition="模型上下文协议",
+                explanation="协议",
+            )
+        )
+    )
+
+    assert dao.added[0].aliases == ["Model Context Protocol"]
+
+
 def test_create_knowledge_term_rejects_duplicate() -> None:
     dao = StubKnowledgeTermDAO([sample_term()])
     service = CreateKnowledgeTermAppService(dao)
@@ -106,7 +124,50 @@ def test_create_knowledge_term_rejects_duplicate() -> None:
         )
         raise AssertionError("should raise")
     except KnowledgeTermValidationError as error:
-        assert error.error_code == "knowledge_term_conflict"
+        assert error.error_code == "knowledge_term_match_key_conflict"
+
+
+def test_create_knowledge_term_rejects_term_that_is_an_existing_alias() -> None:
+    dao = StubKnowledgeTermDAO([sample_term(term="Model Context Protocol", aliases=["MCP"])])
+    service = CreateKnowledgeTermAppService(dao)
+
+    try:
+        asyncio.run(
+            service.execute(
+                SaveKnowledgeTermReq(
+                    term="MCP",
+                    aliases=[],
+                    definition="模型上下文协议",
+                    explanation="协议",
+                )
+            )
+        )
+        raise AssertionError("should raise")
+    except KnowledgeTermValidationError as error:
+        assert error.error_code == "knowledge_term_match_key_conflict"
+
+
+def test_update_knowledge_term_rejects_alias_owned_by_another_term() -> None:
+    existing = sample_term(term="Model Context Protocol", aliases=["MCP"])
+    term = sample_term(term="Context Protocol", aliases=[])
+    dao = StubKnowledgeTermDAO([existing, term])
+    service = UpdateKnowledgeTermAppService(dao)
+
+    try:
+        asyncio.run(
+            service.execute(
+                term.id,
+                SaveKnowledgeTermReq(
+                    term="Context Protocol",
+                    aliases=["MCP"],
+                    definition="定义",
+                    explanation="解释",
+                ),
+            )
+        )
+        raise AssertionError("should raise")
+    except KnowledgeTermValidationError as error:
+        assert error.error_code == "knowledge_term_match_key_conflict"
 
 
 def test_update_knowledge_term_changes_fields() -> None:

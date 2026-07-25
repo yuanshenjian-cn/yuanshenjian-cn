@@ -94,4 +94,36 @@ describe("InvestmentBriefingRecommendWidget", () => {
     expect(screen.getByText("建议先看英伟达相关两期。")).toBeInTheDocument();
     expect(screen.getByText("投资简报 · 2026-05-08")).toBeInTheDocument();
   });
+
+  it("保留可见容器以展示需要人工交互的验证", async () => {
+    let turnstileElement: HTMLElement | null = null;
+
+    window.turnstile = {
+      render: (element) => {
+        turnstileElement = element;
+        return "widget-id";
+      },
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <InvestmentBriefingRecommendWidget
+        enabled
+        workerUrl="/api/v1/ai-assistant"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={60000}
+        maxInputChars={200}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("输入主题，例如 英伟达财报、港股回购、半导体设备"), {
+      target: { value: "英伟达" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await waitFor(() => expect(turnstileElement).not.toBeNull());
+    expect(turnstileElement).not.toHaveClass("h-0");
+    expect(turnstileElement).not.toHaveClass("overflow-hidden");
+  });
 });

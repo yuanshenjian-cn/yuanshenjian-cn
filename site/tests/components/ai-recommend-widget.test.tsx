@@ -270,4 +270,37 @@ describe("AiRecommendWidget", () => {
     });
     expect(screen.getByText("现在有点忙，请稍后再试。")).toBeInTheDocument();
   });
+
+  it("保留可见容器以展示需要人工交互的验证", async () => {
+    let turnstileElement: HTMLElement | null = null;
+
+    window.turnstile = {
+      render: (element) => {
+        turnstileElement = element;
+        return "widget-id";
+      },
+      execute: () => undefined,
+      reset: () => undefined,
+    };
+
+    render(
+      <AiRecommendWidget
+        enabled
+        workerUrl="/api/v1/ai-assistant"
+        turnstileSiteKey="test-site-key"
+        turnstileTimeoutMs={60000}
+        maxInputChars={200}
+        quickTopics={[]}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("想找什么主题的文章？直接告诉我"), {
+      target: { value: "TDD" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "问 AI" }));
+
+    await waitFor(() => expect(turnstileElement).not.toBeNull());
+    expect(turnstileElement).not.toHaveClass("h-0");
+    expect(turnstileElement).not.toHaveClass("overflow-hidden");
+  });
 });
