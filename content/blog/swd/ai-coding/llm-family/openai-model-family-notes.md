@@ -1,5 +1,5 @@
 ---
-title: "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
+title: "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
 date: '2026-07-10'
 tags:
   - AI前沿

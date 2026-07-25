@@ -1,5 +1,5 @@
 ---
-title: "Google Gemini 模型谱系档案：从长上下文到 agentic era 的主线怎么走"
+title: "Google Gemini：从长上下文到 agentic era 的主线怎么走"
 date: '2026-06-14'
 tags:
   - AI前沿

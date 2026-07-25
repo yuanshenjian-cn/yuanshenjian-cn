@@ -1,5 +1,5 @@
 ---
-title: "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent"
+title: "Anthropic：Claude 为什么越来越像长跑型 Agent"
 date: '2026-07-25'
 tags:
   - AI前沿

@@ -1,5 +1,5 @@
 ---
-title: "DeepSeek 模型谱系档案：从 V3 到 V4，这家最锋利的地方不只是便宜"
+title: "DeepSeek：从 V3 到 V4，这家最锋利的地方不只是便宜"
 date: '2026-07-22'
 tags:
   - AI前沿

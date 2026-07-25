@@ -1,10 +1,10 @@
 {
-  "generated": "2026-07-22T00:00:00.000Z",
+  "generated": "2026-07-25T00:00:00.000Z",
   "posts": [
     {
       "slug": "anthropic-model-family-notes",
       "title": "Anthropic 模型谱系档案：Claude 为什么越来越像长跑型 Agent",
-      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Sonnet 5、Fable 5 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。",
+      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5、Sonnet 5、Fable 5 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。",
       "tags": [
         "AI前沿",
         "LLM",
@@ -12,7 +12,7 @@
         "Claude",
         "模型评测"
       ],
-      "date": "2026-07-22T00:00:00.000Z"
+      "date": "2026-07-25T00:00:00.000Z"
     },
     {
       "slug": "deepseek-model-family-notes",
