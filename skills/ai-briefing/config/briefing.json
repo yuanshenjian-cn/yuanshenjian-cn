@@ -8,6 +8,12 @@
     "requireSufficientForNoEvents": true
   },
   "contentRulesV2EffectiveDate": "2026-08-15",
+  "proseRulesEffectiveDate": "2026-07-26",
+  "proseRules": {
+    "paragraphTargetMin": 60,
+    "paragraphMax": 100,
+    "sentenceMax": 40
+  },
   "dynamicBodyLengthRules": [
     {
       "minEvents": 1,

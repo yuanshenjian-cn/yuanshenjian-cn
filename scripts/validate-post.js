@@ -32,6 +32,8 @@ const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
   contentRulesV2EffectiveDate: "2026-08-15",
+  proseRulesEffectiveDate: "2026-07-26",
+  proseRules: { paragraphTargetMin: 60, paragraphMax: 100, sentenceMax: 40 },
   dynamicBodyLengthRules: [
     { minEvents: 1, maxEvents: 1, recommendedMin: 450, recommendedMax: 800, hardMax: 1200 },
     { minEvents: 2, maxEvents: 3, recommendedMin: 750, recommendedMax: 1300, hardMax: 1800 },
@@ -59,6 +61,8 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
   sourceSectionHeading: "来源",
 };
 const DEFAULT_INVESTMENT_BRIEFING_CONFIG = {
+  proseRulesEffectiveDate: "2026-07-26",
+  proseRules: { paragraphTargetMin: 60, paragraphMax: 100, sentenceMax: 40 },
   bodyLengthRules: [
     {
       effectiveFrom: "0000-01-01",
@@ -334,20 +338,19 @@ function extractOverviewItems(body, sectionHeading) {
     .map(normalizeAiEventTitle);
 }
 
-function extractAiSourceGroups(body, sourceSectionHeading) {
-  return extractSubsections(body, sourceSectionHeading).map((section) => {
-    const sources = [];
-    const invalidLines = [];
-    for (const line of section.content.split(/\r?\n/).map((item) => item.trim()).filter(Boolean)) {
-      const match = /^-\s+\[([^\]]+)\]\s+\[([^\]]+)\]\(([^)\s]+)\)\s*$/.exec(line);
-      if (!match) {
-        invalidLines.push(line);
-        continue;
-      }
-      sources.push({ label: match[1], title: match[2], url: match[3] });
+function extractAiSources(body, sourceSectionHeading) {
+  const sources = [];
+  const invalidLines = [];
+  const section = getSectionContent(body, sourceSectionHeading);
+  for (const line of section.split(/\r?\n/).map((item) => item.trim()).filter(Boolean)) {
+    const match = /^-\s+\[([^\]]+)\]\s+\[([^\]]+)\]\(([^)\s]+)\)\s*$/.exec(line);
+    if (!match) {
+      invalidLines.push(line);
+      continue;
     }
-    return { heading: section.heading, sources, invalidLines };
-  });
+    sources.push({ label: match[1], title: match[2], url: match[3] });
+  }
+  return { sources, invalidLines };
 }
 
 function getAiEventHeadings(body) {
@@ -381,7 +384,7 @@ function getAiRegistryHosts() {
   return hosts;
 }
 
-function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
+function validateAiBriefing({ file, relativeFile, parsed, dateClean }) {
   const pathMatch = /^content\/ai-briefings\/(\d{4})\/(\d{2})\/(\d{4}-\d{2}-\d{2})-ai-briefing\.md$/.exec(relativeFile);
   const expectedPath = `content/ai-briefings/${dateClean.slice(0, 4)}/${dateClean.slice(5, 7)}/${dateClean}-ai-briefing.md`;
   if (!pathMatch || pathMatch[3] !== dateClean || relativeFile !== expectedPath) {
@@ -394,7 +397,7 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
 
   const overviewItems = extractOverviewItems(parsed.body, "速览");
   const eventHeadings = getAiEventHeadings(parsed.body);
-  const sourceGroups = extractAiSourceGroups(
+  const sourceList = extractAiSources(
     parsed.body,
     aiBriefingConfig.sourceSectionHeading || DEFAULT_AI_BRIEFING_CONFIG.sourceSectionHeading,
   );
@@ -402,13 +405,13 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
   const uniqueEventHeadings = new Set(eventHeadings);
 
   if (eventHeadings.length === 0) {
-    addError("V2 AI 简报至少需要一个正文事件标题", relativeFile, 1);
+    addError("AI 简报至少需要一个正文事件标题", relativeFile, 1);
   }
   if (uniqueEventHeadings.size !== eventHeadings.length) {
     addError("同一事件标题不得同时或重复出现在重点动态与补充更新", relativeFile, 1);
   }
   if (uniqueOverviewItems.size !== overviewItems.length || overviewItems.length !== eventHeadings.length) {
-    addError("V2 AI 简报速览条目数必须等于正文事件数，且每条摘要必须唯一并按正文顺序排列", relativeFile, 1);
+    addError("AI 简报速览条目数必须等于正文事件数，且每条摘要必须唯一并按正文顺序排列", relativeFile, 1);
   }
   const requiredSections = Array.isArray(aiBriefingConfig.requiredSections)
     ? aiBriefingConfig.requiredSections
@@ -420,42 +423,34 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
   ) {
     addError("AI 简报缺少 `## 为什么值得关注` 章节", relativeFile, 1);
   }
-
-  const sourceGroupHeadings = sourceGroups.map((group) => group.heading);
-  if (
-    new Set(sourceGroupHeadings).size !== sourceGroupHeadings.length ||
-    sourceGroupHeadings.length !== eventHeadings.length ||
-    sourceGroupHeadings.some((heading) => !uniqueEventHeadings.has(heading))
-  ) {
-    addError("V2 AI 简报来源分组标题必须与正文事件标题完全一致", relativeFile, 1);
-  }
-
   const allowedLabels = new Set(["官方", "原始文件", "媒体报道"]);
   const allowedHosts = getAiRegistryHosts();
-  for (const group of sourceGroups) {
-    if (group.sources.length === 0) {
-      addError(`V2 AI 简报事件 \`${group.heading}\` 至少需要一个来源条目`, relativeFile, 1);
+  if (sourceList.sources.length === 0) {
+    addError("AI 简报 `## 来源` 章节至少需要一个来源条目", relativeFile, 1);
+  }
+  for (const invalidLine of sourceList.invalidLines) {
+    if (/^#{1,6}\s+/.test(invalidLine)) {
+      addError("AI 简报 `## 来源` 章节只能使用扁平列表，不得包含来源分组标题", relativeFile, 1);
+    } else {
+      addError(`AI 简报来源条目格式不合法：${invalidLine}`, relativeFile, 1);
     }
-    for (const invalidLine of group.invalidLines) {
-      addError(`V2 AI 简报来源条目格式不合法：${invalidLine}`, relativeFile, 1);
+  }
+  for (const source of sourceList.sources) {
+    if (!allowedLabels.has(source.label)) {
+      addError(`AI 简报来源标签只允许 [官方]、[原始文件]、[媒体报道]（当前：${source.label}）`, relativeFile, 1);
     }
-    for (const source of group.sources) {
-      if (!allowedLabels.has(source.label)) {
-        addError(`V2 AI 简报来源标签只允许 [官方]、[原始文件]、[媒体报道]（当前：${source.label}）`, relativeFile, 1);
-      }
-      let url;
-      try {
-        url = new URL(source.url);
-      } catch {
-        addError(`V2 AI 简报来源链接不合法：${source.url}`, relativeFile, 1);
-        continue;
-      }
-      if (url.protocol !== "https:") {
-        addError(`V2 AI 简报来源链接必须使用 HTTPS：${source.url}`, relativeFile, 1);
-      }
-      if (!allowedHosts.has(url.hostname.toLowerCase())) {
-        addError(`V2 AI 简报来源域名未在 source registry 中登记：${url.hostname}`, relativeFile, 1);
-      }
+    let url;
+    try {
+      url = new URL(source.url);
+    } catch {
+      addError(`AI 简报来源链接不合法：${source.url}`, relativeFile, 1);
+      continue;
+    }
+    if (url.protocol !== "https:") {
+      addError(`AI 简报来源链接必须使用 HTTPS：${source.url}`, relativeFile, 1);
+    }
+    if (!allowedHosts.has(url.hostname.toLowerCase())) {
+      addError(`AI 简报来源域名未在 source registry 中登记：${url.hostname}`, relativeFile, 1);
     }
   }
 
@@ -470,8 +465,7 @@ function validateAiBriefingV2({ file, relativeFile, parsed, dateClean }) {
       1,
     );
   }
-
-  return { overviewItems, eventHeadings, sourceGroups, file };
+  return { overviewItems, eventHeadings, sourceList, file };
 }
 
 /**
@@ -838,6 +832,64 @@ function countChineseCharacters(body) {
 }
 
 /**
+ * @param {unknown} rules
+ * @param {{ paragraphTargetMin: number; paragraphMax: number; sentenceMax: number }} fallback
+ */
+function normalizeBriefingProseRules(rules, fallback) {
+  const value = rules && typeof rules === "object" ? rules : {};
+  return {
+    paragraphTargetMin: toNumberOr(value.paragraphTargetMin, fallback.paragraphTargetMin),
+    paragraphMax: toNumberOr(value.paragraphMax, fallback.paragraphMax),
+    sentenceMax: toNumberOr(value.sentenceMax, fallback.sentenceMax),
+  };
+}
+
+/**
+ * @param {{ body: string; dateClean: string; relativeFile: string; sourceSectionHeading: string; config: Record<string, unknown>; defaults: { proseRulesEffectiveDate: string; proseRules: { paragraphTargetMin: number; paragraphMax: number; sentenceMax: number } }; label: string }} options
+ */
+function validateBriefingProse({ body, dateClean, relativeFile, sourceSectionHeading, config, defaults, label }) {
+  const effectiveDate = typeof config.proseRulesEffectiveDate === "string"
+    ? config.proseRulesEffectiveDate
+    : defaults.proseRulesEffectiveDate;
+  if (!dateClean || dateClean < effectiveDate) return;
+
+  const rules = normalizeBriefingProseRules(config.proseRules, defaults.proseRules);
+  const prose = maskFencedCodeBlocks(removeSections(body, [sourceSectionHeading]));
+  const paragraphs = prose.split(/\r?\n\s*\r?\n/);
+  let searchStart = 0;
+
+  for (const rawParagraph of paragraphs) {
+    const paragraph = rawParagraph.trim().replace(/^#{1,6}\s+.*(?:\r?\n|$)/, "").trim();
+    const paragraphIndex = body.indexOf(rawParagraph, searchStart);
+    if (paragraphIndex >= 0) searchStart = paragraphIndex + rawParagraph.length;
+    if (!paragraph || /^(?:[-*+]\s|\d+\.\s|>\s|\*\*郑重声明：)/m.test(paragraph)) continue;
+
+    const line = getLineNumber(body, Math.max(paragraphIndex, 0));
+    const paragraphLength = countChineseCharacters(paragraph);
+    if (paragraphLength > rules.paragraphMax) {
+      addError(
+        `${label}正文自然段超过 ${rules.paragraphMax} 个中文汉字（当前：${paragraphLength}），必须另起新段`,
+        relativeFile,
+        line,
+      );
+    }
+
+    let sentenceOffset = 0;
+    for (const sentence of paragraph.split(/[。！？；.!?;]+/)) {
+      const sentenceLength = countChineseCharacters(sentence);
+      if (sentenceLength > rules.sentenceMax) {
+        addError(
+          `${label}正文单句超过 ${rules.sentenceMax} 个中文汉字（当前：${sentenceLength}），必须拆句`,
+          relativeFile,
+          getLineNumber(body, Math.max(paragraphIndex, 0) + sentenceOffset),
+        );
+      }
+      sentenceOffset += sentence.length + 1;
+    }
+  }
+}
+
+/**
  * @param {string} body
  * @param {string[]} headings
  */
@@ -1000,9 +1052,12 @@ function validateBriefingFile(file, slugs, logicalFile = file) {
   if (sourceSectionContent.length === 0 || !/https?:\/\//.test(sourceSectionContent)) {
     addError("AI 简报的 `## 来源` 章节必须包含至少一个可追溯来源链接", relativeFile, 1);
   }
+  if (/^#{1,6}\s+/m.test(sourceSectionContent)) {
+    addError("AI 简报 `## 来源` 章节只能使用扁平列表，不得包含来源分组标题", relativeFile, 1);
+  }
 
   if (usesV2Rules) {
-    validateAiBriefingV2({ file, relativeFile, parsed, dateClean });
+    validateAiBriefing({ file, relativeFile, parsed, dateClean });
   } else {
     const chineseCharacters = countChineseCharacters(removeSections(parsed.body, [sourceSectionHeading]));
     const aiBodyRange = normalizeAiBodyLengthRule(resolveAiBodyLengthRule(dateClean));
@@ -1015,6 +1070,15 @@ function validateBriefingFile(file, slugs, logicalFile = file) {
       );
     }
   }
+  validateBriefingProse({
+    body: parsed.body,
+    dateClean,
+    relativeFile,
+    sourceSectionHeading,
+    config: aiBriefingConfig,
+    defaults: DEFAULT_AI_BRIEFING_CONFIG,
+    label: "AI 简报",
+  });
 
   if (dateClean) {
     validateRecentBriefingDuplicates(
@@ -1356,6 +1420,15 @@ function validateInvestmentBriefingFile(file, slugs) {
       1,
     );
   }
+  validateBriefingProse({
+    body: parsed.body,
+    dateClean,
+    relativeFile,
+    sourceSectionHeading,
+    config: investmentBriefingConfig,
+    defaults: DEFAULT_INVESTMENT_BRIEFING_CONFIG,
+    label: "投资简报",
+  });
 
   const confirmSectionHeading = investmentBriefingConfig.confirmSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.confirmSectionHeading;
   const watchSectionHeading = investmentBriefingConfig.watchSectionHeading || DEFAULT_INVESTMENT_BRIEFING_CONFIG.watchSectionHeading;

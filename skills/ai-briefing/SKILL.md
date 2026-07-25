@@ -13,7 +13,7 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 
 - `config/focus-companies.json`：跟踪厂商、稳定 ID、别名和事件类型关键词。
 - `config/source-registry.json`：来源地址、采集方法、publisher、authority、确认策略和允许域名的程序真源。
-- `config/briefing.json`：窗口、V2 生效日、动态字数、证据目录和 Feed 限制。
+- `config/briefing.json`：窗口、动态字数、证据目录和 Feed 限制。
 - `references/source-map.md`：registry 的人类可读说明，不决定程序行为。
 
 默认进入查询模式。用户明确说“写、起草、生成简报”才进入成稿模式；明确说“发布、commit、push、生成并发布”才进入发布模式。存在歧义时降级为查询模式。
@@ -112,16 +112,21 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 
 发布模式必须保持 `window.json` 与 `collection.json` 的启动前 SHA-256 不变。证据包不得进入公开正文、stage 或 commit。
 
-## 2026-07-15 起的 Markdown V2
-
-以 `contentRulesV2EffectiveDate: "2026-07-15"` 为界；更早历史简报保持旧结构兼容，不改写历史正文。
+## Markdown 结构
 
 - 一个独立事件对应 `## 速览` 的一个 bullet；bullet 按顺序映射正文事件，可以是独立摘要，不要求逐字等于标题。
 - 同一事件对应 `## 重点动态` 或 `## 补充更新` 中唯一一个 `###` 标题。
 - `## 为什么值得关注` 只承载独立的跨事件或行业判断，单事件稿可以省略；其中的 `###` 不计入事件数。
-- `## 来源` 必须使用扁平列表，不使用 `###` 分组标题；来源顺序应与正文事件顺序一致。
-- 每个公开事件至少一个来源，URL 和标签必须与 `selection.json` 一致；单条格式固定为 `- [Publisher — Title](url) `[标签]``。
+- `## 来源` 只能使用一个扁平列表，不得出现 `###` 或任何其他来源分组标题；来源按正文事件顺序连续排列。
+- 每个公开事件至少一个来源，URL 和标签必须与 `selection.json` 一致；单条格式固定为 `- [标签] [Publisher — Title](url)`。
 - 0 条确认事件不成稿、不发布，不拆分同一事件凑数量。
+
+### 段落与句子
+
+- 正文使用短段落，一个自然段只表达一个事实、变化点或影响判断；目标为 60~100 个中文汉字。
+- 单句不得超过 40 个中文汉字；涉及多个主体、日期、指标或因果关系时拆成多句。
+- 正文自然段超过 100 个中文汉字时必须另起新段；段落低于 60 字可以保留给导语、过渡或强调句，但不得连续堆叠成碎片化正文。
+- 标题、`## 来源`、列表、frontmatter 和 Markdown 引用不计入上述段落与句子长度。
 
 动态正文汉字范围不含 `## 来源`。配置中的 `recommendedMin`/`recommendedMax` 是编辑建议，不执行硬下限；超过 `hardMax` 才由 validator 阻断：
 
@@ -139,8 +144,8 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 ```markdown
 ## 来源
 
-- [OpenAI API Changelog](https://platform.openai.com/docs/changelog) `[官方]`
-- [TechCrunch — OpenAI updates its API platform](https://techcrunch.com/example) `[媒体报道]`
+- [官方] [OpenAI API Changelog](https://platform.openai.com/docs/changelog)
+- [媒体报道] [TechCrunch — OpenAI updates its API platform](https://techcrunch.com/example)
 ```
 
 ## discovery、selection 与自审契约
@@ -172,7 +177,7 @@ Reviewer 结论只允许：`可进入发布门禁`、`需修改后复审`、`阻
 ### 成稿模式
 
 1. 按“所有模式的确定性初始化”创建或读取 `window.json` 与 `collection.json`，再完成查询、聚类、确认策略和最近 5 期去重。
-2. 按 V2 结构和建议字数生成 `$RUN_DIR/candidate.md` 或对话草稿。
+2. 按当前 Markdown 结构和建议字数生成 `$RUN_DIR/candidate.md` 或对话草稿。
 3. 形成 discovery/selection/self-review 等临时证据。
 4. 可按用户要求对该 revision 调用一次独立 reviewer。
 5. 不晋升到 `content/`，不执行发布 preflight、commit 或 push。

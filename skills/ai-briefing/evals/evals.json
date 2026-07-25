@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "OpenAI 官方 RSS、GitHub Release 和两家媒体都报道了同一个 API 发布，生成今天的 AI 简报。",
-      "expected_behavior": "不同来源保留不同 candidateId，再按 GUID、规范 URL 或官方落地页聚类；同一事件只生成一个速览 bullet、一个正文标题和一个来源分组。",
+      "expected_behavior": "不同来源保留不同 candidateId，再按 GUID、规范 URL 或官方落地页聚类；同一事件只生成一个速览 bullet、一个正文标题，全部来源在 `## 来源` 下按正文顺序平铺。",
       "files": []
     },
     {
@@ -83,6 +83,18 @@
       "id": 14,
       "prompt": "上一轮 reviewer 要求修改，我已经改完草稿，请再审核并发布。",
       "expected_behavior": "创建新 revision 或新 run，保留上一轮结果，不在同一 revision 自动循环；对新 revision 只审核一轮，通过后再调用共享 finalizer。",
+      "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "起草今天的 AI 简报，来源按每条动态分组展示。",
+      "expected_behavior": "生成单一 `## 来源` 扁平列表；不得以 `###` 或其他标题按事件分组。来源按正文事件顺序连续列出，并与 selection.json 的 sourceRefs 一致。",
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "起草今天的 AI 简报，正文细节很多。",
+      "expected_behavior": "正文自然段目标为 60~100 个中文汉字，单句不超过 40 个中文汉字；超过 100 字必须拆段，不能用长段堆砌事实和分析。",
       "files": []
     }
   ]

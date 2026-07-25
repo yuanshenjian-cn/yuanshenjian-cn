@@ -47,15 +47,10 @@ Meta 于 7 月 24 日发布 Meta AI 重大更新，由 Muse Spark 1.1 驱动。�
 
 ## 来源
 
-### Anthropic 发布 Opus 5，接近 Fable 5 能力但价格减半
-
 - [官方] [Anthropic — Introducing Claude Opus 5](https://www.anthropic.com/news/claude-opus-5)
 - [媒体报道] [TechCrunch — Anthropic launches Opus 5](https://techcrunch.com/2026/07/24/anthropic-launches-opus-5/)
 - [媒体报道] [The Verge — Anthropic releases Opus 5 with 'close' to Fable 5's capabilities](https://www.theverge.com/ai-artificial-intelligence/970105/claude-opus-5-announced-anthropic-ai-model-release)
 
-### Meta AI 升级 Muse Spark 1.1，转向主动规划与执行
-
 - [官方] [Meta — Meta AI Doesn't Just Think, It Acts](https://about.fb.com/news/2026/07/meta-ai-muse-spark-doesnt-just-think-it-acts/)
 - [媒体报道] [The Verge — Meta is making its AI chatbot more like an assistant](https://www.theverge.com/tech/970570/meta-ai-chatbot-productivity-update)
-
 

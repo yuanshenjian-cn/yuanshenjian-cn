@@ -1,6 +1,12 @@
 {
   "timezone": "Asia/Shanghai",
   "cadence": "as-available",
+  "proseRulesEffectiveDate": "2026-07-26",
+  "proseRules": {
+    "paragraphTargetMin": 60,
+    "paragraphMax": 100,
+    "sentenceMax": 40
+  },
   "bodyLengthRules": [
     {
       "effectiveFrom": "0000-01-01",

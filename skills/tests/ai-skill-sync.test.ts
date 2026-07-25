@@ -13,6 +13,11 @@ const mirroredFiles = [
     ".claude/skills/ai-briefing/README.md",
   ],
   [
+    "skills/ai-briefing/references/reviewer-policy.md",
+    ".opencode/skills/ai-briefing/references/reviewer-policy.md",
+    ".claude/skills/ai-briefing/references/reviewer-policy.md",
+  ],
+  [
     "skills/ai-briefing/references/source-map.md",
     ".opencode/skills/ai-briefing/references/source-map.md",
     ".claude/skills/ai-briefing/references/source-map.md",
@@ -49,9 +54,32 @@ const mirroredFiles = [
   ],
 ] as const;
 
+const mirroredInvestmentFiles = [
+  [
+    "skills/investment-briefing/SKILL.md",
+    ".opencode/skills/investment-briefing/SKILL.md",
+    ".claude/skills/investment-briefing/SKILL.md",
+  ],
+  [
+    "skills/investment-briefing/README.md",
+    ".opencode/skills/investment-briefing/README.md",
+    ".claude/skills/investment-briefing/README.md",
+  ],
+  [
+    "skills/investment-briefing/config/briefing.json",
+    ".opencode/skills/investment-briefing/config/briefing.json",
+    ".claude/skills/investment-briefing/config/briefing.json",
+  ],
+  [
+    "skills/investment-briefing/evals/evals.json",
+    ".opencode/skills/investment-briefing/evals/evals.json",
+    ".claude/skills/investment-briefing/evals/evals.json",
+  ],
+] as const;
+
 describe("ai skill mirror sync", () => {
   it("keeps mirrored skill files byte-equal", () => {
-    for (const [source, ...mirrors] of mirroredFiles) {
+    for (const [source, ...mirrors] of [...mirroredFiles, ...mirroredInvestmentFiles]) {
       const sourceContent = fs.readFileSync(source, "utf8");
       for (const mirror of mirrors) {
         expect(sourceContent).toBe(fs.readFileSync(mirror, "utf8"));
@@ -72,7 +100,9 @@ describe("ai skill mirror sync", () => {
     expect(skill).toContain("finalize-ai-briefing-run.sh");
     expect(skill).toContain("recommendedMin");
     expect(skill).toContain("hardMax");
-    expect(skill).toContain("contentRulesV2EffectiveDate");
+    expect(skill).not.toContain("contentRulesV2EffectiveDate");
+    expect(skill).toContain("只能使用一个扁平列表");
+    expect(skill).toContain("不得出现 `###`");
     expect(skill).toContain("## 补充更新");
     expect(skill).toContain("selection.json");
     expect(skill).toContain("只运行一轮");
@@ -98,10 +128,14 @@ describe("ai skill mirror sync", () => {
     expect(readme).toContain("不能简写为根目录下的 `runs/`");
     expect(readme).toContain("calendar-date-overlap");
     expect(readme).toContain("candidate.md");
+    expect(readme).toContain("扁平列表");
+    expect(readme).not.toContain("Markdown V2");
     expect(readme).toContain("finalize-ai-briefing-run.sh");
     expect(readme).toContain("hardMax");
     expect(readme).toContain("AI_BRIEFING_TRUST_FAKE_IP_RANGE=1");
     expect(readme).toContain("重试一次");
+    expect(skill).toContain("60~100");
+    expect(skill).toContain("40 个中文汉字");
     const openCodeCommand = fs.readFileSync(".opencode/commands/publish-ai-briefing.md", "utf8");
     expect(openCodeCommand).not.toContain("ai-briefing.sh");
     expect(openCodeCommand).not.toContain("scripts/finalize-ai-briefing-run.sh");
@@ -126,6 +160,17 @@ describe("ai skill mirror sync", () => {
     ]) {
       expect(evalText).toContain(scenario);
     }
+  });
+
+  it("documents investment briefing prose limits", () => {
+    const skill = fs.readFileSync("skills/investment-briefing/SKILL.md", "utf8");
+    const readme = fs.readFileSync("skills/investment-briefing/README.md", "utf8");
+    const config = JSON.parse(fs.readFileSync("skills/investment-briefing/config/briefing.json", "utf8"));
+
+    expect(skill).toContain("60~100");
+    expect(skill).toContain("单句不得超过 40");
+    expect(readme).toContain("超过 100 字必须拆段");
+    expect(config.proseRules).toEqual({ paragraphTargetMin: 60, paragraphMax: 100, sentenceMax: 40 });
   });
 
   it("keeps both reviewers read-only with independent web verification", () => {

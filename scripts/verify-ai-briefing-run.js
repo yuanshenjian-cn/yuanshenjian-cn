@@ -776,7 +776,7 @@ function normalizeUrl(value) {
 
 
 
-function validateSelectionEvidence({ selection, collection, discovery, window, sourceRegistry, publicSourceGroups }) {
+function validateSelectionEvidence({ selection, collection, discovery, window, sourceRegistry, publicSources }) {
   const sourceById = new Map(sourceRegistry.sources.filter((source) => source.enabled).map((source) => [source.id, source]));
   const evidenceById = new Map();
   const addEvidence = (evidenceId, evidence) => {
@@ -803,10 +803,7 @@ function validateSelectionEvidence({ selection, collection, discovery, window, s
 
   const includedEvents = selection.events.filter((event) => event.included);
   validatePublicSourceLabels(includedEvents, sourceById);
-  const publicGroupsByHeading = new Map((publicSourceGroups || []).map((group) => [group.heading, group.sources]));
-  if (publicSourceGroups && publicGroupsByHeading.size !== includedEvents.length) {
-    throw new Error("公开 Markdown 来源分组与 included event 数量不一致");
-  }
+  const expectedPublicSources = [];
 
   for (const event of includedEvents) {
     for (const candidateId of event.candidateIds) getUniqueEvidence(candidateId, `事件 ${event.eventId}`);
@@ -843,14 +840,13 @@ function validateSelectionEvidence({ selection, collection, discovery, window, s
       throw new Error(`事件 ${event.eventId} 未满足来源确认策略`);
     }
 
-    if (publicSourceGroups) {
-      const publicSources = publicGroupsByHeading.get(event.title);
-      if (!publicSources) throw new Error(`公开 Markdown 缺少事件来源分组：${event.title}`);
-      const expected = event.sourceRefs.map((ref) => `${ref.label}\n${normalizeUrl(ref.url)}`).sort();
-      const actual = publicSources.map((ref) => `${ref.label}\n${normalizeUrl(ref.url)}`).sort();
-      if (JSON.stringify(expected) !== JSON.stringify(actual)) {
-        throw new Error(`事件 ${event.title} 的 selection sourceRefs 与公开来源不一致`);
-      }
+    expectedPublicSources.push(...event.sourceRefs.map((ref) => ({ label: ref.label, url: normalizeUrl(ref.url) })));
+  }
+
+  if (publicSources) {
+    const actual = publicSources.map((ref) => ({ label: ref.label, url: normalizeUrl(ref.url) }));
+    if (JSON.stringify(expectedPublicSources) !== JSON.stringify(actual)) {
+      throw new Error("selection sourceRefs 与公开扁平来源列表不一致");
     }
   }
 }
@@ -895,22 +891,16 @@ function verifyRemoteContainsCommit({ commit, branch, remote = "origin", runGit 
   if (mergeBase.status !== 0) throw new Error(`远端分支不包含 commit：${commit}`);
 }
 
-function parsePublicSourceGroups(markdown) {
+function parsePublicSources(markdown) {
   const sourceMatch = /^##\s+来源\s*$/m.exec(markdown);
   if (!sourceMatch) return [];
   const section = markdown.slice(sourceMatch.index + sourceMatch[0].length);
-  const matches = [...section.matchAll(/^###\s+(.+?)\s*$/gm)];
-  return matches.map((match, index) => {
-    const start = match.index + match[0].length;
-    const end = index + 1 < matches.length ? matches[index + 1].index : section.length;
-    const sources = section
-      .slice(start, end)
-      .split(/\r?\n/)
-      .map((line) => /^-\s+\[([^\]]+)\]\s+\[[^\]]+\]\(([^)\s]+)\)\s*$/.exec(line.trim()))
-      .filter(Boolean)
-      .map((item) => ({ label: item[1], url: item[2] }));
-    return { heading: match[1].trim(), sources };
-  });
+  if (/^#{1,6}\s+/m.test(section)) throw new Error("公开 Markdown `## 来源` 章节不得包含来源分组标题");
+  return section
+    .split(/\r?\n/)
+    .map((line) => /^-\s+\[([^\]]+)\]\s+\[[^\]]+\]\(([^)\s]+)\)\s*$/.exec(line.trim()))
+    .filter(Boolean)
+    .map((item) => ({ label: item[1], url: item[2] }));
 }
 
 function readJson(file) {
@@ -1075,7 +1065,7 @@ function verifyEvidenceRun(runDir, expectedHashes = null, options = {}) {
     discovery,
     window,
     sourceRegistry: config.sourceRegistry,
-    publicSourceGroups: parsePublicSourceGroups(fs.readFileSync(evidenceFile, "utf8")),
+    publicSources: parsePublicSources(fs.readFileSync(evidenceFile, "utf8")),
   });
   const briefingFile =
     options.briefingFile || path.relative(process.cwd(), defaultBriefingFile).replace(/\\/g, "/");
@@ -1176,6 +1166,7 @@ module.exports = {
   isConfirmedEvent,
   isEvidenceWithinCoverage,
   parseClaudeOutput,
+  parsePublicSources,
   resolveConfirmationPolicy,
   sha256File,
   shanghaiCoverageInterval,

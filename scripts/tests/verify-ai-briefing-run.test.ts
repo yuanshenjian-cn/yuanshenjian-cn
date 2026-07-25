@@ -367,11 +367,17 @@ describe("evidence contracts and coverage", () => {
         discovery,
         window,
         sourceRegistry: { sources },
-        publicSourceGroups: [
-          { heading: "OpenAI 更新 API", sources: [{ label: "官方", url: "https://openai.com/release" }] },
-        ],
+        publicSources: [{ label: "官方", url: "https://openai.com/release" }],
       }),
     ).not.toThrow();
+  });
+
+  it("rejects source section headings in public Markdown", () => {
+    expect(() =>
+      verifier.parsePublicSources(
+        "## 来源\n\n### OpenAI 更新 API\n\n- [官方] [OpenAI](https://openai.com/release)\n",
+      ),
+    ).toThrow("不得包含来源分组标题");
   });
 
   it("rejects source URLs outside the configured prefix", () => {
@@ -386,9 +392,7 @@ describe("evidence contracts and coverage", () => {
         discovery,
         window,
         sourceRegistry: { sources },
-        publicSourceGroups: [
-          { heading: "OpenAI 更新 API", sources: [{ label: "官方", url: "https://openai.com/unrelated/release" }] },
-        ],
+        publicSources: [{ label: "官方", url: "https://openai.com/unrelated/release" }],
       }),
     ).toThrow("URL 不匹配 source official 的允许前缀");
   });
