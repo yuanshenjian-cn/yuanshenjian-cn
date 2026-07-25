@@ -1,6 +1,6 @@
 {
   "slug": "openai-model-family-notes",
-  "title": "OpenAI 模型谱系档案：从 GPT-4 Turbo 到 GPT-5.6 的主线演进",
+  "title": "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进",
   "date": "2026-07-10T00:00:00.000Z",
   "excerpt": "这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-5.6 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。",
   "tags": [

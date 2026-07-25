@@ -1,6 +1,6 @@
 {
   "slug": "google-gemini-model-family-notes",
-  "title": "Google Gemini 模型谱系档案：从长上下文到 agentic era 的主线怎么走",
+  "title": "Google Gemini：从长上下文到 agentic era 的主线怎么走",
   "date": "2026-06-14T00:00:00.000Z",
   "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。首版覆盖 Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
   "tags": [

@@ -1,0 +1,71 @@
+{
+  "slug": "gpt-5-6-sol-first-look",
+  "title": "GPT-5.6 拆成三个模型卖，OpenAI 想明白了什么",
+  "date": "2026-07-10T00:00:00.000Z",
+  "excerpt": "2026 年 7 月 9 日，OpenAI 正式发布 GPT-5.6 系列。与以往不同，这次不是一个模型加几档推理力度，而是拆成 Sol、Terra、Luna 三个独立层级，外加一个多 Agent 并行的 Ultra 模式。Sol 在编码和 Agentic 任务上拿下多项新纪录，同时 token 效率比上一代大幅提升。但 SWE-Bench Pro 上 Anthropic 依然领先 15 个百分点。这篇文章梳理官方数据、定价变化和监管风波，帮你判断三个层级分别适合什么场景。",
+  "tags": [
+    "AI前沿",
+    "OpenAI",
+    "GPT",
+    "大模型",
+    "模型评测"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "GPT-5.6 的核心卖点不是\"更聪明\"，而是\"同样的钱能完成更多工作\"——OpenAI 终于开始认真卖效率了。 2026 年 7 月 9 日，OpenAI 正式面向所有用户发布 GPT-5.6 系列。距离 6 月 26 日的限量预览仅过去 13 天，中间经历了一段不太常见的监管波折——美国政府以网络安全能力为由，要求 OpenAI 限制初期访问范围，只对经过审核的\"受信任合作伙伴\"开放。 这次发布最大的变化不在某项基准分数，而在产品形态：GPT-5.6 不再是\"一个模型调力度\"，而是三个独立模型各管一摊。Sol 是旗舰，Terra 是日常主力，Luna 是性价比之选。OpenAI 说这三个名字是\"持久的能力层级\"，未来每个层级可以独立迭代。",
+      "excerpt": "GPT-5.6 的核心卖点不是\"更聪明\"，而是\"同样的钱能完成更多工作\"——OpenAI 终于开始认真卖效率了。 2026 年 7 月 9 日，OpenAI 正式面向所有用户发布 GPT-5.6 系列。距离 6 月 26 日的限量预览仅过去 13 天，中间经历了一段不太常见的监管波折——美国政府以网络安全能力为由，要求..."
+    },
+    {
+      "id": "三层架构不再猜力度直接选模型",
+      "anchorId": "三层架构不再猜力度直接选模型",
+      "heading": "三层架构：不再猜力度，直接选模型",
+      "content": "GPT-5.5 时代，用户面对的是同一个模型加上不同的推理力度设定——low、medium、high、xhigh。问题在于，大多数人搞不清\"medium\"和\"high\"的实际差异，也不知道什么任务值得花更多 token。 GPT-5.6 的做法更直接：把不同的能力和价格切成三个独立产品。 Sol（$5 / $30 每百万 token）是旗舰，适合复杂推理、长周期编码和 Agentic 工作流。它有 1.05M token 的上下文窗口，支持 max 和 ultra 两种增强模式。Ultra 模式默认协调 4 个 Agent 并行工作，用更多 token 换取更高成功率和更短完成时间。 Terra（$2.50 / $15）是平衡之选，OpenAI 声称其性能与 GPT-5.5 相当，成本约为后者的一半。Notion 的联合创始人 Simon Last 在测试后表示：\"很多原来用 GPT-5.5 的 Agent 换到 Terra 后表现一样好，成本降了一半，token 用量减少 16%。\" Luna（$1 / $6）是最快最便宜的层级，面向高吞吐、低延迟场景，比如分类、客服和实时推理。 这三个层级的定价逻辑清晰：Sol 维持了 GPT-5.5 的价格（$5 / $30），但能力明显提升；Terra 以一半价格提供 GPT-5.5 级别的表现；Luna 则进入了以前只有小模型才能覆盖的价格区间。OpenAI 同时引入了缓存写入定价（1.25 倍未缓存输入价），缓存读取保持 90% 折扣，最短缓存生命周期 30 分钟。",
+      "excerpt": "GPT-5.5 时代，用户面对的是同一个模型加上不同的推理力度设定——low、medium、high、xhigh。问题在于，大多数人搞不清\"medium\"和\"high\"的实际差异，也不知道什么任务值得花更多 token。 GPT-5.6 的做法更直接：把不同的能力和价格切成三个独立产品。 Sol（$5 / $30 每百..."
+    },
+    {
+      "id": "编码和-agentic-任务sol-的主场",
+      "anchorId": "编码和-agentic-任务sol-的主场",
+      "heading": "编码和 Agentic 任务：Sol 的主场",
+      "content": "GPT-5.6 Sol 在编码和 Agentic 类基准上拿下了多项新纪录。 基准 GPT-5.6 Sol GPT-5.6 Sol Ultra GPT-5.5 Claude Fable 5 ------ ------------- ------------------- --------- ---------------- AA Coding Agent Index v1.1 80 — 76.4 77.2 Terminal-Bench 2.1 88.8% 91.9% 85.6% 83.1% DeepSWE v1.1 72.7% — 67% 69.7% Agents' Last Exam 52.7% — 46.9% 40.5% BrowseComp 90.4% 92.2% 84.4% 84.3% OSWorld 2.0 62.6% — 47.5% — *数据：OpenAI 官方发布，2026 年 7 月 9 日。Claude Fable 5 为 Anthropic 公开发布的推理模型。 再来看几组关键数字。 Agents' Last Exam 覆盖 55 个职业领域的长周期工作流，Sol 拿到 52.7%，比 Claude Fable 5 高出 12.2 个百分点。即使把 Sol 调到 medium 推理力度，它仍然比 Fable 5 高 11.4 个百分点，而估算成本只有后者的四分之一左右。 Terminal-Bench 2.1 测试命令行工作流中的规划、工具协调和多步骤执行。Sol Ultra 以 91.9% 刷新了记录，比 Claude Mythos 5（88%）高出近 4 个百分点——在这个分数区间，4 个百分点的差距不小。 OSWorld 2.0 衡量模型自主操作真实计算机环境的能力。Sol 拿到 62.6%，比 Opus 4.8 高出近 8 个百分点，同时输出 token 用量减少了 85%。 不过 Sol 也不是全面碾压。SWE-Bench Pro（真实 GitHub 代码修复）上，Sol 的 64.6% 远低于 Claude Mythos 5 的 80.3% 和 Fable 5 的 80%。差距超过 15 个百分点——如果你的核心场景是自动修复代码中的真实 Bug，Anthropic 的模型是更佳选择。",
+      "excerpt": "GPT-5.6 Sol 在编码和 Agentic 类基准上拿下了多项新纪录。 基准 GPT-5.6 Sol GPT-5.6 Sol Ultra GPT-5.5 Claude Fable 5 ------ ------------- ------------------- --------- --------------..."
+    },
+    {
+      "id": "效率提升才是真正的故事",
+      "anchorId": "效率提升才是真正的故事",
+      "heading": "效率提升才是真正的故事",
+      "content": "基准分数之外，GPT-5.6 最值得关注的变化在效率。 OpenAI 在官方博客中反复强调一个概念：performance per dollar（每美元的性能产出）。在 Artificial Analysis Intelligence Index 上，Sol（max 推理）的综合智能得分接近 Claude Fable 5（58.9 vs 59.9），但完成任务的时间减少了 61%，估算成本约为后者的一半。 这种效率提升部分来自一项新能力——Programmatic Tool Calling。模型可以在内存中编写并运行轻量程序来协调工具调用、处理中间结果、监控进度，而不需要每次工具调用都把完整上下文传回模型。OpenAI 称这种方式兼容零数据保留（ZDR），对企业客户有实际意义。 Rogo 的应用 AI 工程师 Alex Wang 给出了具体数字：GPT-5.6 配合 Programmatic Tool Calling 后，在金融研究工作流中\"输出 token 减少 24%，任务完成速度提升 28%，同时质量评分还提高了\"。Clio 的工程副总裁 Angel Faus 报告了类似的效果：法律文档分析中\"prompt token 减少 38%，质量无损\"。 对于按 token 付费的 API 用户，token 效率的提升直接等于成本下降。",
+      "excerpt": "基准分数之外，GPT-5.6 最值得关注的变化在效率。 OpenAI 在官方博客中反复强调一个概念：performance per dollar（每美元的性能产出）。在 Artificial Analysis Intelligence Index 上，Sol（max 推理）的综合智能得分接近 Claude Fable ..."
+    },
+    {
+      "id": "网络安全能力引发的监管风波",
+      "anchorId": "网络安全能力引发的监管风波",
+      "heading": "网络安全能力引发的监管风波",
+      "content": "这次 GPT-5.6 的发布过程有点不一样。6 月 26 日首发时，OpenAI 只向经美国政府审核的\"受信任合作伙伴\"开放，理由是模型的网络安全能力需要更谨慎的部署。 在 ExploitBench（从接触漏洞代码到实现任意代码执行的全链路测试）上，Sol 拿到 73.5%，而 GPT-5.5 只有 47.9%——提升幅度超过 50%。SEC-Bench Pro（真实软件的概念验证攻击生成）上，Sol 的 71.2% 同样远超 GPT-5.5 的 45.8%。 不过 OpenAI 在安全评估中指出，GPT-5.6 \"更擅长发现和修复漏洞，而非对加固目标发起端到端自主攻击\"。这意味着防御者的收益大于攻击者。模型的网络安全能力仍在 OpenAI 内部风险框架的 Critical 阈值以下。 此次监管的插曲透露出两层意义。一是模型安全确实在成为实际约束 —— Politico 报道称，白宫的干预使公开发布推迟了近两周。二是 OpenAI 公开表示这种限制\"不应该成为常态\"，但先例已经立下了。",
+      "excerpt": "这次 GPT-5.6 的发布过程有点不一样。6 月 26 日首发时，OpenAI 只向经美国政府审核的\"受信任合作伙伴\"开放，理由是模型的网络安全能力需要更谨慎的部署。 在 ExploitBench（从接触漏洞代码到实现任意代码执行的全链路测试）上，Sol 拿到 73.5%，而 GPT-5.5 只有 47.9%——提升..."
+    },
+    {
+      "id": "科学和设计两个值得关注的方向",
+      "anchorId": "科学和设计两个值得关注的方向",
+      "heading": "科学和设计：两个值得关注的方向",
+      "content": "除了编码和安全，GPT-5.6 在两个方向上的进步比较显著。 科学研究方面，GeneBench Pro（多阶段基因组学分析）Sol 拿到 28.7%，GPT-5.5 只有 12%。FrontierMath Tier 1-3 得分 89%，Tier 4 得分 83%，后者比 GPT-5.5 的 72.5% 高出超过 10 个百分点。 设计判断方面，OpenAI 特别强调了 GPT-5.6 在前端界面生成上的提升。Figma 的首席设计官 Loredana Crisan 评价说：\"GPT-5.6 能把复杂设计转化为可交互的原型。\"Triple Whale 的 CEO AJ Orbach 给出了更具体的测评数据：在 7 项前端任务的 5 分制 QA 评分中，GPT-5.6 拿到 4.4 分，GPT-5.5 拿到 4.0，Claude Opus 4.8 拿到 3.5。",
+      "excerpt": "除了编码和安全，GPT-5.6 在两个方向上的进步比较显著。 科学研究方面，GeneBench Pro（多阶段基因组学分析）Sol 拿到 28.7%，GPT-5.5 只有 12%。FrontierMath Tier 1-3 得分 89%，Tier 4 得分 83%，后者比 GPT-5.5 的 72.5% 高出超过 10..."
+    },
+    {
+      "id": "局限和边界",
+      "anchorId": "局限和边界",
+      "heading": "局限和边界",
+      "content": "SWE-Bench Pro 差距明显。Sol 的 64.6% 与 Claude Mythos 5 的 80.3% 之间有 15.7 个百分点的差距。对于以代码修复为核心需求的场景，这个差距有实际意义。 抽象推理仍然薄弱。ARC-AGI-3 上 Sol 只拿到 7.78%，虽然远高于其他模型（Opus 4.8 为 1.5%），但绝对值说明大模型在真正的抽象推理上仍处于早期。 Ultra 模式的成本不透明。Ultra 默认协调 4 个 Agent 并行，token 用量会成倍增长，但 OpenAI 没有公布 Ultra 的具体成本乘数。API 用户需要自己监控实际支出。 首次引入缓存写入收费。GPT-5.6 之前，OpenAI 不收缓存写入费用。现在缓存写入按 1.25 倍输入价计费。虽然 90% 的缓存读取折扣仍然存在，但对频繁更新系统提示词的工作流来说，这是一个新增成本。",
+      "excerpt": "SWE-Bench Pro 差距明显。Sol 的 64.6% 与 Claude Mythos 5 的 80.3% 之间有 15.7 个百分点的差距。对于以代码修复为核心需求的场景，这个差距有实际意义。 抽象推理仍然薄弱。ARC-AGI-3 上 Sol 只拿到 7.78%，虽然远高于其他模型（Opus 4.8 为 1.5..."
+    },
+    {
+      "id": "三个层级怎么选",
+      "anchorId": "三个层级怎么选",
+      "heading": "三个层级怎么选",
+      "content": "场景 推荐 理由 ------ ------ ------ 复杂多步骤 Agentic 任务 GPT-5.6 Sol Agents' Last Exam 和 Terminal-Bench 2.1 领先，token 效率高 真实代码修复 / PR 审查 Claude Mythos 5 / Fable 5 SWE-Bench Pro 领先 Sol 超过 15 个百分点 日常生产工作流 GPT-5.6 Terra GPT-5.5 级别表现，成本减半 高吞吐实时推理 GPT-5.6 Luna $1/$6 价格区间，延迟最低 网络安全防御 GPT-5.6 Sol（Trusted Access） ExploitBench 73.5%，需申请认证访问 科学研究 / 基因组分析 GPT-5.6 Sol GeneBench Pro 28.7%，远超上一代 GPT-5.6 把一个模型拆成三个独立层级，本质上是在承认：不是每个用户都需要旗舰能力，但每个价格区间都应该有足够好的选项。Terra 以 GPT-5.5 一半的价格提供接近的能力，这对已经在 GPT-5.5 上运行生产工作流的团队来说是直接的成本节约。Luna 让 OpenAI 具备和开源小模型正面竞争的性价比。 你可以先用 Terra 跑一遍现有工作流，确认质量没有下降后再从 GPT-5.5 切换——这大概率能省下一半 API 支出。Sol 留给真正需要突破性能力的场景，比如长周期的多 Agent 任务或安全攻防。Luna 用来替代那些被过度配置的分类和摘要流水线。 OpenAI 从 GPT-5 到 5.6，一年内迭代了 7 个版本，节奏之快。GPT-5.6 的理念不是\"我们又变聪明了\"，而是\"我们开始认真优化每一美元的产出\"。这个可能对那些按 token 付费的使用者的账单产生较大影响。",
+      "excerpt": "场景 推荐 理由 ------ ------ ------ 复杂多步骤 Agentic 任务 GPT-5.6 Sol Agents' Last Exam 和 Terminal-Bench 2.1 领先，token 效率高 真实代码修复 / PR 审查 Claude Mythos 5 / Fable 5 SWE-Benc..."
+    }
+  ]
+}
