@@ -1,6 +1,22 @@
 {
-  "generated": "2026-07-25T00:00:00.000Z",
+  "generated": "2026-07-26T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-26",
+      "title": "AI 简报 · 2026-07-26",
+      "excerpt": "Anthropic 向 SK Hynix 请求芯片供应启动自研硬件；DeepSeek 暂停 15 亿美元融资轮；NYT 披露 OpenAI 和 Anthropic 私下推动华盛顿限制开源模型。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "DeepSeek",
+        "OpenAI",
+        "SK Hynix",
+        "Claude",
+        "policy"
+      ],
+      "date": "2026-07-26T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-26"
+    },
     {
       "slug": "2026-07-25",
       "title": "AI 简报 · 2026-07-25",
@@ -1176,6 +1192,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-26",
+      "title": "AI 简报 · 2026-07-26",
+      "excerpt": "Anthropic 向 SK Hynix 请求芯片供应启动自研硬件；DeepSeek 暂停 15 亿美元融资轮；NYT 披露 OpenAI 和 Anthropic 私下推动华盛顿限制开源模型。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "DeepSeek",
+        "OpenAI",
+        "SK Hynix",
+        "Claude",
+        "policy"
+      ],
+      "date": "2026-07-26T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-26"
+    },
     {
       "slug": "2026-07-25",
       "title": "AI 简报 · 2026-07-25",
