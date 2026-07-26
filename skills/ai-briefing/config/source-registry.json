@@ -616,6 +616,31 @@
       "enabled": true
     },
     {
+      "id": "fortune-media-search",
+      "companyId": null,
+      "publisherId": "fortune",
+      "name": "Fortune Search",
+      "method": "search",
+      "format": "auto",
+      "queryTemplates": ["site:fortune.com {company} {category} after:{windowStartDate} before:{windowEndDate}"],
+      "authority": "media",
+      "coverageRole": "discovery",
+      "confirmationPolicy": {
+        "default": "needs-corroboration",
+        "byCategory": {
+          "organization": "standalone",
+          "legal": "standalone",
+          "regulation": "standalone",
+          "exclusive": "standalone"
+        }
+      },
+      "categories": ["*"],
+      "sourceTimezone": "America/New_York",
+      "allowedRedirectHosts": [],
+      "allowedArticleHosts": ["www.fortune.com", "fortune.com"],
+      "enabled": true
+    },
+    {
       "id": "cnbc-media-search",
       "companyId": null,
       "publisherId": "cnbc",
