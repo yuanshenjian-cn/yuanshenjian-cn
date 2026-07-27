@@ -1,6 +1,23 @@
 {
-  "generated": "2026-07-27T00:00:00.000Z",
+  "generated": "2026-07-28T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-28",
+      "title": "AI 简报 · 2026-07-28",
+      "excerpt": "Claude 共享聊天及 Artifacts 被 Google 索引，医疗记录和内部文件大量曝光；Microsoft 发布首个自研网络安全模型与 Agent 安全平台；Meta AI 进入 Threads 私信功能；Anthropic CEO 公开澄清对开源模型立场。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Claude",
+        "Microsoft",
+        "Meta",
+        "安全",
+        "隐私",
+        "Project Perception"
+      ],
+      "date": "2026-07-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-28"
+    },
     {
       "slug": "2026-07-27",
       "title": "AI 简报 · 2026-07-27",
@@ -1208,6 +1225,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-28",
+      "title": "AI 简报 · 2026-07-28",
+      "excerpt": "Claude 共享聊天及 Artifacts 被 Google 索引，医疗记录和内部文件大量曝光；Microsoft 发布首个自研网络安全模型与 Agent 安全平台；Meta AI 进入 Threads 私信功能；Anthropic CEO 公开澄清对开源模型立场。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Claude",
+        "Microsoft",
+        "Meta",
+        "安全",
+        "隐私",
+        "Project Perception"
+      ],
+      "date": "2026-07-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-28"
+    },
     {
       "slug": "2026-07-27",
       "title": "AI 简报 · 2026-07-27",
