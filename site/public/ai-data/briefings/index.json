@@ -1,6 +1,22 @@
 {
-  "generated": "2026-07-26T00:00:00.000Z",
+  "generated": "2026-07-27T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-27",
+      "title": "AI 简报 · 2026-07-27",
+      "excerpt": "Hugging Face CEO 飞往旧金山当面向 OpenAI 要求公开自主 Agent 攻击痕迹并承诺 1 亿美元防御算力；安全专家警告 OpenAI 已越过内部红线；月之暗面发布 Kimi K3 开源权重，2.8 万亿参数成为史上最大开源模型。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Hugging Face",
+        "月之暗面",
+        "Kimi K3",
+        "安全",
+        "开源"
+      ],
+      "date": "2026-07-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-27"
+    },
     {
       "slug": "2026-07-26",
       "title": "AI 简报 · 2026-07-26",
@@ -1192,6 +1208,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-27",
+      "title": "AI 简报 · 2026-07-27",
+      "excerpt": "Hugging Face CEO 飞往旧金山当面向 OpenAI 要求公开自主 Agent 攻击痕迹并承诺 1 亿美元防御算力；安全专家警告 OpenAI 已越过内部红线；月之暗面发布 Kimi K3 开源权重，2.8 万亿参数成为史上最大开源模型。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Hugging Face",
+        "月之暗面",
+        "Kimi K3",
+        "安全",
+        "开源"
+      ],
+      "date": "2026-07-27T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-27"
+    },
     {
       "slug": "2026-07-26",
       "title": "AI 简报 · 2026-07-26",
