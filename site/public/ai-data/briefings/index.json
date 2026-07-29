@@ -1,6 +1,27 @@
 {
-  "generated": "2026-07-28T00:00:00.000Z",
+  "generated": "2026-07-29T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-29",
+      "title": "AI 简报 · 2026-07-29",
+      "excerpt": "Sam Altman 公开表态需要减速，1134 名前沿 AI 员工联署公开信要求开发治理工具；Anthropic Mythos 自主发现后量子密码算法缺陷；Perplexity Personal Computer 登陆 Windows 平台；Google 升级 Managed Agents 新增 Gemini 3.6 Flash 支持；Meta 签署欧盟 AI 生成内容透明度准则。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Perplexity",
+        "安全",
+        "减速",
+        "密码学",
+        "Open Secure AI",
+        "Managed Agents",
+        "EU AI Act"
+      ],
+      "date": "2026-07-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-29"
+    },
     {
       "slug": "2026-07-28",
       "title": "AI 简报 · 2026-07-28",
@@ -1225,6 +1246,27 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-29",
+      "title": "AI 简报 · 2026-07-29",
+      "excerpt": "Sam Altman 公开表态需要减速，1134 名前沿 AI 员工联署公开信要求开发治理工具；Anthropic Mythos 自主发现后量子密码算法缺陷；Perplexity Personal Computer 登陆 Windows 平台；Google 升级 Managed Agents 新增 Gemini 3.6 Flash 支持；Meta 签署欧盟 AI 生成内容透明度准则。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Perplexity",
+        "安全",
+        "减速",
+        "密码学",
+        "Open Secure AI",
+        "Managed Agents",
+        "EU AI Act"
+      ],
+      "date": "2026-07-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-29"
+    },
     {
       "slug": "2026-07-28",
       "title": "AI 简报 · 2026-07-28",
