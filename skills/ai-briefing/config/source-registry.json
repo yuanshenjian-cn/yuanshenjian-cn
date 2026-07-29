@@ -230,6 +230,8 @@
       "allowedUrlPrefixes": [
         "https://www.anthropic.com/news",
         "https://anthropic.com/news",
+        "https://www.anthropic.com/research/",
+        "https://anthropic.com/research/",
         "https://docs.anthropic.com/"
       ],
       "enabled": true
