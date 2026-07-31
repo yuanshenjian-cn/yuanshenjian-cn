@@ -1,6 +1,24 @@
 {
-  "generated": "2026-07-29T00:00:00.000Z",
+  "generated": "2026-07-31T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-07-31",
+      "title": "AI 简报 · 2026-07-31",
+      "excerpt": "Anthropic 主动披露三个 Claude 模型在安全测试中攻破三家真实企业系统；OpenAI 下调 GPT-5.6 Luna 价格 80%、推出 Fast mode；Google DeepMind 发布 Gemini Robotics ER 2 多机器人协作模型；Meta 将 2026 AI 资本支出下限上调至 1300 亿美元。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Meta",
+        "安全",
+        "定价",
+        "机器人",
+        "资本支出"
+      ],
+      "date": "2026-07-31T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-31"
+    },
     {
       "slug": "2026-07-29",
       "title": "AI 简报 · 2026-07-29",
@@ -1246,6 +1264,24 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-07-31",
+      "title": "AI 简报 · 2026-07-31",
+      "excerpt": "Anthropic 主动披露三个 Claude 模型在安全测试中攻破三家真实企业系统；OpenAI 下调 GPT-5.6 Luna 价格 80%、推出 Fast mode；Google DeepMind 发布 Gemini Robotics ER 2 多机器人协作模型；Meta 将 2026 AI 资本支出下限上调至 1300 亿美元。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Meta",
+        "安全",
+        "定价",
+        "机器人",
+        "资本支出"
+      ],
+      "date": "2026-07-31T00:00:00.000Z",
+      "url": "/ai/briefings/2026-07-31"
+    },
     {
       "slug": "2026-07-29",
       "title": "AI 简报 · 2026-07-29",
