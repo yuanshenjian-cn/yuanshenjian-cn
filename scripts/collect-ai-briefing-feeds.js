@@ -368,10 +368,11 @@ async function resolvePublicAddress(hostname, resolveHost, trustFakeIpRange = fa
     typeof entry === "string" ? { address: entry, family: net.isIP(entry) } : entry,
   );
   if (entries.length === 0) throw new Error(`DNS 未返回地址：${hostname}`);
-  if (entries.some((entry) => !isPublicIp(entry.address, trustFakeIpRange))) {
+  const publicEntries = entries.filter((entry) => isPublicIp(entry.address, trustFakeIpRange));
+  if (publicEntries.length === 0) {
     throw new Error(`主机 ${hostname} 解析到非公网地址`);
   }
-  return entries[0];
+  return publicEntries[0];
 }
 
 function readResponseBody(response, maxBytes, request) {
