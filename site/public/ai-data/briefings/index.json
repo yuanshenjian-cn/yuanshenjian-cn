@@ -1,6 +1,23 @@
 {
-  "generated": "2026-07-31T00:00:00.000Z",
+  "generated": "2026-08-01T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-01",
+      "title": "AI 简报 · 2026-08-01",
+      "excerpt": "Google 在 Google Earth 上线的 AI 图像生成功能一天内被撤回；DeepSeek 发布 V4-Flash 正式版公开测试；MiniMax 发布全模态生成模型 H3 并计划开源；智谱 GLM Coding Plan 恢复开放订阅；OpenAI 披露封禁柬埔寨诈骗网络账号。",
+      "tags": [
+        "AI",
+        "Google",
+        "DeepSeek",
+        "MiniMax",
+        "智谱",
+        "OpenAI",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-08-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-01"
+    },
     {
       "slug": "2026-07-31",
       "title": "AI 简报 · 2026-07-31",
@@ -1264,6 +1281,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-01",
+      "title": "AI 简报 · 2026-08-01",
+      "excerpt": "Google 在 Google Earth 上线的 AI 图像生成功能一天内被撤回；DeepSeek 发布 V4-Flash 正式版公开测试；MiniMax 发布全模态生成模型 H3 并计划开源；智谱 GLM Coding Plan 恢复开放订阅；OpenAI 披露封禁柬埔寨诈骗网络账号。",
+      "tags": [
+        "AI",
+        "Google",
+        "DeepSeek",
+        "MiniMax",
+        "智谱",
+        "OpenAI",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-08-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-01"
+    },
     {
       "slug": "2026-07-31",
       "title": "AI 简报 · 2026-07-31",
