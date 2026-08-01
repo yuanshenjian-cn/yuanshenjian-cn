@@ -440,7 +440,11 @@
       "sourceTimezone": "Asia/Shanghai",
       "allowedRedirectHosts": ["api-docs.deepseek.com"],
       "allowedArticleHosts": ["api-docs.deepseek.com", "www.deepseek.com"],
-      "allowedUrlPrefixes": ["https://api-docs.deepseek.com/news/", "https://www.deepseek.com/"],
+      "allowedUrlPrefixes": [
+        "https://api-docs.deepseek.com/news/",
+        "https://api-docs.deepseek.com/updates/",
+        "https://www.deepseek.com/"
+      ],
       "enabled": true
     },
     {
@@ -483,6 +487,7 @@
       "allowedUrlPrefixes": [
         "https://www.minimaxi.com/news",
         "https://minimaxi.com/news",
+        "https://www.minimaxi.com/blog/",
         "https://api.minimax.chat/",
         "https://hailuoai.com/"
       ],
@@ -803,6 +808,60 @@
         "https://www.cnbc.com/2026/07/17/",
         "https://thenextweb.com/news/"
       ],
+      "enabled": true
+    },
+    {
+      "id": "technode-media-page",
+      "companyId": null,
+      "publisherId": "technode",
+      "name": "TechNode",
+      "method": "page",
+      "format": "html",
+      "url": "https://technode.com/",
+      "authority": "media",
+      "coverageRole": "discovery",
+      "confirmationPolicy": { "default": "needs-corroboration", "byCategory": {} },
+      "categories": ["*"],
+      "sourceTimezone": "Asia/Shanghai",
+      "allowedRedirectHosts": ["technode.com", "www.technode.com"],
+      "allowedArticleHosts": ["technode.com", "www.technode.com"],
+      "allowedUrlPrefixes": ["https://technode.com/"],
+      "enabled": true
+    },
+    {
+      "id": "bjnews-media-page",
+      "companyId": null,
+      "publisherId": "bjnews",
+      "name": "Beijing News (新京报)",
+      "method": "page",
+      "format": "html",
+      "url": "https://www.bjnews.com.cn/",
+      "authority": "media",
+      "coverageRole": "discovery",
+      "confirmationPolicy": { "default": "needs-corroboration", "byCategory": {} },
+      "categories": ["*"],
+      "sourceTimezone": "Asia/Shanghai",
+      "allowedRedirectHosts": ["www.bjnews.com.cn", "bjnews.com.cn"],
+      "allowedArticleHosts": ["www.bjnews.com.cn", "bjnews.com.cn"],
+      "allowedUrlPrefixes": ["https://www.bjnews.com.cn/"],
+      "enabled": true
+    },
+    {
+      "id": "zhipu-glm-coding-page",
+      "companyId": "zhipu",
+      "publisherId": "zhipu-ai",
+      "name": "Zhipu GLM Coding Plan",
+      "method": "page",
+      "format": "html",
+      "url": "https://www.bigmodel.cn/glm-coding",
+      "authority": "official",
+      "coverageRole": "supplemental",
+      "confirmationPolicy": { "default": "standalone", "byCategory": {} },
+      "categories": ["model", "api", "agent", "product", "pricing", "availability"],
+      "sourceTimezone": "Asia/Shanghai",
+      "allowedRedirectHosts": ["www.bigmodel.cn", "bigmodel.cn"],
+      "allowedArticleHosts": ["www.bigmodel.cn", "bigmodel.cn"],
+      "allowedUrlPrefixes": ["https://www.bigmodel.cn/"],
       "enabled": true
     }
   ]
