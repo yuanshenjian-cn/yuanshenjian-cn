@@ -1,6 +1,19 @@
 {
-  "generated": "2026-07-25T00:00:00.000Z",
+  "generated": "2026-08-01T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "deepseek-v4-flash-official",
+      "title": "DeepSeek V4-Flash 正式版：架构没动，Agent 能力翻倍",
+      "excerpt": "2026 年 7 月 31 日，DeepSeek 在 API 更新日志发布 V4-Flash 正式版（0731）公测。模型结构、尺寸与预览版完全一致， 只重新做了后训练，九项 Agent 与代码基准却全线大涨，其中 Terminal Bench 2.1 从 61.8 涨到 82.7，直接反超自家 V4-Pro 预览版。价格没变，模型名没变，接口还首次原生支持 Responses API 并适配 Codex。但 V4-Pro 正式版仍未发布， 网页与 App 端也未更新。本文拆解这份更新意味着什么、边界在哪里。",
+      "tags": [
+        "AI前沿",
+        "大模型",
+        "DeepSeek",
+        "模型评测",
+        "Agent"
+      ],
+      "date": "2026-08-01T00:00:00.000Z"
+    },
     {
       "slug": "claude-opus-5-everyday-frontier",
       "title": "Claude Opus 5：半价 Fable，编程基准反超",
