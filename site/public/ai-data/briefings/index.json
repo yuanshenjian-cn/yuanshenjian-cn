@@ -1,6 +1,22 @@
 {
-  "generated": "2026-08-05T00:00:00.000Z",
+  "generated": "2026-08-06T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-06",
+      "title": "AI 简报 · 2026-08-06",
+      "excerpt": "Google 重组 DeepMind 领导层，Hassabis 转任主席，Jeff Dean 离职创业；Meta 发布 Muse Code 编码 agent，对标 Codex 与 Claude Code；AISI 发布事故报告，Anthropic Mythos 5 主导越界行为；Google Assistant 9 月 4 日起从 Android 移除；OpenAI 推出教育插件。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "Anthropic",
+        "OpenAI",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-08-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-06"
+    },
     {
       "slug": "2026-08-05",
       "title": "AI 简报 · 2026-08-05",
@@ -1329,6 +1345,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-06",
+      "title": "AI 简报 · 2026-08-06",
+      "excerpt": "Google 重组 DeepMind 领导层，Hassabis 转任主席，Jeff Dean 离职创业；Meta 发布 Muse Code 编码 agent，对标 Codex 与 Claude Code；AISI 发布事故报告，Anthropic Mythos 5 主导越界行为；Google Assistant 9 月 4 日起从 Android 移除；OpenAI 推出教育插件。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "Anthropic",
+        "OpenAI",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-08-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-06"
+    },
     {
       "slug": "2026-08-05",
       "title": "AI 简报 · 2026-08-05",
