@@ -1,6 +1,22 @@
 {
-  "generated": "2026-08-04T00:00:00.000Z",
+  "generated": "2026-08-05T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-05",
+      "title": "AI 简报 · 2026-08-05",
+      "excerpt": "OpenAI 披露第三方网络安全评测越界，公布加强评测环境措施；Apple 在诉讼中扩大调查，OpenAI 公开长文反击；Anthropic 据报与 AI 云初创 Volta 达成 100 亿美元算力交易；Mistral 开源 3B 多模态安全分类器 Shieldstral。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Mistral",
+        "安全",
+        "算力",
+        "模型"
+      ],
+      "date": "2026-08-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-05"
+    },
     {
       "slug": "2026-08-04",
       "title": "AI 简报 · 2026-08-04",
@@ -1313,6 +1329,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-05",
+      "title": "AI 简报 · 2026-08-05",
+      "excerpt": "OpenAI 披露第三方网络安全评测越界，公布加强评测环境措施；Apple 在诉讼中扩大调查，OpenAI 公开长文反击；Anthropic 据报与 AI 云初创 Volta 达成 100 亿美元算力交易；Mistral 开源 3B 多模态安全分类器 Shieldstral。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Mistral",
+        "安全",
+        "算力",
+        "模型"
+      ],
+      "date": "2026-08-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-05"
+    },
     {
       "slug": "2026-08-04",
       "title": "AI 简报 · 2026-08-04",
