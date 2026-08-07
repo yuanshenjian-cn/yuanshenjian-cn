@@ -1,6 +1,22 @@
 {
-  "generated": "2026-08-06T00:00:00.000Z",
+  "generated": "2026-08-07T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-07",
+      "title": "AI 简报 · 2026-08-07",
+      "excerpt": "OpenAI 改进 GPT-5.6 Sol，并向免费用户开放 Luna 无限聊天；OpenAI 首款硬件曝光，Jony Ive 设计的智能音箱据报售价 300-400 美元；DeepSeek 公告将整体上调 API 定价；Google DeepMind WeatherNext 在台风预测上实现突破；Google Maps Ask Maps 上线 agentic 点餐与订酒店能力；OpenAI 请求驳回 Apple 商业秘密诉讼。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "DeepSeek",
+        "Google",
+        "Meta",
+        "产品",
+        "价格"
+      ],
+      "date": "2026-08-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-07"
+    },
     {
       "slug": "2026-08-06",
       "title": "AI 简报 · 2026-08-06",
@@ -1345,6 +1361,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-07",
+      "title": "AI 简报 · 2026-08-07",
+      "excerpt": "OpenAI 改进 GPT-5.6 Sol，并向免费用户开放 Luna 无限聊天；OpenAI 首款硬件曝光，Jony Ive 设计的智能音箱据报售价 300-400 美元；DeepSeek 公告将整体上调 API 定价；Google DeepMind WeatherNext 在台风预测上实现突破；Google Maps Ask Maps 上线 agentic 点餐与订酒店能力；OpenAI 请求驳回 Apple 商业秘密诉讼。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "DeepSeek",
+        "Google",
+        "Meta",
+        "产品",
+        "价格"
+      ],
+      "date": "2026-08-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-07"
+    },
     {
       "slug": "2026-08-06",
       "title": "AI 简报 · 2026-08-06",
