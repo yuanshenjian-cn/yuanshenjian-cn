@@ -32,6 +32,7 @@ const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
   contentRulesV2EffectiveDate: "2026-08-15",
+  unifiedMainSectionEffectiveDate: "2026-08-09",
   proseRulesEffectiveDate: "2026-07-26",
   proseRules: { paragraphTargetMin: 60, paragraphMax: 100, sentenceMax: 40 },
   dynamicBodyLengthRules: [
@@ -354,10 +355,7 @@ function extractAiSources(body, sourceSectionHeading) {
 }
 
 function getAiEventHeadings(body) {
-  return [
-    ...extractSubsections(body, "重点动态"),
-    ...extractSubsections(body, "补充更新"),
-  ].map((section) => section.heading);
+  return extractSubsections(body, "重点动态").map((section) => section.heading);
 }
 
 function resolveDynamicAiBodyLengthRule(eventCount) {
@@ -408,7 +406,7 @@ function validateAiBriefing({ file, relativeFile, parsed, dateClean }) {
     addError("AI 简报至少需要一个正文事件标题", relativeFile, 1);
   }
   if (uniqueEventHeadings.size !== eventHeadings.length) {
-    addError("同一事件标题不得同时或重复出现在重点动态与补充更新", relativeFile, 1);
+    addError("同一事件标题不得在重点动态中重复出现", relativeFile, 1);
   }
   if (uniqueOverviewItems.size !== overviewItems.length || overviewItems.length !== eventHeadings.length) {
     addError("AI 简报速览条目数必须等于正文事件数，且每条摘要必须唯一并按正文顺序排列", relativeFile, 1);
@@ -1037,6 +1035,11 @@ function validateBriefingFile(file, slugs, logicalFile = file) {
 
   const v2EffectiveDate = aiBriefingConfig.contentRulesV2EffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.contentRulesV2EffectiveDate;
   const usesV2Rules = Boolean(dateClean && dateClean >= v2EffectiveDate);
+  const unifiedMainSectionEffectiveDate =
+    aiBriefingConfig.unifiedMainSectionEffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.unifiedMainSectionEffectiveDate;
+  if (dateClean && dateClean >= unifiedMainSectionEffectiveDate && findHeading(parsed.body, "补充更新")) {
+    addError("AI 简报所有入选事件必须统一放在 `## 重点动态`，不得设置 `## 补充更新` 章节", relativeFile, 1);
+  }
   const requiredSections = Array.isArray(aiBriefingConfig.requiredSections)
     ? aiBriefingConfig.requiredSections
     : DEFAULT_AI_BRIEFING_CONFIG.requiredSections;

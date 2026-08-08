@@ -103,7 +103,8 @@ describe("ai skill mirror sync", () => {
     expect(skill).not.toContain("contentRulesV2EffectiveDate");
     expect(skill).toContain("只能使用一个扁平列表");
     expect(skill).toContain("不得出现 `###`");
-    expect(skill).toContain("## 补充更新");
+    expect(skill).toContain("不得另设 `## 补充更新`");
+    expect(skill).not.toContain("其余可进入 `## 补充更新`");
     expect(skill).toContain("selection.json");
     expect(skill).toContain("只运行一轮");
     expect(skill).toContain("所有模式的确定性初始化");
@@ -201,7 +202,7 @@ describe("ai skill mirror sync", () => {
       "recommendedMin",
       "hardMax",
       "重点动态",
-      "补充更新",
+      "不得出现 `## 补充更新`",
       "networkStatus",
       "checkedEvidenceIds",
       "uncheckedHighRiskItems",

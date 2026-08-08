@@ -114,11 +114,9 @@ function buildAiBriefingBody(
   const paragraph = "这是用于验证动态篇幅规则的确定性正文内容。它明确说明能力变化与开放范围。该变化会影响开发者接入和后续决策。"
   const paragraphCount = Math.ceil(targetBodyCharacters / eventCount / 80);
   const eventBody = options.eventBody ?? Array.from({ length: paragraphCount }, () => paragraph).join("\n\n");
-  const primaryCount = eventCount >= 7 ? 4 : eventCount;
   const renderEvents = (items: string[]) => items.map((heading) => `### ${heading}\n\n${eventBody}`).join("\n\n");
   const overviewItems =
     options.overviewItems ?? headings.slice(0, options.overviewCount ?? headings.length).map((heading) => `${heading}。`);
-  const supplemental = headings.slice(primaryCount);
   const sources = headings.map((_heading, index) => {
     const label = index === 0 && options.sourceLabel ? options.sourceLabel : "官方";
     const url = index === 0 && options.sourceUrl ? options.sourceUrl : `https://openai.com/index/test-${index + 1}/`;
@@ -131,8 +129,7 @@ ${overviewItems.map((item) => `- ${item}`).join("\n")}
 
 ## 重点动态
 
-${renderEvents(headings.slice(0, primaryCount))}
-${supplemental.length > 0 ? `\n\n## 补充更新\n\n${renderEvents(supplemental)}` : ""}
+${renderEvents(headings)}
 ${options.includeWhy === false ? "" : "\n\n## 为什么值得关注\n\n这些事件共同说明平台能力、开放范围与开发者生态正在同步变化。"}
 
 ## 来源
@@ -557,7 +554,19 @@ describe("validate-post ai briefing guards", () => {
     }
   });
 
-  it("includes supplemental updates in recent briefing dedupe", () => {
+  it("rejects supplemental update sections in current briefings", () => {
+    const body = buildAiBriefingBody(2).replace("### 测试事件2", "## 补充更新\n\n### 测试事件2");
+    writeAiBriefing(aiTestFile, "2099-01-06", body);
+
+    expect(() => runValidate(relativeAiTestFile)).toThrow();
+    try {
+      runValidate(relativeAiTestFile);
+    } catch (error) {
+      expect(getStderr(error)).toContain("不得设置 `## 补充更新` 章节");
+    }
+  });
+
+  it("includes legacy supplemental updates in recent briefing dedupe", () => {
     const duplicateHeading = "OpenAI 扩大 Realtime API 新语音矩阵";
     const previousHeadings = [
       "历史重点事件一",
@@ -568,7 +577,11 @@ describe("validate-post ai briefing guards", () => {
       "历史补充事件二",
       "历史补充事件三",
     ];
-    writeAiBriefing(previousAiFiles[0], "2099-01-05", buildAiBriefingBody(7, { headings: previousHeadings }));
+    const previousBody = buildAiBriefingBody(7, { headings: previousHeadings }).replace(
+      `### ${duplicateHeading}`,
+      `## 补充更新\n\n### ${duplicateHeading}`,
+    );
+    writeAiBriefing(previousAiFiles[0], "2099-01-05", previousBody);
     writeAiBriefing(aiTestFile, "2099-01-06", buildAiBriefingBody(1, { headings: [duplicateHeading] }));
 
     try {

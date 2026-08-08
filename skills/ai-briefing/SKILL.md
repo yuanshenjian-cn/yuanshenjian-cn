@@ -115,7 +115,7 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 ## Markdown 结构
 
 - 一个独立事件对应 `## 速览` 的一个 bullet；bullet 按顺序映射正文事件，可以是独立摘要，不要求逐字等于标题。
-- 同一事件对应 `## 重点动态` 或 `## 补充更新` 中唯一一个 `###` 标题。
+- 所有入选事件统一放在 `## 重点动态` 下，每个独立事件对应唯一一个 `###` 标题；不得另设 `## 补充更新` 或其他次级事件章节。
 - `## 为什么值得关注` 只承载独立的跨事件或行业判断，单事件稿可以省略；其中的 `###` 不计入事件数。
 - `## 来源` 只能使用一个扁平列表，不得出现 `###` 或任何其他来源分组标题；来源按正文事件顺序连续排列。
 - 每个公开事件至少一个来源，URL 和标签必须与 `selection.json` 一致；单条格式固定为 `- [标签] [Publisher — Title](url)`。
@@ -137,7 +137,7 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 | 4~6 | 1100~1800 | 2400 |
 | 7+ | 1500~2200 | 3200 |
 
-7 条及以上时可按 `editorialPriority` 重点展开高价值事件，其余可进入 `## 补充更新` 或在 `selection.json` 以 `low-editorial-value` 等机器可读原因排除。每条重点事件建议覆盖以下六项中的四项：确认事实、事件时间、版本或能力、开放范围、限制或价格、实际影响。
+7 条及以上时可按 `editorialPriority` 筛选公开事件。所有公开事件仍统一进入 `## 重点动态`；不值得作为主条目展开的候选应在 `selection.json` 以 `low-editorial-value` 等机器可读原因排除，不得降级到单独的补充章节。每条入选事件建议覆盖以下六项中的四项：确认事实、事件时间、版本或能力、开放范围、限制或价格、实际影响。
 
 来源结构：
 
@@ -152,9 +152,9 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 
 `discovery.json` 的每条非 Feed 路径必须包含 `sourceId`、`companyId`、`method`、`status`、`checkedAt`、`request`、`candidateCount`、`error`、`evidence`。`success` 至少一条 evidence；`checked-empty` 要求实际 URL/query、`candidateCount: 0` 和空 evidence；`failed` 必须记录 error。最终引用 evidence 的 URL 必须使用 HTTPS 并满足对应 source 的 host 与 `allowedUrlPrefixes`。
 
-`selection.json` 同时记录 included 与 excluded。每个 included event 必须包含 `eventId`、`title`、`eventType`、`candidateIds`、`sourceRefs`、结构化 `materialDelta`、结构化 `historyMatches` 和 `editorialPriority`；一个 candidateId 不能属于两个 included event。补充更新也必须参加最近 5 期去重。excluded 候选必须有机器可读原因。
+`selection.json` 同时记录 included 与 excluded。每个 included event 必须包含 `eventId`、`title`、`eventType`、`candidateIds`、`sourceRefs`、结构化 `materialDelta`、结构化 `historyMatches` 和 `editorialPriority`；一个 candidateId 不能属于两个 included event。所有入选事件都必须参加最近 5 期去重。excluded 候选必须有机器可读原因。
 
-`self-review.json` 必须显式确认日期 coverage、`coverageConclusion` 与缺口、最近 5 期重点/补充事件、确认策略和高风险未确认项；`no_events` 还要给出所有候选的排除统计。
+`self-review.json` 必须显式确认日期 coverage、`coverageConclusion` 与缺口、最近 5 期已发布事件、确认策略和高风险未确认项；`no_events` 还要给出所有候选的排除统计。
 
 ## 独立 reviewer
 

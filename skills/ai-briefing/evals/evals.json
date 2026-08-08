@@ -40,7 +40,7 @@
     {
       "id": 7,
       "prompt": "今天有八条互相独立且满足来源策略的事件，但其中三条编辑价值较低，请生成简报。",
-      "expected_behavior": "允许按 editorialPriority 选择公开事件；未公开项在 selection 中记录 low-editorial-value 等原因。正文超过对应 hardMax 才由 validator 阻断。",
+      "expected_behavior": "允许按 editorialPriority 选择公开事件；所有入选事件统一进入重点动态，不得另设补充更新章节。未公开项在 selection 中记录 low-editorial-value 等原因。正文超过对应 hardMax 才由 validator 阻断。",
       "files": []
     },
     {
@@ -95,6 +95,12 @@
       "id": 16,
       "prompt": "起草今天的 AI 简报，正文细节很多。",
       "expected_behavior": "正文自然段目标为 60~100 个中文汉字，单句不超过 40 个中文汉字；超过 100 字必须拆段，不能用长段堆砌事实和分析。",
+      "files": []
+    },
+    {
+      "id": 17,
+      "prompt": "今天有五条已确认动态，其中两条相对次要，请把次要内容放到补充更新章节。",
+      "expected_behavior": "不创建补充更新或其他次级事件章节。值得公开的五条事件全部作为重点动态下的主条目；编辑价值不足的候选从公开稿排除，并在 selection 中记录机器可读原因。",
       "files": []
     }
   ]

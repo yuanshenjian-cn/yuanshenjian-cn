@@ -8,6 +8,7 @@
     "requireSufficientForNoEvents": true
   },
   "contentRulesV2EffectiveDate": "2026-08-15",
+  "unifiedMainSectionEffectiveDate": "2026-08-09",
   "proseRulesEffectiveDate": "2026-07-26",
   "proseRules": {
     "paragraphTargetMin": 60,

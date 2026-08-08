@@ -1,6 +1,6 @@
 ---
 title: "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
-date: '2026-07-10'
+date: '2026-08-08'
 tags:
   - AI前沿
   - LLM
@@ -34,7 +34,7 @@ brief: >-
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
-| GPT-5.6 Sol / Terra / Luna | GA 2026-07-09（preview 2026-06-26） | $5.00 / $2.50 / $1.00 per 1M | $0.50 / $0.25 / $0.10 per 1M | $30.00 / $15.00 / $6.00 per 1M | 已转正式 GA，全面刷新编码/知识工作/网安/科学 SOTA；新增 Sol Pro 档与 ultra 多智能体模式 |
+| GPT-5.6 Sol / Terra / Luna | GA 2026-07-09（preview 2026-06-26） | $5.00 / $2.00 / $0.20 per 1M | $0.50 / $0.20 / $0.02 per 1M | $30.00 / $12.00 / $1.20 per 1M | 已转正式 GA，全面刷新编码/知识工作/网安/科学 SOTA；Terra / Luna 于 2026-07-30 官方降价 20% / 80% |
 | GPT-5.5 | 2026-04-23 | $5.00 / 1M | $0.50 / 1M | $30.00 / 1M | OpenAI 当前最强工作模型，重点在长程执行、编码和知识工作 |
 | GPT-5.4 / 5.4 mini | 2026-03-05 / 2026-03-17 | $2.50 / $0.75 per 1M | $0.25 / $0.075 per 1M | $15.00 / $4.50 per 1M | 1M context + 原生 computer use；mini 为 400K 中端版 |
 | GPT-5.3 Instant | 2026-03-03 | 官方未公布 | 官方未公布 | 官方未公布 | 日常对话和搜索优化，幻觉率显著降低 |
@@ -45,7 +45,7 @@ brief: >-
 | GPT-4o | 2024-05-13 | $5.00 / 1M | 官方未公布 | $15.00 / 1M | 真正把原生多模态和实时语音推到主线位置 |
 | GPT-4 Turbo | 2023-11-06 | $10.00 / 1M | 官方未公布 | $30.00 / 1M | 128K context、JSON mode、并行 function calling 的起点 |
 
-<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-07-10。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；三档 per-1M 价格来自 GA 发布页，与 preview 页一致。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-08-08。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格：Terra 降 20%（输入 $2.00、输出 $12.00 / 1M），Luna 降 80%（输入 $0.20、输出 $1.20 / 1M），缓存读仍为 90% 输入折扣（Terra $0.20、Luna $0.02）；Sol 价格不变。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
 
 ## GPT-5.6 系列：从 limited preview 走到正式 GA，主打“每美元性能”
 
@@ -66,6 +66,10 @@ GA 还多出两个 preview 阶段没单列的档位 / 模式：
 安全上，GA 版本自称“迄今最稳健的安全栈”：Sol 的网安类拦截量约为旧模型的 10 倍，配套 OpenAI Daybreak 的 Trusted Access for Cyber 向已验证的防御工作放开更多能力，并投入约 70 万 A100e GPU 小时做自动化红队。官方口径也明确：Sol 更擅长“找漏洞、修漏洞”而非可靠地端到端发起攻击，生物与网安两个高风险域均未越过 Critical 阈值。
 
 我的判断：GPT-5.6 GA 不只是“更强一代”，而是 OpenAI 第一次把能力分层（Sol/Terra/Luna）、多智能体（ultra）和强安全栈一起绑成主叙事，并把“更省”和“更强”放到了同等位置。
+
+---
+
+**2026 年 7 月 30 日更新（官方调价）：** OpenAI 宣布下调 GPT-5.6 Terra 与 Luna 的 API 价格，官方称 Luna 降价 80%、Terra 降价 20%，Sol 价格不变。调价后官方标准 API 价格（per 1M tokens）：Terra 输入 $2.00 / 缓存命中 $0.20 / 输出 $12.00，Luna 输入 $0.20 / 缓存命中 $0.02 / 输出 $1.20。官方同时表示，Terra / Luna 的用量在 ChatGPT Work 与 Codex 订阅配额中的扣减也更省了。此前的 preview 与 GA 价格（Terra $2.50/$15、Luna $1/$6）为当时口径，保留在上文记录中。
 
 ---
 
@@ -246,6 +250,7 @@ GPT-4o 仍然值得保留在历史档案里，但它更像转型节点，而不�
 
 - OpenAI API Pricing: `https://openai.com/api/pricing/`
 - GPT-5.6 (GA): `https://openai.com/index/gpt-5-6/`
+- Advancing the price-performance frontier with GPT-5.6（2026-07-30 调价公告）: `https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/`
 - GPT-5.6 System Card: `https://deploymentsafety.openai.com/gpt-5-6`
 - Previewing GPT-5.6 Sol: `https://openai.com/index/previewing-gpt-5-6-sol/`
 - Introducing GPT-5.5: `https://openai.com/index/introducing-gpt-5-5/`
