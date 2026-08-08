@@ -60,59 +60,6 @@ function assertExactKeys(value, allowedKeys, label) {
   if (unexpected.length > 0) throw new Error(`${label} 包含未允许字段：${unexpected.join(", ")}`);
 }
 
-function validateGeneratorResult(result, issueDate) {
-  if (!result || typeof result !== "object") throw new Error("generator structured_output 必须是对象");
-  requireString(result.status, "status");
-  if (!["draft_ready", "no_events", "blocked", "failed"].includes(result.status)) {
-    throw new Error(`未知 generator status：${result.status}`);
-  }
-  requireString(result.issueDate, "issueDate");
-  if (result.issueDate !== issueDate) throw new Error(`generator issueDate 不匹配：${result.issueDate}`);
-
-  if (result.status === "draft_ready") {
-    assertExactKeys(
-      result,
-      [
-        "status",
-        "issueDate",
-        "candidatePath",
-        "selectionPath",
-        "selfReviewPath",
-        "coverageConclusion",
-        "selfReviewConclusion",
-      ],
-      "draft_ready",
-    );
-    requireString(result.candidatePath, "candidatePath");
-    requireString(result.selectionPath, "selectionPath");
-    requireString(result.selfReviewPath, "selfReviewPath");
-    if (!["sufficient", "degraded"].includes(result.coverageConclusion)) {
-      throw new Error("draft_ready coverageConclusion 必须为 sufficient 或 degraded");
-    }
-    requireString(result.selfReviewConclusion, "selfReviewConclusion");
-  } else if (result.status === "no_events") {
-    assertExactKeys(
-      result,
-      ["status", "issueDate", "selectionPath", "selfReviewPath", "coverageConclusion", "reason"],
-      "no_events",
-    );
-    requireString(result.selectionPath, "selectionPath");
-    requireString(result.selfReviewPath, "selfReviewPath");
-    if (result.coverageConclusion !== "sufficient") {
-      throw new Error("no_events coverageConclusion 必须为 sufficient");
-    }
-    requireString(result.reason, "reason");
-  } else if (result.status === "blocked") {
-    assertExactKeys(result, ["status", "issueDate", "reason", "blockers"], "blocked");
-    requireString(result.reason, "reason");
-    requireStringArray(result.blockers, "blockers");
-  } else {
-    assertExactKeys(result, ["status", "issueDate", "reason"], "failed");
-    requireString(result.reason, "reason");
-  }
-  return result;
-}
-
 function validateEvidenceQuality(value) {
   if (!value || typeof value !== "object") throw new Error("reviewer 缺少 evidenceQuality");
   assertExactKeys(value, ["authority", "authenticity", "timeliness"], "evidenceQuality");
@@ -148,6 +95,7 @@ function validateReviewerResult(result) {
   if (result.status === "approved") {
     assertExactKeys(result, common, "approved");
     if (result.conclusion !== "可进入发布门禁") throw new Error("approved reviewer conclusion 必须为 可进入发布门禁");
+    if (result.networkStatus === "offline") throw new Error("offline reviewer 不得批准发布");
     if (result.checkedEvidenceIds.length === 0) throw new Error("approved reviewer 必须包含 checkedEvidenceIds");
     if (result.uncheckedHighRiskItems.length > 0) throw new Error("approved reviewer 存在高风险未核验项");
   } else if (result.status === "needs_changes") {
@@ -161,6 +109,23 @@ function validateReviewerResult(result) {
     requireString(result.reason, "reason");
   }
   return result;
+}
+
+function validateReviewerEvidenceIds(result, collection, discovery) {
+  const evidenceIds = new Set();
+  for (const source of collection.sources || []) {
+    for (const candidate of source.candidates || []) {
+      evidenceIds.add(candidate.evidenceId || candidate.candidateId);
+    }
+  }
+  for (const item of discovery.paths || []) {
+    for (const evidence of item.evidence || []) evidenceIds.add(evidence.evidenceId);
+  }
+  for (const evidenceId of result.checkedEvidenceIds) {
+    if (!evidenceIds.has(evidenceId)) {
+      throw new Error(`reviewer checkedEvidenceIds 引用了本轮不存在的 evidence：${evidenceId}`);
+    }
+  }
 }
 
 function resolveConfirmationPolicy(source, eventType) {
@@ -1074,12 +1039,6 @@ function verifyEvidenceRun(runDir, expectedHashes = null, options = {}) {
 
 function main() {
   const { command, args } = parseArgs(process.argv.slice(2));
-  if (command === "parse-generator") {
-    const result = validateGeneratorResult(parseClaudeOutput(fs.readFileSync(args.input, "utf8")), args["issue-date"]);
-    updateVerification(args["run-dir"], "generator", { status: result.status });
-    process.stdout.write(`${JSON.stringify(result)}\n`);
-    return;
-  }
   if (command === "verify-no-events") {
     const result = verifyNoEventsRun(args["run-dir"], {
       window: args["expected-window-hash"],
@@ -1110,6 +1069,11 @@ function main() {
   if (command === "verify-reviewer") {
     const result = validateReviewerResult(parseClaudeOutput(fs.readFileSync(args.input, "utf8")));
     if (result.status !== "approved") throw new Error(`reviewer 未批准：${result.status}`);
+    validateReviewerEvidenceIds(
+      result,
+      readJson(path.join(args["run-dir"], "collection.json")),
+      readJson(path.join(args["run-dir"], "discovery.json")),
+    );
     updateVerification(args["run-dir"], "reviewer", { status: result.status });
     return;
   }
@@ -1119,6 +1083,11 @@ function main() {
       parseClaudeOutput(fs.readFileSync(path.join(args["run-dir"], "reviewer-output.json"), "utf8")),
     );
     if (reviewer.status !== "approved") throw new Error("reviewer 未批准，禁止 commit");
+    validateReviewerEvidenceIds(
+      reviewer,
+      readJson(path.join(args["run-dir"], "collection.json")),
+      readJson(path.join(args["run-dir"], "discovery.json")),
+    );
     if (!fs.existsSync(args["briefing-file"]) || !fs.existsSync(args["index-file"])) throw new Error("commit 前文件缺失");
     const issueDate = readJson(path.join(args["run-dir"], "window.json")).issueDate;
     if (!fs.readFileSync(args["index-file"], "utf8").includes(issueDate)) throw new Error("AI 简报索引未包含本期日期");
@@ -1175,10 +1144,10 @@ module.exports = {
   validateCoverage,
   validateCoverageForStatus,
   validateDiscoveryContract,
-  validateGeneratorResult,
   validateNoEventsDisposition,
   validatePublicSourceLabels,
   validateReviewerResult,
+  validateReviewerEvidenceIds,
   validateSelectionContract,
   validateSelectionEvidence,
   validateSelfReviewContract,

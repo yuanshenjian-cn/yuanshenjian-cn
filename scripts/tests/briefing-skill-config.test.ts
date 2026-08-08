@@ -20,7 +20,6 @@ interface AiBriefingConfig {
   briefing: Record<string, unknown>;
   focusCompanies: Array<{ id: string; priorityFocus: boolean }>;
   sourceRegistry: { version: number; sources: SourceDefinition[] };
-  generatorResultSchema: Record<string, unknown>;
   reviewerResultSchema: Record<string, unknown>;
 }
 
@@ -34,13 +33,12 @@ describe("AI briefing machine configuration", () => {
   it("loads the complete configuration", () => {
     const config = loadAiBriefingSkillConfig();
 
-    expect(config.briefing.contentRulesV2EffectiveDate).toBe("2026-08-15");
-    expect(config.briefing.unifiedMainSectionEffectiveDate).toBe("2026-08-09");
     expect(config.briefing.windowStrategy).toBe("calendar-date-overlap");
     expect(config.briefing.initialLookbackDays).toBe(1);
     expect(config.sourceRegistry.version).toBe(1);
-    expect(config.generatorResultSchema.anyOf).toBeInstanceOf(Array);
     expect(config.reviewerResultSchema.anyOf).toBeInstanceOf(Array);
+    expect(config.briefing).not.toHaveProperty("contentRulesV2EffectiveDate");
+    expect(config.briefing).not.toHaveProperty("bodyLengthRules");
   });
 
   it("defines unique and safe registry sources", () => {
@@ -51,10 +49,28 @@ describe("AI briefing machine configuration", () => {
 
     for (const source of sources) {
       expect(source.publisherId).not.toBe("");
+      expect(["official", "primary-record", "media"]).toContain(source.authority);
       expect(["primary", "supplemental", "discovery"]).toContain(source.coverageRole);
       expect(() => new Intl.DateTimeFormat("en-US", { timeZone: source.sourceTimezone })).not.toThrow();
       if (source.enabled && source.url) {
         expect(new URL(source.url).protocol).toBe("https:");
+      }
+    }
+  });
+
+  it("uses window output fields in media search templates", () => {
+    const searchSources = loadAiBriefingSkillConfig().sourceRegistry.sources.filter(
+      (source) => source.method === "search",
+    );
+
+    for (const source of searchSources) {
+      const templates = source.queryTemplates ?? [];
+      expect(templates.length).toBeGreaterThan(0);
+      for (const template of templates) {
+        expect(template).toContain("{searchStartDate}");
+        expect(template).toContain("{searchEndDateExclusive}");
+        expect(template).not.toContain("{windowStartDate}");
+        expect(template).not.toContain("{windowEndDate}");
       }
     }
   });
@@ -120,22 +136,12 @@ describe("AI briefing machine configuration", () => {
     }
   });
 
-  it("only documents registered sources as independent check paths", () => {
+  it("keeps source details in the registry instead of a duplicated static list", () => {
     const sourceMap = fs.readFileSync("skills/ai-briefing/references/source-map.md", "utf8");
-    const section = sourceMap.match(
-      /## Registry 中的独立路径([\s\S]*?)(?=\n## |$)/,
-    )?.[1];
-    expect(section).toBeTruthy();
 
-    const documentedIds = [...(section ?? "").matchAll(/`([a-z0-9][a-z0-9-]+)`/g)].map(
-      (match) => match[1],
-    );
-    const registeredIds = new Set(
-      loadAiBriefingSkillConfig().sourceRegistry.sources.map((source) => source.id),
-    );
-
-    expect(documentedIds.length).toBeGreaterThan(0);
-    for (const id of documentedIds) expect(registeredIds).toContain(id);
+    expect(sourceMap).toContain("直接从 registry 读取，不在本文维护静态清单");
+    expect(sourceMap).not.toContain("| OpenAI |");
+    expect(sourceMap).not.toContain("曾返回 404");
   });
 
   it("pins fast-xml-parser 5.10.0 in package metadata", () => {

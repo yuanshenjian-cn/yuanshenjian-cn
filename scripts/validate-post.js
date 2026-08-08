@@ -28,12 +28,12 @@ const ROOT = repoRoot;
 const CONTENT_ROOT = blogContentDir;
 const BRIEFINGS_ROOT = aiBriefingsDir;
 const INVESTMENT_BRIEFINGS_ROOT = investmentBriefingsDir;
+const AI_VALIDATION_COMPATIBILITY = JSON.parse(
+  fs.readFileSync(path.join(ROOT, "config", "ai-briefing-validation-compatibility.json"), "utf8"),
+);
 const MARKDOWN_EXT_RE = /\.mdx?$/i;
 const BRIEFING_EXT_RE = /\.md$/i;
 const DEFAULT_AI_BRIEFING_CONFIG = {
-  contentRulesV2EffectiveDate: "2026-08-15",
-  unifiedMainSectionEffectiveDate: "2026-08-09",
-  proseRulesEffectiveDate: "2026-07-26",
   proseRules: { paragraphTargetMin: 60, paragraphMax: 100, sentenceMax: 40 },
   dynamicBodyLengthRules: [
     { minEvents: 1, maxEvents: 1, recommendedMin: 450, recommendedMax: 800, hardMax: 1200 },
@@ -41,22 +41,7 @@ const DEFAULT_AI_BRIEFING_CONFIG = {
     { minEvents: 4, maxEvents: 6, recommendedMin: 1100, recommendedMax: 1800, hardMax: 2400 },
     { minEvents: 7, maxEvents: null, recommendedMin: 1500, recommendedMax: 2200, hardMax: 3200 },
   ],
-  bodyLengthRules: [
-    {
-      effectiveFrom: "0000-01-01",
-      min: 700,
-      max: 1100,
-      label: "legacy",
-    },
-    {
-      effectiveFrom: "2026-05-26",
-      min: 900,
-      max: 1300,
-      label: "v2",
-    },
-  ],
   dedupeLookbackIssues: 5,
-  dedupeEffectiveFrom: "2026-05-14",
   requiredSections: ["速览", "重点动态", "为什么值得关注", "来源"],
   dedupeSectionHeading: "重点动态",
   sourceSectionHeading: "来源",
@@ -309,8 +294,8 @@ function resolveEffectiveRule(dateText, configuredRules, fallbackRules) {
 function resolveAiBodyLengthRule(dateText) {
   return resolveEffectiveRule(
     dateText,
-    aiBriefingConfig.bodyLengthRules,
-    DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules,
+    AI_VALIDATION_COMPATIBILITY.bodyLengthRules,
+    AI_VALIDATION_COMPATIBILITY.bodyLengthRules,
   );
 }
 
@@ -366,7 +351,7 @@ function resolveDynamicAiBodyLengthRule(eventCount) {
 }
 
 function getAiRegistryHosts() {
-  const hosts = new Set();
+  const hosts = new Set(AI_VALIDATION_COMPATIBILITY.sourceHosts || []);
   for (const source of aiSourceRegistry.sources || []) {
     if (source.url) {
       try {
@@ -489,9 +474,10 @@ function toNumberOr(value, fallback) {
  * @param {{ min?: number; max?: number }} rule
  */
 function normalizeAiBodyLengthRule(rule) {
+  const fallbackRule = AI_VALIDATION_COMPATIBILITY.bodyLengthRules[AI_VALIDATION_COMPATIBILITY.bodyLengthRules.length - 1];
   return {
-    min: toNumberOr(rule.min, DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules[DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules.length - 1].min),
-    max: toNumberOr(rule.max, DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules[DEFAULT_AI_BRIEFING_CONFIG.bodyLengthRules.length - 1].max),
+    min: toNumberOr(rule.min, fallbackRule.min),
+    max: toNumberOr(rule.max, fallbackRule.max),
   };
 }
 
@@ -843,13 +829,11 @@ function normalizeBriefingProseRules(rules, fallback) {
 }
 
 /**
- * @param {{ body: string; dateClean: string; relativeFile: string; sourceSectionHeading: string; config: Record<string, unknown>; defaults: { proseRulesEffectiveDate: string; proseRules: { paragraphTargetMin: number; paragraphMax: number; sentenceMax: number } }; label: string }} options
+ * @param {{ body: string; dateClean: string; relativeFile: string; sourceSectionHeading: string; config: Record<string, unknown>; defaults: { proseRulesEffectiveDate?: string; proseRules: { paragraphTargetMin: number; paragraphMax: number; sentenceMax: number } }; effectiveDate?: string; label: string }} options
  */
-function validateBriefingProse({ body, dateClean, relativeFile, sourceSectionHeading, config, defaults, label }) {
-  const effectiveDate = typeof config.proseRulesEffectiveDate === "string"
-    ? config.proseRulesEffectiveDate
-    : defaults.proseRulesEffectiveDate;
-  if (!dateClean || dateClean < effectiveDate) return;
+function validateBriefingProse({ body, dateClean, relativeFile, sourceSectionHeading, config, defaults, effectiveDate, label }) {
+  const proseEffectiveDate = effectiveDate || config.proseRulesEffectiveDate || defaults.proseRulesEffectiveDate;
+  if (!dateClean || (proseEffectiveDate && dateClean < proseEffectiveDate)) return;
 
   const rules = normalizeBriefingProseRules(config.proseRules, defaults.proseRules);
   const prose = maskFencedCodeBlocks(removeSections(body, [sourceSectionHeading]));
@@ -1033,10 +1017,9 @@ function validateBriefingFile(file, slugs, logicalFile = file) {
     addError("frontmatter 缺少 brief 或 brief 为空", relativeFile, 1);
   }
 
-  const v2EffectiveDate = aiBriefingConfig.contentRulesV2EffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.contentRulesV2EffectiveDate;
+  const v2EffectiveDate = AI_VALIDATION_COMPATIBILITY.contentRulesEffectiveDate;
   const usesV2Rules = Boolean(dateClean && dateClean >= v2EffectiveDate);
-  const unifiedMainSectionEffectiveDate =
-    aiBriefingConfig.unifiedMainSectionEffectiveDate || DEFAULT_AI_BRIEFING_CONFIG.unifiedMainSectionEffectiveDate;
+  const unifiedMainSectionEffectiveDate = AI_VALIDATION_COMPATIBILITY.unifiedMainSectionEffectiveDate;
   if (dateClean && dateClean >= unifiedMainSectionEffectiveDate && findHeading(parsed.body, "补充更新")) {
     addError("AI 简报所有入选事件必须统一放在 `## 重点动态`，不得设置 `## 补充更新` 章节", relativeFile, 1);
   }
@@ -1080,6 +1063,7 @@ function validateBriefingFile(file, slugs, logicalFile = file) {
     sourceSectionHeading,
     config: aiBriefingConfig,
     defaults: DEFAULT_AI_BRIEFING_CONFIG,
+    effectiveDate: AI_VALIDATION_COMPATIBILITY.proseRulesEffectiveDate,
     label: "AI 简报",
   });
 
@@ -1297,9 +1281,10 @@ function isPublishedBriefingEntry(entry) {
  * @param {Set<string>} genericHeadingSet
  */
 function validateRecentBriefingDuplicates(currentFile, currentDate, rootDir, sectionHeading, lookbackIssues, label, genericHeadingSet) {
-  const configSource = label === "AI 简报" ? aiBriefingConfig : investmentBriefingConfig;
   const defaultConfig = label === "AI 简报" ? DEFAULT_AI_BRIEFING_CONFIG : DEFAULT_INVESTMENT_BRIEFING_CONFIG;
-  const dedupeEffectiveFrom = configSource.dedupeEffectiveFrom || defaultConfig.dedupeEffectiveFrom;
+  const dedupeEffectiveFrom = label === "AI 简报"
+    ? AI_VALIDATION_COMPATIBILITY.dedupeEffectiveFrom
+    : investmentBriefingConfig.dedupeEffectiveFrom || defaultConfig.dedupeEffectiveFrom;
 
   if (dedupeEffectiveFrom && currentDate < dedupeEffectiveFrom) {
     return;

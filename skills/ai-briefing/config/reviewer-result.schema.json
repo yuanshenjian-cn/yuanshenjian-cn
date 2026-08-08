@@ -20,7 +20,7 @@
       "properties": {
         "status": { "const": "approved" },
         "conclusion": { "const": "可进入发布门禁" },
-        "networkStatus": { "enum": ["online", "partial", "offline"] },
+        "networkStatus": { "enum": ["online", "partial"] },
         "checkedEvidenceIds": {
           "type": "array",
           "minItems": 1,

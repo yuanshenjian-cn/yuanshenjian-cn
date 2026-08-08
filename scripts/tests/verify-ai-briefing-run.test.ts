@@ -128,30 +128,25 @@ afterEach(() => {
 
 describe("Claude structured output contracts", () => {
   it("parses JSON and final stream-json structured_output", () => {
-    const generator = readJsonFixture("claude-generator-results.json");
+    const reviewer = readJsonFixture("claude-reviewer-results.json");
     const stream = [
       JSON.stringify({ type: "assistant", message: { content: [] } }),
-      JSON.stringify({ type: "result", structured_output: generator.draft_ready.structured_output }),
+      JSON.stringify({ type: "result", structured_output: reviewer.approved.structured_output }),
     ].join("\n");
 
-    expect(verifier.parseClaudeOutput(JSON.stringify(generator.draft_ready)).status).toBe("draft_ready");
-    expect(verifier.parseClaudeOutput(stream).status).toBe("draft_ready");
+    expect(verifier.parseClaudeOutput(JSON.stringify(reviewer.approved)).status).toBe("approved");
+    expect(verifier.parseClaudeOutput(stream).status).toBe("approved");
     expect(() => verifier.parseClaudeOutput(JSON.stringify({ result: "natural language only" }))).toThrow(
       "structured_output",
     );
   });
 
-  it("validates every generator and reviewer discriminated branch", () => {
-    const generator = readJsonFixture("claude-generator-results.json");
+  it("validates every reviewer discriminated branch", () => {
     const reviewer = readJsonFixture("claude-reviewer-results.json");
 
-    for (const value of Object.values(generator)) {
-      expect(() => verifier.validateGeneratorResult(verifier.parseClaudeOutput(JSON.stringify(value)), "2026-07-15")).not.toThrow();
-    }
     for (const value of Object.values(reviewer)) {
       expect(() => verifier.validateReviewerResult(verifier.parseClaudeOutput(JSON.stringify(value)))).not.toThrow();
     }
-    expect(() => verifier.validateGeneratorResult({ status: "unknown" }, "2026-07-15")).toThrow("未知 generator status");
     expect(() =>
       verifier.validateReviewerResult({
         status: "approved",
@@ -162,30 +157,41 @@ describe("Claude structured output contracts", () => {
         evidenceQuality: { authority: "通过", authenticity: "通过", timeliness: "通过" },
       }),
     ).toThrow("高风险未核验项");
+    expect(() =>
+      verifier.validateReviewerResult({
+        status: "approved",
+        conclusion: "可进入发布门禁",
+        networkStatus: "offline",
+        checkedEvidenceIds: ["one"],
+        uncheckedHighRiskItems: [],
+        evidenceQuality: { authority: "通过", authenticity: "通过", timeliness: "通过" },
+      }),
+    ).toThrow("offline reviewer 不得批准发布");
   });
 
-  it("supports the parse-generator CLI without reading natural language output", () => {
-    const input = path.join(tempRoot, "claude-output.json");
-    const runDir = path.join(tempRoot, "run");
-    fs.writeFileSync(input, JSON.stringify(readJsonFixture("claude-generator-results.json").no_events));
-    const result = spawnSync(
-      "node",
-      [
-        "scripts/verify-ai-briefing-run.js",
-        "parse-generator",
-        "--input",
-        input,
-        "--run-dir",
-        runDir,
-        "--issue-date",
-        "2026-07-15",
-      ],
-      { cwd: process.cwd(), encoding: "utf8" },
+  it("rejects reviewer evidence ids that do not exist in the run", () => {
+    const reviewer = verifier.parseClaudeOutput(
+      JSON.stringify(readJsonFixture("claude-reviewer-results.json").approved),
     );
 
-    expect(result.status).toBe(0);
-    expect(JSON.parse(result.stdout).status).toBe("no_events");
+    expect(() =>
+      verifier.validateReviewerEvidenceIds(
+        reviewer,
+        { sources: [{ candidates: [{ candidateId: "candidate-1" }] }] },
+        { paths: [] },
+      ),
+    ).toThrow("本轮不存在的 evidence");
+
+    reviewer.checkedEvidenceIds = ["candidate-1"];
+    expect(() =>
+      verifier.validateReviewerEvidenceIds(
+        reviewer,
+        { sources: [{ candidates: [{ candidateId: "candidate-1" }] }] },
+        { paths: [] },
+      ),
+    ).not.toThrow();
   });
+
 });
 
 describe("date coverage and confirmation policy", () => {

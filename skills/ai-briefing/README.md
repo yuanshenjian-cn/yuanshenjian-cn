@@ -4,11 +4,11 @@
 
 ## 三种模式
 
-- 查询：只回答，不落盘，不 commit，不 push。
+- 查询：只回答；仅在 `.local/ai-briefing/runs/` 写运行证据，不写公开内容，不 commit，不 push。
 - 成稿：返回 Markdown 草稿和审核摘要，不写入 `content/`。
 - 发布：独立 reviewer 与确定性门禁全部通过后才允许发布。
 
-发布模式由当前会话 agent 驱动：在被忽略的 runDir 生成 `candidate.md` 和 agent 证据，独立 reviewer 子代理通过后，由共享 `scripts/finalize-ai-briefing-run.sh` 独占正式晋升、Git 与远端验证。不再存在 fork 独立 generator/reviewer 子进程的外层编排脚本。
+发布模式由当前会话 agent 驱动：在被忽略的 runDir 生成 `candidate.md` 和证据，独立 reviewer 子代理通过后，由 `scripts/finalize-ai-briefing-run.sh` 完成正式晋升、Git 与远端验证。
 
 ## 所有模式都先采集
 
@@ -70,7 +70,7 @@ collector 默认拒绝 DNS 解析到私网或 `198.18.0.0/15`（Clash/Surge/Miho
 
 ## 证据与 reviewer
 
-运行证据保存在被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，包括 `window.json`、`collection.json`、`discovery.json`、`selection.json`、`self-review.json`、`candidate.md`、主 agent 和 reviewer 原始结构化输出，以及 `verification.json`。
+运行证据保存在被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`，包括 `window.json`、`collection.json`、`discovery.json`、`selection.json`、`self-review.json`、`candidate.md`、`reviewer-output.json` 和 `verification.json`。
 
 独立 reviewer 具有受限只读 WebFetch/WebSearch，禁止编辑和 Bash。它只访问 registry/证据包列出的 URL；approved 必须真实记录 `networkStatus`、已检查证据和高风险未核验项。
 
@@ -86,20 +86,4 @@ Reviewer、candidate 校验或 build 失败时不在正式目录遗留本轮文�
 
 ```text
 docs(ai-briefing): 发布 YYYY-MM-DD AI 简报
-```
-
-## 目录
-
-```text
-ai-briefing/
-├── SKILL.md
-├── README.md
-├── config/
-│   ├── briefing.json
-│   ├── focus-companies.json
-│   ├── source-registry.json
-│   ├── generator-result.schema.json
-│   └── reviewer-result.schema.json
-├── references/source-map.md
-└── evals/evals.json
 ```

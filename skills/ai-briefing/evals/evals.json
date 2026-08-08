@@ -22,7 +22,7 @@
     {
       "id": 4,
       "prompt": "某重点厂商 Feed 抓取失败，官方 changelog 检查成功但本期没有更新。",
-      "expected_behavior": "官方路径记录 checked-empty、实际 URL、checkedAt、candidateCount=0 和空 evidence；coverage 可标记 degraded 并披露 Feed 失败，不得伪造事件证据。",
+      "expected_behavior": "官方路径记录 checked-empty、实际 URL、checkedAt、candidateCount=0 和空 evidence；若该路径满足 primary 与非 Feed 补检要求，Feed 失败不单独导致 coverage 降级，但必须披露采集缺口，不得伪造事件证据。",
       "files": []
     },
     {

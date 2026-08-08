@@ -47,7 +47,16 @@ for command in git "$NODE_BIN" just; do
 done
 
 [ -d "$RUN_DIR" ] || fail "run directory 不存在：$RUN_DIR"
+RUN_DIR_ABS="$(cd -- "$RUN_DIR" && pwd -P)"
+ALLOWED_RUN_ROOT="$PROJECT_DIR/.local/ai-briefing/runs"
+case "$RUN_DIR_ABS/" in
+  "$ALLOWED_RUN_ROOT"/*) ;;
+  *) fail "run directory 必须位于 $ALLOWED_RUN_ROOT：$RUN_DIR" ;;
+esac
 [ -f "$CANDIDATE" ] || fail "candidate 不存在：$CANDIDATE"
+CANDIDATE_ABS="$(cd -- "$(dirname -- "$CANDIDATE")" && pwd -P)/$(basename -- "$CANDIDATE")"
+RUN_DIR="$RUN_DIR_ABS"
+CANDIDATE="$CANDIDATE_ABS"
 [ "$CANDIDATE" = "$RUN_DIR/candidate.md" ] || fail "candidate 必须是 runDir/candidate.md：$CANDIDATE"
 [[ "$ISSUE_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || fail "issueDate 格式不合法：$ISSUE_DATE"
 EXPECTED_BRIEFING_FILE="content/ai-briefings/${ISSUE_DATE:0:4}/${ISSUE_DATE:5:2}/${ISSUE_DATE}-ai-briefing.md"

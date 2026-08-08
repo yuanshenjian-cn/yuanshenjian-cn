@@ -18,17 +18,17 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 
 默认进入查询模式。用户明确说“写、起草、生成简报”才进入成稿模式；明确说“发布、commit、push、生成并发布”才进入发布模式。存在歧义时降级为查询模式。
 
-- 查询模式：只回答，不写公开内容，不 commit，不 push。
+- 查询模式：只回答；仅在 `.local/ai-briefing/runs/` 写运行证据，不写公开内容，不 commit，不 push。
 - 成稿模式：返回完整 Markdown 草稿和内部审核摘要，不写入 `content/`，不 commit，不 push。
 - 普通发布模式：明确发布意图后才允许写正式文件，并在独立 reviewer 与确定性门禁通过后发布。
 
-发布由当前会话 agent 驱动确定性脚本完成，不存在独立的外层编排脚本，也不再 fork 单独的 generator/reviewer 子进程。
+发布由当前会话 agent 驱动；正式晋升和 Git 操作统一交给 `scripts/finalize-ai-briefing-run.sh`。
 
 ## 所有模式的确定性初始化
 
 查询、成稿和普通发布模式都必须先具备冻结日期 coverage 与确定性 Feed 采集结果：
 
-1. 在任何模式开始时创建被 Git 忽略的 `.local/ai-briefing/runs/<run-id>/`。`runDir` 必须从仓库根目录解析，规范化后的相对路径必须仍以 `.local/ai-briefing/runs/` 开头；禁止使用根目录 `runs/<run-id>`、当前目录相对的 `runs/<run-id>` 或其他替代路径。路径校验失败时立即停止，不得创建目录或运行 CLI。
+1. 从仓库根目录解析并规范化 `runDir`，确认其相对路径以 `.local/ai-briefing/runs/` 开头后，再创建 `.local/ai-briefing/runs/<run-id>/`。路径校验失败时立即停止，不得创建目录或运行 CLI。
 2. 运行 `node scripts/ai-briefing-window.js --output <runDir>/window.json`，在一次调用中冻结 `issueDate` 与 `observedAt`；只有显式指定日期时才附加 `--issue-date <date> --observed-at <iso>`。
 3. 先按默认安全策略运行 `node scripts/collect-ai-briefing-feeds.js --window-file <runDir>/window.json --output <runDir>/collection.json`，随后读取 `collection.json` 的 `summary` 与逐源 `error`，不得只依据终端汇总判断采集成功。
 4. 若且仅若 `successCount === 0`、`failureCount === sourceCount`，并且所有失败原因都包含 `解析到非公网地址`，视为本机 Clash/Surge/Mihomo 等透明代理可能返回 `198.18.0.0/15` Fake-IP。此时使用完全相同的 window 与 output，带 `AI_BRIEFING_TRUST_FAKE_IP_RANGE=1` 自动重试一次。该开关只放行 collector 内明确限定的 Fake-IP 网段，不得用于放行其他私网地址，也不得重复重试。
@@ -53,8 +53,8 @@ argument-hint: "[时间范围] [厂商] [关键词] [只生成不发布/发布]"
 
 固定按以下顺序执行：
 
-1. 读取初始化阶段生成的 `collection.json`，优先处理官方 RSS/Atom、GitHub Release 和 Hugging Face 候选。
-2. 使用只读 WebFetch 检查官方页面、changelog、release notes 和发布页，把结果写入 `discovery.json`。
+1. 读取初始化阶段生成的 `collection.json`，优先处理官方 RSS/Atom 和 GitHub Release 候选。
+2. 使用只读 WebFetch 检查官方页面、Hugging Face、changelog、release notes 和发布页，把结果写入 `discovery.json`。
 3. 按 `focus-companies.json` 的厂商别名和事件类型关键词执行定向搜索，记录查询串、时间、结果 URL 和失败原因。
 4. 使用媒体 Feed 与权威媒体搜索补漏。
 5. 对高价值候选回溯原始源，或按 registry 完成双源确认。
@@ -137,7 +137,7 @@ Feed 只是发现渠道，不等于自动确认。路径状态可为 `success`�
 | 4~6 | 1100~1800 | 2400 |
 | 7+ | 1500~2200 | 3200 |
 
-7 条及以上时可按 `editorialPriority` 筛选公开事件。所有公开事件仍统一进入 `## 重点动态`；不值得作为主条目展开的候选应在 `selection.json` 以 `low-editorial-value` 等机器可读原因排除，不得降级到单独的补充章节。每条入选事件建议覆盖以下六项中的四项：确认事实、事件时间、版本或能力、开放范围、限制或价格、实际影响。
+7 条及以上时可按 `editorialPriority` 筛选公开事件。所有公开事件统一进入 `## 重点动态`；不值得作为主条目展开的候选应在 `selection.json` 以 `low-editorial-value` 等机器可读原因排除，不得降级到单独的补充章节。每条入选事件建议覆盖以下六项中的四项：确认事实、事件时间、版本或能力、开放范围、限制或价格、实际影响。
 
 来源结构：
 
@@ -177,7 +177,7 @@ Reviewer 结论只允许：`可进入发布门禁`、`需修改后复审`、`阻
 ### 成稿模式
 
 1. 按“所有模式的确定性初始化”创建或读取 `window.json` 与 `collection.json`，再完成查询、聚类、确认策略和最近 5 期去重。
-2. 按当前 Markdown 结构和建议字数生成 `$RUN_DIR/candidate.md` 或对话草稿。
+2. 按 Markdown 结构和建议字数生成 `$RUN_DIR/candidate.md` 或对话草稿。
 3. 形成 discovery/selection/self-review 等临时证据。
 4. 可按用户要求对该 revision 调用一次独立 reviewer。
 5. 不晋升到 `content/`，不执行发布 preflight、commit 或 push。
@@ -197,7 +197,7 @@ docs(ai-briefing): 发布 YYYY-MM-DD AI 简报
 ## 输出
 
 - 查询：窗口、确认动态、待核验线索、必要来源和覆盖不完整提示。
-- 成稿：Markdown 草稿、内部审核摘要、唯一一轮 reviewer 结论、未入稿原因。
+- 成稿：Markdown 草稿、内部审核摘要和未入稿原因；用户要求审核时再附唯一一轮 reviewer 结论。
 - 发布：文件路径、审核摘要、commit hash、push 与远端验证结果。
 
 任一关键源、确认策略、内容门禁、reviewer、Git 或远端验证失败时，明确报告失败并停止。

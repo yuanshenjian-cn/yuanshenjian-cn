@@ -43,11 +43,6 @@ const mirroredFiles = [
     ".claude/skills/ai-briefing/config/source-registry.json",
   ],
   [
-    "skills/ai-briefing/config/generator-result.schema.json",
-    ".opencode/skills/ai-briefing/config/generator-result.schema.json",
-    ".claude/skills/ai-briefing/config/generator-result.schema.json",
-  ],
-  [
     "skills/ai-briefing/config/reviewer-result.schema.json",
     ".opencode/skills/ai-briefing/config/reviewer-result.schema.json",
     ".claude/skills/ai-briefing/config/reviewer-result.schema.json",
@@ -108,7 +103,7 @@ describe("ai skill mirror sync", () => {
     expect(skill).toContain("selection.json");
     expect(skill).toContain("只运行一轮");
     expect(skill).toContain("所有模式的确定性初始化");
-    expect(skill).toContain("禁止使用根目录 `runs/<run-id>`");
+    expect(skill).toContain("相对路径以 `.local/ai-briefing/runs/` 开头");
     expect(skill).toContain("node scripts/ai-briefing-window.js");
     expect(skill).toContain("node scripts/collect-ai-briefing-feeds.js");
     expect(skill).toContain("AI_BRIEFING_TRUST_FAKE_IP_RANGE=1");
@@ -144,7 +139,8 @@ describe("ai skill mirror sync", () => {
     expect(openCodeCommand).not.toContain("git push");
     expect(sourceMap).toContain("source-registry.json");
     expect(sourceMap).toContain("registry 才是程序真源");
-    expect(sourceMap).toContain("Anthropic 和 Mistral 常见猜测 RSS 地址曾返回 404");
+    expect(sourceMap).toContain("未经 smoke 验证的猜测 URL 不得加入启用列表");
+    expect(sourceMap).not.toContain("曾返回 404");
 
     const evals = JSON.parse(fs.readFileSync("skills/ai-briefing/evals/evals.json", "utf8"));
     expect(evals.evals.length).toBeGreaterThanOrEqual(12);
