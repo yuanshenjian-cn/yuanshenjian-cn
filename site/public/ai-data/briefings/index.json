@@ -1,6 +1,19 @@
 {
-  "generated": "2026-08-07T00:00:00.000Z",
+  "generated": "2026-08-08T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-08",
+      "title": "AI 简报 · 2026-08-08",
+      "excerpt": "OpenAI 披露在研模型 Astra 初步具备 Critical 级网络安全能力，暂停涉及该模型的内部活动；Anthropic 改进 Fable 5 生物安全防护，生物学相关内容误拦截率大幅下降；新墨西哥州法院裁定 Meta 追加 5.67 亿美元儿童安全罚款，累计达 9.42 亿美元。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-08-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-08"
+    },
     {
       "slug": "2026-08-07",
       "title": "AI 简报 · 2026-08-07",
@@ -1361,6 +1374,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-08",
+      "title": "AI 简报 · 2026-08-08",
+      "excerpt": "OpenAI 披露在研模型 Astra 初步具备 Critical 级网络安全能力，暂停涉及该模型的内部活动；Anthropic 改进 Fable 5 生物安全防护，生物学相关内容误拦截率大幅下降；新墨西哥州法院裁定 Meta 追加 5.67 亿美元儿童安全罚款，累计达 9.42 亿美元。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta"
+      ],
+      "date": "2026-08-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-08"
+    },
     {
       "slug": "2026-08-07",
       "title": "AI 简报 · 2026-08-07",
