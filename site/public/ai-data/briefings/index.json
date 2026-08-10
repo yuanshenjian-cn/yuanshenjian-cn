@@ -1,6 +1,20 @@
 {
-  "generated": "2026-08-10T00:00:00.000Z",
+  "generated": "2026-08-11T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-11",
+      "title": "AI 简报 · 2026-08-11",
+      "excerpt": "OpenAI 扩展 Daybreak 并发布 GPT-5.6-Cyber；ChatGPT Business 推出 Premium 席位；Meta 开源 Muse Glimmer 并提供本地运行能力；Zuckerberg 发布个人超级智能宣言。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Meta",
+        "开源",
+        "Agent"
+      ],
+      "date": "2026-08-11T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-11"
+    },
     {
       "slug": "2026-08-10",
       "title": "AI 简报 · 2026-08-10",
@@ -1399,6 +1413,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-11",
+      "title": "AI 简报 · 2026-08-11",
+      "excerpt": "OpenAI 扩展 Daybreak 并发布 GPT-5.6-Cyber；ChatGPT Business 推出 Premium 席位；Meta 开源 Muse Glimmer 并提供本地运行能力；Zuckerberg 发布个人超级智能宣言。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Meta",
+        "开源",
+        "Agent"
+      ],
+      "date": "2026-08-11T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-11"
+    },
     {
       "slug": "2026-08-10",
       "title": "AI 简报 · 2026-08-10",
