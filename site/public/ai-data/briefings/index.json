@@ -1,6 +1,20 @@
 {
-  "generated": "2026-08-11T00:00:00.000Z",
+  "generated": "2026-08-12T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-12",
+      "title": "AI 简报 · 2026-08-12",
+      "excerpt": "Gemini 应用月活突破 10 亿；OpenAI 广告测试扩展至 5 国并让 Daybreak 上线 AWS；Anthropic 公布文本与图片水印方案；Google AMIE 实现实时视频问诊。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Mistral"
+      ],
+      "date": "2026-08-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-12"
+    },
     {
       "slug": "2026-08-11",
       "title": "AI 简报 · 2026-08-11",
@@ -1413,6 +1427,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-12",
+      "title": "AI 简报 · 2026-08-12",
+      "excerpt": "Gemini 应用月活突破 10 亿；OpenAI 广告测试扩展至 5 国并让 Daybreak 上线 AWS；Anthropic 公布文本与图片水印方案；Google AMIE 实现实时视频问诊。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Mistral"
+      ],
+      "date": "2026-08-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-12"
+    },
     {
       "slug": "2026-08-11",
       "title": "AI 简报 · 2026-08-11",
