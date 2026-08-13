@@ -1,6 +1,16 @@
 {
-  "generated": "2026-08-12T00:00:00.000Z",
+  "generated": "2026-08-13T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-13",
+      "title": "AI 简报 · 2026-08-13",
+      "excerpt": "DeepSeek V4 Pro 正式版上线；xAI 发布 Grok Bot；Google DeepMind 推出 SL2T 手语模型并在 Pixel 11 上线；OpenAI 发布企业 agentic AI 研究报告。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-13"
+    },
     {
       "slug": "2026-08-12",
       "title": "AI 简报 · 2026-08-12",
@@ -1427,6 +1437,16 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-13",
+      "title": "AI 简报 · 2026-08-13",
+      "excerpt": "DeepSeek V4 Pro 正式版上线；xAI 发布 Grok Bot；Google DeepMind 推出 SL2T 手语模型并在 Pixel 11 上线；OpenAI 发布企业 agentic AI 研究报告。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-13"
+    },
     {
       "slug": "2026-08-12",
       "title": "AI 简报 · 2026-08-12",
