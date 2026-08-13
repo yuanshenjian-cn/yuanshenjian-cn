@@ -443,6 +443,8 @@
       "allowedUrlPrefixes": [
         "https://api-docs.deepseek.com/news/",
         "https://api-docs.deepseek.com/updates/",
+        "https://api-docs.deepseek.com/quick_start/pricing",
+        "https://api-docs.deepseek.com/",
         "https://www.deepseek.com/"
       ],
       "enabled": true
