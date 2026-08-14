@@ -1,6 +1,16 @@
 {
-  "generated": "2026-08-13T00:00:00.000Z",
+  "generated": "2026-08-14T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-14",
+      "title": "AI 简报 · 2026-08-14",
+      "excerpt": "OpenAI 预览 GPT-5.6 Sol 的 Ultrafast 模式并任命新 CRO；Google DeepMind 发布 Gemini 3.7 Flash；xAI 推出 Grok 4.6；Meta 向爱尔兰视障人士捐赠 15,000 副 AI 眼镜。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-14"
+    },
     {
       "slug": "2026-08-13",
       "title": "AI 简报 · 2026-08-13",
@@ -1437,6 +1447,16 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-14",
+      "title": "AI 简报 · 2026-08-14",
+      "excerpt": "OpenAI 预览 GPT-5.6 Sol 的 Ultrafast 模式并任命新 CRO；Google DeepMind 发布 Gemini 3.7 Flash；xAI 推出 Grok 4.6；Meta 向爱尔兰视障人士捐赠 15,000 副 AI 眼镜。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-14"
+    },
     {
       "slug": "2026-08-13",
       "title": "AI 简报 · 2026-08-13",
