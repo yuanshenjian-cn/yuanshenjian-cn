@@ -1,7 +1,7 @@
 {
   "slug": "author",
   "title": "袁慎建",
-  "summary": "AI 架构师 | AI 研发效能顾问 | 敏捷教练",
+  "summary": "AI 架构师 | AI 研发顾问 | 敏捷教练",
   "entities": {
     "profile": {
       "id": "hero",
@@ -9,7 +9,7 @@
       "name": "袁慎建",
       "roles": [
         "AI 架构师",
-        "AI 研发效能顾问",
+        "AI 研发顾问",
         "敏捷教练"
       ],
       "phone": "18192235667",
@@ -113,70 +113,54 @@
     },
     "experiences": [
       {
-        "id": "experience-凯捷中国-ai-架构师-and-and-fde",
-        "title": "凯捷中国 - AI 架构师 && FDE",
+        "id": "experience-凯捷中国-ai-架构师-fde",
+        "title": "凯捷中国 - AI 架构师 • FDE",
         "period": "2026.08 ~ 至今",
         "description": "聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
         "list": [],
         "organization": "凯捷中国",
-        "role": "AI 架构师 && FDE"
+        "role": "AI 架构师 • FDE"
       },
       {
-        "id": "experience-趣申请-ai-agent-and-and-效率工程师",
-        "title": "趣申请 - AI Agent && 效率工程师",
+        "id": "experience-趣申请-ai-agent-效率工程师",
+        "title": "趣申请 - AI Agent • 效率工程师",
         "period": "2026.02 ~ 2026.07",
         "description": "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
         "list": [],
         "organization": "趣申请",
-        "role": "AI Agent && 效率工程师"
+        "role": "AI Agent • 效率工程师"
       },
       {
-        "id": "experience-locammend-智能顾问-技术负责人",
-        "title": "Locammend 智能顾问 - 技术负责人",
+        "id": "experience-freelancer-架构师-ai-agent-工程师",
+        "title": "Freelancer - 架构师 • AI Agent 工程师",
         "period": "2025.05 ~ 2025.12",
         "description": "聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
         "list": [],
-        "organization": "Locammend 智能顾问",
-        "role": "技术负责人"
+        "organization": "Freelancer",
+        "role": "架构师 • AI Agent 工程师"
       },
       {
-        "id": "experience-保时捷super-app-tech-leader-and-架构师",
-        "title": "保时捷Super App - Tech Leader & 架构师",
-        "period": "2023.02 ~ 2025.02",
-        "description": "在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
-        "list": [],
-        "organization": "保时捷Super App",
-        "role": "Tech Leader & 架构师"
-      },
-      {
-        "id": "experience-thoughtworks-技术教练-and-咨询顾问",
-        "title": "Thoughtworks - 技术教练 & 咨询顾问",
-        "period": "2019.06 ~ 2023.01",
+        "id": "experience-thoughtworks-架构师-敏捷教练-研发顾问-tech-lead",
+        "title": "Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
+        "period": "2015.03 ~ 2025.04",
         "list": [
+          "担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
           "推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率",
-          "主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员"
+          "主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
+          "经历了多个金融、物流、IT、汽车等领域的敏捷交付项目，在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。"
         ],
         "organization": "Thoughtworks",
-        "role": "技术教练 & 咨询顾问"
+        "role": "架构师 • 敏捷教练 • 研发顾问 • Tech Lead"
       },
       {
-        "id": "experience-thoughtworks-服务端开发",
-        "title": "Thoughtworks - 服务端开发",
-        "period": "2015.03 ~ 2019.05",
-        "description": "经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
-        "list": [],
-        "organization": "Thoughtworks",
-        "role": "服务端开发"
-      },
-      {
-        "id": "experience-早期职业生涯",
-        "title": "早期职业生涯",
+        "id": "experience-早起懵懂生涯",
+        "title": "早起懵懂生涯",
         "period": "2013.06 ~ 2015.02",
         "list": [
           "2014.10 ~ 2015.02：软件开发工作室（自由创业）",
           "2013.06 ~ 2014.09：西安美林数据股份有限公司"
         ],
-        "organization": "早期职业生涯"
+        "organization": "早起懵懂生涯"
       }
     ],
     "projects": [
@@ -593,14 +577,14 @@
       "id": "hero",
       "anchorId": "hero",
       "heading": "个人简介",
-      "content": "袁慎建 AI 架构师，AI 研发效能顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
-      "excerpt": "袁慎建 AI 架构师，AI 研发效能顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192...",
+      "content": "袁慎建 AI 架构师，AI 研发顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 架构师，AI 研发顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：1819223...",
       "sectionType": "hero",
       "entityType": "profile",
       "entityId": "hero",
       "keywords": [
         "AI 架构师",
-        "AI 研发效能顾问",
+        "AI 研发顾问",
         "敏捷教练",
         "软件架构",
         "服务端开发",
@@ -849,60 +833,56 @@
       ]
     },
     {
-      "id": "experience-凯捷中国-ai-架构师-and-and-fde",
+      "id": "experience-凯捷中国-ai-架构师-fde",
       "anchorId": "experience",
-      "heading": "经历｜凯捷中国 - AI 架构师 && FDE",
-      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
-      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      "heading": "经历｜凯捷中国 - AI 架构师 • FDE",
+      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 • FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 • FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-凯捷中国-ai-架构师-and-and-fde",
+      "entityId": "experience-凯捷中国-ai-架构师-fde",
       "organization": "凯捷中国",
-      "role": "AI 架构师 && FDE",
+      "role": "AI 架构师 • FDE",
       "period": "2026.08 ~ 至今",
       "keywords": [
         "凯捷中国",
-        "AI 架构师 && FDE",
-        "AI 架构师",
-        "FDE"
+        "AI 架构师 • FDE"
       ]
     },
     {
-      "id": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "id": "experience-趣申请-ai-agent-效率工程师",
       "anchorId": "experience",
-      "heading": "经历｜趣申请 - AI Agent && 效率工程师",
-      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
-      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "heading": "经历｜趣申请 - AI Agent • 效率工程师",
+      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent • 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent • 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "entityId": "experience-趣申请-ai-agent-效率工程师",
       "organization": "趣申请",
-      "role": "AI Agent && 效率工程师",
+      "role": "AI Agent • 效率工程师",
       "period": "2026.02 ~ 2026.07",
       "keywords": [
         "趣申请",
-        "AI Agent && 效率工程师",
-        "AI Agent",
-        "效率工程师",
+        "AI Agent • 效率工程师",
         "同时负责深度参与项目架构设计和实施",
         "并独立负责多个项目的开发和设计。"
       ]
     },
     {
-      "id": "experience-locammend-智能顾问-技术负责人",
+      "id": "experience-freelancer-架构师-ai-agent-工程师",
       "anchorId": "experience",
-      "heading": "经历｜Locammend 智能顾问 - 技术负责人",
-      "content": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
-      "excerpt": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "heading": "经历｜Freelancer - 架构师 • AI Agent 工程师",
+      "content": "2025.05 ~ 2025.12 Freelancer - 架构师 • AI Agent 工程师 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "excerpt": "2025.05 ~ 2025.12 Freelancer - 架构师 • AI Agent 工程师 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-locammend-智能顾问-技术负责人",
-      "organization": "Locammend 智能顾问",
-      "role": "技术负责人",
+      "entityId": "experience-freelancer-架构师-ai-agent-工程师",
+      "organization": "Freelancer",
+      "role": "架构师 • AI Agent 工程师",
       "period": "2025.05 ~ 2025.12",
       "keywords": [
-        "Locammend 智能顾问",
-        "技术负责人",
+        "Freelancer",
+        "架构师 • AI Agent 工程师",
         "AI辅助效能提升和AI应用开发。作为技术负责人",
         "在Locammend负责系统架构设计和落地",
         "SDD开发框架提升AI辅助研发的质量",
@@ -910,85 +890,41 @@
       ]
     },
     {
-      "id": "experience-保时捷super-app-tech-leader-and-架构师",
+      "id": "experience-thoughtworks-架构师-敏捷教练-研发顾问-tech-lead",
       "anchorId": "experience",
-      "heading": "经历｜保时捷Super App - Tech Leader & 架构师",
-      "content": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
-      "excerpt": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
+      "heading": "经历｜Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
+      "content": "2015.03 ~ 2025.04 Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead 担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员 经历了多个金融、物流、IT、汽车等领域的敏捷交付项目，在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "excerpt": "2015.03 ~ 2025.04 Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead 担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训...",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-保时捷super-app-tech-leader-and-架构师",
-      "organization": "保时捷Super App",
-      "role": "Tech Leader & 架构师",
-      "period": "2023.02 ~ 2025.02",
-      "keywords": [
-        "保时捷Super App",
-        "Tech Leader & 架构师",
-        "Tech Leader",
-        "架构师",
-        "研发效能提升",
-        "支撑10多个垂直业务团队顺畅完成业务目标。"
-      ]
-    },
-    {
-      "id": "experience-thoughtworks-技术教练-and-咨询顾问",
-      "anchorId": "experience",
-      "heading": "经历｜Thoughtworks - 技术教练 & 咨询顾问",
-      "content": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
-      "excerpt": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
-      "sectionType": "experience",
-      "entityType": "experience",
-      "entityId": "experience-thoughtworks-技术教练-and-咨询顾问",
+      "entityId": "experience-thoughtworks-架构师-敏捷教练-研发顾问-tech-lead",
       "organization": "Thoughtworks",
-      "role": "技术教练 & 咨询顾问",
-      "period": "2019.06 ~ 2023.01",
+      "role": "架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
+      "period": "2015.03 ~ 2025.04",
       "keywords": [
         "Thoughtworks",
-        "技术教练 & 咨询顾问",
-        "技术教练",
-        "咨询顾问",
+        "架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
+        "担任架构方案设计和落地",
+        "研发效能提升",
+        "支撑10多个垂直业务团队顺畅完成业务目标。",
         "客户研发效能提升",
         "显著缩短交付前置时间以及降低需求返工率",
-        "设计6+个技术学习项目",
-        "交付60+场技术训练营"
+        "设计6+个技术学习项目"
       ]
     },
     {
-      "id": "experience-thoughtworks-服务端开发",
+      "id": "experience-早起懵懂生涯",
       "anchorId": "experience",
-      "heading": "经历｜Thoughtworks - 服务端开发",
-      "content": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
-      "excerpt": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "heading": "经历｜早起懵懂生涯",
+      "content": "2013.06 ~ 2015.02 早起懵懂生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
+      "excerpt": "2013.06 ~ 2015.02 早起懵懂生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-thoughtworks-服务端开发",
-      "organization": "Thoughtworks",
-      "role": "服务端开发",
-      "period": "2015.03 ~ 2019.05",
-      "keywords": [
-        "Thoughtworks",
-        "服务端开发",
-        "经历了多个交付项目",
-        "项目涉及金融",
-        "物流",
-        "IT",
-        "汽车等领域。项目均采用敏捷交付方式",
-        "前后作为核心开发人员"
-      ]
-    },
-    {
-      "id": "experience-早期职业生涯",
-      "anchorId": "experience",
-      "heading": "经历｜早期职业生涯",
-      "content": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
-      "excerpt": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
-      "sectionType": "experience",
-      "entityType": "experience",
-      "entityId": "experience-早期职业生涯",
-      "organization": "早期职业生涯",
+      "entityId": "experience-早起懵懂生涯",
+      "organization": "早起懵懂生涯",
       "period": "2013.06 ~ 2015.02",
       "keywords": [
-        "早期职业生涯",
+        "早起懵懂生涯",
         "2014.10 ~ 2015.02",
         "软件开发工作室(自由创业",
         "2013.06 ~ 2014.09",
@@ -1370,8 +1306,8 @@
       "id": "hero",
       "anchorId": "hero",
       "heading": "个人简介",
-      "content": "袁慎建 AI 架构师，AI 研发效能顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
-      "excerpt": "袁慎建 AI 架构师，AI 研发效能顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192..."
+      "content": "袁慎建 AI 架构师，AI 研发顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：18192235667 邮箱：yuanshenjian@foxmail.com",
+      "excerpt": "袁慎建 AI 架构师，AI 研发顾问，敏捷教练 在 Thoughtworks 深耕 10多年，经历多个交付、咨询和技术人员培养项目 擅长将 AI Agent 工作流与敏捷工程实践融入到研发场景中，提升团队研发效率 具备扎实的架构设计与领域建模功底，有良好的业务 Sense 、产品思维、代码洁癖 联系电话：1819223..."
     },
     {
       "id": "skill-敏捷开发",
@@ -1472,53 +1408,39 @@
       "excerpt": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/"
     },
     {
-      "id": "experience-凯捷中国-ai-架构师-and-and-fde",
+      "id": "experience-凯捷中国-ai-架构师-fde",
       "anchorId": "experience",
-      "heading": "经历｜凯捷中国 - AI 架构师 && FDE",
-      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
-      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计"
+      "heading": "经历｜凯捷中国 - AI 架构师 • FDE",
+      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 • FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 • FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计"
     },
     {
-      "id": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "id": "experience-趣申请-ai-agent-效率工程师",
       "anchorId": "experience",
-      "heading": "经历｜趣申请 - AI Agent && 效率工程师",
-      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
-      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。"
+      "heading": "经历｜趣申请 - AI Agent • 效率工程师",
+      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent • 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent • 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。"
     },
     {
-      "id": "experience-locammend-智能顾问-技术负责人",
+      "id": "experience-freelancer-架构师-ai-agent-工程师",
       "anchorId": "experience",
-      "heading": "经历｜Locammend 智能顾问 - 技术负责人",
-      "content": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
-      "excerpt": "2025.05 ~ 2025.12 Locammend 智能顾问 - 技术负责人 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。"
+      "heading": "经历｜Freelancer - 架构师 • AI Agent 工程师",
+      "content": "2025.05 ~ 2025.12 Freelancer - 架构师 • AI Agent 工程师 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
+      "excerpt": "2025.05 ~ 2025.12 Freelancer - 架构师 • AI Agent 工程师 聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。"
     },
     {
-      "id": "experience-保时捷super-app-tech-leader-and-架构师",
+      "id": "experience-thoughtworks-架构师-敏捷教练-研发顾问-tech-lead",
       "anchorId": "experience",
-      "heading": "经历｜保时捷Super App - Tech Leader & 架构师",
-      "content": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
-      "excerpt": "2023.02 ~ 2025.02 保时捷Super App - Tech Leader & 架构师 在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。"
+      "heading": "经历｜Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
+      "content": "2015.03 ~ 2025.04 Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead 担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员 经历了多个金融、物流、IT、汽车等领域的敏捷交付项目，在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
+      "excerpt": "2015.03 ~ 2025.04 Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead 担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训..."
     },
     {
-      "id": "experience-thoughtworks-技术教练-and-咨询顾问",
+      "id": "experience-早起懵懂生涯",
       "anchorId": "experience",
-      "heading": "经历｜Thoughtworks - 技术教练 & 咨询顾问",
-      "content": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
-      "excerpt": "2019.06 ~ 2023.01 Thoughtworks - 技术教练 & 咨询顾问 推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率 主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员"
-    },
-    {
-      "id": "experience-thoughtworks-服务端开发",
-      "anchorId": "experience",
-      "heading": "经历｜Thoughtworks - 服务端开发",
-      "content": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
-      "excerpt": "2015.03 ~ 2019.05 Thoughtworks - 服务端开发 经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。"
-    },
-    {
-      "id": "experience-早期职业生涯",
-      "anchorId": "experience",
-      "heading": "经历｜早期职业生涯",
-      "content": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
-      "excerpt": "2013.06 ~ 2015.02 早期职业生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司"
+      "heading": "经历｜早起懵懂生涯",
+      "content": "2013.06 ~ 2015.02 早起懵懂生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司",
+      "excerpt": "2013.06 ~ 2015.02 早起懵懂生涯 2014.10 ~ 2015.02：软件开发工作室（自由创业） 2013.06 ~ 2014.09：西安美林数据股份有限公司"
     },
     {
       "id": "project-创业项目",

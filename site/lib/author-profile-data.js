@@ -3,7 +3,7 @@ const authorProfileData = {
     id: "hero",
     heading: "个人简介",
     name: "袁慎建",
-    roles: ["AI 架构师", "AI 研发效能顾问", "敏捷教练"],
+    roles: ["AI 架构师", "AI 研发顾问", "敏捷教练"],
     phone: "18192235667",
     email: "yuanshenjian@foxmail.com",
     summary: [
@@ -98,45 +98,35 @@ const authorProfileData = {
     items: [
       {
         period: "2026.08 ~ 至今",
-        title: "凯捷中国 - AI 架构师 && FDE",
+        title: "凯捷中国 - AI 架构师 • FDE",
         description:
           "聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
       },
       {
         period: "2026.02 ~ 2026.07",
-        title: "趣申请 - AI Agent && 效率工程师",
+        title: "趣申请 - AI Agent • 效率工程师",
         description:
           "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
       },
       {
         period: "2025.05 ~ 2025.12",
-        title: "Locammend 智能顾问 - 技术负责人",
+        title: "Freelancer - 架构师 • AI Agent 工程师",
         description:
           "聚焦在AI辅助效能提升和AI应用开发。作为技术负责人，在Locammend负责系统架构设计和落地，引入SDD开发框架提升AI辅助研发的质量，采用AWS云原生架构进行部署。",
       },
       {
-        period: "2023.02 ~ 2025.02",
-        title: "保时捷Super App - Tech Leader & 架构师",
-        description:
-          "在保时捷Super App项目上做架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
-      },
-      {
-        period: "2019.06 ~ 2023.01",
-        title: "Thoughtworks - 技术教练 & 咨询顾问",
+        period: "2015.03 ~ 2025.04",
+        title: "Thoughtworks - 架构师 • 敏捷教练 • 研发顾问 • Tech Lead",
         list: [
+          "担任架构方案设计和落地，推动研发效能提升，支撑10多个垂直业务团队顺畅完成业务目标。",
           "推动客户研发效能提升，显著缩短交付前置时间以及降低需求返工率",
           "主导设计6+个技术学习项目，交付60+场技术训练营，涵盖了500+中、高级技术人员",
+          "经历了多个金融、物流、IT、汽车等领域的敏捷交付项目，在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。"
         ],
       },
       {
-        period: "2015.03 ~ 2019.05",
-        title: "Thoughtworks - 服务端开发",
-        description:
-          "经历了多个交付项目，项目涉及金融、物流、IT、汽车等领域。项目均采用敏捷交付方式，前后作为核心开发人员、Tech Lead在项目中推动和践行敏捷工程实践落地和改进，带领团队做架构设计，遗留系统重构、测试优化、持续部署流水线优化等工作。",
-      },
-      {
         period: "2013.06 ~ 2015.02",
-        title: "早期职业生涯",
+        title: "早起懵懂生涯",
         list: [
           "2014.10 ~ 2015.02：软件开发工作室（自由创业）",
           "2013.06 ~ 2014.09：西安美林数据股份有限公司",

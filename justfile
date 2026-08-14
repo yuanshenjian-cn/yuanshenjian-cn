@@ -127,6 +127,9 @@ build-site-ai-data: _check_node
 build-site-investment-data: _check_node
     @npm --prefix {{SITE_DIR}} run build:investment-data
 
+# 提交前同步 site 需纳入版本控制的公开数据产物。
+sync-site-public-data: build-site-ai-data build-site-investment-data
+
 # 执行 site 静态资源优化。
 optimize-site-assets: _check_node
     @npm --prefix {{SITE_DIR}} run optimize-images
