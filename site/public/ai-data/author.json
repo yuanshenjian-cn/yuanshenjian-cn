@@ -113,13 +113,22 @@
     },
     "experiences": [
       {
-        "id": "experience-创业项目-ai-应用-and-效率工程师",
-        "title": "创业项目 - AI 应用 & 效率工程师",
-        "period": "2026.02 ~ 至今",
+        "id": "experience-凯捷中国-ai-架构师-and-and-fde",
+        "title": "凯捷中国 - AI 架构师 && FDE",
+        "period": "2026.08 ~ 至今",
+        "description": "聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+        "list": [],
+        "organization": "凯捷中国",
+        "role": "AI 架构师 && FDE"
+      },
+      {
+        "id": "experience-趣申请-ai-agent-and-and-效率工程师",
+        "title": "趣申请 - AI Agent && 效率工程师",
+        "period": "2026.02 ~ 2026.07",
         "description": "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
         "list": [],
-        "organization": "创业项目",
-        "role": "AI 应用 & 效率工程师"
+        "organization": "趣申请",
+        "role": "AI Agent && 效率工程师"
       },
       {
         "id": "experience-locammend-智能顾问-技术负责人",
@@ -840,21 +849,40 @@
       ]
     },
     {
-      "id": "experience-创业项目-ai-应用-and-效率工程师",
+      "id": "experience-凯捷中国-ai-架构师-and-and-fde",
       "anchorId": "experience",
-      "heading": "经历｜创业项目 - AI 应用 & 效率工程师",
-      "content": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
-      "excerpt": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "heading": "经历｜凯捷中国 - AI 架构师 && FDE",
+      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
       "sectionType": "experience",
       "entityType": "experience",
-      "entityId": "experience-创业项目-ai-应用-and-效率工程师",
-      "organization": "创业项目",
-      "role": "AI 应用 & 效率工程师",
-      "period": "2026.02 ~ 至今",
+      "entityId": "experience-凯捷中国-ai-架构师-and-and-fde",
+      "organization": "凯捷中国",
+      "role": "AI 架构师 && FDE",
+      "period": "2026.08 ~ 至今",
       "keywords": [
-        "创业项目",
-        "AI 应用 & 效率工程师",
-        "AI 应用",
+        "凯捷中国",
+        "AI 架构师 && FDE",
+        "AI 架构师",
+        "FDE"
+      ]
+    },
+    {
+      "id": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "anchorId": "experience",
+      "heading": "经历｜趣申请 - AI Agent && 效率工程师",
+      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "sectionType": "experience",
+      "entityType": "experience",
+      "entityId": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "organization": "趣申请",
+      "role": "AI Agent && 效率工程师",
+      "period": "2026.02 ~ 2026.07",
+      "keywords": [
+        "趣申请",
+        "AI Agent && 效率工程师",
+        "AI Agent",
         "效率工程师",
         "同时负责深度参与项目架构设计和实施",
         "并独立负责多个项目的开发和设计。"
@@ -1444,11 +1472,18 @@
       "excerpt": "长安大学（统招本科 211） 软件工程（转） 2009.09 ~ 2013.07 学校官网：https://www.chd.edu.cn/"
     },
     {
-      "id": "experience-创业项目-ai-应用-and-效率工程师",
+      "id": "experience-凯捷中国-ai-架构师-and-and-fde",
       "anchorId": "experience",
-      "heading": "经历｜创业项目 - AI 应用 & 效率工程师",
-      "content": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
-      "excerpt": "2026.02 ~ 至今 创业项目 - AI 应用 & 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。"
+      "heading": "经历｜凯捷中国 - AI 架构师 && FDE",
+      "content": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      "excerpt": "2026.08 ~ 至今 凯捷中国 - AI 架构师 && FDE 聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计"
+    },
+    {
+      "id": "experience-趣申请-ai-agent-and-and-效率工程师",
+      "anchorId": "experience",
+      "heading": "经历｜趣申请 - AI Agent && 效率工程师",
+      "content": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
+      "excerpt": "2026.02 ~ 2026.07 趣申请 - AI Agent && 效率工程师 聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。"
     },
     {
       "id": "experience-locammend-智能顾问-技术负责人",

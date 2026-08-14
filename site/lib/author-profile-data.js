@@ -97,8 +97,14 @@ const authorProfileData = {
     heading: "经历概览",
     items: [
       {
-        period: "2026.02 ~ 至今",
-        title: "创业项目 - AI 应用 & 效率工程师",
+        period: "2026.08 ~ 至今",
+        title: "凯捷中国 - AI 架构师 && FDE",
+        description:
+          "聚焦 AI 研发提效赋能 以及 Agentic Agile Delivery Platform 架构设计",
+      },
+      {
+        period: "2026.02 ~ 2026.07",
+        title: "趣申请 - AI Agent && 效率工程师",
         description:
           "聚焦 AI 研发提效和 Agent 应用开发。通过设计和开发AI 工作流来提升团队的研发和Bug修复的效率，同时负责深度参与项目架构设计和实施，并独立负责多个项目的开发和设计。",
       },
