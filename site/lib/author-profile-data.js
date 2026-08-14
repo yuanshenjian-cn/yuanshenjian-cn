@@ -3,7 +3,7 @@ const authorProfileData = {
     id: "hero",
     heading: "个人简介",
     name: "袁慎建",
-    roles: ["AI 工程师", "研发效能专家", "敏捷开发教练"],
+    roles: ["AI 架构师", "AI 研发效能顾问", "敏捷教练"],
     phone: "18192235667",
     email: "yuanshenjian@foxmail.com",
     summary: [
