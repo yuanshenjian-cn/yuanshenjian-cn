@@ -1,6 +1,16 @@
 {
-  "generated": "2026-08-14T00:00:00.000Z",
+  "generated": "2026-08-15T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-15",
+      "title": "AI 简报 · 2026-08-15",
+      "excerpt": "Google 推出 Sheets canvas 绘图画布并计划允许移除 Gemini 可见水印；苹果携手阿里巴巴为中国市场训练定制大模型；IBM 与 OpenAI 达成企业级战略合作推广 GPT-5.6；Databricks 完成 50 亿美元融资。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-15"
+    },
     {
       "slug": "2026-08-14",
       "title": "AI 简报 · 2026-08-14",
@@ -1447,6 +1457,16 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-15",
+      "title": "AI 简报 · 2026-08-15",
+      "excerpt": "Google 推出 Sheets canvas 绘图画布并计划允许移除 Gemini 可见水印；苹果携手阿里巴巴为中国市场训练定制大模型；IBM 与 OpenAI 达成企业级战略合作推广 GPT-5.6；Databricks 完成 50 亿美元融资。",
+      "tags": [
+        "AI 简报"
+      ],
+      "date": "2026-08-15T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-15"
+    },
     {
       "slug": "2026-08-14",
       "title": "AI 简报 · 2026-08-14",
