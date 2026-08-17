@@ -1,6 +1,19 @@
 {
-  "generated": "2026-08-15T00:00:00.000Z",
+  "generated": "2026-08-17T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-17",
+      "title": "AI 简报 · 2026-08-17",
+      "excerpt": "过去几天中，Stripe 据报将以超 70 亿美元收购 AI 模型网关 OpenRouter，约为其五月估值五倍；DeepSeek V4 API 峰谷定价于 8 月 17 日生效，V4 Pro 高峰时段缓存未命中输入涨至 9 元/百万 token。",
+      "tags": [
+        "AI",
+        "Stripe",
+        "OpenRouter",
+        "DeepSeek"
+      ],
+      "date": "2026-08-17T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-17"
+    },
     {
       "slug": "2026-08-15",
       "title": "AI 简报 · 2026-08-15",
@@ -1457,6 +1470,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-17",
+      "title": "AI 简报 · 2026-08-17",
+      "excerpt": "过去几天中，Stripe 据报将以超 70 亿美元收购 AI 模型网关 OpenRouter，约为其五月估值五倍；DeepSeek V4 API 峰谷定价于 8 月 17 日生效，V4 Pro 高峰时段缓存未命中输入涨至 9 元/百万 token。",
+      "tags": [
+        "AI",
+        "Stripe",
+        "OpenRouter",
+        "DeepSeek"
+      ],
+      "date": "2026-08-17T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-17"
+    },
     {
       "slug": "2026-08-15",
       "title": "AI 简报 · 2026-08-15",
