@@ -1,6 +1,6 @@
 ---
 title: "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
-date: '2026-08-08'
+date: '2026-08-17'
 tags:
   - AI前沿
   - LLM
@@ -45,7 +45,7 @@ brief: >-
 | GPT-4o | 2024-05-13 | $5.00 / 1M | 官方未公布 | $15.00 / 1M | 真正把原生多模态和实时语音推到主线位置 |
 | GPT-4 Turbo | 2023-11-06 | $10.00 / 1M | 官方未公布 | $30.00 / 1M | 128K context、JSON mode、并行 function calling 的起点 |
 
-<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-08-08。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格：Terra 降 20%（输入 $2.00、输出 $12.00 / 1M），Luna 降 80%（输入 $0.20、输出 $1.20 / 1M），缓存读仍为 90% 输入折扣（Terra $0.20、Luna $0.02）；Sol 价格不变。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-08-17。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格：Terra 降 20%（输入 $2.00、输出 $12.00 / 1M），Luna 降 80%（输入 $0.20、输出 $1.20 / 1M），缓存读仍为 90% 输入折扣（Terra $0.20、Luna $0.02）；Sol 价格不变。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
 
 ## GPT-5.6 系列：从 limited preview 走到正式 GA，主打“每美元性能”
 
@@ -70,6 +70,10 @@ GA 还多出两个 preview 阶段没单列的档位 / 模式：
 ---
 
 **2026 年 7 月 30 日更新（官方调价）：** OpenAI 宣布下调 GPT-5.6 Terra 与 Luna 的 API 价格，官方称 Luna 降价 80%、Terra 降价 20%，Sol 价格不变。调价后官方标准 API 价格（per 1M tokens）：Terra 输入 $2.00 / 缓存命中 $0.20 / 输出 $12.00，Luna 输入 $0.20 / 缓存命中 $0.02 / 输出 $1.20。官方同时表示，Terra / Luna 的用量在 ChatGPT Work 与 Codex 订阅配额中的扣减也更省了。此前的 preview 与 GA 价格（Terra $2.50/$15、Luna $1/$6）为当时口径，保留在上文记录中。
+
+---
+
+**2026 年 8 月 13 日更新（新模式）：** OpenAI 发布 GPT-5.6 Sol 的 [Ultrafast mode](https://openai.com/index/previewing-ultrafast/)，官方称在部分工作负载下可实现最高 14 倍的速度提升。这不是新模型，而是 Sol 的一个推理/服务层模式，与已有的 `max` reasoning effort 和 `ultra` multi-agent 模式并行。它更适合对延迟敏感、可接受略微牺牲单步质量的场景。由于官方未将其作为独立模型定价，API 价格仍沿用 Sol 标准费率，因此不单独列入顶部总表，只作为 GPT-5.6 系列的运行模式补充记录。
 
 ---
 
@@ -250,6 +254,7 @@ GPT-4o 仍然值得保留在历史档案里，但它更像转型节点，而不�
 
 - OpenAI API Pricing: `https://openai.com/api/pricing/`
 - GPT-5.6 (GA): `https://openai.com/index/gpt-5-6/`
+- Previewing Ultrafast mode: GPT-5.6 Sol at up to 14X the speed（2026-08-13）: `https://openai.com/index/previewing-ultrafast/`
 - Advancing the price-performance frontier with GPT-5.6（2026-07-30 调价公告）: `https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/`
 - GPT-5.6 System Card: `https://deploymentsafety.openai.com/gpt-5-6`
 - Previewing GPT-5.6 Sol: `https://openai.com/index/previewing-gpt-5-6-sol/`
