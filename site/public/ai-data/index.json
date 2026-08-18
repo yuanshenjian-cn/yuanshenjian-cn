@@ -1,10 +1,23 @@
 {
-  "generated": "2026-08-08T00:00:00.000Z",
+  "generated": "2026-08-17T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "deepseek-model-family-notes",
+      "title": "DeepSeek：从 V3 到 V4，这家最锋利的地方不只是便宜",
+      "excerpt": "这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "DeepSeek",
+        "模型评测",
+        "开源权重"
+      ],
+      "date": "2026-08-17T00:00:00.000Z"
+    },
     {
       "slug": "google-gemini-model-family-notes",
       "title": "Google Gemini：从长上下文到 agentic era 的主线怎么走",
-      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。首版覆盖 Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
+      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
       "tags": [
         "AI前沿",
         "LLM",
@@ -12,7 +25,33 @@
         "Gemini",
         "模型评测"
       ],
-      "date": "2026-08-08T00:00:00.000Z"
+      "date": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "slug": "kimi-model-family-notes",
+      "title": "Kimi：月之暗面这条线最特别的地方，是 Agent 味越来越重",
+      "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "月之暗面",
+        "Kimi",
+        "模型评测"
+      ],
+      "date": "2026-08-17T00:00:00.000Z"
+    },
+    {
+      "slug": "mimo-model-family-notes",
+      "title": "小米 MiMo：这条线值得关注，不只是因为国产新玩家",
+      "excerpt": "这是一份按代际持续维护的小米 MiMo 模型档案。首版覆盖 MiMo-V2.5-Pro、MiMo-V2.5、MiMo-V2、MiMo-V2-Flash 和 MiMo-7B 系列，重点记录官方发布时间、已公开能力、Agent 长任务特征与官方价格缺口，后续只追加新模型信息。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "小米MiMo",
+        "模型评测",
+        "开源权重"
+      ],
+      "date": "2026-08-17T00:00:00.000Z"
     },
     {
       "slug": "openai-model-family-notes",
@@ -25,7 +64,7 @@
         "GPT",
         "模型评测"
       ],
-      "date": "2026-08-08T00:00:00.000Z"
+      "date": "2026-08-17T00:00:00.000Z"
     },
     {
       "slug": "deepseek-v4-flash-official",
@@ -66,32 +105,6 @@
       "date": "2026-07-25T00:00:00.000Z"
     },
     {
-      "slug": "deepseek-model-family-notes",
-      "title": "DeepSeek：从 V3 到 V4，这家最锋利的地方不只是便宜",
-      "excerpt": "这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "DeepSeek",
-        "模型评测",
-        "开源权重"
-      ],
-      "date": "2026-07-22T00:00:00.000Z"
-    },
-    {
-      "slug": "kimi-model-family-notes",
-      "title": "Kimi：月之暗面这条线最特别的地方，是 Agent 味越来越重",
-      "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "月之暗面",
-        "Kimi",
-        "模型评测"
-      ],
-      "date": "2026-07-22T00:00:00.000Z"
-    },
-    {
       "slug": "gpt-5-6-sol-first-look",
       "title": "GPT-5.6 拆成三个模型卖，OpenAI 想明白了什么",
       "excerpt": "2026 年 7 月 9 日，OpenAI 正式发布 GPT-5.6 系列。与以往不同，这次不是一个模型加几档推理力度，而是拆成 Sol、Terra、Luna 三个独立层级，外加一个多 Agent 并行的 Ultra 模式。Sol 在编码和 Agentic 任务上拿下多项新纪录，同时 token 效率比上一代大幅提升。但 SWE-Bench Pro 上 Anthropic 依然领先 15 个百分点。这篇文章梳理官方数据、定价变化和监管风波，帮你判断三个层级分别适合什么场景。",
@@ -114,19 +127,6 @@
         "智谱AI",
         "GLM",
         "模型评测"
-      ],
-      "date": "2026-06-28T00:00:00.000Z"
-    },
-    {
-      "slug": "mimo-model-family-notes",
-      "title": "小米 MiMo：这条线值得关注，不只是因为国产新玩家",
-      "excerpt": "这是一份按代际持续维护的小米 MiMo 模型档案。首版覆盖 MiMo-V2.5-Pro、MiMo-V2.5、MiMo-V2、MiMo-V2-Flash 和 MiMo-7B 系列，重点记录官方发布时间、已公开能力、Agent 长任务特征与官方价格缺口，后续只追加新模型信息。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "小米MiMo",
-        "模型评测",
-        "开源权重"
       ],
       "date": "2026-06-28T00:00:00.000Z"
     },
