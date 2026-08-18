@@ -1,6 +1,19 @@
 {
-  "generated": "2026-08-17T00:00:00.000Z",
+  "generated": "2026-08-18T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-18",
+      "title": "AI 简报 · 2026-08-18",
+      "excerpt": "OpenAI 加入 PORTS-Pike 项目，锁定俄亥俄州 8GW 级数据中心容量，NVIDIA 同步向项目开发商 SB Energy 投资 15 亿美元；同日 OpenAI 发布安全策略文章《The Defender's Window》。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "数据中心",
+        "NVIDIA"
+      ],
+      "date": "2026-08-18T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-18"
+    },
     {
       "slug": "2026-08-17",
       "title": "AI 简报 · 2026-08-17",
@@ -1470,6 +1483,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-18",
+      "title": "AI 简报 · 2026-08-18",
+      "excerpt": "OpenAI 加入 PORTS-Pike 项目，锁定俄亥俄州 8GW 级数据中心容量，NVIDIA 同步向项目开发商 SB Energy 投资 15 亿美元；同日 OpenAI 发布安全策略文章《The Defender's Window》。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "数据中心",
+        "NVIDIA"
+      ],
+      "date": "2026-08-18T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-18"
+    },
     {
       "slug": "2026-08-17",
       "title": "AI 简报 · 2026-08-17",
