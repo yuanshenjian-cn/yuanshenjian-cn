@@ -1,6 +1,21 @@
 {
-  "generated": "2026-08-18T00:00:00.000Z",
+  "generated": "2026-08-20T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-20",
+      "title": "AI 简报 · 2026-08-20",
+      "excerpt": "OpenAI 预告 Zero Data Retention 兼容的 Private Safety Processing，并推出 ChatGPT for Teens 与欧洲广告扩展；Anthropic 年化营收运行率突破 650 亿美元；Grok 4.6 上线 Amazon Bedrock，Meta AI 发布 Mac 应用，Google 推出开学季学习工具。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "xAI",
+        "Meta",
+        "Google"
+      ],
+      "date": "2026-08-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-20"
+    },
     {
       "slug": "2026-08-18",
       "title": "AI 简报 · 2026-08-18",
@@ -1483,6 +1498,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-20",
+      "title": "AI 简报 · 2026-08-20",
+      "excerpt": "OpenAI 预告 Zero Data Retention 兼容的 Private Safety Processing，并推出 ChatGPT for Teens 与欧洲广告扩展；Anthropic 年化营收运行率突破 650 亿美元；Grok 4.6 上线 Amazon Bedrock，Meta AI 发布 Mac 应用，Google 推出开学季学习工具。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "xAI",
+        "Meta",
+        "Google"
+      ],
+      "date": "2026-08-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-20"
+    },
     {
       "slug": "2026-08-18",
       "title": "AI 简报 · 2026-08-18",
