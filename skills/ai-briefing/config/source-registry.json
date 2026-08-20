@@ -192,6 +192,26 @@
       "enabled": true
     },
     {
+      "id": "openai-chatgpt-plugins-docs",
+      "companyId": "openai",
+      "publisherId": "openai",
+      "name": "OpenAI ChatGPT Plugins Docs",
+      "method": "page",
+      "format": "html",
+      "url": "https://learn.chatgpt.com/docs/plugins?surface=app",
+      "authority": "official",
+      "coverageRole": "primary",
+      "confirmationPolicy": { "default": "standalone", "byCategory": {} },
+      "categories": ["product", "plugin", "desktop", "agent"],
+      "sourceTimezone": "America/Los_Angeles",
+      "allowedRedirectHosts": ["learn.chatgpt.com"],
+      "allowedArticleHosts": ["learn.chatgpt.com"],
+      "allowedUrlPrefixes": [
+        "https://learn.chatgpt.com/docs/plugins"
+      ],
+      "enabled": true
+    },
+    {
       "id": "openai-api-changelog",
       "companyId": "openai",
       "publisherId": "openai",
