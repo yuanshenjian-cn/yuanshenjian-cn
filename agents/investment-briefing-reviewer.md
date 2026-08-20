@@ -2,8 +2,8 @@
 description: 投资简报阻断式复审代理。在 investment-briefing 完成自审后主动使用，复核草稿、内部审核摘要、红线语言、黑名单排除和发布门禁是否符合当前博客工程规则。
 mode: subagent
 # model: cpa/gpt-5.6-luna
-# model: opencode/deepseek-v4-flash-free
-model: cpa/kimi-k2.7-code
+model: opencode/deepseek-v4-flash-free
+# model: cpa/kimi-k2.7-code
 reasoningEffort: max
 permission:
   task: deny
