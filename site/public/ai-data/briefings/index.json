@@ -1,6 +1,19 @@
 {
-  "generated": "2026-08-20T00:00:00.000Z",
+  "generated": "2026-08-21T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-21",
+      "title": "AI 简报 · 2026-08-21",
+      "excerpt": "Mistral 发布面向企业复杂文档的 Agentic Search；OpenAI 在 ChatGPT 桌面端推出 Apple Messages 插件；Google 为 Discover 与 Search 上线自然语言调优和 Preferred Sources；OpenAI API 新增 Prompt Caching 仪表板与 gpt-image-2 透明背景。",
+      "tags": [
+        "AI",
+        "Mistral",
+        "OpenAI",
+        "Google"
+      ],
+      "date": "2026-08-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-21"
+    },
     {
       "slug": "2026-08-20",
       "title": "AI 简报 · 2026-08-20",
@@ -1498,6 +1511,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-21",
+      "title": "AI 简报 · 2026-08-21",
+      "excerpt": "Mistral 发布面向企业复杂文档的 Agentic Search；OpenAI 在 ChatGPT 桌面端推出 Apple Messages 插件；Google 为 Discover 与 Search 上线自然语言调优和 Preferred Sources；OpenAI API 新增 Prompt Caching 仪表板与 gpt-image-2 透明背景。",
+      "tags": [
+        "AI",
+        "Mistral",
+        "OpenAI",
+        "Google"
+      ],
+      "date": "2026-08-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-21"
+    },
     {
       "slug": "2026-08-20",
       "title": "AI 简报 · 2026-08-20",
