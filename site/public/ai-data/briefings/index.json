@@ -1,6 +1,21 @@
 {
-  "generated": "2026-08-23T00:00:00.000Z",
+  "generated": "2026-08-24T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-24",
+      "title": "AI 简报 · 2026-08-24",
+      "excerpt": "Guidelight AI Standards 报告指出前沿实验室 containment 计划公开披露不足；OpenAI 得分最高，Anthropic 与 Meta 最低。",
+      "tags": [
+        "AI",
+        "安全",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "监管"
+      ],
+      "date": "2026-08-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-24"
+    },
     {
       "slug": "2026-08-23",
       "title": "AI 简报 · 2026-08-23",
@@ -1536,6 +1551,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-24",
+      "title": "AI 简报 · 2026-08-24",
+      "excerpt": "Guidelight AI Standards 报告指出前沿实验室 containment 计划公开披露不足；OpenAI 得分最高，Anthropic 与 Meta 最低。",
+      "tags": [
+        "AI",
+        "安全",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "监管"
+      ],
+      "date": "2026-08-24T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-24"
+    },
     {
       "slug": "2026-08-23",
       "title": "AI 简报 · 2026-08-23",
