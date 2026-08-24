@@ -804,6 +804,31 @@
       "allowedArticleHosts": ["www.bigmodel.cn", "bigmodel.cn"],
       "allowedUrlPrefixes": ["https://www.bigmodel.cn/"],
       "enabled": true
+    },
+    {
+      "id": "business-insider-media-page",
+      "companyId": null,
+      "publisherId": "business-insider",
+      "name": "Business Insider",
+      "method": "page",
+      "format": "html",
+      "url": "https://www.businessinsider.com/",
+      "authority": "media",
+      "coverageRole": "discovery",
+      "confirmationPolicy": {
+        "default": "needs-corroboration",
+        "byCategory": {
+          "organization": "standalone",
+          "legal": "standalone",
+          "regulation": "standalone",
+          "exclusive": "standalone"
+        }
+      },
+      "categories": ["*"],
+      "sourceTimezone": "America/New_York",
+      "allowedRedirectHosts": [],
+      "allowedArticleHosts": ["www.businessinsider.com", "businessinsider.com"],
+      "enabled": true
     }
   ]
 }
