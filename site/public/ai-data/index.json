@@ -1,6 +1,19 @@
 {
-  "generated": "2026-08-17T00:00:00.000Z",
+  "generated": "2026-08-26T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "glm-model-family-notes",
+      "title": "智谱 GLM：从 GLM-4.5 到 GLM-5.3，这条线越来越像工程型选手",
+      "excerpt": "这是一份按代际持续维护的智谱 GLM 模型档案。覆盖 GLM-5.3、GLM-5.2、GLM-5.1、GLM-5、GLM-4.7-Flash、GLM-4.7、GLM-4.6 和 GLM-4.5，重点记录官方发布时间、可确认价格、Coding 与 Agent 相关能力，以及后续只追加不删历史的维护规则。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "智谱AI",
+        "GLM",
+        "模型评测"
+      ],
+      "date": "2026-08-26T00:00:00.000Z"
+    },
     {
       "slug": "deepseek-model-family-notes",
       "title": "DeepSeek：从 V3 到 V4，这家最锋利的地方不只是便宜",
@@ -116,19 +129,6 @@
         "模型评测"
       ],
       "date": "2026-07-10T00:00:00.000Z"
-    },
-    {
-      "slug": "glm-model-family-notes",
-      "title": "智谱 GLM：从 GLM-4.5 到 GLM-5.1，这条线越来越像工程型选手",
-      "excerpt": "这是一份按代际持续维护的智谱 GLM 模型档案。首版覆盖 GLM-5.1、GLM-5、GLM-4.7-Flash、GLM-4.7、GLM-4.6 和 GLM-4.5，重点记录官方发布时间、可确认价格、Coding 与 Agent 相关能力，以及后续只追加不删历史的维护规则。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "智谱AI",
-        "GLM",
-        "模型评测"
-      ],
-      "date": "2026-06-28T00:00:00.000Z"
     },
     {
       "slug": "mediterranean-diet-culture",
