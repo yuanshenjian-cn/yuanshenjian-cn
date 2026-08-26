@@ -1,6 +1,22 @@
 {
-  "generated": "2026-08-25T00:00:00.000Z",
+  "generated": "2026-08-26T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-26",
+      "title": "AI 简报 · 2026-08-26",
+      "excerpt": "OpenAI 公布 Jalapeño 自研推理芯片首批基准结果；Anthropic 推出 500 万美元用户福祉研究资助；Stability AI 完成 7600 万美元 B 轮融资；阿拉巴马州检察长就 Hugging Face 黑客事件向 OpenAI 发出传票。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Stability AI",
+        "Google",
+        "硬件",
+        "监管"
+      ],
+      "date": "2026-08-26T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-26"
+    },
     {
       "slug": "2026-08-25",
       "title": "AI 简报 · 2026-08-25",
@@ -1565,6 +1581,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-26",
+      "title": "AI 简报 · 2026-08-26",
+      "excerpt": "OpenAI 公布 Jalapeño 自研推理芯片首批基准结果；Anthropic 推出 500 万美元用户福祉研究资助；Stability AI 完成 7600 万美元 B 轮融资；阿拉巴马州检察长就 Hugging Face 黑客事件向 OpenAI 发出传票。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Stability AI",
+        "Google",
+        "硬件",
+        "监管"
+      ],
+      "date": "2026-08-26T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-26"
+    },
     {
       "slug": "2026-08-25",
       "title": "AI 简报 · 2026-08-25",
