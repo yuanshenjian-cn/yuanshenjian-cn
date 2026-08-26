@@ -3,16 +3,18 @@
   "items": [
     {
       "slug": "2026-08-27",
-      "title": "2026-08-27 AI 简报：OpenAI 复盘 HF 安全事件并扩展课堂 AI；Google 发转写与血糖基础模型",
-      "excerpt": "本期聚焦 4 件官方动态：OpenAI 发布 Hugging Face 安全事件官方复盘并扩大 ChatGPT for Teachers 覆盖；Google 推出 Gemini 3.5 Transcribe 转写模型与 GlucoFM 连续血糖监测基础模型。",
+      "title": "2026-08-27 AI 简报：OpenAI 复盘 HF 安全事件并扩展课堂 AI；Google 发转写与血糖模型；智谱开源 GLM-5.3-Flash",
+      "excerpt": "本期聚焦 5 件官方动态：OpenAI 发布 Hugging Face 安全事件官方复盘并扩大 ChatGPT for Teachers 覆盖；Google 推出 Gemini 3.5 Transcribe 转写模型与 GlucoFM 连续血糖监测基础模型；智谱发布并开源 GLM-5.3-Flash 原生多模态模型。",
       "tags": [
         "AI",
         "OpenAI",
         "Google",
+        "智谱",
         "安全",
         "教育",
         "语音模型",
-        "医疗AI"
+        "医疗AI",
+        "多模态"
       ],
       "date": "2026-08-27T00:00:00.000Z",
       "url": "/ai/briefings/2026-08-27"
@@ -1599,16 +1601,18 @@
   "briefings": [
     {
       "slug": "2026-08-27",
-      "title": "2026-08-27 AI 简报：OpenAI 复盘 HF 安全事件并扩展课堂 AI；Google 发转写与血糖基础模型",
-      "excerpt": "本期聚焦 4 件官方动态：OpenAI 发布 Hugging Face 安全事件官方复盘并扩大 ChatGPT for Teachers 覆盖；Google 推出 Gemini 3.5 Transcribe 转写模型与 GlucoFM 连续血糖监测基础模型。",
+      "title": "2026-08-27 AI 简报：OpenAI 复盘 HF 安全事件并扩展课堂 AI；Google 发转写与血糖模型；智谱开源 GLM-5.3-Flash",
+      "excerpt": "本期聚焦 5 件官方动态：OpenAI 发布 Hugging Face 安全事件官方复盘并扩大 ChatGPT for Teachers 覆盖；Google 推出 Gemini 3.5 Transcribe 转写模型与 GlucoFM 连续血糖监测基础模型；智谱发布并开源 GLM-5.3-Flash 原生多模态模型。",
       "tags": [
         "AI",
         "OpenAI",
         "Google",
+        "智谱",
         "安全",
         "教育",
         "语音模型",
-        "医疗AI"
+        "医疗AI",
+        "多模态"
       ],
       "date": "2026-08-27T00:00:00.000Z",
       "url": "/ai/briefings/2026-08-27"
