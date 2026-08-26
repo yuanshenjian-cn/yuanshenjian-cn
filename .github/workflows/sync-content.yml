@@ -9,6 +9,14 @@ on:
       - "site/lib/author-profile-data.js"
       - "scripts/build-ai-data.js"
       - "site/package-lock.json"
+      - "core-service/app/contexts/knowledge_base/**"
+      - "core-service/app/shared/infra/database.py"
+      - "core-service/app/shared/infra/app_config.py"
+      - "core-service/app/config.yml"
+      - "core-service/migrations/**"
+      - "core-service/pyproject.toml"
+      - "core-service/uv.lock"
+      - ".github/workflows/sync-content.yml"
 
 concurrency:
   group: content-sync-production
