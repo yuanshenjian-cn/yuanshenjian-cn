@@ -786,10 +786,45 @@
       "allowedArticleHosts": ["www.bjnews.com.cn", "bjnews.com.cn"],
       "allowedUrlPrefixes": ["https://www.bjnews.com.cn/"],
       "enabled": true
+  },
+  {
+    "id": "zai-blog",
+    "companyId": "zhipu",
+    "publisherId": "zai",
+    "name": "Z.ai Blog (GLM Official)",
+    "method": "page",
+    "format": "html",
+    "url": "https://z.ai/blog/glm-5.3-flash",
+    "authority": "official",
+    "coverageRole": "primary",
+    "confirmationPolicy": {
+      "default": "standalone",
+      "byCategory": {}
     },
-    {
-      "id": "zhipu-glm-coding-page",
-      "companyId": "zhipu",
+    "categories": [
+      "model",
+      "api",
+      "agent",
+      "product",
+      "pricing",
+      "availability",
+      "company"
+    ],
+    "sourceTimezone": "Asia/Shanghai",
+    "allowedRedirectHosts": [
+      "z.ai"
+    ],
+    "allowedArticleHosts": [
+      "z.ai"
+    ],
+    "allowedUrlPrefixes": [
+      "https://z.ai/blog"
+    ],
+    "enabled": true
+  },
+  {
+    "id": "zhipu-glm-coding-page",
+    "companyId": "zhipu",
       "publisherId": "zhipu-ai",
       "name": "Zhipu GLM Coding Plan",
       "method": "page",
