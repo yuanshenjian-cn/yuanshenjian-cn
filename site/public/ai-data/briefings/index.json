@@ -1,6 +1,22 @@
 {
-  "generated": "2026-08-28T00:00:00.000Z",
+  "generated": "2026-08-31T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-08-31",
+      "title": "2026-08-31 AI 简报：OpenAI 终止 Cursor 合同并扩展泰国布局；Anthropic 遭版权诉讼且赢得五角大楼诉讼；Meta 高管跳槽 OpenAI",
+      "excerpt": "本期聚焦 5 件动态：OpenAI 宣布终止与 Cursor 的合同并扩展泰国 AI 初创支持；Anthropic 遭索尼音乐和华纳版权诉讼，同时在五角大楼供应链风险标签案中首次胜诉；Meta 高管跳槽至 OpenAI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "版权诉讼",
+        "法律",
+        "公司动态"
+      ],
+      "date": "2026-08-31T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-31"
+    },
     {
       "slug": "2026-08-28",
       "title": "2026-08-28 AI 简报：Anthropic 推模型硬件标准；Google 连发多款模型与能力；Meta 公开 AI 基础设施；OpenAI 扩展巴西布局",
@@ -1616,6 +1632,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-08-31",
+      "title": "2026-08-31 AI 简报：OpenAI 终止 Cursor 合同并扩展泰国布局；Anthropic 遭版权诉讼且赢得五角大楼诉讼；Meta 高管跳槽 OpenAI",
+      "excerpt": "本期聚焦 5 件动态：OpenAI 宣布终止与 Cursor 的合同并扩展泰国 AI 初创支持；Anthropic 遭索尼音乐和华纳版权诉讼，同时在五角大楼供应链风险标签案中首次胜诉；Meta 高管跳槽至 OpenAI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "版权诉讼",
+        "法律",
+        "公司动态"
+      ],
+      "date": "2026-08-31T00:00:00.000Z",
+      "url": "/ai/briefings/2026-08-31"
+    },
     {
       "slug": "2026-08-28",
       "title": "2026-08-28 AI 简报：Anthropic 推模型硬件标准；Google 连发多款模型与能力；Meta 公开 AI 基础设施；OpenAI 扩展巴西布局",
