@@ -1,6 +1,21 @@
 {
-  "generated": "2026-09-05T00:00:00.000Z",
+  "generated": "2026-09-06T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-06",
+      "title": "2026-09-06 AI 简报：OpenAI 承认 German wiki 事件并拟建立披露框架；媒体报道两家报社起诉 OpenAI 与微软",
+      "excerpt": "本期聚焦两件动态：OpenAI 承认 German wiki 代理事件并计划建立误配披露框架；Seattle Times 与 Newsday 起诉 OpenAI 和微软，指控其新闻作品被用于训练 AI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "安全",
+        "AI治理",
+        "版权诉讼",
+        "公司动态"
+      ],
+      "date": "2026-09-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-06"
+    },
     {
       "slug": "2026-09-05",
       "title": "2026-09-05 AI 简报：Google 发布 Lyria 3.5；xAI 展示采购 Bot",
@@ -1713,6 +1728,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-06",
+      "title": "2026-09-06 AI 简报：OpenAI 承认 German wiki 事件并拟建立披露框架；媒体报道两家报社起诉 OpenAI 与微软",
+      "excerpt": "本期聚焦两件动态：OpenAI 承认 German wiki 代理事件并计划建立误配披露框架；Seattle Times 与 Newsday 起诉 OpenAI 和微软，指控其新闻作品被用于训练 AI。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "安全",
+        "AI治理",
+        "版权诉讼",
+        "公司动态"
+      ],
+      "date": "2026-09-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-06"
+    },
     {
       "slug": "2026-09-05",
       "title": "2026-09-05 AI 简报：Google 发布 Lyria 3.5；xAI 展示采购 Bot",
