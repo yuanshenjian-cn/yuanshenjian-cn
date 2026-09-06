@@ -1,6 +1,45 @@
 {
-  "generated": "2026-08-26T00:00:00.000Z",
+  "generated": "2026-09-06T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "anthropic-model-family-notes",
+      "title": "Anthropic：Claude 为什么越来越像长跑型 Agent",
+      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5、Sonnet 5、Fable 5.1 / Mythos 5.1 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "Anthropic",
+        "Claude",
+        "模型评测"
+      ],
+      "date": "2026-09-06T00:00:00.000Z"
+    },
+    {
+      "slug": "google-gemini-model-family-notes",
+      "title": "Google Gemini：从长上下文到 agentic era 的主线怎么走",
+      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.8 Flash、Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "Google",
+        "Gemini",
+        "模型评测"
+      ],
+      "date": "2026-09-06T00:00:00.000Z"
+    },
+    {
+      "slug": "openai-model-family-notes",
+      "title": "OpenAI：从 GPT-4 Turbo 到 GPT-6 Astra 的主线演进",
+      "excerpt": "这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-6 Astra 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "OpenAI",
+        "GPT",
+        "模型评测"
+      ],
+      "date": "2026-09-06T00:00:00.000Z"
+    },
     {
       "slug": "glm-model-family-notes",
       "title": "智谱 GLM：从 GLM-4.5 到 GLM-5.3，这条线越来越像工程型选手",
@@ -24,19 +63,6 @@
         "DeepSeek",
         "模型评测",
         "开源权重"
-      ],
-      "date": "2026-08-17T00:00:00.000Z"
-    },
-    {
-      "slug": "google-gemini-model-family-notes",
-      "title": "Google Gemini：从长上下文到 agentic era 的主线怎么走",
-      "excerpt": "这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "Google",
-        "Gemini",
-        "模型评测"
       ],
       "date": "2026-08-17T00:00:00.000Z"
     },
@@ -67,19 +93,6 @@
       "date": "2026-08-17T00:00:00.000Z"
     },
     {
-      "slug": "openai-model-family-notes",
-      "title": "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进",
-      "excerpt": "这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-5.6 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "OpenAI",
-        "GPT",
-        "模型评测"
-      ],
-      "date": "2026-08-17T00:00:00.000Z"
-    },
-    {
       "slug": "deepseek-v4-flash-official",
       "title": "DeepSeek V4-Flash 正式版：架构没动，Agent 能力翻倍",
       "excerpt": "2026 年 7 月 31 日，DeepSeek 在 API 更新日志发布 V4-Flash 正式版（0731）公测。模型结构、尺寸与预览版完全一致， 只重新做了后训练，九项 Agent 与代码基准却全线大涨，其中 Terminal Bench 2.1 从 61.8 涨到 82.7，直接反超自家 V4-Pro 预览版。价格没变，模型名没变，接口还首次原生支持 Responses API 并适配 Codex。但 V4-Pro 正式版仍未发布， 网页与 App 端也未更新。本文拆解这份更新意味着什么、边界在哪里。",
@@ -101,19 +114,6 @@
         "大模型",
         "Anthropic",
         "Claude"
-      ],
-      "date": "2026-07-25T00:00:00.000Z"
-    },
-    {
-      "slug": "anthropic-model-family-notes",
-      "title": "Anthropic：Claude 为什么越来越像长跑型 Agent",
-      "excerpt": "这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5、Sonnet 5、Fable 5 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "Anthropic",
-        "Claude",
-        "模型评测"
       ],
       "date": "2026-07-25T00:00:00.000Z"
     },
