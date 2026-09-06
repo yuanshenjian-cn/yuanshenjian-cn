@@ -1,6 +1,24 @@
 {
-  "generated": "2026-09-01T00:00:00.000Z",
+  "generated": "2026-09-02T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-02",
+      "title": "2026-09-02 AI 简报：Anthropic 发布 Fable 5.1；Google 推进 Gemini 与网络防御",
+      "excerpt": "本期聚焦 7 件动态：Anthropic 发布 Claude Fable 5.1 与 Mythos 5.1；xAI 更新 Grok 4.6 生物安全评测；Google 连续推出 Agentic video understanding、Gemini 3.8 Flash、Fairwind 和 Google Pics；OpenAI API 新增限流与过载错误分类。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI",
+        "Google",
+        "OpenAI",
+        "模型",
+        "Agent",
+        "网络安全",
+        "API"
+      ],
+      "date": "2026-09-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-02"
+    },
     {
       "slug": "2026-09-01",
       "title": "2026-09-01 AI 简报：OpenAI 为 Astra 加强网络安全防护；Anthropic 推出企业安全方案；Google 推 TimesFM-3",
@@ -1649,6 +1667,24 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-02",
+      "title": "2026-09-02 AI 简报：Anthropic 发布 Fable 5.1；Google 推进 Gemini 与网络防御",
+      "excerpt": "本期聚焦 7 件动态：Anthropic 发布 Claude Fable 5.1 与 Mythos 5.1；xAI 更新 Grok 4.6 生物安全评测；Google 连续推出 Agentic video understanding、Gemini 3.8 Flash、Fairwind 和 Google Pics；OpenAI API 新增限流与过载错误分类。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "xAI",
+        "Google",
+        "OpenAI",
+        "模型",
+        "Agent",
+        "网络安全",
+        "API"
+      ],
+      "date": "2026-09-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-02"
+    },
     {
       "slug": "2026-09-01",
       "title": "2026-09-01 AI 简报：OpenAI 为 Astra 加强网络安全防护；Anthropic 推出企业安全方案；Google 推 TimesFM-3",
