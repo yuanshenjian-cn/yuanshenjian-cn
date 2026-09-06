@@ -3,7 +3,7 @@ description: 投资简报阻断式复审代理。在 investment-briefing 完成�
 mode: subagent
 # model: cpa/gpt-5.6-luna
 # model: opencode/deepseek-v4-flash-free
-model: cpa/kimi-k2.7-code
+# model: cpa/kimi-k2.7-code
 reasoningEffort: max
 permission:
   task: deny
