@@ -1,6 +1,6 @@
 ---
 title: "Google Gemini：从长上下文到 agentic era 的主线怎么走"
-date: '2026-08-17'
+date: '2026-09-06'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。
+  这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.8 Flash、Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。
 ---
 
 > Google 这条线最容易让人记住的两个词，一个是长上下文，一个是原生多模态。但如果你把最近几代串起来看，会发现它真正的主线是：先把“能吃下更多信息”做好，再把“能带工具去做事”推出来。
@@ -18,7 +18,7 @@ Gemini 的代际叙事和 OpenAI、Anthropic 都不太一样。
 
 Google 不是每一代都把“编码最强”挂在最前面，它更像是在搭一个越来越完整的 agent 基座：长上下文、原生多模态、搜索、代码执行、浏览器与研究代理。
 
-这篇先覆盖从 Gemini 1.5 Pro 到 Gemini 2.5 Pro 的完整主线代际。
+这篇先覆盖从 Gemini 1.5 Pro 到 Gemini 3.8 Flash 的完整主线代际。
 
 如果后面 Gemini 再出新的主力代，我也会继续往上追加，不删旧代。
 
@@ -36,7 +36,8 @@ Google 不是每一代都把“编码最强”挂在最前面，它更像是在�
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存相关价格 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
-| Gemini 3.7 Flash | 2026-08-13 | Intro $0.75 / 1M（至 2026-12-31）；标准 $1.50 / 1M | 官方未公布 | Intro $3.75 / 1M（至 2026-12-31）；标准 $7.50 / 1M | Flash 系新主力：coding/agent/web dev 全面超越 3.6 Flash，intro 价格反而比 3.6 Flash 便宜一半 |
+| Gemini 3.8 Flash | 2026-09-02 | Intro $0.75 / 1M（至 2026-12-31）；标准 $1.50 / 1M | 官方未公布 | Intro $3.75 / 1M（至 2026-12-31）；标准 $7.50 / 1M | Flash 系最新主力：面向长程 coding、agentic workflow 和专业推理，价格与 3.7 Flash 相同 |
+| Gemini 3.7 Flash | 2026-08-13 | Intro $0.75 / 1M（至 2026-12-31）；标准 $1.50 / 1M | 官方未公布 | Intro $3.75 / 1M（至 2026-12-31）；标准 $7.50 / 1M | Flash 系主力：coding/agent/web dev 全面超越 3.6 Flash，intro 价格反而比 3.6 Flash 便宜一半 |
 | Gemini 3.6 Flash | 2026-07-21 | $1.50 / 1M | Context caching $0.15 / 1M，storage $1.00 / 1M tokens / hour | $7.50 / 1M | Flash 系原最新主力：输出 token 少 17%、输出单价从 $9 降到 $7.50，computer use 变内置工具 |
 | Gemini 3.5 Flash-Lite | 2026-07-21 | $0.30 / 1M | Context caching $0.03 / 1M，storage $1.00 / 1M tokens / hour | $2.50 / 1M | 350 output tokens/s 的 3.5 系最快模型，agentic 流程规模化选择 |
 | Gemini 3.5 Flash | 2026-05-19 | $1.50 / 1M | Context caching $0.15 / 1M，storage $1.00 / 1M tokens / hour | $9.00 / 1M | Gemini 3 系列当前主力，agentic 和 coding 任务上的持续前沿表现 |
@@ -46,7 +47,19 @@ Google 不是每一代都把“编码最强”挂在最前面，它更像是在�
 | Gemini 2.0 Flash | 2024-12-11 | $0.10 / 1M（text/image/video）或 $0.70 / 1M（audio） | Context caching $0.025 / 1M 或 $0.175 / 1M，storage $1.00 / 1M tokens / hour | $0.40 / 1M | 正式把 Gemini 推向 agentic era，原生工具调用和多模态输出上台面 |
 | Gemini 1.5 Pro | 2024-02-15 | 官方未公布 | 官方未公布 | 官方未公布 | 1M context 的分水岭，Google 长上下文路线真正成型 |
 
-<small>*数据来源：Google 官方 Gemini API Changelog、Gemini API Pricing 页面与官方博客，查询日期 2026-08-17。Gemini 3.7 Flash 于 2026-08-13 发布，官方定位为 Flash 系新主力；intro 定价 $0.75/$3.75 per 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格官方博客未直接公布，按“官方未公布”处理。Gemini 3.6 Flash 与 Gemini 3.5 Flash-Lite 于 2026-07-21 同日发布，均为 GA；官方同时宣布 Gemini 3.5 Pro 仍在与合作伙伴测试中。3.5 Flash Cyber 为限定试点模型（仅面向政府与受信合作伙伴），不在公开 API 定价中。Gemini 1.5 Pro 首发阶段官方只说明测试期与后续 pricing tiers，未给稳定模型级单价。Gemini 3.1 Flash-Lite 的 preview 版本发布于 2026-03-03，GA 版本发布于 2026-05-07。*</small>
+<small>*数据来源：Google 官方 Gemini API Changelog、Gemini API Pricing 页面与官方博客，查询日期 2026-09-06。Gemini 3.8 Flash 于 2026-09-02 发布，官方给出的 intro 定价为输入 $0.75、输出 $3.75 / 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格在官方发布页和当前定价页均未直接公布，按“官方未公布”处理。Gemini 3.8 Flash Cyber 是面向 Fairwind Program 受信防御者的限定变体，官方未公布公开 API 单价。Gemini 3.7 Flash 于 2026-08-13 发布，intro 定价 $0.75/$3.75 per 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格官方博客未直接公布，按“官方未公布”处理。Gemini 3.6 Flash 与 Gemini 3.5 Flash-Lite 于 2026-07-21 同日发布，均为 GA；官方同时宣布 Gemini 3.5 Pro 仍在与合作伙伴测试中。3.5 Flash Cyber 为限定试点模型（仅面向政府与受信合作伙伴），不在公开 API 定价中。Gemini 1.5 Pro 首发阶段官方只说明测试期与后续 pricing tiers，未给稳定模型级单价。Gemini 3.1 Flash-Lite 的 preview 版本发布于 2026-03-03，GA 版本发布于 2026-05-07。*</small>
+
+## Gemini 3.8 Flash：把 Flash 系推向长程 coding 和自主 Agent
+
+**2026 年 9 月 2 日发布：** Google 推出 Gemini 3.8 Flash 和 Gemini 3.8 Flash Cyber。前者是面向开发者的公开模型，后者共享同一基础智能，但只通过 Fairwind Program 向受信防御者提供更强的网络安全能力。
+
+Gemini 3.8 Flash 的核心变化有三点：
+
+- **长程 coding**：在复杂软件工程任务中执行更长的推理与工具调用循环，官方定位为 Gemini 当前最强的 reasoning 和 coding Flash 模型
+- **专业 Agent 工作**：围绕金融、法律、科学和其他专业场景增强多步推理与报告能力
+- **成本保持不变**：2026 年 12 月 31 日前，输入 $0.75/1M、输出 $3.75/1M；2027 年 1 月 1 日起恢复输入 $1.50/1M、输出 $7.50/1M
+
+API 模型 ID 是 `gemini-3.8-flash`。Google 官方发布页没有直接给出它的上下文缓存读写价格，当前官方定价页也尚未列出该模型，因此不使用其他模型的缓存价格代填。
 
 ## Gemini 3.7 Flash：把 Flash 系的“工作模型”身份再往前推一代
 
@@ -200,7 +213,7 @@ Google 在这代里做了几件很重要的事：
 
 ## 我对 Google 这条线的实际判断
 
-Google 从 Gemini 1.5 Pro 到 Gemini 3.5 Flash 的完整主线，我会概括成三步：
+Google 从 Gemini 1.5 Pro 到 Gemini 3.8 Flash 的完整主线，我会概括成三步：
 
 - 先把超长上下文做成硬差异
 - 再把多模态和工具链组织成 Agent 能力
@@ -228,6 +241,7 @@ Google 从 Gemini 1.5 Pro 到 Gemini 3.5 Flash 的完整主线，我会概括成
 - Gemini 3.5 Flash-Lite：3.5 系最快的轻量档，agentic 流程规模化选项
 - Gemini 3.6 Flash：输出更省更便宜，computer use 内置于 API
 - Gemini 3.7 Flash：Flash 系新主力，coding / agent / web dev 全面超越 3.6 Flash，intro 价格反而更低
+- Gemini 3.8 Flash：继续强化长程 coding、专业推理和自主 Agent，价格与 3.7 Flash 相同
 
 所以如果你的问题是”Gemini 最适合什么场景”，我会优先想到这些：
 
@@ -235,7 +249,7 @@ Google 从 Gemini 1.5 Pro 到 Gemini 3.5 Flash 的完整主线，我会概括成
 - 需要多模态 + 搜索 + 工具一起配合的任务
 - 想在 Google 生态里搭 Agent 或研究工作流
 - 需要控制推理成本的中等复杂度任务（2.5 Flash / 3.1 Flash-Lite）
-- 想要 Gemini 3 系列里更偏前沿 agentic/coding 表现的场景（3.5 Flash）
+- 想要 Gemini 3 系列里更偏前沿 agentic/coding 表现的场景（3.8 Flash / 3.5 Flash）
 
 如果是极纯粹的终端编码 Agent 竞赛，Gemini 不一定是第一反应。
 
@@ -245,6 +259,7 @@ Google 从 Gemini 1.5 Pro 到 Gemini 3.5 Flash 的完整主线，我会概括成
 
 - Gemini API Pricing: `https://ai.google.dev/gemini-api/docs/pricing`
 - Gemini API Changelog: `https://ai.google.dev/gemini-api/docs/changelog`
+- Introducing Gemini 3.8 Flash and 3.8 Flash Cyber: `https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/`
 - Introducing Gemini 3.7 Flash: `https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-3-7-flash/`
 - Introducing Gemini 3.6 Flash, 3.5 Flash-Lite, and 3.5 Flash Cyber: `https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-6-flash-3-5-flash-lite-3-5-flash-cyber/`
 - Gemini 2.5: Our most intelligent AI model: `https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-model-thinking-updates-march-2025/`

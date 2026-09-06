@@ -1,6 +1,6 @@
 ---
-title: "OpenAI：从 GPT-4 Turbo 到 GPT-5.6 的主线演进"
-date: '2026-08-17'
+title: "OpenAI：从 GPT-4 Turbo 到 GPT-6 Astra 的主线演进"
+date: '2026-09-06'
 tags:
   - AI前沿
   - LLM
@@ -9,14 +9,14 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-5.6 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。
+  这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-6 Astra 的完整主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。
 ---
 
 > 如果你只想快速判断 OpenAI 这一家最近在往哪里卷，先看结论：它的主线已经从“更强聊天模型”转成“更像专业执行者的工作模型”，最新几代几乎都围着编码、工具调用、电脑操作和长上下文在打。
 
 这篇不是快讯，而是一份会持续追加的厂商档案。
 
-第一版先把从 GPT-4 Turbo 到 GPT-5.5 的完整主线代际收拢到一起。后面再有新模型，我只会把新代记录加到顶部，旧记录和旧来源都会保留。
+第一版先把从 GPT-4 Turbo 到 GPT-6 Astra 的完整主线代际收拢到一起。后面再有新模型，我只会把新代记录加到顶部，旧记录和旧来源都会保留。
 
 ## 我给 OpenAI 这条线看 5 个维度
 
@@ -34,7 +34,8 @@ brief: >-
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
-| GPT-5.6 Sol / Terra / Luna | GA 2026-07-09（preview 2026-06-26） | $5.00 / $2.00 / $0.20 per 1M | $0.50 / $0.20 / $0.02 per 1M | $30.00 / $12.00 / $1.20 per 1M | 已转正式 GA，全面刷新编码/知识工作/网安/科学 SOTA；Terra / Luna 于 2026-07-30 官方降价 20% / 80% |
+| GPT-6 Astra | 2026-09-03 | $10.00 / 1M | $1.00 / 1M | $50.00 / 1M | OpenAI 当前最强模型，把推理、编码、电脑操作、研究和专业工作合成一条端到端执行主线 |
+| GPT-5.6 Sol / Terra / Luna | GA 2026-07-09（preview 2026-06-26） | $4.00 / $2.00 / $0.20 per 1M | $0.40 / $0.20 / $0.02 per 1M | $20.00 / $12.00 / $1.20 per 1M | 已转正式 GA，全面刷新编码/知识工作/网安/科学 SOTA；Terra / Luna 于 2026-07-30、Sol 于 2026-08-21 继续降价 |
 | GPT-5.5 | 2026-04-23 | $5.00 / 1M | $0.50 / 1M | $30.00 / 1M | OpenAI 当前最强工作模型，重点在长程执行、编码和知识工作 |
 | GPT-5.4 / 5.4 mini | 2026-03-05 / 2026-03-17 | $2.50 / $0.75 per 1M | $0.25 / $0.075 per 1M | $15.00 / $4.50 per 1M | 1M context + 原生 computer use；mini 为 400K 中端版 |
 | GPT-5.3 Instant | 2026-03-03 | 官方未公布 | 官方未公布 | 官方未公布 | 日常对话和搜索优化，幻觉率显著降低 |
@@ -45,7 +46,22 @@ brief: >-
 | GPT-4o | 2024-05-13 | $5.00 / 1M | 官方未公布 | $15.00 / 1M | 真正把原生多模态和实时语音推到主线位置 |
 | GPT-4 Turbo | 2023-11-06 | $10.00 / 1M | 官方未公布 | $30.00 / 1M | 128K context、JSON mode、并行 function calling 的起点 |
 
-<small>*数据来源：OpenAI 官方发布页与官方 API Pricing，查询日期 2026-08-17。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA，在 ChatGPT、Codex 与 OpenAI API 全面开放；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格：Terra 降 20%（输入 $2.00、输出 $12.00 / 1M），Luna 降 80%（输入 $0.20、输出 $1.20 / 1M），缓存读仍为 90% 输入折扣（Terra $0.20、Luna $0.02）；Sol 价格不变。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+<small>*数据来源：OpenAI 官方发布页、Developer Docs API Pricing 与 API Changelog，查询日期 2026-09-06。GPT-6 Astra 于 2026-09-03 发布，标准短上下文价格为输入 $10、缓存读 $1、输出 $50 / 1M，缓存写为 $12.50 / 1M；超过 272K 输入 token 时，官方价格为输入 $20、缓存读 $2、缓存写 $25、输出 $75 / 1M。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格；2026-08-21 又将 Sol 标准短上下文价格调整为输入 $4、缓存读 $0.40、输出 $20 / 1M，促销价至少持续到 2026-11-21，此前口径保留为历史价格。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+
+## GPT-6 Astra：把推理、电脑操作和长程执行合成一条主线
+
+**2026 年 9 月 3 日发布：** GPT-6 Astra 是 OpenAI 当前最强的端到端工作模型，首日向有限组织开放，随后逐步扩展到 ChatGPT、OpenAI API、Azure 和 AWS Bedrock。
+
+这代最值得记的不是单一 benchmark，而是能力被收拢到同一个执行闭环里：
+
+- **端到端工作**：把复杂推理、软件工程、电脑操作、浏览、研究和文档创建放在同一模型里
+- **长程 Agent**：支持 1.05M context、128K 最大输出，以及跨上下文窗口保留和检索工作记录
+- **电脑与浏览器操作**：可填写表单、操作 CRM、运行软件、检查前端页面，并在任务推进中处理环境反馈
+- **安全与边界**：官方将更强的意图理解、任务边界遵循和 misalignment monitoring 作为正式部署的一部分
+
+API 模型 ID 是 `gpt-6-astra`。标准短上下文价格为输入 $10、缓存读 $1、缓存写 $12.50、输出 $50 / 1M；超过 272K 输入 token 后，官方价格为输入 $20、缓存读 $2、缓存写 $25、输出 $75 / 1M。Batch 和 Flex 为标准价格的 50%，Fast mode 为适用价格的 2 倍。
+
+我的判断：GPT-6 Astra 不是 GPT-5.6 Sol 的简单提分版，而是 OpenAI 把“会想、会写、会操作、会验证”正式合成一个专业执行者之后的主线升级。
 
 ## GPT-5.6 系列：从 limited preview 走到正式 GA，主打“每美元性能”
 
@@ -222,7 +238,7 @@ GPT-4o 是 2024 年 5 月 13 日的发布。
 
 ## 我对 OpenAI 这条演进线的实际判断
 
-OpenAI 从 GPT-4 Turbo 到 GPT-5.5 的完整主线，我会概括成一句话：
+OpenAI 从 GPT-4 Turbo 到 GPT-6 Astra 的完整主线，我会概括成一句话：
 
 从会回答，走向会执行。
 
@@ -238,10 +254,11 @@ OpenAI 从 GPT-4 Turbo 到 GPT-5.5 的完整主线，我会概括成一句话：
 - GPT-5.4 / 5.4 mini：把 Agent 和专业工作模型真正做成主模型；mini 为 400K 中端版
 - GPT-5.5：把长程执行和真实工作进一步拉开差距
 - GPT-5.6 系列：新命名系统（Sol/Terra/Luna）+ 多智能体 ultra + 最强安全栈，已于 2026-07-09 正式 GA
+- GPT-6 Astra：把推理、编码、电脑操作、研究与专业工作收拢为端到端执行模型，2026-09-03 发布
 
 如果你的问题是”现在 OpenAI 这一家里该优先看谁”，我的答案很简单：
 
-- 要最强能力、长任务、复杂攻坚（且能接受 GA 初期更严的安全栈）：看 GPT-5.6 Sol / Sol Pro，需要极限拉满再上 ultra
+- 要最强能力、长任务、复杂攻坚：看 GPT-6 Astra；需要更低成本或更灵活的能力分层，再看 GPT-5.6 Sol / Terra / Luna
 - 预算宽松、任务长、要求高：看 GPT-5.5
 - 要主力生产模型，兼顾价格：看 GPT-5.4（需要 1M 上下文）或 GPT-5.4 mini（400K，便宜约 70%）
 - 中等负载、成本敏感：看 GPT-5.2
@@ -253,6 +270,10 @@ GPT-4o 仍然值得保留在历史档案里，但它更像转型节点，而不�
 ## 官方来源
 
 - OpenAI API Pricing: `https://openai.com/api/pricing/`
+- OpenAI API Pricing（Developer Docs）: `https://developers.openai.com/api/docs/pricing`
+- GPT-6 Astra: `https://openai.com/index/gpt-6-astra/`
+- GPT-6 Astra API model docs: `https://developers.openai.com/api/docs/models/gpt-6-astra`
+- OpenAI API Changelog: `https://developers.openai.com/api/docs/changelog`
 - GPT-5.6 (GA): `https://openai.com/index/gpt-5-6/`
 - Previewing Ultrafast mode: GPT-5.6 Sol at up to 14X the speed（2026-08-13）: `https://openai.com/index/previewing-ultrafast/`
 - Advancing the price-performance frontier with GPT-5.6（2026-07-30 调价公告）: `https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/`
