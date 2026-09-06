@@ -1,6 +1,23 @@
 {
-  "generated": "2026-08-31T00:00:00.000Z",
+  "generated": "2026-09-01T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-01",
+      "title": "2026-09-01 AI 简报：OpenAI 为 Astra 加强网络安全防护；Anthropic 推出企业安全方案；Google 推 TimesFM-3",
+      "excerpt": "本期聚焦 4 件官方动态：OpenAI 公布 Astra 的关键网络安全能力与发布前防护，并为 ChatGPT for Healthcare 接入 EHR 和公共医疗数据；Anthropic 推出 Enterprise Frontier Safeguards；Google Research 发布 TimesFM-3 多变量时间序列基础模型。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "网络安全",
+        "企业安全",
+        "医疗 AI",
+        "时间序列"
+      ],
+      "date": "2026-09-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-01"
+    },
     {
       "slug": "2026-08-31",
       "title": "2026-08-31 AI 简报：OpenAI 终止 Cursor 合同并扩展泰国布局；Anthropic 遭版权诉讼且赢得五角大楼诉讼；Meta 高管跳槽 OpenAI",
@@ -1632,6 +1649,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-01",
+      "title": "2026-09-01 AI 简报：OpenAI 为 Astra 加强网络安全防护；Anthropic 推出企业安全方案；Google 推 TimesFM-3",
+      "excerpt": "本期聚焦 4 件官方动态：OpenAI 公布 Astra 的关键网络安全能力与发布前防护，并为 ChatGPT for Healthcare 接入 EHR 和公共医疗数据；Anthropic 推出 Enterprise Frontier Safeguards；Google Research 发布 TimesFM-3 多变量时间序列基础模型。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "网络安全",
+        "企业安全",
+        "医疗 AI",
+        "时间序列"
+      ],
+      "date": "2026-09-01T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-01"
+    },
     {
       "slug": "2026-08-31",
       "title": "2026-08-31 AI 简报：OpenAI 终止 Cursor 合同并扩展泰国布局；Anthropic 遭版权诉讼且赢得五角大楼诉讼；Meta 高管跳槽 OpenAI",
