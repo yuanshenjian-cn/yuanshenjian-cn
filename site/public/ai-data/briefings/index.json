@@ -1,6 +1,24 @@
 {
-  "generated": "2026-09-02T00:00:00.000Z",
+  "generated": "2026-09-03T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-03",
+      "title": "2026-09-03 AI 简报：OpenAI 发布 GPT-6 Astra；Google 推出 WeatherNext 3",
+      "excerpt": "本期聚焦 5 件动态：OpenAI 发布 GPT-6 Astra 并披露安全边界，为一线防御者承诺 10 亿美元 Daybreak 支持；Google 发布 WeatherNext 3 与 Lyria 3.5；xAI 向企业开放 Grok Bot。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "xAI",
+        "GPT",
+        "Agent",
+        "网络安全",
+        "天气 AI",
+        "音乐生成"
+      ],
+      "date": "2026-09-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-03"
+    },
     {
       "slug": "2026-09-02",
       "title": "2026-09-02 AI 简报：Anthropic 发布 Fable 5.1；Google 推进 Gemini 与网络防御",
@@ -1667,6 +1685,24 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-03",
+      "title": "2026-09-03 AI 简报：OpenAI 发布 GPT-6 Astra；Google 推出 WeatherNext 3",
+      "excerpt": "本期聚焦 5 件动态：OpenAI 发布 GPT-6 Astra 并披露安全边界，为一线防御者承诺 10 亿美元 Daybreak 支持；Google 发布 WeatherNext 3 与 Lyria 3.5；xAI 向企业开放 Grok Bot。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "xAI",
+        "GPT",
+        "Agent",
+        "网络安全",
+        "天气 AI",
+        "音乐生成"
+      ],
+      "date": "2026-09-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-03"
+    },
     {
       "slug": "2026-09-02",
       "title": "2026-09-02 AI 简报：Anthropic 发布 Fable 5.1；Google 推进 Gemini 与网络防御",
