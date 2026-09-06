@@ -1,6 +1,20 @@
 {
-  "generated": "2026-09-04T00:00:00.000Z",
+  "generated": "2026-09-05T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-05",
+      "title": "2026-09-05 AI 简报：Google 发布 Lyria 3.5；xAI 展示采购 Bot",
+      "excerpt": "本期确认 2 件动态：Google 将 Lyria 3.5 推入 Gemini 应用与 API；xAI 公布 Grok Bot 在采购场景发现超过 10 万美元节省。",
+      "tags": [
+        "AI",
+        "Google",
+        "xAI",
+        "Agent",
+        "音乐生成"
+      ],
+      "date": "2026-09-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-05"
+    },
     {
       "slug": "2026-09-04",
       "title": "2026-09-04 AI 简报：OpenAI Responses API 增加长任务控制",
@@ -1699,6 +1713,20 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-05",
+      "title": "2026-09-05 AI 简报：Google 发布 Lyria 3.5；xAI 展示采购 Bot",
+      "excerpt": "本期确认 2 件动态：Google 将 Lyria 3.5 推入 Gemini 应用与 API；xAI 公布 Grok Bot 在采购场景发现超过 10 万美元节省。",
+      "tags": [
+        "AI",
+        "Google",
+        "xAI",
+        "Agent",
+        "音乐生成"
+      ],
+      "date": "2026-09-05T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-05"
+    },
     {
       "slug": "2026-09-04",
       "title": "2026-09-04 AI 简报：OpenAI Responses API 增加长任务控制",
