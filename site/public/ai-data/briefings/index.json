@@ -1,6 +1,22 @@
 {
-  "generated": "2026-09-06T00:00:00.000Z",
+  "generated": "2026-09-07T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-07",
+      "title": "2026-09-07 AI 简报：OpenAI 公开递归自我改进与监控风险；内部数据显示 Agent 加速研究；Anthropic 版权和解分配出现争议",
+      "excerpt": "本期聚焦三件动态：OpenAI 公开讨论递归自我改进与对齐监控风险，披露编码 Agent 加速研究的内部数据；TechCrunch 报道 Anthropic 版权和解付款分配出现作者投诉。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Agent",
+        "AI安全",
+        "AI治理",
+        "版权"
+      ],
+      "date": "2026-09-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-07"
+    },
     {
       "slug": "2026-09-06",
       "title": "2026-09-06 AI 简报：OpenAI 承认 German wiki 事件并拟建立披露框架；媒体报道两家报社起诉 OpenAI 与微软",
@@ -1728,6 +1744,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-07",
+      "title": "2026-09-07 AI 简报：OpenAI 公开递归自我改进与监控风险；内部数据显示 Agent 加速研究；Anthropic 版权和解分配出现争议",
+      "excerpt": "本期聚焦三件动态：OpenAI 公开讨论递归自我改进与对齐监控风险，披露编码 Agent 加速研究的内部数据；TechCrunch 报道 Anthropic 版权和解付款分配出现作者投诉。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Agent",
+        "AI安全",
+        "AI治理",
+        "版权"
+      ],
+      "date": "2026-09-07T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-07"
+    },
     {
       "slug": "2026-09-06",
       "title": "2026-09-06 AI 简报：OpenAI 承认 German wiki 事件并拟建立披露框架；媒体报道两家报社起诉 OpenAI 与微软",
