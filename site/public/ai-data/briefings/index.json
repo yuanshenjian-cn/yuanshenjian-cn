@@ -1,6 +1,24 @@
 {
-  "generated": "2026-09-07T00:00:00.000Z",
+  "generated": "2026-09-12T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-12",
+      "title": "2026-09-12 AI 简报：OpenAI 推出 Agents API 与 GPT-Live-1；Mistral 完成 30 亿欧元融资；DeepSeek 发布 V4.1-Flash",
+      "excerpt": "本期聚焦 9 件动态：OpenAI 推出 Agents API 和 GPT-Live-1 API；Anthropic Newsroom 列出 9 月 AI 滥用报告；Meta 发布 Muse；Mistral 完成融资并与 Cloudera 合作；Google 更新 ToolGrad 与 AlphaGenome Atlas；DeepSeek 发布 V4.1-Flash。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Mistral",
+        "DeepSeek",
+        "Agent",
+        "AI安全"
+      ],
+      "date": "2026-09-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-12"
+    },
     {
       "slug": "2026-09-07",
       "title": "2026-09-07 AI 简报：OpenAI 公开递归自我改进与监控风险；内部数据显示 Agent 加速研究；Anthropic 版权和解分配出现争议",
@@ -1744,6 +1762,24 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-12",
+      "title": "2026-09-12 AI 简报：OpenAI 推出 Agents API 与 GPT-Live-1；Mistral 完成 30 亿欧元融资；DeepSeek 发布 V4.1-Flash",
+      "excerpt": "本期聚焦 9 件动态：OpenAI 推出 Agents API 和 GPT-Live-1 API；Anthropic Newsroom 列出 9 月 AI 滥用报告；Meta 发布 Muse；Mistral 完成融资并与 Cloudera 合作；Google 更新 ToolGrad 与 AlphaGenome Atlas；DeepSeek 发布 V4.1-Flash。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Anthropic",
+        "Google",
+        "Meta",
+        "Mistral",
+        "DeepSeek",
+        "Agent",
+        "AI安全"
+      ],
+      "date": "2026-09-12T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-12"
+    },
     {
       "slug": "2026-09-07",
       "title": "2026-09-07 AI 简报：OpenAI 公开递归自我改进与监控风险；内部数据显示 Agent 加速研究；Anthropic 版权和解分配出现争议",
