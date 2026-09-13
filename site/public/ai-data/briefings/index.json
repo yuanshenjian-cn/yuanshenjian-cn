@@ -1,6 +1,21 @@
 {
-  "generated": "2026-09-12T00:00:00.000Z",
+  "generated": "2026-09-13T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-13",
+      "title": "2026-09-13 AI 简报：OpenAI 展示 GPT-6 Astra 在 Devin 自测中的应用",
+      "excerpt": "OpenAI 发布 Cognition 客户案例，展示 GPT-6 Astra 如何帮助 Devin 执行软件测试并呈现验证结果。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "GPT-6 Astra",
+        "Devin",
+        "Agent",
+        "软件工程"
+      ],
+      "date": "2026-09-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-13"
+    },
     {
       "slug": "2026-09-12",
       "title": "2026-09-12 AI 简报：OpenAI 推出 Agents API 与 GPT-Live-1；Mistral 完成 30 亿欧元融资；DeepSeek 发布 V4.1-Flash",
@@ -1762,6 +1777,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-13",
+      "title": "2026-09-13 AI 简报：OpenAI 展示 GPT-6 Astra 在 Devin 自测中的应用",
+      "excerpt": "OpenAI 发布 Cognition 客户案例，展示 GPT-6 Astra 如何帮助 Devin 执行软件测试并呈现验证结果。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "GPT-6 Astra",
+        "Devin",
+        "Agent",
+        "软件工程"
+      ],
+      "date": "2026-09-13T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-13"
+    },
     {
       "slug": "2026-09-12",
       "title": "2026-09-12 AI 简报：OpenAI 推出 Agents API 与 GPT-Live-1；Mistral 完成 30 亿欧元融资；DeepSeek 发布 V4.1-Flash",
