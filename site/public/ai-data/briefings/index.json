@@ -1,6 +1,23 @@
 {
-  "generated": "2026-09-13T00:00:00.000Z",
+  "generated": "2026-09-16T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-16",
+      "title": "2026-09-16 AI 简报：OpenAI 测试 Sponsored Agents；Google 发布 Gemini 3.8 Live；Mistral 接入 Firefox",
+      "excerpt": "本期确认 6 件动态：OpenAI 展开 ChatGPT Ads 与 GPT-6 Astra 客户案例；Google 发布实时语音模型并介绍检索方法；Meta 推出 Meta One；Mistral 与 Mozilla 合作。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Meta",
+        "Mistral",
+        "GPT-6 Astra",
+        "Agent",
+        "AI产品"
+      ],
+      "date": "2026-09-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-16"
+    },
     {
       "slug": "2026-09-13",
       "title": "2026-09-13 AI 简报：OpenAI 展示 GPT-6 Astra 在 Devin 自测中的应用",
@@ -1777,6 +1794,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-16",
+      "title": "2026-09-16 AI 简报：OpenAI 测试 Sponsored Agents；Google 发布 Gemini 3.8 Live；Mistral 接入 Firefox",
+      "excerpt": "本期确认 6 件动态：OpenAI 展开 ChatGPT Ads 与 GPT-6 Astra 客户案例；Google 发布实时语音模型并介绍检索方法；Meta 推出 Meta One；Mistral 与 Mozilla 合作。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Meta",
+        "Mistral",
+        "GPT-6 Astra",
+        "Agent",
+        "AI产品"
+      ],
+      "date": "2026-09-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-16"
+    },
     {
       "slug": "2026-09-13",
       "title": "2026-09-13 AI 简报：OpenAI 展示 GPT-6 Astra 在 Devin 自测中的应用",
