@@ -29,6 +29,8 @@
 
 - 官方新闻：`https://api-docs.deepseek.com/news/`
 - 官方价格页：`https://api-docs.deepseek.com/quick_start/pricing`
+- DeepSeek-V4.1-Flash Release：`https://api-docs.deepseek.com/news/news260910`
+- DeepSeek-V4-Flash-Vision-Exp Release：`https://api-docs.deepseek.com/news/news260821`
 - DeepSeek-V4 Preview Release：`https://api-docs.deepseek.com/news/news260424`
 - DeepSeek-V3.2 Release：`https://api-docs.deepseek.com/news/news251201`
 - DeepSeek-R1-0528 Release：`https://api-docs.deepseek.com/news/news250528`
