@@ -1,6 +1,22 @@
 {
-  "generated": "2026-09-16T00:00:00.000Z",
+  "generated": "2026-09-19T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-19",
+      "title": "2026-09-19 AI 简报：Anthropic 加码生物访问与前沿评估；OpenAI 推出法律专用模型",
+      "excerpt": "本期确认 4 件动态：Anthropic 推出生命科学验证计划，并与 Accenture 开展嵌入式评估；OpenAI 建立模型失配披露框架并发布 Astra for Law。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "AI安全",
+        "AI治理",
+        "Agent",
+        "企业AI"
+      ],
+      "date": "2026-09-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-19"
+    },
     {
       "slug": "2026-09-16",
       "title": "2026-09-16 AI 简报：OpenAI 测试 Sponsored Agents；Google 发布 Gemini 3.8 Live；Mistral 接入 Firefox",
@@ -1794,6 +1810,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-19",
+      "title": "2026-09-19 AI 简报：Anthropic 加码生物访问与前沿评估；OpenAI 推出法律专用模型",
+      "excerpt": "本期确认 4 件动态：Anthropic 推出生命科学验证计划，并与 Accenture 开展嵌入式评估；OpenAI 建立模型失配披露框架并发布 Astra for Law。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "AI安全",
+        "AI治理",
+        "Agent",
+        "企业AI"
+      ],
+      "date": "2026-09-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-19"
+    },
     {
       "slug": "2026-09-16",
       "title": "2026-09-16 AI 简报：OpenAI 测试 Sponsored Agents；Google 发布 Gemini 3.8 Live；Mistral 接入 Firefox",
