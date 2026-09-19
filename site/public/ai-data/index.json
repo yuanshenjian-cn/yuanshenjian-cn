@@ -1,6 +1,19 @@
 {
-  "generated": "2026-09-06T00:00:00.000Z",
+  "generated": "2026-09-16T00:00:00.000Z",
   "posts": [
+    {
+      "slug": "deepseek-model-family-notes",
+      "title": "DeepSeek：从 V3 到 V4.1，这家最锋利的地方不只是便宜",
+      "excerpt": "这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，本次追加 DeepSeek-V4.1-Flash 与 DeepSeek-V4-Flash-Vision-Exp，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。",
+      "tags": [
+        "AI前沿",
+        "LLM",
+        "DeepSeek",
+        "模型评测",
+        "开源权重"
+      ],
+      "date": "2026-09-16T00:00:00.000Z"
+    },
     {
       "slug": "anthropic-model-family-notes",
       "title": "Anthropic：Claude 为什么越来越像长跑型 Agent",
@@ -52,19 +65,6 @@
         "模型评测"
       ],
       "date": "2026-08-26T00:00:00.000Z"
-    },
-    {
-      "slug": "deepseek-model-family-notes",
-      "title": "DeepSeek：从 V3 到 V4，这家最锋利的地方不只是便宜",
-      "excerpt": "这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。",
-      "tags": [
-        "AI前沿",
-        "LLM",
-        "DeepSeek",
-        "模型评测",
-        "开源权重"
-      ],
-      "date": "2026-08-17T00:00:00.000Z"
     },
     {
       "slug": "kimi-model-family-notes",
