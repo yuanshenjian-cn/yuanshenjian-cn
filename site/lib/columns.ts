@@ -166,6 +166,31 @@ const AI_COLUMNS: ColumnConfig[] = [
     },
   },
   {
+    slug: "bmad-method",
+    title: "BMad Method",
+    description:
+      "围绕 BMad Method 的规模化研发流程、项目上下文、团队定制和 Builder 扩展，记录从一次 Build 到企业 AI 研发治理的完整实践。",
+    contentDir: "swd/ai-coding/bmad-method",
+    guide: {
+      intro:
+        "共 10 篇，从 BMad 的概念和架构开始，依次学习一次小型 Build、项目上下文、Spec 与 Story、Epic 验收、团队 Override，以及 Skill、Eval 和 Module 的产品化路径。",
+      paths: [
+        {
+          label: "先建立整体认识",
+          description: "先读序章，再进入安装、Build、Spec 和 Epic Retro 的原生流程",
+        },
+        {
+          label: "第一次实战",
+          description: "从第 2 篇开始，跑通安装、Build、Spec、Story 和 Epic Retro",
+        },
+        {
+          label: "设计客户治理能力",
+          description: "从第 7 篇开始，依次学习 Override、Workflow Skill、Eval 和 Module",
+        },
+      ],
+    },
+  },
+  {
     slug: "deepseek",
     title: "DeepSeek",
     description:

@@ -1,754 +1,274 @@
 ---
-title: 'OpenCode Agent 速查手册'
-date: '2026-02-09'
+title: "OpenCode Agent 速查手册"
+date: '2026-09-19'
 tags:
   - 软件开发
   - AI 编程
   - OpenCode
 published: true
-brief: 'OpenCode 的 Sub Agent 功能让 AI 编程助手从单一对话模式升级为多代理协作系统。本文详细介绍 Primary Agent 与 Sub Agent 的区别、内置代理类型、配置方法以及实战使用技巧，帮助你构建更高效的 AI 辅助开发工作流。'
+brief: >-
+  OpenCode 的 Agent 分为直接对话的 primary agent 和由主代理调用的 subagent。内容以当前内置的 Build、Plan、General、Explore、Scout 为主线，覆盖权限边界、调用方式、配置文件和自定义审查工作流。
 ---
 
-> OpenCode Sub Agent 让 AI 助手实现"分工协作"，复杂任务并行处理，效率倍增。
+> 选 Agent 之前先问一个问题：这次任务需要直接改代码，还是需要先读代码、查资料或拆解计划？
 
-## 为什么需要 Sub Agent
+## 两类 Agent，承担两种责任
 
-使用传统 AI 编程助手时，所有任务都在同一个对话中完成。分析代码、修改文件、搜索文档——这些操作串行执行，效率受限。
+OpenCode 的 Agent 分成两类：
 
-OpenCode 的 Sub Agent 解决了这个问题：
+| 类型 | 作用 | 进入方式 |
+| --- | --- | --- |
+| primary agent | 负责与你直接对话，推进当前会话 | Tab 或配置的 agent 切换快捷键 |
+| subagent | 由 primary agent 委派专门任务，也可以被 @ 提及 | Task 工具或 @agent-name |
 
-- **并行处理**：多个任务同时执行
-- **专业化分工**：不同代理负责不同领域
-- **上下文隔离**：子任务不污染主对话
-- **权限管控**：精细化控制每个代理的能力
+primary agent 负责保持主线。subagent 负责一个相对独立的研究、探索或执行单元。子会话有自己的上下文，结果返回主会话后，主代理再决定是否采用。
 
-## Agent 类型详解
+## 内置 Agent 速查
 
-OpenCode 有两种 Agent 类型：Primary（主代理）和 Sub（子代理）。
+### Build：默认开发入口
 
-### Primary Agent（主代理）
+Build 是默认的 primary agent，工具权限完整，适合：
 
-直接与用户交互，处理主要对话。
+- 读取并修改项目文件；
+- 执行测试、构建和 Git 命令；
+- 完成从定位问题到验证结果的连续任务。
 
-| 代理 | 模式 | 特点 |
-|------|------|------|
-| **Build** | Primary | 默认代理，拥有全部工具权限 |
-| **Plan** | Primary | 受限代理，仅分析和规划，不修改代码 |
+你可以直接在 TUI 中描述目标，也可以用 CLI：
 
-**切换方式**：按 `Tab` 键循环切换。
-
-### Sub Agent（子代理）
-
-由主代理调用，处理特定任务。
-
-| 代理 | 用途 |
-|------|------|
-| **General** | 通用任务，支持文件修改 |
-| **Explore** | 代码库探索，只读模式 |
-
-**调用方式**：`@agent-name` 手动调用，或由主代理自动调用。
-
-### 系统代理
-
-| 代理 | 模式 | 状态 | 功能 |
-|------|------|------|------|
-| **Compaction** | primary | 隐藏 | 自动压缩长上下文 |
-| **Title** | primary | 隐藏 | 自动生成会话标题 |
-| **Summary** | primary | 隐藏 | 自动创建会话摘要 |
-
-## 内置代理使用指南
-
-### Build 代理
-
-全能型代理，适合日常开发。
-
-**适用场景**：
-- 编写和修改代码
-- 执行系统命令
-- 完整的开发任务
-
-**特点**：所有工具默认启用。
-
-### Plan 代理
-
-安全分析型代理，适合代码审查。
-
-**默认权限**：
-- 文件编辑：需要确认（ask）
-- Bash 命令：需要确认（ask）
-
-**适用场景**：
-- 代码审查
-- 架构规划
-- 方案设计
-
-### General 子代理
-
-通用任务处理专家。
-
-```
-@general 帮我并行处理以下任务：
-1. 搜索所有使用了 fetch API 的文件
-2. 分析 package.json 中的依赖
-3. 列出 components 目录下的所有组件
+```bash
+opencode run --agent build "为用户列表增加分页，并运行相关测试"
 ```
 
-**特点**：
-- 完整工具访问（除 todo 外）
-- 可修改文件
-- 适合多任务并行
+Build 的能力完整，也意味着权限范围最大。对陌生仓库使用时，先检查项目规则和工作区状态。
 
-### Explore 子代理
+### Plan：先看清范围
 
-代码库探索专家。
+Plan 是受限的 primary agent，适合分析代码、提出方案和列出验证方式。默认情况下，文件编辑和 Bash 命令会询问许可，拒绝这些请求时可以保持只读。
 
+Plan 不是“永远不能写”的特殊沙箱。只要你批准了权限，它仍可能执行对应操作。需要硬性只读时，应在配置中把 edit 和 bash 设为 deny，或使用只读 subagent。
+
+### General：可执行的子任务代理
+
+General 是通用 subagent，适合研究复杂问题和执行多步任务。它可以在被允许的范围内修改文件，但默认不使用 todo 工具。复杂工作可以拆成多个 General 子任务并行处理，再由主代理整合结果。
+
+手动调用：
+
+```text
+@general 请检查支付回调的错误处理，并提出可直接验证的修复方案。
 ```
-@explore 找出项目中所有自定义 Hook 的使用位置
+
+### Explore：快速、只读的代码探索
+
+Explore 专门回答“代码在哪里”“哪些文件受影响”“这个符号如何被调用”。它不能修改文件，适合在动手之前查找入口：
+
+```text
+@explore 找出订单状态从请求到数据库写入的完整调用链。
 ```
 
-**特点**：
-- 只读模式，不会修改文件
-- 快速搜索和定位
-- 安全探索代码库
+Explore 的价值是缩短定位时间，而不是代替主代理做实现决策。它返回的路径和结论仍然需要结合当前分支验证。
 
-## 配置方法
+### Scout：只读的外部资料研究
 
-### JSON 配置
+Scout 面向远程仓库、官方文档和依赖源码研究。需要核对库的真实实现、查 API 约定或比较上游示例时，可以使用它：
 
-在项目根目录创建 `opencode.json`：
+```text
+@scout 查找官方文档中关于这个 API 的认证和超时配置，并给出来源链接。
+```
 
-```json
+Scout 适合“已知要查什么”的资料研究，不适合直接修改当前项目。
+
+### 隐藏的系统 Agent
+
+OpenCode 还会在内部使用 Compaction、Title 和 Summary。它们分别负责压缩长上下文、生成会话标题和创建摘要，不会出现在普通 Agent 选择列表中，也不是用户日常开发时要切换的入口。
+
+## 选择方式
+
+可以按这个表快速决定：
+
+| 你的目标 | 推荐入口 |
+| --- | --- |
+| 已经知道要改什么，想直接完成 | Build |
+| 需求复杂，想先看文件和方案 | Plan |
+| 只想找实现位置或调用链 | Explore |
+| 需要查上游文档、依赖源码或示例 | Scout |
+| 复杂任务需要拆出独立执行单元 | General |
+| 需要持续推进多个阶段 | Build + todo，或配置 subagent 协作 |
+
+主代理可以自动调用 subagent，也可以由你在消息里用 @ 指定。调用 subagent 不会自动证明结论正确；它只是把工作拆开，让主会话少背一些无关上下文。
+
+## JSON 配置 Agent
+
+Agent 配置写在 opencode.json 或 opencode.jsonc 的 agent 字段中：
+
+```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
   "agent": {
     "build": {
-      "description": "默认开发代理，负责日常编码与修改",
       "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-6",
       "permission": {
         "edit": "allow",
-        "bash": "allow"
+        "bash": "ask"
       }
     },
-    "code-reviewer": {
-      "description": "代码审查专家",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-6",
-      "prompt": "专注于代码质量、安全性和性能优化",
-      "permission": {
-        "edit": "deny"
-      }
-    }
-  }
-}
-```
-
-### Markdown 配置
-
-将代理配置文件保存为 `.md` 格式，支持两种保存位置：
-
-- **全局配置**：`~/.config/opencode/agents/`（所有项目可用）
-- **项目配置**：`.opencode/agents/`（当前项目专用）
-
-例如，在全局目录创建 `review.md`：
-
-```markdown
----
-description: 代码审查专家
-mode: subagent
-model: anthropic/claude-sonnet-4-6
-temperature: 0.1
-permission:
-  edit: deny
-  bash: deny
----
-
-专注于：
-- 代码质量和最佳实践
-- 潜在 Bug 和边界情况
-- 性能影响
-- 安全考虑
-
-仅提供建议，不做直接修改。
-```
-
-## 核心配置选项
-
-### Temperature（温度）
-
-控制输出的创造性和随机性。
-
-| 范围 | 适用场景 |
-|------|----------|
-| 0.0-0.2 | 代码分析、规划（确定性高） |
-| 0.3-0.5 | 一般开发任务（平衡） |
-| 0.6-1.0 | 头脑风暴、探索（创造性高） |
-
-> **默认值**：如果未指定温度，OpenCode 使用模型默认值（大多数模型为 0，Qwen 模型为 0.55）。
-
-### Steps（步数上限）
-
-限制代理的迭代次数，控制成本。现在应使用 `steps`，旧的 `maxSteps` 已经废弃。
-
-```json
-{
-  "agent": {
-    "quick-thinker": {
-      "steps": 5
-    }
-  }
-}
-```
-
-### Permissions（权限）
-
-精细控制工具权限。
-
-```json
-{
-  "agent": {
     "review": {
+      "description": "Review code without changing files",
+      "mode": "subagent",
       "permission": {
         "edit": "deny",
         "bash": {
           "*": "ask",
-          "git status*": "allow"
-        }
+          "git diff*": "allow",
+          "grep *": "allow"
+        },
+        "webfetch": "allow"
       }
     }
   }
 }
 ```
 
-权限级别：
-- `ask`：执行前询问
-- `allow`：允许执行
-- `deny`：禁止执行
+配置内置 Agent 时，未写出的字段继续使用内置默认值。自定义 Agent 至少应提供 description，方便主代理判断它是否适合某个子任务。
 
-### Mode（模式）
+Agent 的 mode 有三种：
 
-```json
-{
-  "agent": {
-    "my-agent": {
-      "mode": "subagent"  // primary | subagent | all
-    }
-  }
-}
-```
+- primary：可以作为直接对话入口；
+- subagent：只能作为子任务代理；
+- all：两种方式都可以。
 
-### Hidden（隐藏）
+default_agent 只能指向 primary agent。如果指向不存在的 Agent 或 subagent，OpenCode 会回退到 Build 并发出警告。
 
-隐藏子代理，不让其在 `@` 菜单中显示。
+## Markdown 配置更适合长提示词
 
-```json
-{
-  "agent": {
-    "internal-helper": {
-      "mode": "subagent",
-      "hidden": true
-    }
-  }
-}
-```
-
-### Top P（采样控制）
-
-控制响应多样性的温度替代方案。
-
-```json
-{
-  "agent": {
-    "brainstorm": {
-      "top_p": 0.9
-    }
-  }
-}
-```
-
-值范围 0.0-1.0：低值更聚焦，高值更多样。
-
-### Color（颜色）
-
-自定义代理在 UI 中的显示颜色。
-
-支持十六进制颜色（如 `#FF5733`）或主题色：`primary`、`secondary`、`accent`、`success`、`warning`、`error`、`info`。
-
-```json
-{
-  "agent": {
-    "code-reviewer": {
-      "color": "accent"
-    },
-    "creative": {
-      "color": "#ff6b6b"
-    }
-  }
-}
-```
-
-### Disable（禁用）
-
-设置为 `true` 禁用代理。
-
-```json
-{
-  "agent": {
-    "review": {
-      "disable": true
-    }
-  }
-}
-```
-
-### Task Permission（代理调用权限）
-
-控制代理可以调用哪些子代理，使用 glob 模式匹配。
-
-```json
-{
-  "agent": {
-    "orchestrator": {
-      "mode": "primary",
-      "permission": {
-        "task": {
-          "*": "deny",
-          "orchestrator-*": "allow",
-          "code-reviewer": "ask"
-        }
-      }
-    }
-  }
-}
-```
-
-### Prompt（自定义提示）
-
-指定自定义系统提示文件。
-
-```json
-{
-  "agent": {
-    "code-reviewer": {
-      "prompt": "{file:./prompts/code-review.txt}"
-    }
-  }
-}
-```
-
-路径相对于配置文件所在位置。
-
-### Model（模型选择）
-
-为不同代理使用不同模型。
-
-```json
-{
-  "agent": {
-    "plan": {
-      "model": "anthropic/claude-haiku-4-5"
-    },
-    "build": {
-      "model": "anthropic/claude-sonnet-4-6"
-    }
-  }
-}
-```
-
-模型 ID 格式：`provider/model-id`。
-
-### Other（传递给模型的参数）
-
-其他选项会直接传递给模型提供商。
-
-```json
-{
-  "agent": {
-    "deep-thinker": {
-      "description": "使用高推理努力解决复杂问题",
-      "model": "openai/gpt-5",
-      "reasoningEffort": "high"
-    }
-  }
-}
-```
-
-## 实战技巧
-
-### 手动调用子代理
-
-```
-@general 帮我分析这个函数的性能瓶颈
-@explore 查找项目中所有未使用的导入
-```
-
-### 会话导航
-
-当子代理创建子会话时：
-
-- `\<Leader\>+Down`：进入第一个子 agent 会话
-- `→`：子会话循环
-- `←`：子会话反向循环
-- `↑`：返回父会话
-
-### 并行任务
-
-让 General 子代理并行处理多个独立任务：
-
-```
-@general 同时执行：
-1. 检查 src/utils/ 目录下所有文件
-2. 分析 tests/ 目录的测试覆盖率
-3. 搜索所有 TODO 注释
-```
-
-### 安全审查工作流
-
-```
-使用 Plan 代理分析代码 → 
-@code-reviewer 审查安全风险 → 
-Build 代理实施修改
-```
-
-## 自定义代理创建
-
-使用命令行快速创建：
-
-```bash
-opencode agent create
-```
-
-交互式流程：
-1. 选择保存位置（全局/项目）
-2. 描述代理用途
-3. 生成系统提示词
-4. 选择可用工具
-5. 创建 Markdown 配置文件
-
-## 典型使用场景
-
-| 场景 | 推荐代理 | 配置要点 |
-|------|----------|----------|
-| 日常开发 | Build | 全工具开启 |
-| 代码审查 | Plan / 自定义 Review | 只读，温度 0.1-0.2 |
-| 代码探索 | Explore | 只读 |
-| 安全审计 | Security Auditor | 禁止写操作，温度 0.1 |
-| 文档编写 | Docs Writer | 禁用 bash |
-| 多任务并行 | General | 全工具 |
-| 调试问题 | Debug | 禁止写操作，温度 0.2 |
-| 创意探索 | Creative | 高温度 0.8，high top_p |
-| 快速规划 | Plan (Haiku) | 使用 Haiku 模型节省成本 |
-
-## 实用示例
-
-### 代码审查代理配置示例
+长 system prompt 不适合塞进 JSON。可以创建：
 
 ```markdown
 ---
-description: 代码审查专家
+description: Review code without making edits
 mode: subagent
+model: provider/model-id
 temperature: 0.1
 permission:
   edit: deny
+  bash:
+    "*": ask
+    "git diff*": allow
+    "grep *": allow
 ---
 
-审查重点：
-- 代码规范
-- 潜在 Bug
-- 性能问题
-- 安全风险
-
-提供建设性反馈。
+检查潜在 bug、边界条件、性能和安全问题。
+输出文件路径、行号、影响和建议，不直接修改文件。
 ```
 
-### 安全审计代理配置示例
+全局 Agent 放在 ~/.config/opencode/agents/，项目专用 Agent 放在 .opencode/agents/。文件名会成为 Agent 名称，例如 review.md 对应 @review。
 
-```markdown
----
-description: 安全漏洞检测
-mode: subagent
-permission:
-  edit: deny
----
+## 常用配置字段
 
-关注：
-- 输入验证漏洞
-- 认证授权缺陷
-- 数据暴露风险
-- 依赖漏洞
-```
+| 字段 | 用途 |
+| --- | --- |
+| description | 描述职责，属于自定义 Agent 的必填信息 |
+| mode | primary、subagent 或 all |
+| model | 指定 provider/model |
+| temperature | 控制回答的随机性 |
+| top_p | 调整采样范围 |
+| steps | 限制 agentic 操作轮数 |
+| prompt | 引用外部 system prompt 文件 |
+| permission | 允许、询问或拒绝工具 |
+| hidden | 隐藏 subagent 的 @ 自动补全入口 |
+| color | 设置 TUI 中的显示颜色 |
+| disable | 暂时停用 Agent |
 
-### 文档编写代理配置示例
+reasoningEffort、textVerbosity 等附加字段的行为取决于目标模型和 provider；只使用官方 schema 和 provider 文档明确支持的字段。模型 ID 则统一写成 provider/model。
 
-```markdown
----
-description: 编写和维护项目文档
-mode: subagent
-model: anthropic/claude-sonnet-4-6
-permission:
-  bash: deny
----
+steps 达到上限后，Agent 会停止继续进行工具操作并总结当前工作。它是成本和范围控制，不是质量保证；仍然要配置测试和验收方式。
 
-专注于：
-- 清晰的解释
-- 合理的结构
-- 代码示例
-- 友好的语言
-```
+## 权限规则要写在工具层
 
-### Debug 代理配置示例
+每个权限值是 allow、ask 或 deny：
 
-```markdown
----
-description: 调试专家
-mode: subagent
-model: anthropic/claude-sonnet-4-6
-temperature: 0.2
-permission:
-  edit: deny
----
+- allow：无需再次询问；
+- ask：执行前向用户确认；
+- deny：不允许使用。
 
-调试重点：
-- 分析错误堆栈
-- 追踪问题根因
-- 提供修复建议
-- 不直接修改代码
-```
-
-### 创意代理配置示例
-
-```markdown
----
-description: 创意头脑风暴
-mode: subagent
-model: anthropic/claude-sonnet-4-6
-temperature: 0.8
-top_p: 0.9
-color: "#ff6b6b"
----
-
-用于头脑风暴和创意探索，提供多种可能性。
-```
-
-## 实战工作流示例
-
-### 完整的代码审查工作流
-
-```
-# 1. 使用 Plan 代理分析改动
-<切换到 Plan 代理>
-分析最近提交的更改，列出影响范围。
-
-# 2. 使用 Explore 代理检查相关文件
-@explore 找出所有被修改的文件及其依赖关系。
-
-# 3. 使用自定义 review 代理进行审查
-@review 审查这些更改，重点关注：
-- 代码规范
-- 潜在 Bug
-- 性能影响
-- 安全风险
-
-# 4. 使用 Build 代理实施建议（如果需要）
-<切换到 Build 代理>
-根据 review 的建议修复发现的问题。
-```
-
-### 新功能开发工作流
-
-```
-# 1. Plan 模式制定方案
-<切换到 Plan>
-为用户添加「一键导出 PDF」功能，使用后端生成。
-
-# 2. 探索现有代码
-@explore 找出项目中现有的导出功能实现。
-
-# 3. 并行任务处理
-@general 同时完成：
-1. 分析现有 PDF 生成库的兼容性
-2. 设计 API 接口规范
-3. 列出需要修改的组件清单
-
-# 4. Build 模式实施
-<切换到 Build>
-根据 Plan 的方案开始实现。
-```
-
-### 性能优化工作流
-
-```
-# 1. 使用分析代理
-<切换到 Plan>
-分析项目性能瓶颈，提出优化方向。
-
-# 2. 探索相关代码
-@explore 找出所有数据库查询和 API 调用。
-
-# 3. 并行分析
-@general 并行处理：
-1. 分析前端渲染性能
-2. 分析 API 响应时间
-3. 检查是否有未优化的查询
-
-# 4. 实施优化
-<切换到 Build>
-根据分析结果实施性能优化。
-```
-
-### 安全审计工作流
-
-```
-# 1. 使用审计代理
-@security-audit 对整个项目进行安全审计。
-
-# 2. 深入检查特定模块
-@explore 找出所有处理用户输入的代码。
-
-# 3. 验证修复
-@security-audit 验证最新提交的安全修复是否完整。
-```
-
-### 文档更新工作流
-
-```
-# 1. 使用 docs 代理
-@docs 分析最近的代码更改，更新相关文档。
-
-# 2. 探索文档结构
-@explore 找出所有 API 文档和 README。
-
-# 3. 并行更新
-@docs 同时处理：
-1. 更新 API 文档
-2. 更新变更日志
-3. 更新使用示例
-```
-
-### 调试复杂问题工作流
-
-```
-# 1. 使用 debug 代理
-@debug 分析这个错误：[错误日志]
-
-# 2. 探索相关代码
-@explore 找出错误堆栈中涉及的所有文件。
-
-# 3. 追踪调用链
-@explore 追踪数据从入口到数据库的完整流向。
-
-# 4. 提出修复方案
-@debug 基于分析结果提供详细的修复建议。
-```
-
-## 高级技巧
-
-### 使用通配符控制工具
-
-禁用整个 MCP 服务器的工具：
+全局配置可以先设一个默认规则，再用更具体的模式覆盖：
 
 ```json
 {
-  "agent": {
-    "readonly": {
-      "permission": {
-        "mymcp_*": "deny",
-        "edit": "deny"
-      }
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "*": "ask",
+    "read": "allow",
+    "grep": "allow",
+    "edit": "deny",
+    "bash": {
+      "*": "ask",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git push*": "deny"
     }
   }
 }
 ```
 
-### 精细化 Bash 命令权限
+匹配规则按顺序计算，最后匹配的规则生效。read、edit、glob、grep、bash、task、external_directory、lsp 和 skill 支持按模式细分；其他权限键使用简单的 allow、ask、deny。
 
-允许特定命令，其他都需要确认：
+不要只在 Agent 的 prompt 中写“不要修改文件”。真正的边界应放在 permission 中。提示词负责说明判断标准，权限负责限制工具行为。
 
-```json
-{
-  "agent": {
-    "build": {
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "git status*": "allow",
-          "git diff": "allow",
-          "git log": "allow"
-        }
-      }
-    }
-  }
-}
-```
+## 控制子 Agent 的调用深度
 
-### 多代理协作配置
-
-配置一个编排器代理控制子代理调用：
+主代理可以用 Task 工具调用 subagent。配置 subagent_depth 可以限制嵌套深度：
 
 ```json
 {
-  "agent": {
-    "orchestrator": {
-      "description": "任务编排器",
-      "mode": "primary",
-      "permission": {
-        "task": {
-          "*": "deny",
-          "code-reviewer": "allow",
-          "security-audit": "ask"
-        }
-      }
-    },
-    "code-reviewer": {
-      "mode": "subagent",
-      "permission": {
-        "edit": "deny"
-      }
-    }
-  }
+  "$schema": "https://opencode.ai/config.json",
+  "subagent_depth": 1
 }
 ```
 
-### 不同场景的模型选择
+默认值 1 允许 primary agent 启动 subagent，但不允许 subagent 再启动下一层。设为 0 可以禁用子代理调用，设为 2 则允许多一层嵌套。对于只需要 Explore 或 Scout 返回资料的任务，保持浅层结构通常更容易追踪。
 
-```json
-{
-  "agent": {
-    "plan": {
-      "description": "快速规划",
-      "mode": "primary",
-      "model": "anthropic/claude-haiku-4-5",
-      "temperature": 0.1
-    },
-    "build": {
-      "description": "标准开发",
-      "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-6",
-      "temperature": 0.3
-    },
-    "creative": {
-      "description": "创意探索",
-      "mode": "subagent",
-      "model": "anthropic/claude-opus-4-7",
-      "temperature": 0.8,
-      "top_p": 0.9
-    }
-  }
-}
-```
+还可以在 Agent 上配置 permission.task，按名称允许或拒绝它调用哪些 subagent。用户仍然可以通过 @ 自动补全直接调用可见的 subagent，所以这项设置主要约束模型的自动委派。
 
-## 总结
+## 三条可复用工作流
 
-OpenCode Agent 的核心价值：
+### 先研究，再实现
 
-1. **专业化分工**：不同任务交给不同专家
-2. **并行处理**：多任务同时执行，节省时间
-3. **权限隔离**：精细化控制，安全可控
-4. **上下文管理**：主对话保持清晰
+让 Explore 找调用链，让 Plan 写方案，最后由 Build 实现。适合修改范围不清、风险较高的遗留代码。
 
-## 参考
+### 先审查，再合并
 
-- [官方文档 - 代理](https://opencode.ai/docs/agents/)
-- [官方文档 - 介绍](https://opencode.ai/docs/)
-- [GitHub](https://github.com/anomalyco/opencode)
-- [社区](https://opencode.ai/discord)
+使用只读 review Agent 检查 diff，再让 Build 根据问题修改。review Agent 设为 edit deny，避免审查过程意外改变工作区。
+
+### 研究和实现并行
+
+让 General 处理一条独立的迁移或测试任务，主会话继续处理主线。并行任务必须有不重叠的写入范围，否则两个 Agent 同时编辑同一文件，会让结果难以判断。
+
+## 子会话导航
+
+当 primary agent 创建子会话后，可以在 TUI 中查看它们：
+
+| 快捷键 | 作用 |
+| --- | --- |
+| Leader + Down | 进入第一个子会话 |
+| Right | 切换到下一个子会话 |
+| Left | 切换到上一个子会话 |
+| Up | 返回父会话 |
+
+默认 Leader 是 Ctrl+X，也可以在 tui.json 中修改。子会话适合观察过程和读取结果，不代表主会话会自动采纳所有结论。
+
+## 最后检查
+
+创建 Agent 前先写清它的输入、输出和禁止操作。完成后检查三件事：
+
+- 它是否真的使用了预期的模型和 provider；
+- 它是否拥有完成任务所需的最小权限；
+- 返回结果能否通过文件、命令或测试复核。
+
+OpenCode 的 Agent 不是越多越好。Build 和 Plan 负责主线，Explore 和 Scout 负责只读研究，General 负责明确的可执行子任务；这套边界已经足够支撑大多数项目。
+
+## 官方参考
+
+- [OpenCode Agents](https://opencode.ai/docs/agents/)
+- [OpenCode Permissions](https://opencode.ai/docs/permissions/)
+- [OpenCode Config](https://opencode.ai/docs/config/)
+- [OpenCode Keybinds](https://opencode.ai/docs/keybinds/)

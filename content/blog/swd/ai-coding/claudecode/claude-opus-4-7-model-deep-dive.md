@@ -1,433 +1,172 @@
 ---
-title: "Claude Opus 4.7 深度解析：每个维度都强一步"
-date: '2026-04-17'
+title: "Claude Code 最新模型选择：Fable 5.1、Opus 5、Sonnet 5 怎么用"
+date: '2026-09-19'
 tags: ['软件开发', 'AI 编程', 'ClaudeCode', '模型评测']
 published: true
-brief: "Anthropic 于 2026 年 4 月 16 日发布 Claude Opus 4.7，SWE-bench Pro 达到 64.3%，视觉分辨率提升 3 倍，新增 xhigh 努力等级，引入自适应推理与自我验证机制。本文整合官方基准测试、社区大 V 评测与 API 破坏性变更，帮你判断是否值得升级。"
+brief: "Claude Code 当前的模型选择可以按任务拆成四档：Fable 5.1 负责最长的自主工作，Opus 5 负责复杂编码和知识工作，Sonnet 5 负责速度与能力的平衡，Haiku 4.5 负责轻量任务。本文结合上下文、effort、费用和安全边界给出可执行的选择方法。"
 ---
 
-## 模型发布
+> 模型选择的关键不是寻找一个永远最强的答案，而是让模型的能力、上下文和任务风险相匹配。
 
-2026 年 4 月 16 日，Anthropic 正式发布 **Claude Opus 4.7**，定位为 Opus 4.6 的直接升级版，继续 Anthropic 大约每两个月一次的 Opus 发布节奏（4.5 在 2025 年 11 月，4.6 在 2026 年 2 月）。
+## 当前模型阵容
 
-发布当天，Anthropic 还公布了另一件事：公司年化营收已达 **300 亿美元**，Opus 4.7 是这个体量必须兑现的能力承诺。
+Anthropic 的模型概览把 Claude Code 常用模型分成四个层级：
 
-Anthropic 在发布公告中直接承认：**Opus 4.7 不如公司内部的 Claude Mythos Preview**——这个目前通用能力最强、但因网络安全能力过强存在安全风险而被限制分发的模型，依然是其最强产品。但 Opus 4.7 是目前最强的**公开可用模型**，也是 Anthropic 用来测试新安全护栏、为最终面向大众开放 Mythos 级模型探路的"前哨"。
+| 模型 | 更适合的工作 | 输入 / 输出价格（每百万 Token） | 上下文 | 思考方式 |
+|------|--------------|-------------------------------|--------|----------|
+| Claude Fable 5.1 | 最长的自主任务、困难推理、长链路 Agent | $10 / $50 | 1M | 自适应，始终开启 |
+| Claude Opus 5 | 复杂 Agent 编码、企业知识工作 | $5 / $25 | 1M | 自适应 |
+| Claude Sonnet 5 | 日常编码中速度与能力的平衡 | $2 / $10 | 1M | 自适应 |
+| Claude Haiku 4.5 | 快速、简单、规模化的任务 | $1 / $5 | 200K | 扩展思考 |
 
+这些是 Claude API 的公开价格；订阅计划、usage credits、Bedrock、Google Cloud、Microsoft Foundry 和网关的计费方式可能不同。Claude Code 的 `/model` 选择器会根据当前身份显示可用模型和费用信息。
 
-## 核心改进速览
+## Fable 5.1：把任务交给它之前，先确认边界
 
-| 改进项 | 4.6 | 4.7 |
-|--------|-----|-----|
-| SWE-bench Pro | 53.4% | **64.3%** (+10.9 pts) |
-| SWE-bench Verified | 80.8% | **87.6%** (+6.8 pts) |
-| CursorBench | 58% | **70%** (+12 pts) |
-| 图像分辨率（长边） | ~1,568px（~1.15 MP） | **2,576px（~3.75 MP）** |
-| 视觉精度（XBOW） | 54.5% | **98.5%** |
-| Effort 等级数 | 4 级 | **5 级**（新增 xhigh） |
-| 自适应推理 | enabled + budget_tokens | **唯一支持模式，需显式传入 `{"type": "adaptive"}`** |
-| 定价（输入/输出） | $5 / $25 per MTok | **$5 / $25 per MTok（不变）** |
+Fable 5.1 的定位是长时间自主工作。它适合根因调查、复杂架构决策、跨模块重构、长文档研究和需要多次自我验证的任务。最适合给它的是目标、约束和验收条件，而不是把每个操作步骤都写死：
 
-
-## 官方基准测试
-
-![Opus 4.7 vs Opus 4.6 / GPT-5.4 / Gemini 3.1 Pro / Mythos Preview 基准对比](/images/swd/ai-coding/claudecode/opus-4-7-benchmark-comparison.png)
-
-### 编程基准
-
-| 基准 | Opus 4.7 | Opus 4.6 | 变化 |
-|------|---------|---------|------|
-| SWE-bench Pro | 64.3% | 53.4% | **+10.9 pts** |
-| SWE-bench Verified | 87.6% | 80.8% | **+6.8 pts** |
-| SWE-bench Multilingual | 领先 | — | 多语言编程 |
-| Terminal-Bench 2.0 | 69.4% | 65.x% | 新解 3 道此前 Claude 模型无法解决的题 |
-| CursorBench | 70% | 58% | **+12 pts** |
-
-### 推理与知识
-
-| 基准 | Opus 4.7 | GPT-5.4 | Gemini 3.1 Pro |
-|------|---------|---------|----------------|
-| GPQA Diamond | 94.2% | 94.4% | 94.3% |
-| ARC-AGI-1 | 92%* | — | — |
-| ARC-AGI-2 | 75.83%* | — | — |
-| GDPval-AA（1753 Elo） | **#1** | #2 | — |
-
-> **注**：GPQA Diamond 三家已接近饱和（~94%），竞争分化正转向多步骤任务和真实工程场景。ARC-AGI 数据（*）来自社区整理（@scaling01），非 Anthropic 官方公告。GDPval-AA（Elo 排名）为 Anthropic 官方发布页引用的**第三方 leaderboard** 数据，非内部 benchmark。
-
-### 多模态与第三方合作伙伴评测
-
-以下数据来自 Anthropic 官方发布页列举的合作伙伴独立评测，非 Anthropic 内部 benchmark：
-
-| 评估 | Opus 4.7 | Opus 4.6 | 说明 |
-|------|---------|---------|------|
-| XBOW 视觉精度 | 98.5% | 54.5% | 计算机使用/截图解析 |
-| BigLaw Bench（Harvey） | 90.9% | — | 法律文书推理，高努力模式 |
-| OfficeQA Pro（Databricks） | 21% 更少错误 | 基线 | 企业文档分析 |
-| 图表解析（LlamaIndex） | 55.8% | 13.5% | **显著提升** |
-| Finance Agent（AlphaSense） | 0.813 | 0.767 | 金融研究 Agent |
-| Vals Index | **71.4%（#1）** | 67.7% | 综合 Agent 能力 |
-
-
-## 新特性深度解析
-
-### xhigh 努力等级
-
-Opus 4.7 将 effort 等级从 4 级扩展到 **5 级**，在 `high` 和 `max` 之间新增了 `xhigh`（"超高"）：
-
-```
-low → medium → high → xhigh（新增）→ max
+```text
+把当前支付模块迁移到新的校验接口。
+保持现有公共 API 和数据库结构不变，补齐回归测试。
+完成后报告改动文件、测试结果、未验证的外部依赖和需要人工决定的地方。
 ```
 
-**关键洞察**（来自 Latent.Space 社区分析）：
+Fable 5.1 可以用：
 
-> 整条能力曲线整体上移了一档——`4.7-low` 稳稳超过 `4.6-medium`，`4.7-medium` 稳稳超过 `4.6-high`，`4.7-high` 已经超过 `4.6-max`。
-
-Hex 的联合创始人兼 CTO Caitlin Colgrove 的评价更直接：
-
-Claude Code 自发布当天起就将**所有套餐的默认 effort 统一设为 `xhigh`**，成为 Claude Code 内的新默认深度。注意：**直接调用 Messages API 时，默认 effort 仍为 `high`**，需要显式传入 `"effort": "xhigh"` 才能启用。
-
-**各等级适用场景参考**：
-
-| Effort | 适用场景 | Token 成本 |
-|--------|---------|-----------|
-| `low` | 简单确定性任务、快速回答 | 最低 |
-| `medium` | 日常编码、Bug 修复、重构 | 标准 |
-| `high` | 复杂调试、多文件重构、架构设计 | 较高 |
-| `xhigh` | 难题、长时间 Agent 任务（**新默认**） | 高 |
-| `max` | 极端复杂问题，无 token 限制 | 最高 |
-
-### 视觉能力：3 倍分辨率飞跃
-
-这是 Opus 4.7 最具戏剧性的单项提升。
-
-| 指标 | Opus 4.6 | Opus 4.7 |
-|------|---------|---------|
-| 最大图像分辨率（长边） | ~1,568 px | **2,576 px** |
-| 等效像素数 | ~1.15 MP | **~3.75 MP**（> 3 倍） |
-| XBOW 视觉精度 | 54.5% | **98.5%** |
-| 坐标映射 | 需要缩放系数换算 | **1:1 像素映射** |
-
-**实际解锁的场景**：
-
-- **计算机使用 Agent**：可以精确读取高密度截图，消除此前因分辨率不足导致的错误识别
-- **代码截图**：全分辨率下变量名、行号一目了然，不再出现模糊误读
-- **技术图表**：密集数据点、小字标注、坐标轴刻度准确解析
-- **化学结构式**：Solve Intelligence 报告"从阅读化学结构到解析复杂技术图表，多模态理解大幅改善"
-
-XBOW CEO Oege de Moor 说得最直接：
-
-> "Opus 4.6 最大的痛点直接消失了——视觉精度从 54.5% 跳到 98.5%，整整一类此前无法用它来做的任务全部解锁了。"
-
-> ⚠️ **Token 成本提示**：更高分辨率的图片会消耗更多 token。如果你的任务不需要精细视觉细节，可以在发送前对图片降采样。分辨率上限是模型层的自动行为，没有 API 参数可以关闭。
-
-### 自我验证（Self-Verification）
-
-Opus 4.7 会**主动验证自己的输出是否符合原始要求**，然后再报告给用户。这不只是"链式推理"——它会在规划阶段主动发现逻辑漏洞，对比输出与需求，确认结果真正解决了问题。
-
-Vercel 的工程师 Joe Haddad 的观察印证了这一点：
-
-> "在开始工作之前就会对系统代码做证明——这是我们从未在早期 Claude 模型上见过的新行为。"
-
-Intuit 的 VP of Technology 也说：
-
-> "它在规划阶段就发现自己的逻辑错误然后加速执行，远超之前的 Claude 模型。"
-
-### 更严格的指令遵循
-
-Opus 4.7 对指令的解读更加**字面化**——你让它修 login 函数，它只修 login 函数，不会顺手重构旁边的 auth 中间件。
-
-这是**双刃剑**：
-
-- **好处**：显式指令产生更可预测的结果，减少"它为什么改了这个"的困惑
-- **代价**：如果你的 Prompt 依赖 4.6 自动"脑补上下文"或宽泛推广，需要重新调整
-
-Notion 的评测发现它是**第一个通过"隐性需求测试"的模型**——即不靠显式指令就能推断出需要哪些工具和动作。这和字面化指令遵循并不矛盾：它能理解隐含意图，但不会在没有授权的情况下擅自行动。
-
-### 文件系统记忆增强
-
-Opus 4.7 更擅长利用基于文件系统的记忆（如 `.claude/` 目录）。它能够跨会话记住重要笔记，让后续任务需要更少的前期上下文铺垫，直接进入正题。
-
-
-## 开发者新功能
-
-### Task Budgets（公开 Beta）
-
-Task Budgets 是为**长时间 Agent 循环**设计的新机制，让你为整个 Agent 会话设定一个大致的 token 预算。模型能看到倒计时，随着预算消耗，会主动调整工作优先级、适时收尾。
-
-```python
-import anthropic
-
-client = anthropic.Anthropic()
-response = client.beta.messages.create(  # Task Budgets 目前为公测接口
-    model="claude-opus-4-7",
-    max_tokens=16384,
-    thinking={"type": "adaptive"},
-    output_config={
-        "effort": "xhigh",
-        "task_budget": {
-            "type": "tokens",
-            "total": 50000  # 建议总 token 目标
-        }
-    },
-    betas=["task-budgets-2026-03-13"],
-    messages=[{
-        "role": "user",
-        "content": "重构 auth 模块，确保测试全部通过..."
-    }]
-)
+```text
+/model fable
 ```
 
-**关键区别**：
+它不是所有账户和提供商的默认模型，可能使用 usage credits。远程控制、后台会话和 Agent Team 中，如果没有人及时处理额度确认，任务可能在等待窗口结束后停止。自动化脚本和 Agent SDK 不会显示交互式确认，因此更要在组织层明确模型和费用策略。
 
-- `task_budget` 是**建议值，不是硬上限**，模型知晓并主动配合
-- `max_tokens` 是**硬上限**，模型不知道，超出直接截断
-- 最小 task budget 为 **20,000 tokens**
-- 对质量要求高于速度的开放式任务，Anthropic 建议**不设 task budget**
+Fable 不是适合所有任务的“默认答案”：清理格式、解释一段函数、跑一次测试，都没有必要让最昂贵的模型承担。
 
-### /ultrareview（Claude Code 新命令）
+## Opus 5：复杂编码的主力选择
 
-在 Claude Code 会话中输入 `/ultrareview`，会触发一次**专注的代码审查会话**：模型从头读取所有变更，像一个认真的 Code Reviewer 一样标记 Bug 和设计问题。
+Opus 5 面向复杂 Agent 编码和企业知识工作。Anthropic 的官方发布资料把它定位为日常使用的高能力模型，并强调它在编码、知识工作、计算机使用和自我验证方面的表现；在 Frontier-Bench 和 GDPval-AA 等官方引用的评测中，它处于领先位置。
 
-Pro 和 Max 用户各获赠 **3 次免费 /ultrareview** 体验额度。
+对 Claude Code 用户来说，Opus 5 的价值主要体现在三个地方：
 
-### Auto Mode 扩展至 Max 用户
+- 能在较长的多步任务中保持问题主线；
+- 遇到模糊需求时会先调查，再决定修改路径；
+- 更愿意验证自己的结果，而不是在第一次命令成功后立刻结束。
 
-Claude Code 的 Auto Mode（让 Claude 自主决策，减少中断）此前已支持 Pro 用户和 API 用户，现在进一步扩展到所有 **Max 用户**。
+典型入口：
 
-
-## API 破坏性变更（升级前必读）
-
-Opus 4.7 在 Messages API 上引入了 **3 个破坏性变更**，现有代码如果直接换模型 ID 可能会立即报错：
-
-### 变更 1：扩展思考 budget 被移除
-
-```python
-# ❌ 4.6 的写法（Opus 4.7 会返回 400 错误）
-thinking = {"type": "enabled", "budget_tokens": 8192}
-
-# ✅ 4.7 的写法
-thinking = {"type": "adaptive"}
+```bash
+claude --model opus
 ```
 
-Opus 4.7 仅支持**自适应推理**模式（`{"type": "adaptive"}`），需显式传入才会生效；不传则默认不开启推理。`budget_tokens` 参数不再适用，传入会导致 400 错误。
+如果项目有明确测试和验收命令，Opus 5 适合承担跨文件重构、难定位 Bug、生产代码审查和重要 API 设计。它仍然需要权限边界和人类审查，模型的自我验证不能替代真实测试、代码审查或部署审批。
 
-### 变更 2：采样参数被移除
+## Sonnet 5：大多数日常任务的平衡点
 
-```python
-# ❌ 4.6 的写法（Opus 4.7 会返回 400 错误）
-response = client.messages.create(
-    model="claude-opus-4-7",
-    temperature=0.7,  # 不再支持
-    top_p=0.9,        # 不再支持
-    top_k=40,         # 不再支持
-    ...
-)
+Sonnet 5 更适合日常编码、局部重构、测试补齐、文档更新和常规调试。它的速度和价格更适合作为长期默认模型：
 
-# ✅ 4.7 的写法：完全省略，通过 Prompt 引导行为
-response = client.messages.create(
-    model="claude-opus-4-7",
-    ...
-)
+```text
+/model sonnet
+/effort medium
 ```
 
-### 变更 3：思考内容默认隐藏
+当任务只是修改一个组件、解释一段代码或修复已有测试暴露的错误时，Sonnet 5 通常足够。遇到连续几轮仍然无法定位根因，再切到 Opus 5，比从一开始让所有小任务使用 Opus 更容易控制费用。
 
-思考块（thinking blocks）在响应流中仍然存在，但**内容默认为空**，需要主动 opt-in：
+如果任务需要规划但执行本身比较机械，可以使用：
 
-```python
-# ✅ 如需展示推理过程给用户
-response = client.messages.create(
-    model="claude-opus-4-7",
-    thinking={
-        "type": "adaptive",
-        "display": "summarized"  # opt-in 显示推理摘要，需嵌套在 thinking 对象内
-    },
-    ...
-)
+```json
+{
+  "model": "opusplan"
+}
 ```
 
-> ⚠️ 如果你的产品会将推理过程流式输出给用户，默认行为会导致一段很长的"静默"后才出现正文。
+`opusplan` 在 Plan 阶段使用 Opus，在执行阶段切换到 Sonnet。模型切换会影响 Prompt Cache，因此它适合规划收益明显的任务，不适合所有小修改。
 
-### 迁移 Checklist
+## Haiku 4.5：让轻量工作离开主会话
 
-```python
-# 1. 更新模型名
-model = "claude-opus-4-6"   # Before
-model = "claude-opus-4-7"   # After
+Haiku 4.5 的价值是速度和规模化。它适合快速搜索、日志摘要、简单文件分类、格式检查和不需要复杂判断的 Subagent。可以在 Subagent 定义中指定：
 
-# 2. 切换为自适应推理
-thinking = {"type": "enabled", "budget_tokens": 8192}  # Before（400错误）
-thinking = {"type": "adaptive"}                          # After
-
-# 3. 移除采样参数
-temperature = 0.7  # Before（400 错误）
-# 直接省略                # After
-
-# 4. 根据需要 opt-in 思考显示
-# "display": "summarized"  # 如需展示推理摘要
-
-# 5. 为新 Tokenizer 增加 max_tokens 余量
-max_tokens = 8192   # Before
-max_tokens = 12000  # After（同样内容最多多 35% token）
+```markdown
+---
+name: test-log-reader
+description: Read test output and list failures without changing files.
+model: haiku
+tools: Read, Grep, Glob
+---
 ```
 
-### Tokenizer 变化与 Token 成本
+把高输出但低决策密度的工作放在 Haiku Subagent 中，主会话只接收结论，往往比让主模型读取全部日志更快、更便宜。只要任务涉及架构取舍、风险判断或需要修改代码，就不要为了省钱强行使用 Haiku。
 
-Opus 4.7 使用了**新 Tokenizer**，同样的输入最多会产生 **1.35 倍的 token**，加上 xhigh 默认 effort 在 Agent 后期轮次中会产生更多推理输出。
+## Effort 让同一个模型有不同工作档位
 
-但 Anthropic 强调整体效率仍是正向的——**更少的工具调用次数、更高的一次性成功率**，总体 token 消耗在 xhigh effort 下相比 Opus 4.6 的 max effort 是下降的。Anthropic 也已提升所有订阅用户的额度上限来抵消 token 增长。
+模型和 effort 是两个维度。简单任务可以从 `low` 或 `medium` 开始，复杂任务用 `high`，真正需要更深推理时再使用 `xhigh` 或 `max`：
 
+```text
+/effort low
+/effort medium
+/effort high
+/effort xhigh
+/effort max
+```
 
-## 与 GPT-5.4 和 Gemini 3.1 Pro 的对比
+可用档位依赖模型。Fable 5.1、Fable 5、Opus 5 和 Sonnet 5 支持的档位更丰富，Haiku 4.5 不提供同样的 effort 选择。组织还可以用 `maxEffortLevel` 把上限设在 `medium` 或 `high`。
 
-| 指标 | Opus 4.7 | GPT-5.4 | Gemini 3.1 Pro |
-|------|---------|---------|----------------|
-| SWE-bench Pro | **64.3%** | 57.7% | 54.2% |
-| SWE-bench Verified | **87.6%** | 78.2% | 80.6% |
-| CursorBench | **70%** | — | — |
-| GPQA Diamond | 94.2% | **94.4%** | 94.3% |
-| 上下文窗口 | 1M tokens | 1M tokens | **2M tokens** |
-| 定价（输入/输出） | $5 / $25 | $2.50 / $15 | **$2 / $12** |
+默认建议不是把 effort 拉到最高，而是根据失败代价来定：
 
-**结论**：
-
-- **编程和 Agent 任务**：Opus 4.7 当前领先，SWE-bench Pro 超 GPT-5.4 近 7 个百分点
-- **纯推理（GPQA Diamond）**：三家已趋同至 ~94%，竞争分化在别处
-- **计算机使用**：GPT-5.4 在 OSWorld 以 75% 领先，是其相对优势（来源：Lushbinary 第三方分析）
-- **成本敏感场景**：Gemini 3.1 Pro 定价不到 Opus 4.7 的一半，且有 2M 上下文窗口
-
-
-## 社区评测：支持、中性、批评
-
-### 支持声音
-
-**Cursor CEO Michael Truell**：
-> "CursorBench 从 58% 跳到 70%，这是有意义的跨越——尤其在自主执行能力和创造性推理上提升明显。"
-
-**Devin CEO Scott Wu**：
-> "长时间自主性达到新高度——能连续工作数小时，碰到难题不放弃，解锁了一整类此前无法可靠运行的深度调查工作。"
-
-**Replit 总裁 Michele Catasta**：
-> "对我们的日常用例，同等质量所需 token 更少——分析日志、找 Bug、提修复方案更高效，还会在技术讨论中主动推翻我的想法帮我做更好的决策。"
-
-**Vercel 工程师 Joe Haddad**：
-> "在开始工作之前就对系统代码做证明——这是以前从未见过的新行为。"
-
-**AI 社区（Latent.Space / Scaling01）**：
-> "4.7-low 稳超 4.6-medium，4.7-high 已超 4.6-max……这要是放在几年前的发布节奏里，会是一次大升级。"
-
-### 中性 / 分析性观点
-
-**Kimmonismus（AI 评测账号）**：
-> "扎实的升级，聚焦在 Anthropic 核心买家最在意的三件事：Agent 编程可靠性、计算机使用的视觉能力、知识工作。但显然不如 Mythos。"
-
-**LlamaIndex / ParseBench 评测**（独立分析，更有参考价值）：
-- 图表解析：13.5% → 55.8%（**大幅提升**）
-- 格式排版：64.2% → 69.4%（小幅提升）
-- 内容忠实度：89.7% → 90.3%（微升）
-- 布局理解：16.5% → **14.0%**（**轻微回退**）
-
-**Jerry Liu（LlamaIndex CEO）** 的成本分析：
-> "用 Opus 4.7 做 OCR 大概是 ~7¢/页，而我们自己的 Agent 模式只需 ~1.25¢/页，成本优化模式约 ~0.4¢/页。能力强了，但对文档处理流水线来说，专用方案仍然更划算。"
-
-### 批评声音
-
-**长上下文回退**：多名用户和研究者发现 Opus 4.7 在 MRCR（needle-in-a-haystack 类基准）上表现比 4.6 差。Anthropic 工程师 Boris Cherny 的回应是：MRCR 正在被淘汰，因为它过度侧重"干扰项堆砌技巧"，新指标 Graphwalks 才是更好的长上下文推理信号——而 4.7 在 Graphwalks 上从 38.7% 提升到了 58.6%。
-
-**Token 膨胀**：新 Tokenizer 被批评为"Token 吸血鬼"，尽管定价不变，有效成本最高可能上升 35%。
-
-**无法强制推理**：部分用户（如前 Microsoft Bing AI 负责人 Mikhail Parakhin）反映，没有显式开关让模型"必须思考"，对于非编程任务，第一印象是"变笨了"。
-
-**Theo（T3 Chat）** 的尖锐评价：
-> "新的系统提示好像把模型'开刀手术'了一遍。"（他同时建议在 T3 Chat 里使用，因为那里没有 Anthropic 默认的系统提示。）
-
-
-## 社区一线反馈：提升是真的，接入成本也是真的
-
-发布后最有代表性的公开讨论，反而没有纠结 benchmark 本身，而是在问一句更现实的话：**"它到底有没有让我更快把活干完？"**
-
-从 Hacker News 主帖（`47793411`）等一手社区讨论来看，普遍反馈是：**有提升，但不是无脑替换**。用户 `JamesSwift` 直言 Anthropic 仍然 "miles ahead in getting work done"；`arcanemachiner` 则提到，4.7 在 200K+ token 的长会话里比 4.6 更稳，不那么容易在会话后期突然"变笨"。这类反馈的共同点是：对长链路 coding、Agent 任务、复杂多步修复，**4.7 的"收尾能力"比 4.6 更被认可**。
-
-负面反馈也非常集中，且几乎都不是"模型不强"，而是**升级摩擦**：
-
-- `simonw` 直接吐槽新版 `adaptive thinking` 体验混乱，把 thinking summary 默认改为 `omitted` 后，主观感受是"先沉默很久，再突然吐答案"
-- `ai_slop_hater`、`rkuska` 等用户认为，自适应思考的"何时深想"不可控，黑盒感比 4.6 更强
-- 部分用户在升级后反映初印象"好像变笨了"——原因正是没有显式传入 `thinking: {type: "adaptive"}`，模型默认不开推理
-
-**GitHub Issue 里的具体踩坑**是另一面镜子。`stagewise#915`、`anthropics/claude-agent-sdk-python#830`、`CherryHQ/cherry-studio#14349`、`SillyTavern#5465`、`Switchdotnew/switch-router#2`、`vercel/ai#14582` 这些 issue / PR 几乎都在修同三件事：
-
-1. 删掉 `temperature` / `top_p` / `top_k`（传入直接 400）
-2. 把 `thinking.display` 补成 `"summarized"`（否则推理流静默）
-3. 把 `effort` 和 `task_budget` 改到 `output_config` 对象里
-
-这说明社区真正的分歧不在于"4.7 比 4.6 强不强"，而是：**如果你直连 Anthropic API，升级价值很明显；如果你隔着 SDK 封装、代理层或 IDE 插件，真正的成本往往在兼容层，而不在模型本身。**
-
-> 💡 **建议**：升级前用 `dry-run` 思路跑一遍迁移 Checklist；开启 `thinking.display: "summarized"` 后在你的 UI 里预览一次推理流，确认用户侧体验可接受，再切流量。
-
-
-## Mythos 背景与网络安全
-
-Mythos Preview 是 Anthropic 目前最强大的模型，但因网络安全能力太强而被限制分发。
-
-Opus 4.7 是第一个作为"安全护栏测试床"发布的模型：
-
-- 训练中**主动降低**某些网络安全能力（差异化能力缩减）
-- 部署**自动检测和拦截**网络安全违规请求的护栏系统
-- 在此收集的真实部署经验，将用于最终向公众开放 Mythos 级模型
-
-合法的安全研究人员（漏洞研究、渗透测试、Red Team）可以通过新的 [Cyber Verification Program](https://claude.com/form/cyber-use-case) 申请授权访问。
-
-
-## 定价与成本分析
-
-| 项目 | 费用 |
+| 任务 | 建议 |
 |------|------|
-| 标准 API 输入 | $5 / MTok |
-| 标准 API 输出 | $25 / MTok |
-| Prompt Caching | 最高节省 90% |
-| 批处理（Batch） | 节省 50% |
-| 新 Tokenizer 额外开销 | 1.0–1.35x（因内容而异） |
+| 查一个定义、改一处文案 | `low` 或 `medium` |
+| 日常开发、测试和局部 Bug | `medium` 或 `high` |
+| 跨模块重构、架构决策 | `high` 或 `xhigh` |
+| 长时间开放式研究 | Opus / Fable，再考虑 `xhigh` 或 `max` |
 
-相比 Opus 4.6，**单次请求的实际成本可能更高**（新 Tokenizer + xhigh 默认等级），但**完成相同任务所需的轮次更少**。Anthropic 在自己的内部编程评测中，xhigh effort 下 4.7 的总 token 消耗比 4.6 的 max effort 仍然更低。
+`ultracode` 还会安排动态工作流。它优化的是复杂任务的探索和交叉验证，不是每个会话的省钱模式。
 
+## 1M 上下文不是所有任务的必选项
 
-## 何时选 Opus 4.7，何时用 Sonnet 4.6
+Fable、Opus 5 和 Sonnet 5 都支持 1M 上下文。需要处理大仓库、长报告、跨多份设计文档或长时间保持线索时，可以在 `/model` 中选择：
 
-**用 Opus 4.7 的场景**：
-- 多文件跨仓库重构
-- 需要长时间自主运行的 Agent 任务（小时级）
-- 高分辨率图像分析、计算机使用 Agent
-- 需要深度推理的复杂 Bug 排查
-- 法律、金融、科学文献分析
-- 生产代码 Code Review（/ultrareview）
+```text
+/model sonnet[1m]
+/model opus[1m]
+```
 
-**继续用 Sonnet 4.6 的场景**：
-- 日常编码辅助和代码补全
-- 快速问答和解释
-- 有明确范围的中等复杂任务
-- 成本敏感型大规模调用
-- 原型验证和快速迭代
+1M 会带来更大的读取和缓存空间，也可能带来更多噪音。推荐先精确搜索，再逐步扩大范围；不要因为窗口很大就让 Claude 一次读取所有目录。若团队希望隐藏扩展上下文选项，可以设置 `CLAUDE_CODE_DISABLE_1M_CONTEXT=1`。
 
+## 模型安全边界需要单独看
 
-## 总结
+强模型在网络安全、生物和其他高风险领域可能触发安全分类器。Claude Code 可能自动回退到允许的模型，也可能拒绝请求；这由模型、提供商、组织白名单和安全策略共同决定。
 
-Latent.Space 的标题说得精准：**"字面意义上每个维度都强一步"**。
+“模型能理解一段漏洞代码”与“模型会执行攻击或外发数据”不是同一个能力。实际项目应同时配置：
 
-这不是模型路线的范式转换，而是 Anthropic 在每个关键维度精准推进：编程能力又高了 10 个点，视觉能力从"将就能用"跳到"接近完美"，Agent 可靠性从"需要监督"走向"可以放手"。
+- `permissions.deny` 阻止敏感文件和危险工具；
+- Auto Mode 的可信仓库、域名和云资源；
+- Bash 沙箱或隔离容器；
+- 对外发消息、部署和推送的人工确认；
+- CI 中的最小凭证和最小 `allowedTools`。
 
-**xhigh effort + 自适应推理 + 自我验证**这三者的组合，让 Opus 4.7 不再是一个需要细心调教的工具，更像一个可以真正"委托任务"的工程师。Cat Wu（Anthropic）的建议很好地总结了这个方向：
+模型越强，越应该把这些边界写进程序配置，而不是只在提示词里提醒。
 
-> "把它当成你委托的工程师，而不是你手把手指挥的 Pair Programmer。提前写清楚目标、约束和验收标准，然后让它自己跑。"
+## 用项目评测而不是排行榜做最后决定
 
-对于大多数把 Claude Code 或 API 用于复杂编程和 Agent 任务的用户，Opus 4.7 是值得升级的。唯一需要注意的是：**在迁移前处理好 3 个 API 破坏性变更**，并对使用高分辨率图像或大量长文本的场景做一次 token 成本评估。
+公开评测能说明模型在某些条件下的能力，不能替你判断它在当前仓库是否更好。为团队选默认模型时，准备一小组真实任务：
 
+- 一个跨文件 Bug 修复；
+- 一个需要补测试的功能；
+- 一个旧模块重构；
+- 一个代码审查和安全边界任务；
+- 一个长文档或数据整理任务。
 
-## 参考链接
+固定提示词、验证命令和人工评分标准，记录完成时间、工具调用次数、失败类型、人工返工量和缓存用量。模型“回答得更聪明”不等于整个任务成本更低；少一次返工，有时比输出更长的解释更有价值。
 
-- [Anthropic 官方发布公告](https://www.anthropic.com/news/claude-opus-4-7)
-- [Claude Opus 4.7 System Card](https://anthropic.com/claude-opus-4-7-system-card)
-- [迁移指南：Opus 4.6 → 4.7](https://platform.claude.com/docs/en/about-claude/models/migration-guide#migrating-to-claude-opus-4-7)
-- [Claude Opus 4.7 模型配置](/articles/claude-code-model-config)
-- [Project Glasswing 与网络安全](https://www.anthropic.com/glasswing)
-- [Latent.Space：社区深度分析](https://www.latent.space/p/ainews-anthropic-claude-opus-47-literally)
-- [开发者 Benchmark 详解（Lushbinary）](https://lushbinary.com/blog/claude-opus-4-7-developer-guide-benchmarks-vision-migration/)
+## 直接可用的选择表
+
+| 你的任务 | 默认选择 | 何时升级 |
+|----------|----------|----------|
+| 局部编码、测试、文档 | Sonnet 5 | 连续两轮仍无法定位问题时用 Opus 5 |
+| 复杂重构和架构 | Opus 5 | 需要更长自主推进时用 Fable 5.1 |
+| 大仓库长会话 | Sonnet 5 或 Opus 5 + `[1m]` | 只有上下文确实成为瓶颈时开启 |
+| 日志、搜索、分类 | Haiku 4.5 Subagent | 需要判断根因时交给 Sonnet 或 Opus |
+| 高价值开放式研究 | Opus 5 | 需要长时间自主调查和验证时用 Fable 5.1 |
+
+如果没有特别理由，先用 Sonnet 5；复杂度上升时切 Opus 5；只有任务本身需要长期自主性时才用 Fable 5.1。模型名称只是入口，真正决定结果的仍是范围、权限、上下文和验证标准。
+
+官方参考：[模型概览](https://platform.claude.com/docs/en/models/overview)、[Claude Code 模型配置](https://code.claude.com/docs/en/model-config)、[Claude Opus 5 发布说明](https://www.anthropic.com/news/claude-opus-5)。

@@ -1,444 +1,251 @@
 ---
 title: "Claude Code 第二篇：快速上手——安装、登录、选入口、跑通第一个真实任务"
-date: '2026-04-02'
+date: '2026-09-19'
 tags: ['软件开发', 'AI 编程', 'ClaudeCode']
 published: true
 brief: >-
-  从安装到跑通第一个真实任务，只需要十分钟。本文覆盖三种安装方式、四种登录认证、五大入口选择，并带你用一个真实项目闭环走完"理解代码→修改→验证→提交"的全流程。
+  从安装、登录到完成一次真实修改，Claude Code 的上手重点不是记住命令，而是建立“目标—上下文—权限—验证”的工作习惯。本文覆盖本地安装、常用入口、首次任务和最容易踩坑的配置边界。
 ---
 
-> 十分钟内，让 Claude Code 在你的项目里跑起来。
+> 先在真实项目里完成一个小而完整的任务，比在空目录里试一堆命令更容易理解 Claude Code。
 
-## 引言：你的第一个 Claude Code 会话
+## 安装方式按更新习惯来选
 
-上一篇我们建立了从 OpenCode 到 Claude Code 的心智模型。这一篇只做一件事：**让你从零开始，跑通第一个真实任务**。
-
-不是 Hello World，不是玩具项目，而是在你的真实代码库里完成一个有意义的操作闭环：
-
-```
-安装 → 登录 → 选入口 → 理解项目 → 做一个小改动 → 跑验证 → 查看 diff → 提交
-```
-
-## 安装 Claude Code
-
-### 三种安装方式
-
-| 安装方式 | 命令 | 自动更新 | 适用场景 |
-|---------|------|:------:|---------|
-| **Native Install（推荐）** | `curl -fsSL https://claude.ai/install.sh \| bash` | ✅ | 日常开发，保持最新 |
-| **Homebrew** | `brew install --cask claude-code` | ❌ | macOS 用户偏好 brew 管理 |
-| **WinGet** | `winget install Anthropic.ClaudeCode` | ❌ | Windows 用户 |
-
-**macOS / Linux / WSL 推荐**：
+官方推荐 Native Install。macOS、Linux 和 WSL 可以直接运行：
 
 ```bash
-# Native Install（推荐，自动后台更新）
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-**Windows 推荐**：
+Windows 可以在 PowerShell 中运行：
 
 ```powershell
-# PowerShell
 irm https://claude.ai/install.ps1 | iex
 ```
 
-> **Windows 前置条件**：需要先安装 [Git for Windows](https://git-scm.com/downloads/win)。
+也可以使用 CMD 安装脚本：
 
-**验证安装**：
+```bat
+curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+```
+
+Native Install 会在后台更新。macOS 用户如果希望由 Homebrew 管理，可以选择稳定频道或最新频道：
+
+```bash
+brew install --cask claude-code
+# 最新频道：brew install --cask claude-code@latest
+```
+
+Homebrew 不会自动更新，升级命令要和安装的 cask 对应。Windows 也可以使用 WinGet：
+
+```powershell
+winget install Anthropic.ClaudeCode
+```
+
+Windows 原生运行不强制要求 Git for Windows。安装 Git 后，Claude Code 可以使用 Git Bash；没有 Git 时则使用 PowerShell 工具。需要 Linux 工具链或沙箱时，再考虑 WSL 2。
+
+安装完成后先确认命令可用：
 
 ```bash
 claude --version
+claude doctor
 ```
 
-### 更新策略
+`claude doctor` 只做安装和配置诊断，不会开启一轮编码会话。遇到 `command not found` 时，先重新打开终端并检查 PATH，不要急着用 `sudo` 覆盖安装目录。
 
-- **Native Install**：自动后台更新，无需手动操作
-- **Homebrew**：需要定期运行 `brew upgrade claude-code`
-- **WinGet**：需要定期运行 `winget upgrade Anthropic.ClaudeCode`
+## 登录方式决定可用能力
 
-> **从 OpenCode 迁移者注意**：OpenCode 用 `npm install -g opencode-ai` 或 `curl` 脚本安装。Claude Code 不推荐 npm 安装方式，主推 Native Install。
-
-## 登录认证
-
-安装后，在任何项目目录启动 Claude Code：
+在项目目录运行 `claude`，按提示完成登录：
 
 ```bash
-cd your-project
+cd /path/to/your-project
 claude
 ```
 
-首次启动会提示登录。使用 `/login` 命令选择认证方式。
-
-### 四种认证方式
-
-| 认证方式 | 适合人群 | 特点 |
-|---------|---------|------|
-| **Claude Pro / Max** | 个人开发者 | 按月订阅，功能最完整 |
-| **Claude Teams / Enterprise** | 团队 / 企业 | SSO、集中管理、托管策略 |
-| **Anthropic Console（API）** | API 开发者 | 按用量付费，通过环境变量配置 API Key |
-| **第三方 Provider** | 企业云用户 | Amazon Bedrock / Google Vertex AI / Microsoft Foundry |
-
-**个人用户推荐**：Claude Pro 或 Max 订阅，功能最全、限制最少。
-
-**重要区别**：使用 `claude.ai` 账户登录可以获得最完整的功能（包括 Remote Control、Channels、Cloud Sessions 等）。第三方 Provider 登录虽然支持基础编码功能，但部分高级功能（如 Chrome 调试、Agent Teams）可能不可用。
+也可以直接调用认证命令：
 
 ```bash
-# 登录（首次启动自动提示，或手动执行）
-/login
+claude auth login
+```
 
-# 切换账户
+Claude Code 支持几类常见身份：
+
+| 身份 | 适合场景 | 说明 |
+|------|----------|------|
+| Claude Pro / Max | 个人开发 | 通过 Claude 账户登录，适合本地日常使用 |
+| Team / Enterprise | 团队和企业 | 支持组织策略、权限管理和托管设置 |
+| Anthropic Console | API 用量计费 | 可用 API Key，也可用 `claude auth login --console` 登录 |
+| Amazon Bedrock / Google Cloud / Microsoft Foundry | 企业云部署 | 模型、凭证和可用功能由云平台配置 |
+
+如果环境里已经设置 `ANTHROPIC_API_KEY`，首次启动时 Claude Code 会询问是否使用它。API Key、第三方云凭证和 Claude 账户登录不是同一套计费与功能边界；Chrome、Channels 等能力还会受身份类型限制，遇到功能不可用时先查看对应官方文档。
+
+切换账户可以重新运行：
+
+```text
 /login
 ```
 
-登录凭证会安全存储在本地，后续无需重复登录。
-
-## 选择你的入口
-
-Claude Code 有五种主要入口，选哪个取决于你的工作场景：
-
-### 入口选择指南
-
-```
-你的主要工作场景是什么？
-│
-├─ 终端重度用户、需要管道和脚本 → Terminal CLI
-│
-├─ 需要可视化 diff 审查 → VS Code 扩展
-│
-├─ 使用 IntelliJ / PyCharm / WebStorm → JetBrains 插件
-│
-├─ 需要并行多会话、定时任务 → Desktop App
-│
-└─ 没有本地环境、或想在移动端工作 → Web（claude.ai/code）
-```
-
-### Terminal CLI（本文重点）
-
-作为从 OpenCode 迁移过来的用户，你最熟悉的就是 Terminal CLI。好消息是：Claude Code 的 CLI 体验和 OpenCode 非常相似，上手成本极低。
+退出当前身份则使用：
 
 ```bash
-# 启动交互会话
-claude
-
-# 一次性任务（执行后退出）
-claude "fix the build error in src/utils.ts"
-
-# 一次性查询（只返回结果，不交互）
-claude -p "explain the auth flow in this project"
-
-# 继续上一个会话
-claude -c
-
-# 恢复历史会话（选择列表）
-claude -r
+claude auth logout
 ```
 
-### VS Code 扩展
+## 入口选择比命令数量更重要
+
+| 入口 | 适合谁 | 主要价值 |
+|------|--------|----------|
+| CLI | 终端开发者、远程服务器和脚本使用者 | 功能完整，能接管道、`claude -p` 和 Agent SDK |
+| VS Code | 希望在编辑器里看 diff 的开发者 | 内联 diff、文件上下文和计划审查 |
+| JetBrains | IntelliJ、PyCharm、WebStorm 用户 | 选中代码、diff 和终端会话结合 |
+| Desktop | 需要并行会话、预览和可视化审查 | 管理本地或云端任务，也支持 Dispatch |
+| Web / Mobile | 不在电脑前、需要云端继续任务 | 云端运行，移动端负责启动和监控 |
+
+首次使用建议从 CLI 开始，因为它最容易看清权限、工具调用和文件 diff。熟悉后再按工作场景增加 IDE 或 Desktop，不需要把所有入口都装一遍。
+
+## 用一个小任务跑通完整闭环
+
+在真实项目里启动 Claude Code，先让它说明计划，不要一上来就授权大范围修改：
+
+```text
+请先了解这个项目的技术栈、入口文件和测试命令。
+只阅读必要的文件，先不要修改任何内容。
+```
+
+Claude Code 不会因为你启动了会话就自动读完整个仓库。它会根据问题调用搜索和读取工具，因此问题越具体，初始上下文越干净。已知文件时，可以用 `@` 直接引用：
+
+```text
+解释 @src/auth/session.ts 如何从登录请求走到会话校验。
+```
+
+确认项目结构后，给一个范围清楚的小任务：
+
+```text
+在 README.md 增加本地开发说明，沿用 package.json 里的命令。
+只修改 README.md，完成后运行 Markdown 校验或项目已有的文档检查。
+```
+
+在默认权限模式下，Claude Code 会在需要执行命令或修改文件时请求批准。批准前检查路径、命令和变更范围；看见不符合要求的动作，直接拒绝并说明原因。
+
+修改完成后，把验收标准说清楚：
+
+```text
+查看当前 diff，确认没有修改 README.md 之外的文件。
+运行项目已有的检查命令，并把失败原因和未运行的检查分别列出。
+```
+
+确认 diff 和检查结果后，再由你决定是否提交。Claude Code 可以帮忙生成 commit message，但不应该把“看过 diff”和“提交代码”混成一个不可逆动作。
+
+## 六个概念足够支撑第一次使用
+
+### 会话
+
+每次 `claude` 都会创建或恢复一个会话。常用入口如下：
 
 ```bash
-# 安装
-code --install-extension anthropic.claude-code
+claude --continue       # 继续当前目录最近的会话
+claude --resume         # 打开会话选择器
+claude --resume name    # 恢复命名会话
+claude --from-pr 123    # 按 Pull Request 筛选相关会话
 ```
 
-或在 VS Code 扩展市场搜索 "Claude Code"。安装后通过命令面板（`Cmd+Shift+P`）搜索 "Claude Code" 打开。
+会话会持续写入本地 transcript。`/clear` 会开始一段干净对话，但之前的会话仍可通过 `/resume` 找回。
 
-**核心优势**：内联 diff 预览、@-提及文件引用、计划审查面板。
+### 代理循环
 
-### Desktop App
-
-从 [claude.com/download](https://claude.com/download) 下载安装。
-
-**核心优势**：
-- 并行运行多个会话
-- Dispatch：从手机发送任务
-- 可视化 diff 审查
-- 定时任务管理
-- 云端会话
-
-### Web
-
-直接访问 [claude.ai/code](https://claude.ai/code)，无需本地安装。
-
-**核心优势**：
-- 无需本地环境
-- 长时间运行任务
-- 处理你本地没有的仓库
-- 移动端可用
-
-### JetBrains 插件
-
-从 [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/27310-claude-code-beta-) 安装，支持 IntelliJ IDEA、PyCharm、WebStorm 等。
-
-> **建议**：初期先用 Terminal CLI 熟悉核心操作，之后根据需要添加 IDE 扩展或 Desktop App 作为补充。
-
-## 跑通第一个真实任务
-
-现在让我们在你的真实项目里完成一个完整的操作闭环。以下以一个实际的博客项目为例演示。
-
-### 第一步：让 Claude 理解你的项目
-
-```bash
-cd /path/to/your/project
-claude
-```
-
-进入交互会话后，先让 Claude 熟悉你的代码库：
-
-```
-这个项目做什么？用了什么技术栈？
-```
-
-Claude 会自动读取你的项目文件（`package.json`、`tsconfig.json`、目录结构等），给出一份项目概要。
-
-你也可以问更具体的问题：
-
-```
-这个项目的主入口在哪里？
-```
-
-```
-解释一下目录结构和各模块的职责
-```
-
-> **关键区别**：和 OpenCode 不同，你不需要手动把文件"添加到上下文"。Claude Code 会根据需要自动读取文件。
-
-### 第二步：做一个小改动
-
-选一个真实的小任务，比如：
-
-```
-在 README 中添加一个"快速开始"章节，包括安装和启动命令
-```
-
-Claude 会：
-1. 读取现有的 README 文件
-2. 分析项目的 `package.json` 了解可用命令
-3. 生成修改建议并**展示 diff**
-4. **等待你的批准**
-
-```
-> Claude: 我将对 README.md 进行以下修改：
-> [显示 diff 预览]
-> 确认修改？(y/n)
-```
-
-输入 `y` 确认，Claude 会执行修改。
-
-### 第三步：跑验证
-
-让 Claude 帮你验证修改没有破坏任何东西：
-
-```
-运行构建和测试，确保一切正常
-```
-
-Claude 会根据你的项目自动选择正确的命令（`npm run build`、`npm test`、`pytest` 等）。首次运行时，Claude 会请求执行 shell 命令的权限。
-
-### 第四步：查看 diff 和提交
-
-```
-查看我刚才的所有修改
-```
-
-Claude 会执行 `git diff` 并展示变更摘要。
-
-```
-用描述性的提交信息提交这些修改
-```
-
-Claude 会：
-1. 暂存修改的文件
-2. 根据变更内容生成一条描述性的提交信息
-3. 请求你确认后执行提交
-
-```
-> Claude: 建议提交信息：
-> "docs: add quick start section to README with install and run commands"
-> 确认提交？(y/n)
-```
-
-### 完整闭环回顾
-
-恭喜！你刚刚完成了一个完整的 Claude Code 操作闭环：
-
-```
-理解项目 → 做修改 → 跑验证 → 查看 diff → 提交
-```
-
-这五步是你日常使用 Claude Code 最核心的工作流。
-
-## 你需要先知道的 6 个概念
-
-在深入日常使用之前，先了解这 6 个核心概念：
-
-### 会话（Session）
-
-每次 `claude` 启动是一个独立会话，拥有自己的上下文窗口。会话自动保存在本地。
-
-```bash
-claude          # 新会话
-claude -c       # 继续最近的会话
-claude -r       # 选择历史会话恢复
-```
-
-### 代理循环（Agentic Loop）
-
-Claude Code 不是简单的问答，而是一个**代理循环**：
-
-```
-你的提示 → Claude 收集上下文 → Claude 采取行动 → Claude 验证结果 → 重复直到完成
-```
-
-一个任务可能触发十几次工具调用（读文件、搜索、编辑、运行命令），Claude 会根据每一步的结果决定下一步做什么。
+Claude Code 的一次回答可能包含多次读取、搜索、编辑和命令执行。它会根据每一步结果决定下一步，不是只生成一段代码就结束。因此提示词里最好同时写清楚目标、范围和验证方式。
 
 ### 内置工具
 
-Claude Code 自带五类内置工具，覆盖大部分编码任务：
-
-| 类别 | 能力 | 示例 |
-|------|------|------|
-| **文件操作** | 读取、编辑、创建、重命名 | 读代码、改文件 |
-| **搜索** | 文件搜索、内容搜索（正则） | 找到所有使用某个函数的地方 |
-| **执行** | Shell 命令、git、测试 | 跑构建、跑测试、git 提交 |
-| **网络** | Web 搜索、获取文档 | 搜索错误信息、查看库文档 |
-| **代码智能** | 类型检查、跳转定义、查找引用 | 查看类型错误（需要插件） |
+常见工具包括文件读取与编辑、Glob / Grep 搜索、Bash 或 PowerShell、WebFetch、MCP、代码智能和浏览器工具。工具能否调用由权限模式和规则决定，不由 `CLAUDE.md` 里的文字决定。
 
 ### 权限模式
 
-Claude 不会未经许可就修改你的代码。默认模式下，每次编辑和命令都需要你确认。
+当前常用模式可以这样理解：
 
-按 `Shift+Tab` 循环切换模式：
+| 模式 | 无需逐次确认的范围 | 适合场景 |
+|------|--------------------|----------|
+| Manual（配置值 `default`） | 读取通常直接执行，编辑、命令和网络操作会询问 | 初次使用、敏感仓库 |
+| `acceptEdits` | 自动接受文件编辑和常见文件操作，命令仍需关注 | 反复改代码、由人审查命令 |
+| `plan` | 读取和计划阶段的探索动作 | 复杂改动先研究再执行 |
+| `auto` | 由安全分类器代替人工逐项判断 | 长任务、减少提示疲劳 |
+| `dontAsk` | 只运行预先允许的工具，其余直接拒绝 | CI 和严格自动化 |
+| `bypassPermissions` | 跳过大多数检查 | 只在隔离容器或虚拟机中使用 |
 
-| 模式 | 行为 | 适合场景 |
-|------|------|---------|
-| **默认** | 编辑和命令都要确认 | 初期使用、敏感操作 |
-| **自动接受编辑** | 编辑自动通过，命令仍需确认 | 信任 Claude 的代码修改 |
-| **Plan Mode** | 只做分析和规划，但可以读文件和运行探索性 shell 命令 | 复杂任务前先看计划 |
-
-> **Auto Mode**：需要额外启用（非 `Shift+Tab` 循环中的选项），启用后 Claude 自主评估并执行操作，仅在安全规则阻止时才暂停请求确认。适合高度信任场景。
+交互会话中可用 `Shift+Tab` 切换可用模式。`dontAsk` 和 Bypass 通常应在启动参数或受控配置中明确设置。
 
 ### 上下文窗口
 
-Claude 的上下文窗口有限。它保存了你的对话历史、文件内容、命令输出、CLAUDE.md 等所有信息。随着对话推进，上下文会逐渐填满。
+对话历史、工具输出、项目指令和当前问题都会占用上下文。`/context` 可以查看装载情况，`/compact` 会把旧历史压缩成摘要，`/clear` 则从新会话开始。不要把“上下文更大”理解成“所有文件都应该一次读进来”。
 
-- Claude 会自动压缩（compact）旧的对话内容
-- 你可以手动运行 `/compact` 来释放空间
-- 运行 `/context` 查看当前上下文使用情况
-- 超长对话建议开新会话
+### 检查点
 
-### 检查点（Checkpoint）
+Claude Code 会保存文件修改的历史检查点。需要回退时可以运行 `/rewind`，或连续按两次 `Esc` 打开回退入口。检查点只覆盖 Claude Code 能记录的本地文件和对话状态，远程 API、数据库或部署动作不能靠它撤销。
 
-Claude 在编辑文件前会自动快照。如果改坏了：
+## 高频命令
 
-- 按两次 `Esc` 回退到上一个检查点
-- 或者直接告诉 Claude "撤销刚才的修改"
-
-> **注意**：检查点只覆盖文件修改。影响远程系统的操作（数据库写入、API 调用、部署）无法回退。
-
-## 基础命令速查
-
-### 启动命令
-
-| 命令 | 作用 | 示例 |
-|------|------|------|
-| `claude` | 启动交互会话 | `claude` |
-| `claude "task"` | 一次性任务 | `claude "fix the build error"` |
-| `claude -p "query"` | 查询后退出 | `claude -p "explain this function"` |
-| `claude -c` | 继续最近会话 | `claude -c` |
-| `claude -r` | 恢复历史会话 | `claude -r` |
-
-### 会话内命令
-
-| 命令 | 作用 |
-|------|------|
-| `/help` | 显示帮助信息 |
-| `/clear` | 清除对话历史 |
-| `/compact` | 压缩上下文 |
-| `/context` | 查看上下文使用情况 |
-| `/model` | 切换模型 |
-| `/memory` | 查看 / 管理记忆系统 |
-| `/mcp` | 查看 MCP 连接状态 |
-| `/init` | 初始化项目（创建 CLAUDE.md） |
-| `/status` | 查看当前状态 |
-| `exit` 或 `Ctrl+D` | 退出会话 |
-
-### 快捷键
-
-| 快捷键 | 作用 |
-|--------|------|
-| `Shift+Tab` | 循环切换权限模式 |
-| `Esc` × 2 | 回退到检查点（rewind） |
-| `Ctrl+C` | 取消当前操作 |
-| `Ctrl+D` | 退出会话 |
-| `Ctrl+G` | 在编辑器中打开输入 |
-| `Ctrl+O` | 切换详细输出 |
-| `Alt+P` | 切换模型 |
-| `Tab` | 命令补全 |
-| `↑` | 查看历史输入 |
-
-## 初始化你的项目
-
-在你的项目里运行一次 `/init`，Claude 会引导你创建一份 `CLAUDE.md`：
+### 启动与脚本
 
 ```bash
 claude
-# 进入会话后
-/init
+claude "检查登录流程的错误处理"
+claude -p "解释这个函数"                       # 非交互运行
+cat build.log | claude -p "找出构建失败的根因"
+claude --model sonnet
+claude --permission-mode plan
 ```
 
-Claude 会分析你的项目结构、技术栈、构建工具，然后生成一份包含核心约定的 `CLAUDE.md` 文件。
+脚本或 CI 使用 `-p` 时，通常还要配合 `--bare`、`--allowedTools` 和 `--output-format json`，避免把个人机器上的 Hooks、Skills 或 MCP 意外带进自动化环境。
 
-如果你已经有 `AGENTS.md`（从 OpenCode 带过来的），推荐的做法是在 `CLAUDE.md` 中引用它：
+### 会话内命令
+
+```text
+/help          查看帮助
+/config        设置界面
+/permissions   查看 allow / ask / deny 规则
+/model         切换模型
+/effort        调整推理深度
+/context       查看上下文
+/compact       压缩历史
+/clear         开始新对话
+/resume        切换会话
+/rewind        回退检查点
+/mcp           查看 MCP 状态
+/plugin        管理插件
+/hooks         查看 Hooks
+/agents        查看 Subagent 配置
+/tasks         查看后台任务
+/doctor        诊断设置
+```
+
+浏览器自动化使用 `/chrome`，沙箱使用 `/sandbox`，需要把本地会话交给手机或浏览器时使用 Remote Control 相关命令。命令列表会随入口和组织策略变化，以 `/help` 为准。
+
+## 把项目约定放到正确的位置
+
+运行 `/init` 可以让 Claude Code 根据项目生成一份起点 `CLAUDE.md`。生成后仍要人工删掉它能从代码推断出的冗余内容，只留下构建、测试、架构约束和安全边界。
+
+如果项目已经有 `AGENTS.md`，可以直接保留，并在 `CLAUDE.md` 中导入：
 
 ```markdown
-# CLAUDE.md
-
 @AGENTS.md
 
-## 额外约定
-- 提交前运行 npm run build 验证构建
-- 使用 vitest 运行测试
+## Claude Code 专用约定
+- 修改后运行 `just check`
+- 未经确认不要提交或推送
 ```
 
-> **关于记忆系统**：`/init` 只是开始。Claude Code 还有 Auto Memory、`.claude/rules/` 条件规则等更丰富的记忆能力，将在本系列第 5 篇详细介绍。
+项目共享权限和 Hooks 放入 `.claude/settings.json`；个人例外放入 `.claude/settings.local.json`，不要把个人 Token 写进仓库。项目级 MCP 使用 `.mcp.json`，个人 MCP 使用 `~/.claude.json`。
 
-## 常见问题排查
+## 上手时最容易误判的几件事
 
-### 安装问题
+| 现象 | 更准确的判断 |
+|------|--------------|
+| Claude 没有主动读完整个仓库 | 这是正常的按需读取；用具体问题或 `@` 指定范围 |
+| 每一步都在问权限 | 先理解模式和规则，再为安全的重复命令增加 `allow` |
+| Windows 安装提示缺少 Git | Git 是 Bash 工具的选项，不是原生安装的硬性前提 |
+| API Key 能登录但某功能不可用 | 账户登录、Console 和第三方云的功能范围不同 |
+| 上下文很快变大 | 检查大段日志、无关 MCP、过长 `CLAUDE.md` 和没有隔离的探索任务 |
 
-| 问题 | 解决方案 |
-|------|---------|
-| `command not found: claude` | 重新打开终端，或检查 PATH 配置 |
-| Windows 安装失败 | 确保已安装 Git for Windows |
-| 权限错误 | macOS/Linux 下尝试 `sudo` 或检查目录权限 |
+第一次使用不需要记住全部命令。能在真实项目中完成一次“理解范围—修改—验证—审查 diff”的闭环，之后再按遇到的问题补充权限、记忆和扩展配置。
 
-### 登录问题
-
-| 问题 | 解决方案 |
-|------|---------|
-| 浏览器未自动打开 | 手动复制终端显示的 URL 到浏览器 |
-| 令牌过期 | 运行 `/login` 重新登录 |
-| 第三方 Provider 连接失败 | 检查 IAM 凭证或 Service Account 配置 |
-
-### 使用问题
-
-| 问题 | 解决方案 |
-|------|---------|
-| Claude 读不到我的文件 | 确认在正确的项目目录启动 `claude` |
-| 终端显示乱码 | 检查终端是否支持 Unicode，尝试不同终端 |
-| 响应很慢 | 检查网络连接；或换用更快的模型（`/model`） |
-| 上下文溢出 | 运行 `/compact` 或开新会话 |
-
-## 小结
-
-这篇文章带你完成了 Claude Code 的完整起步流程：
-
-1. **安装**：推荐 Native Install，自动后台更新
-2. **登录**：Claude Pro/Max 体验最完整
-3. **选入口**：先从 Terminal CLI 开始，按需扩展
-4. **跑通闭环**：理解项目 → 做修改 → 验证 → 查看 diff → 提交
-5. **核心概念**：会话、代理循环、内置工具、权限模式、上下文窗口、检查点
-6. **初始化项目**：用 `/init` 创建 CLAUDE.md
-
-下一篇，我们将深入 Claude Code 的日常工作流：如何高效地探索代码、修 Bug、重构、写测试、做 Git 操作和代码审查。
+官方参考：[安装与更新](https://code.claude.com/docs/en/setup)、[快速开始](https://code.claude.com/docs/en/quickstart)、[CLI 参考](https://code.claude.com/docs/en/cli-reference)、[认证](https://code.claude.com/docs/en/authentication)。

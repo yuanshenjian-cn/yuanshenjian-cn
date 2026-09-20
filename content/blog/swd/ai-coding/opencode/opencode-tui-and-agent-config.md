@@ -1,346 +1,276 @@
 ---
-title: OpenCode 进阶：TUI 隐藏技巧与 Agent 配置体系深度实践
-date: '2026-04-16'
+title: "OpenCode 进阶：TUI 快捷键与 Agent 配置体系"
+date: '2026-09-19'
 tags:
   - 软件开发
   - AI 编程
   - OpenCode
 published: true
 brief: >-
-  用了 OpenCode 一段时间后，大多数人还停在"建个对话发需求"的层面。这篇文章分享一些 TUI 界面里不太常见的操作方式，以及 Agent 配置体系的完整玩法——包括我自己的多模型 Agent 矩阵实践。
+  OpenCode 的 TUI 和 Agent 配置各自解决不同问题：TUI 负责会话、模型与上下文操作，Agent 负责权限、提示词和工具边界。内容覆盖当前快捷键、显示控制、子会话导航，以及从内置 Agent 到自定义 Agent 的配置方法。
 ---
 
-## 前言
+> TUI 负责把当前会话操作得顺手，Agent 配置负责把模型能做什么说清楚。把两层混在一起，快捷键和权限都会变得难以判断。
 
-OpenCode 的文档写得很全，但很多功能需要你主动去翻才能发现。我用下来感受最深的有两块：一是 TUI 里有不少快捷键和命令，知道了就能省很多重复操作；二是 Agent 配置体系比表面看起来灵活得多，可以基于它构建一套相当完整的多模型协作工作流。
+## TUI 的两个配置文件
 
-这篇文章就按这两个方向写，尽量结合实际用法说，不只是罗列配置项。
+OpenCode 把运行时配置和界面配置分开：
 
-## TUI 隐藏技巧
+| 文件 | 负责什么 | 常见位置 |
+| --- | --- | --- |
+| opencode.json 或 opencode.jsonc | provider、model、Agent、权限、MCP、插件和服务器 | 用户目录或项目根目录 |
+| tui.json 或 tui.jsonc | 主题、快捷键、鼠标、滚动和通知 | 用户目录或项目根目录 |
 
-### 思考块显示控制
+TUI 配置可以使用：
 
-用带推理能力的模型（Claude Sonnet、GPT-5 等）时，OpenCode 会显示模型的"思考过程"。这些思考块在调试复杂问题时很有用，但平时全程显示会占很大屏幕空间。
-
+```json
+{
+  "$schema": "https://opencode.ai/tui.json"
+}
 ```
+
+全局 TUI 文件通常放在 ~/.config/opencode/tui.json，项目专用配置可以放在项目根目录的 tui.json。也可以使用 OPENCODE_TUI_CONFIG 指定另一份文件。
+
+## 思考块和模型推理是两件事
+
+TUI 命令：
+
+```text
 /thinking
 ```
 
-这个命令只切换**显示**，不影响模型是否实际使用推理。换句话说，你可以让模型该思考还是思考，只是 TUI 里折叠起来不显示。调试的时候再 `/thinking` 展开看。
+它只控制思考块在对话中的显示。模型是否使用推理能力，取决于模型和当前 variant。默认快捷键 Ctrl+T 是 variant_cycle，用于循环当前模型支持的推理档位。
 
-### 模型 Variant 切换
+因此，想让界面更清爽时使用 /thinking；想调整模型的推理强度时使用 Ctrl+T。某个模型没有多个 variant 时，快捷键不会凭空创造新的能力。
 
-```
-Ctrl + T    # variant_cycle：循环切换模型 variant
-```
+## 模型列表和快捷切换
 
-这个快捷键会在当前模型支持的 variant 之间循环。各 provider 的 variant 取值不同：
+默认快捷键：
 
-- **Anthropic**（Claude）：`high` / `max` / `xhigh`（Opus 4.7 支持，v1.4.7 新增）
-- **OpenAI**：`none` / `minimal` / `low` / `medium` / `high` / `xhigh`
-- **Google**（Gemini）：`low` / `high`
-- **自定义**：也支持在配置里手动定义 variant
+| 快捷键 | 操作 |
+| --- | --- |
+| Ctrl+X M | 打开模型列表 |
+| Ctrl+F | 收藏或取消收藏当前模型 |
+| F2 | 循环最近使用的模型 |
+| Shift+F2 | 反向循环最近使用的模型 |
+| Ctrl+A | 打开 provider 列表 |
+| Ctrl+T | 循环当前模型的 variant |
 
-TUI 状态栏会显示当前 variant。切换前先确认当前模型支持哪些 variant，循环到不支持的值会 fallback。
+模型列表也可以通过 /models 打开。命令行查看实际可用 ID：
 
-**每个模型的 variant 设置是持久化的**（实测行为），存在 `~/.local/state/opencode/model.json` 的 `variant` 字段里。换句话说，你给某个模型切到 `high` 之后，下次打开还是 `high`，不用每次重设。
-
-不需要每次去 `/models` 里找，`Ctrl+T` 两三下搞定。
-
-### 收藏模型 & 快速切换
-
-OpenCode 维护两个模型列表（实测行为，官方文档未详细说明），都存在 `~/.local/state/opencode/model.json`：
-
-- `recent`：最近使用过的模型，按时间排序
-- `favorite`：你在模型列表里手动收藏（标星）的模型
-
-对应的快捷键：
-
-| 快捷键 | 操作 | 说明 |
-|--------|------|------|
-| `F2` | `model_cycle_recent` | 按最近使用顺序循环切换 |
-| `Shift+F2` | 反向切换 recent | 反向切换 |
-| `model_cycle_favorite` | 只在收藏列表里循环 | 需自定义快捷键绑定 |
-
-收藏模型不需要改配置文件，直接按 `Leader+M` 打开模型列表标星即可，OpenCode 自动写入 state 文件。`F2` 切最近用过的模型特别顺手，常用的几个来回两三下就够。
-
-### 模型列表 & 命令面板
-
-> **关于 `Leader` 键**：OpenCode 默认以 `Ctrl+X` 作为 Leader 键。下文所有 `Leader+X` 快捷键都是"先按 `Ctrl+X`，再按 X"。可以在 `tui.json` 的 `keybinds.leader` 里自定义。
-
-```
-<Leader>+M    # 打开模型列表（model_list）
-Ctrl+P        # 打开命令面板（command_list）
+```bash
+opencode models
+opencode models --refresh
 ```
 
-命令面板里能找到所有可用命令，等同于一个"功能搜索"入口。不记得某个命令叫什么时，`Ctrl+P` 搜一下。
+模型配置使用 provider/model 格式。不要把模型名称、provider 名称和 variant 混为一个字段；它们分别决定路由和推理参数。
 
-### 侧边栏控制
+## 命令面板和会话控制
 
-```
-<Leader>+B    # sidebar_toggle：切换侧边栏显示
-```
+默认 Ctrl+P 打开命令面板。常用操作如下：
 
-侧边栏提供附加信息面板。屏幕空间紧张时隐藏，需要查看时展开。
+| 命令 | 默认快捷键 | 作用 |
+| --- | --- | --- |
+| /connect | 无 | 添加 provider |
+| /compact | Ctrl+X C | 压缩上下文 |
+| /editor | Ctrl+X E | 使用 EDITOR 编辑当前输入 |
+| /exit | Ctrl+X Q | 退出 TUI |
+| /export | Ctrl+X X | 导出会话为 Markdown |
+| /init | 无 | 创建或更新 AGENTS.md |
+| /new | Ctrl+X N | 新建会话 |
+| /sessions | Ctrl+X L | 列出和切换会话 |
+| /themes | Ctrl+X T | 选择主题 |
+| /undo | Ctrl+X U | 撤销消息和文件变化 |
+| /redo | Ctrl+X R | 恢复最近一次撤销 |
 
-### 子 Agent 会话导航
+undo 和 redo 依赖 OpenCode 的快照机制以及项目的 Git 环境。它们适合处理当前会话中的误改，不应替代分支、提交和代码审查。
 
-Task tool 运行时，primary agent 会创建子 agent 会话。子会话默认在后台跑，但你可以主动进去看。
+## 子会话导航
 
-| 快捷键 | 说明 |
-|--------|------|
-| `Leader+Down` | 进入第一个子 agent 会话 |
-| `→` | 切换到下一个子会话 |
-| `←` | 切换到上一个子会话 |
-| `↑` | 返回父会话 |
+primary agent 通过 Task 工具启动 subagent 后，会产生子会话。默认导航键是：
 
-这个导航体系在 Agent 并行运行多个子任务时很有用，可以实时看到各个子任务的进展。
+| 快捷键 | 作用 |
+| --- | --- |
+| Ctrl+X，再按 Down | 进入第一个子会话 |
+| Right | 切换到下一个子会话 |
+| Left | 切换到上一个子会话 |
+| Up | 返回父会话 |
 
-### 工具执行详情
+子会话默认不会污染主对话的可见历史，但它们的结果仍然会返回主代理。需要同时观察多个任务时，可以把 session_child_cycle 绑定到自己熟悉的键。
 
-`tool_details` 默认没有绑定快捷键。如果你想在 TUI 里随时切换工具执行详情，需要先在 `tui.json` 里手动加一个绑定：
+## 工具详情和鼠标行为
+
+工具输出详情默认可以通过命令面板切换。想为它配置快捷键：
 
 ```json
-// ~/.config/opencode/tui.json
 {
+  "$schema": "https://opencode.ai/tui.json",
   "keybinds": {
-    "tool_details": "<leader>d"
+    "tool_details": "ctrl+alt+d",
+    "display_thinking": "none"
   }
 }
 ```
 
-这样我就可以在"只看工具摘要"和"展开完整参数与输出"之间切换。排查复杂调用、看请求参数或者调试 MCP 工具时，会顺手很多。
-
-### TUI 鼠标行为
-
-默认情况下，OpenCode TUI 会捕获鼠标事件。这意味着你在终端里无法用鼠标拖拽选中文本（因为被 TUI 拦截了）。
-
-如果你需要用鼠标复制 TUI 里的内容，可以在 `tui.json` 里禁用：
+TUI 默认捕获鼠标事件。需要复制终端文本时，可以关闭：
 
 ```json
-// ~/.config/opencode/tui.json
 {
+  "$schema": "https://opencode.ai/tui.json",
   "mouse": false
 }
 ```
 
-关掉后，鼠标的文本选择和滚动操作都回归终端原生行为。
-
-### 滚动加速
-
-macOS 上的惯性滚动在 TUI 里默认不生效。如果想要更顺滑的滚动体验：
+滚动配置有两个容易冲突的字段：
 
 ```json
-// ~/.config/opencode/tui.json
 {
+  "$schema": "https://opencode.ai/tui.json",
+  "scroll_speed": 3,
   "scroll_acceleration": {
-    "enabled": true
+    "enabled": false
+  },
+  "diff_style": "auto",
+  "cursor": {
+    "style": "block",
+    "blinking": true
   }
 }
 ```
 
-注意：开启加速后 `scroll_speed` 配置会失效，加速由系统惯性控制。
+scroll_acceleration.enabled 打开后会优先于 scroll_speed。diff_style 使用 auto 时会根据终端宽度调整差异显示，也可以设为 stacked。
 
-## Agent 配置体系
+## Agent 的当前分层
 
-### Primary vs Subagent
+OpenCode 内置：
 
-OpenCode 里 Agent 分两种角色：
+- Build、Plan：primary agent；
+- General、Explore、Scout：subagent；
+- Compaction、Title、Summary：隐藏的系统 Agent。
 
-- **Primary Agent**：和你直接对话的那个，TUI 里 `Tab` 键循环切换
-- **Subagent**：在子会话里运行，有两种调用方式：一是由 primary agent 通过 Task tool 自动调用；二是用户在对话框里直接输入 `@subagent-name` 手动指定
+Build 拥有完整工具权限，Plan 默认对文件编辑和 Bash 询问许可。General 适合复杂、可执行的子任务；Explore 只读探索当前代码库；Scout 只读研究外部文档和依赖源码。
 
-Built-in 的 `build` 和 `plan` 都是 primary，`general` 和 `explore` 都是 subagent。
+Agent 之间的切换使用 Tab 或 Shift+Tab，也可以自定义 agent_cycle 和 agent_cycle_reverse：
 
-这个区分很重要，因为几个配置项只对特定角色生效：
-- `hidden: true` 只对 subagent 有效，primary agent 设了也不会从 Tab 循环里消失
-- `description` 是 agent 配置的正式必填项，subagent 的自动委派尤其依赖它——primary agent 根据 description 决定把任务交给哪个 subagent
-- `default_agent` 只能设置 primary agent（非 primary 会 fallback 到 `build`）
-
-### 完整配置项一览
-
-Agent 配置支持 JSON（`opencode.jsonc` 的 `agent` 字段）和 Markdown 两种格式，选项是一样的。Markdown 文件的放置路径有两个层级：
-
-- **全局**：`~/.config/opencode/agents/name.md`（对所有项目生效）
-- **项目级**：`.opencode/agents/name.md`（仅对当前项目生效，优先级更高）
-
-```markdown
----
-description: subagent 描述（被 primary 自动选择时的触发依据）
-mode: primary | subagent | all    # 默认 all
-model: provider/model-id          # 如 github-copilot/claude-sonnet-4.6
-color: primary | secondary | accent | success | warning | error | info | #hex
-hidden: true | false              # 仅对 subagent 有效
-temperature: 0.0-1.0
-top_p: 0.0-1.0
-steps: 20                         # max steps
-reasoningEffort: high                             # 透传给 provider，取值依 provider 而定
-prompt: "{file:./system-prompt.txt}"           # 外部文件引用
-
-permission:
-  bash:
-    "*": ask
-    "git status*": allow
-    "rm -rf *": deny
-  edit: deny
-  task:
-    "*": deny
-    "safe-agent-*": allow
----
-
-系统 prompt 正文写在这里...
+```json
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "keybinds": {
+    "agent_cycle": "tab",
+    "agent_cycle_reverse": "shift+tab"
+  }
+}
 ```
 
-几个容易踩坑的地方：
+## 用 JSON 配置自定义 Agent
 
-1. **`reasoningEffort` 是透传参数**，不是 OpenCode 内置的，值直接传给 provider API，具体支持哪些取值要看各 provider 的文档
-2. **`tools` 字段已废弃**，现在用 `permission` 来控制工具权限
-3. **`permission.task`** 控制该 agent 可以调用哪些 subagent，最后匹配的规则生效（glob 语法）
-4. **`prompt` 里可以用 `{file:./path}`** 引用外部文件，路径相对于配置文件所在目录
-
-### 实践案例：多模型 Agent 矩阵
-
-我自己用了一套比较系统化的 Agent 配置，核心思路是：**每个 primary agent 绑定一组对应的 subagent，保证整个对话链路用的是同一个模型系列**。
-
-为什么要这样？因为不同提供商的模型特性差异挺大：Claude 更擅长遵循指令和代码修改，GPT-5 推理链路更完整，Kimi 对中文和长上下文处理得好。如果 primary 用 Claude 但 subagent 用 GPT，有时候上下文传递和风格会有割裂感。
-
-#### Primary Agent 矩阵
-
-我配置了几个 primary agent，每个对应一个模型，用于不同场景：
-
-| Agent | 模型 | 适用场景 |
-|-------|------|----------|
-| 赤兔 | Claude Opus（via GitHub Copilot）| 复杂重构、需要深度思考的任务 |
-| 赵云 | Claude Sonnet（via GitHub Copilot）| 日常开发，速度和质量平衡 |
-| 诸葛亮 | GPT-5.4（via GitHub Copilot）| 架构设计、多步骤推理 |
-| 趣申请 | GPT-5.4（直连 OpenAI）| 需要直连 API 的场景 |
-| 国模 | Kimi（k2p5）| 中文任务、长文档处理 |
-
-每个 primary agent 的 system prompt 里都会指定"使用哪个 subagent 代替默认的 explore/general"：
-
-```markdown
----
-# 赵云.md
-description: 日常开发 primary agent，速度和质量平衡，适合大多数编码任务
-model: github-copilot/claude-sonnet-4.6
-color: success
-mode: primary
----
-
-## Sub-Agent 使用规则
-
-- 使用 explore-sonnet 代替 explore
-- 使用 general-sonnet 代替 general
-```
-
-这样当赵云（Sonnet）运行时，它启动的子任务也走 Sonnet，整条链路模型一致。
-
-#### Subagent 矩阵
-
-基于上面的设计，我给每个主要模型都建了 explore 和 general 两个版本的 subagent：
-
-**Explore 系列（只读，快速搜索代码库）**
-
-```markdown
----
-# explore-sonnet.md
-description: Fast agent specialized for exploring codebases...
-mode: subagent
-model: github-copilot/claude-sonnet-4.6
-reasoningEffort: high
-permission:
-  write: deny
-  edit: deny
----
-```
-
-`explore-sonnet`、`explore-opus`、`explore-high`（GPT-5.4 high）、`explore-xhigh`、`explore-china`（Kimi）……
-
-**General 系列（全权限，执行任务）**
-
-```markdown
----
-# general-sonnet.md
-description: General-purpose agent for researching complex questions...
-mode: subagent
-model: github-copilot/claude-sonnet-4.6
-reasoningEffort: high
----
-```
-
-同样有 `general-sonnet`、`general-opus`、`general-high`、`general-xhigh`、`general-china` 等版本。
-
-#### 代码审查 Agent
-
-另外还有两个 review agent，专门做代码审查：
-
-```markdown
----
-# review-high.md
-description: 代码审查专家
-mode: subagent
-model: openai/gpt-5.4
-reasoningEffort: high
-permission:
-  write: deny
-  edit: deny
----
-
-从业界最佳实践、项目规范、代码质量（重复代码、命名表意、代码冗余等）、
-并发安全、测试有效性、是否修复 bug 等方面，对当前的代码实现进行详细审查，
-提出评价和改进建议。
-```
-
-`review-high` 和 `review-xhigh` 的区别只是 `reasoningEffort` 不同，复杂改动用 xhigh 推理更彻底。
-
-#### 全局权限配置
-
-主配置文件里设了一些全局安全规则：
+Agent 定义放在 opencode.json 的 agent 字段：
 
 ```jsonc
-// ~/.config/opencode/opencode.jsonc
 {
-  "default_agent": "赤兔",
-  "permission": {
-    "bash": {
-      "rm *": "deny",
-      "rm -rf *": "deny"
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "review": {
+      "description": "Review code without making changes",
+      "mode": "subagent",
+      "model": "provider/model-id",
+      "prompt": "{file:./prompts/review.txt}",
+      "temperature": 0.1,
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "ask",
+          "git diff*": "allow",
+          "grep *": "allow"
+        },
+        "webfetch": "allow"
+      }
     }
-  },
-  "compaction": {
-    "auto": true,
-    "prune": true,
-    "reserved": 10000
   }
 }
 ```
 
-`rm` 系列命令全局禁止。`compaction.auto` 开启后上下文超长时自动压缩，`prune: true` 会在压缩时移除旧的工具调用输出，节省 token 用量；`reserved: 10000` 则是预留一段 token 缓冲，让压缩过程本身更从容，不容易在临界点顶满上下文。
+description 是自定义 Agent 的职责描述。mode 可选 primary、subagent 或 all。prompt 路径相对于配置文件所在目录，适合把长提示词放到单独文件里。
 
-### Hidden 配置的实际行为
+模型字段不写时，primary agent 使用全局 model；subagent 默认继承调用它的 primary agent 的模型。这样可以先用统一模型运行，再只为确实需要不同能力的 Agent 做覆盖。
 
-说一下 `hidden` 这个配置项，文档里写得不够清楚，实际行为容易搞混：
+steps 控制最多进行多少轮 agentic 操作：
 
-- **对 subagent**：`hidden: true` 让它不出现在 `@` 补全菜单，但 primary agent 仍可以通过 Task tool 调用它（用 agent 名字）
-- **对 primary agent**：用户设置的 primary agent 无法通过 `hidden: true` 从 Tab 循环里隐藏。注意这和系统行为不同——OpenCode 内置了一些 hidden primary agent（如 `compaction`、`title`、`summary`），这些是系统层面的隐藏，不是用户 `hidden: true` 能控制的
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "quick-review": {
+      "description": "Perform a short read-only review",
+      "mode": "subagent",
+      "steps": 5
+    }
+  }
+}
+```
 
-我把 built-in 的 `build` 和 `plan` 设置了 `hidden: true`，但它们还是会出现在 Tab 切换列表里（实测）。正确的做法是直接用 `disable: true` 禁用，或者干脆不动它们，让自己的 agent 默认就好。
+steps 达到限制后，Agent 会总结已完成内容和剩余建议，不代表任务已经通过验证。
 
-## 小结
+## 用 Markdown 管理独立职责
 
-TUI 方面，我用得最多的几个：
+长提示词可以直接写成：
 
-- `Ctrl+T`：切 effort，调任务复杂度时随手按
-- `/thinking`：思考块显示开关，重要任务时展开看推理过程
-- `Leader+Down` / 方向键：子 agent 会话导航，并行任务时跟进进展
+```markdown
+---
+description: Review API changes without editing files
+mode: subagent
+permission:
+  edit: deny
+  bash: ask
+  webfetch: allow
+---
 
-Agent 配置方面，核心思路是**模型绑定**：primary agent 指定配套的 subagent，保证整条链路模型一致。这在需要长时间多轮对话、多 agent 协作的任务里效果比较明显。
+关注兼容性、错误处理、权限和测试覆盖。
+每条意见都给出文件路径、影响和可验证的建议。
+```
 
-这套配置搭起来初始有点工作量，但用熟了后基本不需要再调整，直接 `Tab` 切 agent 就行。
+全局文件放在 ~/.config/opencode/agents/，项目文件放在 .opencode/agents/。如果只希望模型自动调用而不希望用户在 @ 菜单中看到，可以设置 hidden: true；它只影响可见性，不会绕过 permission。
 
-## 参考
+## Task 权限和嵌套深度
 
-- [OpenCode TUI 文档](https://opencode.ai/docs/tui/)
-- [OpenCode Agents 文档](https://opencode.ai/docs/agents/)
-- [OpenCode Keybinds 文档](https://opencode.ai/docs/keybinds/)
-- [OpenCode Config 文档](https://opencode.ai/docs/config/)
+主代理调用 subagent 的能力由 permission.task 控制：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "review": "allow",
+          "explore": "allow"
+        }
+      }
+    }
+  },
+  "subagent_depth": 1
+}
+```
+
+Task 规则支持通配符，最后匹配的规则生效。subagent_depth 默认是 1：primary agent 可以启动 subagent，subagent 不能再启动下一层。多层委派会增加上下文和成本，除非任务确实需要，否则不建议打开。
+
+## 一套可复用的配置思路
+
+日常开发可以保留 Build 的完整能力，把 Plan 配置成对 edit 和 bash 询问，把 Explore 和 Scout 作为只读研究入口，再增加一个 edit deny 的 review Agent。这样每个入口的用途都很清楚：
+
+- Build 负责改变工作区；
+- Plan 负责提出方案；
+- Explore 负责找本地代码；
+- Scout 负责查外部资料；
+- review 负责指出风险。
+
+模型、权限和提示词分别解决不同问题。模型决定能力上限，权限决定能否执行，提示词决定应该关注什么。只改其中一层，通常不能得到预期结果。
+
+## 官方参考
+
+- [OpenCode TUI](https://opencode.ai/docs/tui/)
+- [OpenCode Keybinds](https://opencode.ai/docs/keybinds/)
+- [OpenCode Agents](https://opencode.ai/docs/agents/)
+- [OpenCode Config](https://opencode.ai/docs/config/)
+- [OpenCode Permissions](https://opencode.ai/docs/permissions/)

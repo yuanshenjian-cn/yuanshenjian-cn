@@ -1,267 +1,203 @@
 ---
-title: OpenCode 深度解析：选型与最佳实践
-date: '2026-02-08'
+title: "OpenCode 选型与实践：模型、权限和工作流"
+date: '2026-09-19'
 tags:
   - 软件开发
   - AI 编程
   - OpenCode
 published: false
 brief: >-
-  全面分析 OpenCode 的优缺点，对比 Cursor、Claude Code 等同类工具，提供选型建议和最佳实践，帮助你做出明智选择并持续提升使用效率。
+  OpenCode 的核心取舍是把客户端、模型提供商和项目规则拆开管理。内容从使用形态、模型来源、权限边界和扩展方式比较 OpenCode 与编辑器型、终端型编码代理的差异，并给出适合个人项目和团队仓库的选择与实践建议。
 ---
 
-## 优缺点分析
-
-### 主要优点
+> 如果你想自己决定模型从哪里来、工具能做什么、规则如何进入上下文，OpenCode 值得认真考虑；如果你只想要一套已经打包好的模型和编辑器体验，它的配置成本可能不划算。
 
-**开源免费**
-- 代码完全开源，可审查和定制
-- 提供限时免费体验模型，零成本入门
-- 无订阅费用压力
-
-**隐私可控**
-- OpenCode 本地运行，但数据是否出站取决于你接入的 provider
-- 如果你想彻底避免代码上传，需要改用本地模型或自建通道
-- 数据链路由自己掌控，合规策略也更容易按需定制
-
-**模型灵活**
-- 75+ 提供商可选
-- 支持商业模型和开源模型
-- 随时切换对比效果
-
-**终端原生**
-- 不离开终端即可完成操作
-- 与现有工作流无缝集成
-- 响应速度快
-
-**社区活跃**
-- 近 100K GitHub stars，700+ 贡献者，8,500+ commits
-- 250万+月活开发者
-- 丰富的插件生态（如 oh-my-opencode；它的仓库现已更名为 `oh-my-openagent`，npm 包和命令仍保留 `oh-my-opencode`）
-- 文档完善，更新频繁
-
-### 局限性
-
-**学习曲线**
-- 命令行界面需要适应
-- 快捷键和命令需要记忆
-- 配置相对复杂
-
-**Windows 支持**
-- 桌面应用 Beta 版已支持 Windows（包括 arm64）
-- 建议配合 WSL 使用以获得最佳体验
-- 部分高级功能仍在完善中
-
-**模型依赖**
-- 免费模型能力有限
-- 商业模型需要 API Key
-- 网络环境影响体验
-
-**IDE 集成**
-- 相比 Cursor 等工具，IDE 集成度较低
-- 主要依赖终端交互
-
-## 同类工具对比
-
-| 工具 | 类型 | 价格 | 开源 | 特点 |
-|------|------|------|------|------|
-| **OpenCode** | 终端代理 | 免费（Zen 付费） | ✅ | 开源、模型灵活、75+ 提供商、2.5M+用户 |
-| **Cursor** | IDE | $20/月 | ❌ | 集成度高、体验好、支持GPT-5.2/Opus 4.6 |
-| **Claude Code** | 终端/桌面 | $20-200/月 | ❌ | Claude模型、桌面应用、Cowork功能 |
-| **GitHub Copilot** | IDE插件 | 免费-$39/月 | ❌ | Free计划含50次agent/2000次补全 |
-| **Windsurf** | IDE | 免费/付费 | ❌ | Cascade AI、100万+用户、MCP支持 |
-| **OpenAI Codex** | 桌面/终端 | ChatGPT订阅 | ❌ | OpenAI官方、GPT-5.3-Codex、多代理工作流 |
-| **Trae** | IDE | 免费/付费 | ❌ | 字节跳动出品、SOLO模式、10x工程师 |
-| **CodeBuddy** | IDE插件 | 免费/付费 | ❌ | 腾讯出品、混元大模型、国际版+中国版 |
-
-> 💡 **提示**：Claude Code 价格取决于使用层级，范围为 $20-200/月。
-
-### 各工具详细介绍
+## OpenCode 的核心取舍
 
-#### Windsurf（原 Codeium）
+OpenCode 是开源 AI 编程代理，提供终端 TUI、桌面应用和 IDE 扩展。它把“客户端”与“模型服务”分开：客户端负责会话、工具和项目上下文，模型通过 provider 接入。你可以使用自己的 provider，也可以使用 OpenCode Zen 这类官方整理的模型入口。
 
-- **用户规模**：100万+用户，4000+企业客户
-- **核心功能**：Cascade AI 支持代码库记忆、自动修复 lint 错误
-- **特色**：MCP 支持（Figma、Slack、Stripe）、拖放图片生成代码、Turbo 模式自动执行终端命令
-- **定价**：基于 token 的使用计划，透明公平
-- **优势**：Cascade 代理可自动追踪工作流，Arena Mode 让模型竞争选择最优方案
+这种设计带来三个直接结果：
 
-#### OpenAI Codex
+- 模型可以按任务更换，不必把整个工作流绑定到一个模型产品；
+- provider 的凭据、上下文策略和数据边界需要自己确认；
+- 项目规则、权限、Agent、Skills、MCP 和插件都可以落到可审查的配置里。
 
-- **定位**：OpenAI 推出的专业 AI 编程代理工具
-- **核心特点**：基于 GPT-5.3-Codex 模型，支持多代理并行工作流
-- **Skills 系统**：超越写代码，支持代码理解、原型设计和文档编写
-- **自动化能力**：Automations 功能支持 issue 分类、CI/CD 监控等后台任务
-- **定价**：ChatGPT Free 和 Go 计划可用，其他订阅用户享 2x 速率限制
+OpenCode 不是“免费模型服务”。客户端开源与模型调用费用是两件事；使用什么模型、是否付费、代码发送到哪里，都由你选择的 provider 决定。
 
-#### Trae（字节跳动）
+## 适合从四个维度比较
 
-- **定位**：字节跳动推出的"10x AI 工程师"
-- **核心特点**：SOLO 模式独立构建软件解决方案，Understand → Execute → Deliver 工作流
-- **优势**：字节大厂背书，可能深度集成字节生态（飞书等）
-- **定价**：免费版可用，付费版功能待公布
-- **适合人群**：国内开发者，需要快速原型开发
+| 维度 | OpenCode | 编辑器型编码代理 | 终端型厂商编码代理 |
+| --- | --- | --- | --- |
+| 主要入口 | TUI、桌面、IDE 扩展 | 编辑器内的侧栏和编辑区 | 终端，也可能提供 IDE、桌面或 Web 入口 |
+| 模型来源 | 自己连接 provider，或使用官方模型入口 | 通常由产品统一管理模型体验 | 以厂商模型和账号体系为中心，也可能支持第三方 provider |
+| 工作区控制 | JSONC、Agent、权限、规则、Skills、MCP 和插件 | 依赖产品自己的规则、Agent 和扩展机制 | 依赖厂商的配置、规则、Hooks 和集成 |
+| 适合的使用者 | 愿意管理路由和边界的人 | 希望编辑器内获得完整体验的人 | 已经深度使用对应模型生态的人 |
 
-#### CodeBuddy（腾讯云）
+这个表只描述产品形态，不代表任何工具在所有任务上都更强。真实差异通常出现在权限询问、上下文注入、差异审查、模型切换和失败恢复这些细节里。
 
-**国际版**：[codebuddy.ai](https://codebuddy.ai)
-- 面向全球开发者，基于腾讯混元代码大模型
-- 提升编码效率 90%，降低代码错误率 35%
+Cursor 官方把 Agent 定义为可以搜索、编辑和运行命令的编辑器内助手；Claude Code 官方则同时覆盖终端、IDE、桌面和 Web。它们都能完成多文件编码任务，区别更多是模型生态、界面中心和配置习惯，而不是“能不能写代码”。
 
-**中国版**：[copilot.tencent.com](https://copilot.tencent.com)
-- 面向中国开发者，访问速度更快，深度集成腾讯云生态
+## OpenCode 的优势在哪里
 
-**核心特点**：双版本服务、中文代码理解优秀、企业级应用支持
+### 模型和客户端可以分开
 
-**选择建议**：
-- 追求开源免费 → OpenCode + `/models` 中当前可用的体验模型
-- 追求 IDE 体验 → Cursor
-- 追求开箱即用 → Claude Code
-- 追求性价比 → OpenCode + Zen 按量付费
-- 预算有限 → OpenCode + 限时免费体验模型，必要时可复用已有订阅（GitHub Copilot、ChatGPT Plus）
+OpenCode 的模型配置使用 provider/model 形式：
 
-**地域选择建议**：
-- 中国大陆用户 → CodeBuddy 中国版 或 Trae
-- 海外华人/中文开发者 → CodeBuddy 国际版
-- 全球通用 → OpenCode、Cursor、GitHub Copilot
-- 日本/韩国 → Windsurf、Cursor（有本地化）
+```text
+provider/model-id
+```
 
-**企业合规考虑**：
-- 中国数据合规 → CodeBuddy 中国版、Trae
-- 国际合规认证 → GitHub Copilot Enterprise、Cursor Enterprise
-- 隐私敏感 → OpenCode + 本地模型或自建通道
+可以用 /models 或命令行查看实际可用模型：
 
-## 适合谁使用
+```bash
+opencode models
+opencode models --refresh
+```
 
-**强烈推荐**：
-- 终端重度用户
-- 注重隐私的开发者
-- 希望降低工具成本
-- 喜欢开源工具
-- 需要灵活配置模型
+当一个模型在长任务中表现不稳定时，可以先只更换模型，不必迁移整个项目规则和 TUI 工作流。反过来，这也意味着你要承担 provider 能力不同带来的兼容问题。
 
-**可以考虑**：
-- 愿意尝试 AI 编程的新手
-- 需要快速原型开发
-- 希望提升编码效率
+### 权限是显式的
 
-## 上手建议
+OpenCode 使用 allow、ask、deny 三种权限动作。你可以允许读取和搜索，要求编辑和 Bash 询问，并单独拒绝外部目录：
 
-**第一周：熟悉基础**
-- 完成安装和配置
-- 使用限时免费体验模型体验基本功能
-- 练习常用命令
-- 尝试简单的代码生成任务
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "*": "ask",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "edit": "ask",
+    "bash": "ask",
+    "external_directory": "deny"
+  }
+}
+```
 
-**第二周：提高效率**
-- 在真实项目中使用
-- 掌握 Plan/Build 模式切换
-- 尝试自定义配置
-- 利用文件引用语法快速定位代码
+权限规则还能匹配 Bash 命令和 MCP 工具名。团队仓库如果把规则提交到项目中，新成员更容易得到一致的安全边界。
 
-**第三周：深度定制**
-- 配置 MCP 扩展
-- 创建自定义命令
-- 尝试 oh-my-opencode 社区插件
-- 集成 GitHub Actions 自动化
+### 项目知识可以落到文件
 
-## 最佳实践
+/init 会根据项目生成或更新 AGENTS.md。构建命令、测试方式、目录边界和操作禁忌写进文件后，不需要在每次会话中重新解释。
 
-**1. 善用 Plan 模式**
+这不是 OpenCode 独有的思路，但 OpenCode 同时兼容 Claude Code 的规则和 Skills 路径。对已经使用多种编码代理的项目，统一规则文件能减少重复维护。
 
-对于复杂任务，先用 Plan 模式让 AI 规划方案，确认无误后再切换到 Build 模式执行。这样可以避免 AI 做出不可预期的修改。
+### 扩展面比较完整
 
-**2. 合理配置权限**
+OpenCode 提供自定义 Agent、Commands、Skills、MCP、Plugins、Formatter 和 LSP 配置。它们可以组合成一个项目工作流：
 
-根据项目需求精细控制工具权限，特别是 `bash` 和 `write` 命令，建议设置为 `ask`，避免 AI 执行危险操作。
+- Agent 定义职责和权限；
+- Skill 提供可复用的领域知识；
+- Command 固化重复的 prompt；
+- MCP 接入外部数据和工具；
+- Plugin 在生命周期中增加 hook 或集成；
+- Formatter 与 LSP 把验证反馈接回会话。
 
-**3. 定期压缩会话**
+扩展越多，上下文和故障面也越大。能用项目脚本解决的问题，不一定需要 MCP；能用一个清晰的 Agent 解决的问题，也不必急着安装插件。
 
-使用 `/compact` 命令压缩当前会话，总结上下文，节省 Token 并保持对话效率。
+## OpenCode 的代价是什么
 
-**4. 善用自定义命令**
+### 你要自己处理 provider
 
-将常用的代码审查、生成模板等流程封装成自定义命令，提高重复性任务的效率。
+连接 provider 不只是填 API key。你还要考虑模型 ID、上下文窗口、推理参数、图片和工具调用能力、超时、费用以及数据策略。某个 provider 可以连接，不代表其中每个模型都适合 Agent 工作。
 
-**5. 结合 oh-my-opencode**
+如果团队希望固定成本和固定体验，需要在项目或组织层约束 provider，而不是把选择权完全交给每个开发者。
 
-对于复杂的多步骤任务，使用 oh-my-opencode 的 Sisyphus 等专业 Agent，让 AI 自动协调完成。
+### 配置自由会带来维护成本
 
-**6. 利用 GitHub Actions**
+全局配置、项目配置、TUI 配置、Agent 文件、Skills、MCP 和插件叠加后，问题可能来自多个层级。遇到异常时，不能只盯着当前 prompt。
 
-将 OpenCode 集成到 CI/CD 流程中，实现自动化的代码审查和 Bug 修复。
+可以用这些命令缩小范围：
 
-**7. 定期尝试新模型**
+```bash
+opencode debug config
+opencode auth list
+opencode models --refresh
+opencode mcp list
+```
 
-OpenCode 支持多种模型，定期尝试新的免费体验模型，找到最适合你工作流的模型。
+必要时暂时关闭插件、MCP、Formatter 或 LSP，先确认 OpenCode 核心行为，再逐项恢复扩展。
 
-**8. 关注社区生态**
+### 终端工作流需要习惯
 
-积极参与 OpenCode Discord 社区，了解最新的插件和功能更新，学习其他用户的最佳实践。
+TUI 的斜杠命令、Leader 快捷键、Plan/Build 切换和子会话导航，开始时需要记忆。桌面或编辑器用户更习惯鼠标操作，第一次使用会觉得信息密度偏高。
 
-**9. 保护敏感数据**
+最有效的做法不是记住全部快捷键，而是先熟悉 /models、/init、/compact、/undo、/redo 和 Tab。其余命令在 Ctrl+P 命令面板里查即可。
 
-避免在 OpenCode 中直接处理 API Key、密码等敏感信息，使用环境变量或配置文件管理。
+### 开源不等于风险自动消失
 
-**10. 建立项目文档**
+客户端开源带来可审查性，却不会替你审查 provider、插件、MCP 服务器和项目权限。一个允许 Bash、外部目录和远程 MCP 的配置，风险边界远大于一个只读本地审查 Agent。
 
-利用 `/init` 生成的 `AGENTS.md`，不断完善项目文档，让 AI 更好地理解你的项目结构。
+需要合规或敏感代码场景时，应分别检查：
 
-**11. 善用 MCP 扩展能力**
+- 代码和工具结果是否发送到外部 provider；
+- provider 是否保存或训练使用请求内容；
+- MCP 是否读取仓库之外的路径；
+- 插件是否执行本地命令；
+- 自动化 workflow 拥有哪些 GitHub 权限。
 
-OpenCode 现已支持 MCP (Model Context Protocol)，可以连接外部工具和服务。建议配置常用 MCP 服务器（如数据库、API 工具），利用 MCP 扩展 AI 的能力边界，在复杂任务中结合 MCP 和 Agent 使用。
+## 哪类人适合使用
 
-**12. 充分利用多会话并行**
+**适合 OpenCode 的人**：
 
-OpenCode 支持 Multi-session，可以同时启动多个代理处理不同任务。将大任务拆分为多个子任务并行处理，在不同会话中尝试不同模型对比效果，保持主会话专注于核心开发任务。
+- 经常切换模型或 provider；
+- 主要在终端工作；
+- 希望把权限、规则和 Agent 写成项目配置；
+- 愿意自己排查模型和扩展的兼容性；
+- 需要把同一套客户端接到不同项目。
 
-**13. 善用分享链接协作**
+**不一定适合的人**：
 
-利用 OpenCode 的分享链接功能，将会话链接分享给团队成员进行代码审查，保存重要会话链接作为知识库，用于调试问题时与社区交流。
+- 只希望安装后使用固定模型，不想管理 provider；
+- 团队没有维护项目规则和权限配置的习惯；
+- 主要需求是编辑器内联补全，而不是 Agent 操作；
+- 不能接受模型请求经过外部 provider。
 
-**14. 复用已有订阅降低成本**
+判断工具时，不要只看能否生成一段代码。更值得比较的是：它能否准确获得上下文，能否在修改前询问，能否让你快速检查 diff，失败后能否恢复，以及团队能否复用同一套规则。
 
-OpenCode 支持复用现有 AI 订阅：使用 GitHub Copilot 账户登录无需额外付费，使用 ChatGPT Plus/Pro 账户访问 OpenAI 模型，充分利用这些集成减少模型 API 成本。
+## 一套稳妥的使用方式
 
-## 跨工具通用最佳实践
+### 把工作拆成计划和执行
 
-无论使用哪款 AI 编程工具，以下实践都适用：
+复杂任务先切换到 Plan，让它列出文件、依赖和验收方式；确认后切换到 Build。Plan 默认会对编辑和 Bash 询问权限，但最终仍要检查 diff 和测试。
 
-**掌握 "自主性滑块" 概念**
-- 低自主性：使用 Tab 补全、简单编辑
-- 中自主性：使用 Agent 模式，人工确认关键步骤
-- 高自主性：全自动任务，适合重复性工作
+### 让请求包含边界
 
-**建立个人知识库**
-- 整理常用 Prompt 模板
-- 记录成功案例和失败教训
-- 形成团队内部的 AI 编程规范
+一个可复用的任务描述应该包含：
 
-**代码审查不可少**
-- AI 生成的代码必须经过人工审查
-- 特别关注安全敏感代码（SQL、认证等）
-- 使用静态分析工具辅助检查
+- 目标和不变的行为；
+- 允许修改的目录；
+- 不要引入的抽象；
+- 需要运行的测试；
+- 完成后要汇报的结果。
 
-**保持学习更新**
-- AI 工具发展极快，每月关注更新日志
-- 尝试新功能（如 Cursor 的 Skills、Codex 的 Automations）
-- 参与社区讨论，学习他人技巧
+“把这个模块重构一下”不是可验证的目标；“保持公开 API 不变，拆出查询层，运行现有单元测试并列出未覆盖的路径”才接近可执行任务。
 
-## 资源链接
+### 让验证回到项目工具
 
-### OpenCode
-- **官网**：[https://opencode.ai](https://opencode.ai)
-- **GitHub**：[https://github.com/anomalyco/opencode](https://github.com/anomalyco/opencode)
-- **文档**：[https://opencode.ai/docs](https://opencode.ai/docs)
-- **Discord 社区**：[https://opencode.ai/discord](https://opencode.ai/discord)
-- **下载页面**：[https://opencode.ai/download](https://opencode.ai/download)
+不要把模型的“应该没问题”当成测试。把格式化、类型检查、单元测试、集成测试和 Git diff 作为项目规则写进 AGENTS.md，并要求 Agent 在任务末尾实际执行。
 
-### 其他工具
-- **Cursor**：[https://cursor.com](https://cursor.com)
-- **Claude Code**：[https://claude.ai/download](https://claude.ai/download)
-- **GitHub Copilot**：[https://github.com/features/copilot](https://github.com/features/copilot)
-- **Windsurf**：[https://windsurf.com](https://windsurf.com)
-- **OpenAI Codex**：[https://openai.com/codex](https://openai.com/codex)
-- **Trae**：[https://www.trae.ai](https://www.trae.ai)
-- **CodeBuddy 国际版**：[https://codebuddy.ai](https://codebuddy.ai)
-- **CodeBuddy 中国版**：[https://www.codebuddy.cn](https://www.codebuddy.cn)
+### 控制扩展数量
+
+每增加一个 MCP 或插件，就增加一组工具描述、网络请求和权限边界。先解决当前问题，再按明确需求接入扩展；如果一个扩展没有被任务使用，就不要让它常驻上下文。
+
+### 先检查分享和日志
+
+OpenCode 的分享默认是手动的，但命令一旦执行，仍要检查会话内容。尤其是 provider 错误、环境变量、绝对路径和工具输出，可能包含不应公开的信息。
+
+## 最终判断
+
+OpenCode 的独特价值是可组合，而不是“所有场景都更快”。它更适合把模型、客户端和工程规则分开管理的开发者；它不适合希望完全隐藏这些选择的人。
+
+如果你准备试用，先用一个非敏感项目完成一条完整链路：连接一个 provider，运行 /init，使用 Plan 规划小改动，用 Build 实现，检查 diff 并运行测试。只有这条链路顺畅后，才值得继续配置 MCP、插件和多 Agent。
+
+## 参考资料
+
+- [OpenCode 官方文档](https://opencode.ai/docs/)
+- [OpenCode Config](https://opencode.ai/docs/config/)
+- [OpenCode Permissions](https://opencode.ai/docs/permissions/)
+- [OpenCode Agents](https://opencode.ai/docs/agents/)
+- [OpenCode TUI](https://opencode.ai/docs/tui/)
+- [Cursor Agent Overview](https://cursor.com/docs/agent/overview)
+- [Claude Code Overview](https://code.claude.com/docs/en/overview)

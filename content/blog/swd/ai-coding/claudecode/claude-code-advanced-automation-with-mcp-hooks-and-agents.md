@@ -1,665 +1,191 @@
 ---
 title: "Claude Code 第八篇：高阶自动化实战——Chrome、Channels、CI/CD 与跨端协作"
-date: '2026-04-08'
+date: '2026-09-19'
 tags: ['软件开发', 'AI 编程', 'ClaudeCode']
 published: true
-brief: "三个端到端蓝图串联 Claude Code 全部扩展机制——本地 Chrome 自动化调试、GitHub CI/CD 无人值守流水线、跨端 Channels 协作，带你从理论走向实战。"
+brief: "把 Claude Code 接到浏览器、CI 和消息频道时，重点不是堆叠扩展，而是划清运行位置、凭证、权限和人工确认边界。本文用三个可落地的场景说明原生 Chrome、GitHub Actions 与 Channels 应该怎样组合。"
 ---
 
-## 引言：把所有积木拼起来
+> 自动化真正难的部分不是让 Claude 运行命令，而是让它在正确的环境里、以正确的身份、只做被授权的事。
 
-前七篇我们逐层拆解了 Claude Code 的能力体系：从基础操作到日常工作流，从内置命令到扩展架构。现在是把这些积木拼成完整作品的时候了。
+## 浏览器调试不必再自建 Chrome MCP
 
-本篇将通过**三个端到端蓝图**，展示如何在真实场景中组合使用 Skills、Sub-agents、Hooks、MCP 和 Agent Teams：
+Claude Code 有原生 Chrome 集成。它通过 Claude in Chrome 扩展连接可见的 Chrome、Edge 或其他 Chromium 浏览器，让 Claude 在同一轮任务里编译代码、打开页面、读取控制台和验证交互。
 
-| 蓝图 | 场景 | 涉及机制 |
-|------|------|---------|
-| **蓝图一** | 本地 Chrome 自动化调试 | MCP + Hooks + Sub-agents |
-| **蓝图二** | GitHub CI/CD 无人值守流水线 | Hooks + 程序化运行 + GitHub Actions |
-| **蓝图三** | 跨端 Channels 协作 | Channels + MCP + Agent Teams |
+使用前准备：
 
-> **前置阅读**：本篇假设你已阅读[第七篇](/articles/claude-code-extension-model-overview)，熟悉六大扩展机制的基本概念。
+- 安装 Chrome、Edge 或兼容的 Chromium 浏览器；
+- 安装 Claude in Chrome 扩展；
+- 使用 Claude 账户登录 Claude Code；
+- 在需要浏览器的本地会话中运行 `claude --chrome`。
 
----
-
-## 蓝图一：本地 Chrome 自动化调试
-
-### 场景描述
-
-你正在开发一个 Web 应用，遇到了一个棘手的前端 Bug——某个按钮在特定条件下无响应。你希望 Claude 能：
-
-1. 启动 Chrome 并导航到问题页面
-2. 检查 DOM 结构和 console 错误
-3. 定位问题根因并修复代码
-4. 验证修复后按钮恢复正常
-
-### 架构设计
-
-```
-┌─────────────┐     MCP (stdio)     ┌──────────────┐
-│ Claude Code │ ◄──────────────────► │ Chrome MCP   │
-│             │                      │ Server       │
-│  ┌────────┐ │                      │  ┌────────┐  │
-│  │ Debug  │ │                      │  │Chrome  │  │
-│  │ Skill  │ │                      │  │DevTools│  │
-│  └────────┘ │                      │  └────────┘  │
-│  ┌────────┐ │                      └──────────────┘
-│  │PostTool│ │
-│  │ Hook   │ │
-│  └────────┘ │
-└─────────────┘
+```bash
+claude --chrome
 ```
 
-### 第一步：配置 Chrome MCP 服务器
+进入会话后，直接描述用户行为：
 
-在项目根目录创建 `.mcp.json`：
-
-```json
-{
-  "mcpServers": {
-    "browser": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["@anthropic-ai/mcp-server-browserbase@latest"],
-      "env": {
-        "BROWSER_HEADLESS": "false"
-      }
-    }
-  }
-}
+```text
+打开 http://localhost:3000/login，输入错误密码，确认页面显示正确的错误提示。
+如果控制台有异常，记录错误位置，再检查对应源码。
 ```
 
-> **提示**：浏览器 MCP 服务器的包名可能随版本更新变化，请以 [Claude Code 官方文档](https://code.claude.com/docs/zh-CN/mcp) 或 `claude mcp add` 命令的推荐为准。社区常用的方案还包括 `@anthropic-ai/mcp-server-puppeteer` 和 Playwright MCP 等。
+首次连接时，浏览器动作可能需要批准。`/chrome` 可以查看连接状态、重新连接扩展、管理站点权限和选择浏览器。浏览器动作在可见窗口中执行，遇到登录页或 CAPTCHA 时会暂停并把操作交回用户。
 
-添加完成后，Claude 会获得一组浏览器操作工具：
+### 一个安全的前端验证 Skill
 
-| 工具 | 功能 |
-|------|------|
-| `mcp__browser__navigate` | 导航到 URL |
-| `mcp__browser__screenshot` | 截图 |
-| `mcp__browser__click` | 点击元素 |
-| `mcp__browser__type` | 输入文本 |
-| `mcp__browser__evaluate` | 执行 JavaScript |
-| `mcp__browser__snapshot` | 获取页面可访问性快照 |
-
-### 第二步：创建调试 Skill
-
-创建 `.claude/skills/debug-frontend/SKILL.md`：
+浏览器连接本身由 Claude Code 管理，不需要在项目里写一个猜测包名的 MCP 服务器。可以把稳定的验收标准封装成 Skill：
 
 ```markdown
 ---
-name: debug-frontend
-description: "使用 Chrome 调试前端问题"
-argument-hint: "<URL> <问题描述>"
+name: verify-login
+description: Verify the local login flow in Chrome after frontend changes.
 user-invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Bash(npm run dev)
-  - Bash(npm test)
-  - mcp__browser__*
 ---
 
-# 前端调试流程
+# Verify login
 
-## 环境准备
-
-!`lsof -i :3000 | grep LISTEN || echo "开发服务器未运行"`
-
-## 调试步骤
-
-1. 如果开发服务器未运行，先启动 `npm run dev`
-2. 使用浏览器 MCP 导航到 $1
-3. 获取页面快照，检查 DOM 结构
-4. 检查 console 是否有错误
-5. 根据 $ARGUMENTS 中的问题描述定位可疑代码
-6. 修复代码
-7. 刷新页面验证修复
-8. 运行相关测试确认无回归
+1. Check whether the local server is running.
+2. Open the requested login page in Chrome.
+3. Test invalid and valid inputs described by the user.
+4. Check visible feedback and relevant console errors.
+5. Report what was observed. Do not publish or send data outside the named site.
 ```
 
-### 第三步：配置自动格式化 Hook
+Hook 可以负责确定性的格式化或测试，Chrome 则负责观察真实浏览器行为。不要把登录 Cookie、验证码或浏览器配置文件复制给另一个 MCP 服务器；浏览器集成能使用现有登录状态，正因为它接触的是高价值会话。
 
-在 `.claude/settings.json` 中添加：
+## GitHub Actions 适合把 Claude 放进已有审查链
 
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npx prettier --write",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
-}
+官方 GitHub Action 支持两种用法：在 issue 或 Pull Request 评论中响应 `@claude`，以及由 workflow 的 `prompt` 触发自动任务。快速安装可以在 Claude Code 中运行：
+
+```text
+/install-github-app
 ```
 
-这样，每当 Claude 通过 Write 工具修改文件后，Prettier 会自动格式化。注意 `timeout` 单位是**秒**。
-
-### 第四步：实际使用
-
-```bash
-# 启动调试
-/debug-frontend http://localhost:3000/dashboard "点击'导出报告'按钮无反应"
-```
-
-Claude 会执行完整的调试循环：
-
-```
-1. ✅ 检测到开发服务器已在 :3000 运行
-2. 🌐 导航到 http://localhost:3000/dashboard
-3. 📸 获取页面快照，找到"导出报告"按钮
-4. 🔍 检查 console → 发现 TypeError: exportData is not a function
-5. 📂 定位到 src/components/Dashboard/ExportButton.tsx
-6. 🔧 修复：import { exportData } from '@/lib/export' 路径错误
-7. ♻️ 刷新页面 → 按钮可点击，导出成功
-8. ✅ 运行 npm test → 全部通过
-```
-
-### 进阶：多页面自动化测试
-
-将调试 Skill 扩展为自动化测试代理：
-
-```markdown
----
-name: e2e-verify
-description: "端到端验证关键用户路径"
-context: fork
----
-
-# E2E 验证
-
-对以下页面执行验证：
-
-!`cat e2e-paths.json`
-
-对每个路径：
-1. 导航到页面
-2. 执行页面中定义的关键交互
-3. 截图保存到 `./e2e-screenshots/`
-4. 记录任何 console 错误
-5. 输出验证报告
-```
-
----
-
-## 蓝图二：GitHub CI/CD 无人值守流水线
-
-### 场景描述
-
-你希望在 GitHub Pull Request 流程中自动化以下环节：
-
-1. PR 创建时，Claude 自动进行代码审查
-2. 审查发现问题时，自动创建修复提交
-3. 修复后自动触发测试，确认绿灯
-4. 全程无需人工介入
-
-### 程序化运行（Programmatic Usage）
-
-Claude Code 支持完全无人值守的程序化运行模式，适合 CI/CD 环境：
-
-```bash
-# 基本 Headless 调用
-claude -p "审查这个 PR 的代码改动" --output-format json
-
-# 带流式输出
-claude -p "修复 lint 错误" --output-format stream-json
-
-# 指定权限模式
-claude -p "运行测试并修复失败" --allowedTools "Bash(npm test)" "Write" "Read"
-```
-
-**关键参数**：
-
-| 参数 | 说明 |
-|------|------|
-| `-p "prompt"` | 非交互式执行 |
-| `--output-format json` | JSON 格式输出（含 cost、duration 等元数据） |
-| `--output-format stream-json` | 流式 JSON（实时输出） |
-| `--allowedTools` | 白名单工具（CI 中必须显式授权） |
-| `--max-turns N` | 最大对话轮数 |
-| `--permission-mode` | 权限模式（CI 中通常用 `auto`） |
-| `--continue` | 恢复上一次会话 |
-| `--bare` | 最小化输出，不显示进度和装饰信息 |
-| `--json-schema` | 指定 JSON Schema，约束输出格式 |
-| `--include-hook-events` | 在流式输出中包含 Hook 事件 |
-| `--no-session-persistence` | 不持久化会话记录（适合短期 CI 任务） |
-
-### GitHub Actions 配置
-
-创建 `.github/workflows/claude-review.yml`：
+它会安装 Claude GitHub App、准备认证 Secret 并创建 workflow Pull Request。手工配置时，Action 常见的最小形态是：
 
 ```yaml
-name: Claude Code Review
+name: Claude Code
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-
-permissions:
-  contents: write
-  pull-requests: write
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
 
 jobs:
-  review:
+  claude:
+    if: contains(github.event.comment.body, '@claude')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
-
-      - name: Install Claude Code
-        run: |
-          curl -fsSL https://claude.ai/install.sh | sh
-
-      - name: Run Code Review
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          # 获取 PR 变更文件
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-
-          # Claude 审查
-          claude -p "
-            请审查以下文件的代码改动：
-            $CHANGED_FILES
-
-            审查标准：
-            1. 类型安全（TypeScript 严格模式）
-            2. 错误处理完整性
-            3. 性能影响
-            4. 安全风险
-
-            输出 JSON 格式：
-            {
-              \"issues\": [{\"file\": \"...\", \"line\": N, \"severity\": \"error|warning|info\", \"message\": \"...\"}],
-              \"summary\": \"...\"
-            }
-          " --output-format json \
-            --allowedTools "Read" "Bash(git diff*)" "Bash(git log*)" \
-            --max-turns 10 \
-            > review-result.json
-
-      - name: Post Review Comment
-        uses: actions/github-script@v7
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
         with:
-          script: |
-            const fs = require('fs');
-            const result = JSON.parse(fs.readFileSync('review-result.json', 'utf8'));
-            // 解析并发布评论...
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-### 自动修复流水线
+订阅用户也可以使用 `claude setup-token` 生成的 `CLAUDE_CODE_OAUTH_TOKEN`，再把 workflow 输入改成 `claude_code_oauth_token`。组织场景还可以使用 OIDC workload identity federation，避免在仓库里保存长期 API Key。
 
-在审查基础上增加自动修复步骤：
+### CI 中的权限要显式写
 
-```yaml
-  auto-fix:
-    needs: review
-    if: needs.review.outputs.has-fixable-issues == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Claude Code
-        run: curl -fsSL https://claude.ai/install.sh | sh
-
-      - name: Auto Fix Issues
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          claude -p "
-            请修复以下审查问题：
-            $(cat review-issues.json)
-
-            要求：
-            - 只修改必要的代码
-            - 每个修复保持最小改动
-            - 修复后运行 npm test 确认通过
-          " --allowedTools "Read" "Write" "Bash(npm test)" "Bash(npm run lint)" \
-            --max-turns 20
-
-      - name: Commit Fixes
-        run: |
-          git config user.name "Claude Code Bot"
-          git config user.email "claude-bot@example.com"
-          git add -A
-          git diff --staged --quiet || git commit -m "fix: auto-fix review issues"
-          git push
-```
-
-### 配合 Hooks 实现质量门禁
-
-在项目 `.claude/settings.json` 中配置 CI 专用 Hooks：
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ./scripts/check-dangerous-cmd.js",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ./scripts/ci-report.js"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-其中 `check-dangerous-cmd.js` 脚本检查命令内容，对 `rm -rf`、`git push --force` 等危险命令返回 `{"permissionDecision": "deny"}`。这确保了即使在 `auto` 权限模式下，危险命令也会被拦截。
-
-### 多会话编排
-
-复杂的 CI 流程可以编排多个 Claude 会话：
+自动化运行用 `claude -p`，并把工具、会话上下文和输出格式固定下来：
 
 ```bash
-#!/bin/bash
-# ci-pipeline.sh
-
-# 第一轮：代码审查
-REVIEW=$(claude -p "审查代码改动，输出 JSON" \
-  --output-format json --max-turns 10)
-
-# 解析审查结果
-ISSUES=$(echo "$REVIEW" | jq '.result.issues // []')
-
-if [ "$(echo "$ISSUES" | jq 'length')" -gt 0 ]; then
-  # 第二轮：自动修复
-  claude -p "修复以下问题：$ISSUES" \
-    --allowedTools "Read" "Write" "Bash(npm test)" \
-    --max-turns 20
-
-  # 第三轮：回归验证
-  claude -p "运行全量测试，确认无回归" \
-    --allowedTools "Bash(npm test)" "Read" \
-    --max-turns 5
-fi
+claude --bare -p "审查当前 Pull Request 的变更，只报告可复现的问题" \
+  --output-format json \
+  --permission-mode dontAsk \
+  --allowedTools "Read,Grep,Glob,Bash(git diff *)"
 ```
 
----
+`--bare` 不会加载运行机器上的个人 Hooks、Plugins、MCP、Auto Memory 和 `CLAUDE.md`。如果审查依赖项目 Skill，应在 checkout 后显式加载项目内容，并在 workflow 中固定插件和 `--allowedTools`。
 
-## 蓝图三：跨端 Channels 协作
+自动修复可以使用 `Write` 和针对性的测试命令，但最好只推送到任务分支，由 Pull Request 触发人工审查。不要在一个无人值守 job 里同时授予任意 Bash、生产凭证和默认分支推送权限。
 
-### 场景描述
+### 自动审查和自定义工作流有区别
 
-你是一个团队的 Tech Lead，希望：
+如果团队只需要每个 Pull Request 自动审查，Code Review 功能比自己维护一套 workflow 更合适。需要把 issue 转成代码、响应评论或运行团队 Skill 时，GitHub Action 才有更大的自由度。两者都共享 GitHub App 的权限边界，安装时应审查完整权限集。
 
-1. 在手机 Telegram 上随时给 Claude 发送任务
-2. Claude 在开发机上执行任务并通过 Telegram 回报进度
-3. 多个 Claude 实例协作处理大规模重构
-4. 全程通过移动端监控和指挥
+## Channels 适合把事件推入本地会话
 
-### Channels 基础配置
+Channels 是研究预览能力。它不是一个会在云端凭空运行的机器人，而是让一个 MCP 服务器把消息、告警或 Webhook 事件推入正在运行的 CLI 会话。会话关闭后，事件不会继续排队替你完成工作。
 
-> **前提条件**：Channels 功能需要 Claude Code v2.1.80+ 且使用 claude.ai 账号登录（非 API Key），同时需要安装 Bun 运行时。
+Channels 需要 Claude 账户或 Console API Key 认证，不适用于 Bedrock、Google Cloud 的 Agent Platform 和 Microsoft Foundry。Team、Enterprise 或托管 Console 组织还需要管理员开启 Channels。
 
-Channels 通过安装对应的 Plugin 来启用。以 Telegram 为例：
+以 Telegram 为例，使用官方插件：
+
+```text
+/plugin install telegram@claude-plugins-official
+/telegram:configure <BOT_TOKEN>
+```
+
+退出当前会话，再显式启用频道：
 
 ```bash
-# 安装 Telegram Channel Plugin
-/plugin install telegram-channel
-
-# Plugin 安装后会自动配置 MCP 服务器
-# 启动 Claude 时 Channel 即生效
+claude --channels plugin:telegram@claude-plugins-official
 ```
 
-首次启动时，Claude 会引导你完成频道配对：
+第一次收到消息后，用配对码建立发送者 allowlist：
 
-```
-📱 Channels 已启用
-请在 Telegram 中搜索 @ClaudeCodeBot 并发送配对码：A7X9K2
-等待配对...
-```
-
-### Telegram 工作流
-
-配对完成后，你可以在 Telegram 中：
-
-```
-你：请检查一下项目的 TypeScript 类型错误
-
-Claude：正在执行 npm run typecheck...
-
-发现 3 个类型错误：
-1. src/api/users.ts:42 - 参数类型不匹配
-2. src/components/Table.tsx:88 - 缺少必需属性
-3. src/utils/format.ts:15 - 隐式 any 类型
-
-需要我自动修复吗？
-
-你：修复吧
-
-Claude：正在修复...
-✅ 3 个类型错误已修复
-✅ npm run typecheck 通过
-✅ npm test 通过
-
-已创建提交：fix: resolve 3 TypeScript type errors
+```text
+/telegram:access pair <CODE>
+/telegram:access policy allowlist
 ```
 
-### 安全机制
+Discord 使用对应的官方插件；iMessage 需要 macOS 和 Messages 数据库权限。三者的凭证和平台权限不同，不能把 Telegram 的配置命令套到 Discord 上。
 
-Channels 内置了多层安全保护：
+### 远程消息不是自动授权
 
-| 机制 | 说明 |
-|------|------|
-| **配对码验证** | 首次连接需输入一次性配对码 |
-| **发送者允许列表** | 只接受已认证的发送者消息 |
-| **权限继承** | 遵循当前会话的权限模式 |
-| **审计日志** | 所有 Channel 交互记录在会话日志中 |
+Channel 的安全边界有三层：
 
-### 配合 Agent Teams 实现分布式协作
+1. `--channels` 决定本次会话启用哪些插件；
+2. 插件的配对和 allowlist 决定哪些发送者能推送消息；
+3. Claude Code 的权限模式、规则和沙箱决定收到消息后能执行什么。
 
-在大规模重构场景中，结合 Agent Teams 和 Channels：
+如果开启了 permission relay，频道里的 allowlist 发送者还可能批准工具权限，因此只能加入你信任的人。涉及付款、生产部署、外发消息和删除数据的任务，仍应在对话里留下明确的人工确认点。
+
+## Agent Teams 不等于远程机器人集群
+
+Agent Teams 是本地或 Desktop 工作环境中的多会话协作能力。它需要显式启用：
 
 ```bash
-# 启用实验性 Agent Teams（Channels 通过 Plugin 已启用）
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 claude
 ```
 
-**工作流**：
+Team Lead 会创建任务并分配 Teammate；队友有各自上下文，可以通过消息互相传递发现，也可以共享任务列表。它适合把前端、后端和测试等相对独立的工作并行推进。
 
-```
-手机 Telegram ──────────► Team Lead (Claude)
-                              │
-                    ┌─────────┼─────────┐
-                    ▼         ▼         ▼
-              Teammate A  Teammate B  Teammate C
-              (API 层)    (UI 层)    (测试层)
-                    │         │         │
-                    └─────────┼─────────┘
-                              ▼
-                         共享任务列表
-                              │
-                    ◄─────────┘
-手机 Telegram ◄──── 进度报告 + 完成通知
-```
+Channels 可以作为入口把一个任务消息推入 Lead 会话，但不应在提示词里承诺“手机上会实时显示所有队友进度”。实际可见内容受频道插件、会话终端和消息权限影响；需要更完整的后台会话面板，应使用 Desktop 的 Agent View 或 Web / Mobile 云会话。
 
-在 Telegram 中发起任务：
+如果只是让一个主会话把搜索结果隔离出去，Subagent 更省 Token；如果需要多角色讨论和共享任务，才使用 Agent Teams。对顺序依赖很强、需要修改同一文件的任务，单会话通常更容易审查。
 
-```
-你：把项目从 REST API 迁移到 GraphQL，涉及 api/、components/、tests/ 三个目录
+## 三个场景的选择
 
-Claude (Team Lead)：
-收到，我将任务分解为三部分并分配给团队：
+| 需求 | 首选能力 | 关键边界 |
+|------|----------|----------|
+| 验证 Web 页面真实行为 | `--chrome` + `/chrome` | 浏览器登录态、站点权限和可见操作 |
+| PR 评论、Issue 自动处理 | GitHub Action | Secret、GitHub App 权限、分支保护 |
+| 手机或聊天工具推送事件 | Channels | 会话必须运行、发送者 allowlist、权限 relay |
+| 大范围交叉研究 | Dynamic workflow | 代理数量、总成本和结果核验 |
+| 多模块并行开发 | Agent Teams | 独立文件边界、共享任务和整合成本 |
 
-📋 任务分配：
-- Teammate A (API层)：迁移 api/ 目录下的 REST 端点到 GraphQL resolvers
-- Teammate B (UI层)：更新 components/ 中的 API 调用为 GraphQL queries
-- Teammate C (测试层)：更新 tests/ 中的测试用例适配新 API
+## 生产使用的检查清单
 
-⏳ 开始执行...
+- 运行位置写进流程：本地、云端、CI、容器还是 Desktop；
+- 每个入口使用单独的凭证，避免把个人登录态放进 CI；
+- `--bare`、`--allowedTools`、`dontAsk` 和容器隔离一起审查；
+- 对外发消息、推送代码、部署和审批保留人工确认；
+- 给 MCP、Plugin 和 Channel 做来源审查与最小权限配置；
+- 为长任务设置最大轮数、CI 超时和失败后的人工接管路径；
+- 让测试和 Pull Request 成为自动修复的最终质量门，而不是相信模型的口头总结。
 
-[10分钟后]
+自动化的成熟标志不是“Claude 一直在跑”，而是它在边界处会停下来，并且任何人都能从日志、diff、测试和权限配置中还原它做了什么。
 
-Claude (Team Lead)：
-📊 进度更新：
-✅ Teammate A：已完成 12 个 resolver 迁移
-🔄 Teammate B：正在更新第 8/15 个组件
-🔄 Teammate C：等待 A、B 完成后开始测试更新
-
-预计剩余时间：约 15 分钟
-```
-
-### 频道配置进阶
-
-Channels 的频道连接通过插件或 MCP 服务器实现。由于 Channels 仍处于研究预览阶段，具体的包名和配置方式可能变化，请以 [Claude Code 官方 Channels 文档](https://code.claude.com/docs/zh-CN/channels) 为准。
-
-**配置思路示例**（概念性，非直接可运行）：
-
-```json
-{
-  "mcpServers": {
-    "telegram-channel": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["<telegram-channel-mcp-package>"]
-    },
-    "discord-channel": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["<discord-channel-mcp-package>"],
-      "env": {
-        "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-> **注意**：上述包名为占位符。实际使用时需查阅 Claude Code 官方文档或 Plugin marketplace 获取最新可用的 Channels 插件。
-
----
-
-## 三大蓝图对比与选型
-
-### 适用场景矩阵
-
-| 维度 | 蓝图一：Chrome 调试 | 蓝图二：CI/CD | 蓝图三：Channels |
-|------|-------------------|-------------|-----------------|
-| **环境** | 本地开发机 | 远程 CI 服务器 | 跨设备 |
-| **交互** | 实时交互 | 完全无人值守 | 异步远程 |
-| **核心机制** | MCP + Skill | 程序化运行 + Hook | Channels + Teams |
-| **复杂度** | 中等 | 中高 | 高 |
-| **投入** | 半小时配置 | 数小时配置 | 依赖实验功能 |
-| **收益** | 单次调试效率提升 | 持续集成全自动化 | 团队协作范式转变 |
-
-### 渐进式采用路径
-
-建议按以下顺序逐步引入：
-
-```
-第一阶段（立即可用）
-├── 配置基础 MCP（浏览器、数据库）
-├── 创建常用 Skills（调试、组件生成）
-└── 设置 Hooks（格式化、lint）
-
-第二阶段（稳定后）
-├── 程序化运行接入 CI/CD
-├── 自定义 Sub-agents（安全审查、文档生成）
-└── 多会话编排脚本
-
-第三阶段（实验性）
-├── Channels 跨端协作
-├── Agent Teams 并行开发
-└── 完整 Plugin 开发与分发
-```
-
----
-
-## 生产环境注意事项
-
-### 成本控制
-
-| 策略 | 说明 |
-|------|------|
-| **`--max-turns`** | CI 中务必设置上限，防止无限循环 |
-| **模型选择** | 探索用 Haiku，审查用 Sonnet，复杂推理用 Opus |
-| **`effort` 参数** | 简单任务用 `low`，复杂任务用 `high` |
-| **工具白名单** | 只授权必要工具，减少不必要的工具调用 |
-
-### 安全清单
-
-在生产环境使用 Claude Code 自动化之前，确认以下项：
-
-- [ ] CI 环境的 API Key 使用独立的、有限额的 Key
-- [ ] `--allowedTools` 严格限制，不包含 `Bash` 的通配权限
-- [ ] Hooks 中拦截危险命令（`rm -rf`、`git push --force`、`DROP TABLE`）
-- [ ] 敏感文件在 `.claude/settings.json` 中通过 `permissions.deny` 保护
-- [ ] Git 操作限制在特定分支，禁止直接推送 `main`
-- [ ] 自动提交使用 bot 账号，便于审计追踪
-- [ ] 定期审查 Claude 的操作日志
-
-### 故障恢复
-
-| 场景 | 处理方式 |
-|------|---------|
-| CI 中 Claude 超时 | 设置 `--max-turns` + GitHub Actions `timeout-minutes` |
-| 自动修复引入新 Bug | Hook 在 `Stop` 事件运行全量测试 |
-| Agent Team 成员崩溃 | 当前无法自动恢复，需重新启动 |
-| MCP 服务器断连 | Claude 会自动尝试重连，超时后跳过该工具 |
-| Channels 消息丢失 | 通过配对码重新建立连接 |
-
----
-
-## 全系列回顾：从新手到架构师
-
-八篇文章，一条完整的学习路径：
-
-| 篇号 | 主题 | 你获得了 |
-|------|------|---------|
-| **第一篇** | 心智模型与迁移 | 从 OpenCode 视角理解 Claude Code 的差异与优势 |
-| **第二篇** | 快速上手 | 安装、登录、三种入口、跑通第一个任务 |
-| **第三篇** | 日常工作流 | 探索代码、修 Bug、重构、测试、Git 全流程 |
-| **第四篇** | 交互模式与命令 | 六种权限模式、内置命令、上下文管理 |
-| **第五篇** | CLAUDE.md 与记忆 | 指令层级、规则系统、Auto Memory 机制 |
-| **第六篇** | 设置与权限 | 四层设置、权限规则语法、沙箱防御 |
-| **第七篇** | 扩展架构全景 | 六大机制的定位、配置与选型 |
-| **第八篇** | 高阶自动化实战 | 三个端到端蓝图的完整配置 |
-
-**核心认知跃迁**：
-
-```
-使用者 ──→ 定制者 ──→ 架构师
- (1-3篇)    (4-6篇)    (7-8篇)
-
-从"用 Claude 写代码"
-到"让 Claude 自己组建团队、连接工具、自动化流水线"
-```
-
----
-
-## 结语
-
-Claude Code 不只是一个 AI 编程助手，它是一个**可编程的开发平台**。Skills 让你封装经验，Sub-agents 让你委派任务，Hooks 让你编织自动化，MCP 让你连接万物，Plugins 让你分享能力，Agent Teams 让你突破单人瓶颈。
-
-这些机制的组合空间是指数级的。本系列只是起点——真正的价值，在于你根据自己团队的实际痛点，设计出独一无二的自动化工作流。
-
-祝你构建愉快。
+官方参考：[Chrome](https://code.claude.com/docs/en/chrome)、[GitHub Actions](https://code.claude.com/docs/en/github-actions)、[Channels](https://code.claude.com/docs/en/channels)、[Agent Teams](https://code.claude.com/docs/en/agent-teams)、[非交互运行](https://code.claude.com/docs/en/headless)。

@@ -110,6 +110,28 @@ export function CodexIcon(props: IconProps) {
   );
 }
 
+export function BMadMethodIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* 研发流程节点 */}
+      <path d="M6 6l6 6 6-6" />
+      <path d="M12 12v6" />
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="18" cy="6" r="2.5" />
+      <circle cx="12" cy="18" r="2.5" />
+    </svg>
+  );
+}
+
 export function DeepSeekIcon(props: IconProps) {
   return (
     <svg
@@ -150,6 +172,8 @@ export function getColumnIconBySlug(
       return OpenCodeIcon;
     case "codex":
       return CodexIcon;
+    case "bmad-method":
+      return BMadMethodIcon;
     case "deepseek":
       return DeepSeekIcon;
     default:
