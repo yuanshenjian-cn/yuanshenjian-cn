@@ -90,7 +90,7 @@
       "id": "常见配置问题",
       "anchorId": "常见配置问题",
       "heading": "常见配置问题",
-      "content": "问题 检查方式 ------ ---------- /model 选了模型，下次启动又变了 检查项目、用户和 Managed settings 的 model，以及 ANTHROPICMODEL Fable 不能使用 检查账户额度、组织白名单、提供商模型 ID和安全策略 xhigh 不在选择器里 当前模型、组织 effort 上限或动态工作流能力可能不支持 default 绕过了模型固定 配置 availableModels 时补 enforceAvailableModels 1M 选项消失 检查 CLAUDECODEDISABLE1M_CONTEXT、套餐、提供商和模型能力 长会话突然变慢 检查是否切换模型、effort、MCP 或刚执行过 /compact 模型配置的核心决策可以压缩成三句：日常工作从 sonnet 开始，复杂判断再用 opus；需要长时间自主推进时考虑 fable；只有任务真的需要长上下文时才使用 [1m]。剩下的别名、环境变量和白名单，是为了让这三个判断在个人机器、团队和企业部署中保持一致。 官方参考：模型配置、设置参考、模型概览、Prompt caching。",
+      "content": "问题 检查方式 ------ ---------- /model 选了模型，下次启动又变了 检查项目、用户和 Managed settings 的 model，以及 ANTHROPICMODEL Fable 不能使用 检查账户额度、组织白名单、提供商模型 ID和安全策略 xhigh 不在选择器里 当前模型、组织 effort 上限或动态工作流能力可能不支持 default 绕过了模型固定 配置 availableModels 时补 enforceAvailableModels 1M 选项消失 检查 CLAUDECODEDISABLE1M_CONTEXT、套餐、提供商和模型能力 长会话突然变慢 检查是否切换模型、effort、MCP 或刚执行过 /compact 模型配置的核心决策可以压缩成三句：日常工作从 sonnet 开始，复杂判断再用 opus；需要长时间自主推进时考虑 fable；只有任务真的需要长上下文时才使用 [1m]。剩下的别名、环境变量和白名单，是为了让这三个判断在个人机器、团队和企业部署中保持一致。 别名和模型可用性会受提供商与组织策略影响，配置时应以模型配置、设置参考和模型概览为准；缓存细节见Prompt caching。",
       "excerpt": "问题 检查方式 ------ ---------- /model 选了模型，下次启动又变了 检查项目、用户和 Managed settings 的 model，以及 ANTHROPICMODEL Fable 不能使用 检查账户额度、组织白名单、提供商模型 ID和安全策略 xhigh 不在选择器里 当前模型、组织 eff..."
     }
   ]

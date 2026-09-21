@@ -83,7 +83,7 @@
       "id": "生产使用的检查清单",
       "anchorId": "生产使用的检查清单",
       "heading": "生产使用的检查清单",
-      "content": "运行位置写进流程：本地、云端、CI、容器还是 Desktop； 每个入口使用单独的凭证，避免把个人登录态放进 CI； --bare、--allowedTools、dontAsk 和容器隔离一起审查； 对外发消息、推送代码、部署和审批保留人工确认； 给 MCP、Plugin 和 Channel 做来源审查与最小权限配置； 为长任务设置最大轮数、CI 超时和失败后的人工接管路径； 让测试和 Pull Request 成为自动修复的最终质量门，而不是相信模型的口头总结。 自动化的成熟标志不是“Claude 一直在跑”，而是它在边界处会停下来，并且任何人都能从日志、diff、测试和权限配置中还原它做了什么。 官方参考：Chrome、GitHub Actions、Channels、Agent Teams、非交互运行。",
+      "content": "运行位置写进流程：本地、云端、CI、容器还是 Desktop； 每个入口使用单独的凭证，避免把个人登录态放进 CI； --bare、--allowedTools、dontAsk 和容器隔离一起审查； 对外发消息、推送代码、部署和审批保留人工确认； 给 MCP、Plugin 和 Channel 做来源审查与最小权限配置； 为长任务设置最大轮数、CI 超时和失败后的人工接管路径； 让测试和 Pull Request 成为自动修复的最终质量门，而不是相信模型的口头总结。 自动化的成熟标志不是“Claude 一直在跑”，而是它在边界处会停下来，并且任何人都能从日志、diff、测试和权限配置中还原它做了什么。 Chrome、GitHub Actions、Channels 和 Agent Teams 的权限边界，分别见官方 Chrome 文档、GitHub Actions 文档、Channels 文档和Agent Teams 文档。",
       "excerpt": "运行位置写进流程：本地、云端、CI、容器还是 Desktop； 每个入口使用单独的凭证，避免把个人登录态放进 CI； --bare、--allowedTools、dontAsk 和容器隔离一起审查； 对外发消息、推送代码、部署和审批保留人工确认； 给 MCP、Plugin 和 Channel 做来源审查与最小权限配置；..."
     }
   ]

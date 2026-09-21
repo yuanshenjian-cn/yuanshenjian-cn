@@ -111,7 +111,7 @@
       "id": "常见误区",
       "anchorId": "常见误区",
       "heading": "常见误区",
-      "content": "误区 更稳妥的做法 ------ -------------- 用 CLAUDE.md 代替安全拦截 用 deny、ask、沙箱或 Hook 用 Bash(*) 省掉所有提示 只允许具体的命令前缀 把 Auto Mode 的信任配置写进项目设置 放到用户或 Managed 的 autoMode 以为 deny 只拦截模型内置 Read 对外部命令、沙箱和敏感路径做纵深防御 在 CI 使用 Bypass，却没有容器 先建立隔离环境，再考虑无人值守 修改设置后只看 JSON 文件 用 /permissions、/status 和 claude auto-mode config 验证 安全配置的质量，最终看的是“能否说明一条动作为什么被允许、为什么被阻止”。当设置、权限、沙箱和 Hook 各自承担清楚的责任，Claude 才能在安全边界内获得真正的自动化空间。 官方参考：设置优先级、权限、权限模式、沙箱、Auto Mode 配置。",
+      "content": "误区 更稳妥的做法 ------ -------------- 用 CLAUDE.md 代替安全拦截 用 deny、ask、沙箱或 Hook 用 Bash(*) 省掉所有提示 只允许具体的命令前缀 把 Auto Mode 的信任配置写进项目设置 放到用户或 Managed 的 autoMode 以为 deny 只拦截模型内置 Read 对外部命令、沙箱和敏感路径做纵深防御 在 CI 使用 Bypass，却没有容器 先建立隔离环境，再考虑无人值守 修改设置后只看 JSON 文件 用 /permissions、/status 和 claude auto-mode config 验证 安全配置的质量，最终看的是“能否说明一条动作为什么被允许、为什么被阻止”。当设置、权限、沙箱和 Hook 各自承担清楚的责任，Claude 才能在安全边界内获得真正的自动化空间。 配置细节和托管键可从设置优先级开始，再结合权限、权限模式、沙箱和Auto Mode 配置核对。",
       "excerpt": "误区 更稳妥的做法 ------ -------------- 用 CLAUDE.md 代替安全拦截 用 deny、ask、沙箱或 Hook 用 Bash(*) 省掉所有提示 只允许具体的命令前缀 把 Auto Mode 的信任配置写进项目设置 放到用户或 Managed 的 autoMode 以为 deny 只拦截模..."
     }
   ]

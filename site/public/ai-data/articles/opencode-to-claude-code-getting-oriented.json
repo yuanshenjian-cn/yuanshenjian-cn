@@ -55,7 +55,7 @@
       "id": "什么时候值得切换",
       "anchorId": "什么时候值得切换",
       "heading": "什么时候值得切换",
-      "content": "如果你需要自由选择不同提供商、希望所有组件都由自己掌控，OpenCode 的开放性本身就是重要价值。若你更在意以下能力，Claude Code 的整合会更有吸引力： 本地 CLI、IDE、Desktop、Web 和移动端之间切换； 权限规则、Auto Mode、沙箱和企业托管设置组成的安全边界； 用 Skills、Hooks、MCP 和 Plugins 把团队流程固化； 通过 claude -p、GitHub Actions 或 GitLab CI/CD 进入自动化； 让会话、Subagent、动态工作流和 Agent Teams 共同处理长任务。 迁移的目标不是把 OpenCode 的每个习惯逐项翻译过来，而是重新划分“哪些规则应该持久化、哪些动作必须确认、哪些任务应该隔离”。这三个问题想清楚，剩下的命令和目录结构都只是实现细节。 官方入口：Claude Code 文档、扩展能力总览、记忆系统。",
+      "content": "如果你需要自由选择不同提供商、希望所有组件都由自己掌控，OpenCode 的开放性本身就是重要价值。若你更在意以下能力，Claude Code 的整合会更有吸引力： 本地 CLI、IDE、Desktop、Web 和移动端之间切换； 权限规则、Auto Mode、沙箱和企业托管设置组成的安全边界； 用 Skills、Hooks、MCP 和 Plugins 把团队流程固化； 通过 claude -p、GitHub Actions 或 GitLab CI/CD 进入自动化； 让会话、Subagent、动态工作流和 Agent Teams 共同处理长任务。 迁移的目标不是把 OpenCode 的每个习惯逐项翻译过来，而是重新划分“哪些规则应该持久化、哪些动作必须确认、哪些任务应该隔离”。这三个问题想清楚，剩下的命令和目录结构都只是实现细节。 迁移时可以先从Claude Code 文档了解入口，再看扩展能力总览和记忆系统。",
       "excerpt": "如果你需要自由选择不同提供商、希望所有组件都由自己掌控，OpenCode 的开放性本身就是重要价值。若你更在意以下能力，Claude Code 的整合会更有吸引力： 本地 CLI、IDE、Desktop、Web 和移动端之间切换； 权限规则、Auto Mode、沙箱和企业托管设置组成的安全边界； 用 Skills、Ho..."
     }
   ]

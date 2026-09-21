@@ -76,8 +76,8 @@
       "id": "组合方式取决于问题",
       "anchorId": "组合方式取决于问题",
       "heading": "组合方式取决于问题",
-      "content": "一个现实的落地顺序是：先让 CLAUDE.md 变短而准确，再把重复提示词做成 Skill；当输出开始淹没主会话时引入 Subagent；只有确定性动作才写 Hook；需要外部系统时再接 MCP。Plugin、工作流和 Agent Teams 都应该在前面的边界稳定后再引入。 官方参考：扩展能力总览、Skills、Subagents、Hooks、MCP、Plugins、Agent Teams。",
-      "excerpt": "一个现实的落地顺序是：先让 CLAUDE.md 变短而准确，再把重复提示词做成 Skill；当输出开始淹没主会话时引入 Subagent；只有确定性动作才写 Hook；需要外部系统时再接 MCP。Plugin、工作流和 Agent Teams 都应该在前面的边界稳定后再引入。 官方参考：扩展能力总览、Skills、Su..."
+      "content": "一个现实的落地顺序是：先让 CLAUDE.md 变短而准确，再把重复提示词做成 Skill；当输出开始淹没主会话时引入 Subagent；只有确定性动作才写 Hook；需要外部系统时再接 MCP。Plugin、工作流和 Agent Teams 都应该在前面的边界稳定后再引入。 字段、作用域和限制以扩展能力总览为入口，再按需查看Skills、Subagents、Hooks、MCP和Plugins文档。",
+      "excerpt": "一个现实的落地顺序是：先让 CLAUDE.md 变短而准确，再把重复提示词做成 Skill；当输出开始淹没主会话时引入 Subagent；只有确定性动作才写 Hook；需要外部系统时再接 MCP。Plugin、工作流和 Agent Teams 都应该在前面的边界稳定后再引入。 字段、作用域和限制以扩展能力总览为入口，再..."
     }
   ]
 }
