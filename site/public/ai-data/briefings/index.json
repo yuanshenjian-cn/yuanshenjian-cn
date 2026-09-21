@@ -1,6 +1,19 @@
 {
-  "generated": "2026-09-19T00:00:00.000Z",
+  "generated": "2026-09-21T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-21",
+      "title": "2026-09-21 AI 简报：xAI 发布 Grok Voice Transcribe 2.0",
+      "excerpt": "xAI 发布 Grok Voice Transcribe 2.0，提升真实场景语音转写能力，并保持批量与流式转写的原有价格。",
+      "tags": [
+        "AI",
+        "xAI",
+        "语音模型",
+        "Agent"
+      ],
+      "date": "2026-09-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-21"
+    },
     {
       "slug": "2026-09-19",
       "title": "2026-09-19 AI 简报：Anthropic 加码生物访问与前沿评估；OpenAI 推出法律专用模型",
@@ -1810,6 +1823,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-21",
+      "title": "2026-09-21 AI 简报：xAI 发布 Grok Voice Transcribe 2.0",
+      "excerpt": "xAI 发布 Grok Voice Transcribe 2.0，提升真实场景语音转写能力，并保持批量与流式转写的原有价格。",
+      "tags": [
+        "AI",
+        "xAI",
+        "语音模型",
+        "Agent"
+      ],
+      "date": "2026-09-21T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-21"
+    },
     {
       "slug": "2026-09-19",
       "title": "2026-09-19 AI 简报：Anthropic 加码生物访问与前沿评估；OpenAI 推出法律专用模型",
