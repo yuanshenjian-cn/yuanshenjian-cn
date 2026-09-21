@@ -295,4 +295,4 @@ CI 不应该把整个 `Bash` 或 `Write` 工具放进白名单。自动修复任
 
 安全配置的质量，最终看的是“能否说明一条动作为什么被允许、为什么被阻止”。当设置、权限、沙箱和 Hook 各自承担清楚的责任，Claude 才能在安全边界内获得真正的自动化空间。
 
-官方参考：[设置优先级](https://code.claude.com/docs/en/settings)、[权限](https://code.claude.com/docs/en/permissions)、[权限模式](https://code.claude.com/docs/en/permission-modes)、[沙箱](https://code.claude.com/docs/en/sandboxing)、[Auto Mode 配置](https://code.claude.com/docs/en/auto-mode-config)。
+配置细节和托管键可从[设置优先级](https://code.claude.com/docs/en/settings)开始，再结合[权限](https://code.claude.com/docs/en/permissions)、[权限模式](https://code.claude.com/docs/en/permission-modes)、[沙箱](https://code.claude.com/docs/en/sandboxing)和[Auto Mode 配置](https://code.claude.com/docs/en/auto-mode-config)核对。

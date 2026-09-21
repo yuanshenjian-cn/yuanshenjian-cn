@@ -1,0 +1,57 @@
+{
+  "slug": "bmad-method-06-customize-overrides",
+  "title": "BMad Method 定制：用 Override 注入团队研发规则",
+  "date": "2026-09-17T00:00:00.000Z",
+  "excerpt": "客户团队的规则不应该散落在每次提示词里，也不应该直接修改 BMad 安装目录。本文用 bmad-customize 为 Developer Agent 和代码审查工作流增加团队约束，解释三层合并、稀疏 Override、Agent 与 Workflow 的边界，以及如何用 resolver 验证最终生效配置。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "BMad Method",
+    "研发治理",
+    "AGENTS.md"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "团队定制的目标不是复制一份 BMad，而是在默认能力上叠加少量可审查、可升级的规则。 原生流程解决的是通用研发协作问题。客户项目还会有自己的质量门槛：改动用户行为前要有测试，CLI 必须检查退出码和输出流，持久化格式变化要验证旧数据。这些规则如果每次都写进提示词，迟早会漏掉；如果直接改安装目录，BMad 更新时又会被覆盖。 bmad-customize 提供的是项目级 Override。它把团队规则放在 _bmad/custom/，保留安装目录里的默认文件，升级时也不会丢失定制。",
+      "excerpt": "团队定制的目标不是复制一份 BMad，而是在默认能力上叠加少量可审查、可升级的规则。 原生流程解决的是通用研发协作问题。客户项目还会有自己的质量门槛：改动用户行为前要有测试，CLI 必须检查退出码和输出流，持久化格式变化要验证旧数据。这些规则如果每次都写进提示词，迟早会漏掉；如果直接改安装目录，BMad 更新时又会被覆..."
+    },
+    {
+      "id": "先让引导式定制判断改哪一层",
+      "anchorId": "先让引导式定制判断改哪一层",
+      "heading": "先让引导式定制判断改哪一层",
+      "content": "在新的 AI 会话中运行： 它应该识别这是 Developer Agent 的持久规则，并生成类似这样的项目文件： 示意配置可以是： 这只是结构示意。真正可用的字段以安装目录里对应 Skill 的 customize.toml 为准。先读 Schema，再写 Override，比照抄网上的完整配置可靠。",
+      "excerpt": "在新的 AI 会话中运行： 它应该识别这是 Developer Agent 的持久规则，并生成类似这样的项目文件： 示意配置可以是： 这只是结构示意。真正可用的字段以安装目录里对应 Skill 的 customize.toml 为准。先读 Schema，再写 Override，比照抄网上的完整配置可靠。"
+    },
+    {
+      "id": "agent-override-和-workflow-override-不是一回事",
+      "anchorId": "agent-override-和-workflow-override-不是一回事",
+      "heading": "Agent Override 和 Workflow Override 不是一回事",
+      "content": "Agent Override 改的是某个角色长期遵守的行为，例如 Developer Agent 的原则、持久事实、菜单项或激活钩子。 Workflow Override 改的是某次流程如何运行，例如代码 Review 的默认深度、激活时加载的文件、完成后的动作或额外 Review Layer。 为代码审查增加 CLI 契约审查器时，可以这样描述需求： 当前 v6.12 的 Review 自定义会把统一 diff 写入文件，变量名使用 {difffile}。旧教程中常见的 {diffoutput} 已经废弃。工作流层具体支持哪些 review_layers 字段，仍然要以本地 customize.toml 为准；如果字段不存在，可以使用工作流提供的激活步骤和持久事实，或向上游请求扩展点。",
+      "excerpt": "Agent Override 改的是某个角色长期遵守的行为，例如 Developer Agent 的原则、持久事实、菜单项或激活钩子。 Workflow Override 改的是某次流程如何运行，例如代码 Review 的默认深度、激活时加载的文件、完成后的动作或额外 Review Layer。 为代码审查增加 CLI..."
+    },
+    {
+      "id": "三层合并为什么要求稀疏",
+      "anchorId": "三层合并为什么要求稀疏",
+      "heading": "三层合并为什么要求稀疏",
+      "content": "最终配置按这个优先级合并： 项目文件只放团队真正改动的字段。个人文件适合放语气、个人工作偏好等内容，不要把客户合规规则放在那里，否则其他成员和 CI 都看不到。 稀疏 Override 有两个好处：默认 Skill 增加新字段时仍能被继承；团队规则的差异可以直接在代码审查中看见。复制整份默认配置，会把今天的默认值冻结在项目里，未来升级后的改进反而会被旧副本遮住。 还有几个容易误判的边界： agent.name 和 agent.title 是元数据，不是改名机制。 Override 不能随意删除默认数组项；通常是按 id 或 code 合并或追加。 安装目录里的 customize.toml 不属于项目文件，不应直接修改。 规则必须写成团队共享要求，单个 Story 的临时要求不要升级为永久事实。",
+      "excerpt": "最终配置按这个优先级合并： 项目文件只放团队真正改动的字段。个人文件适合放语气、个人工作偏好等内容，不要把客户合规规则放在那里，否则其他成员和 CI 都看不到。 稀疏 Override 有两个好处：默认 Skill 增加新字段时仍能被继承；团队规则的差异可以直接在代码审查中看见。复制整份默认配置，会把今天的默认值冻结在..."
+    },
+    {
+      "id": "用-resolver-检查实际生效的结果",
+      "anchorId": "用-resolver-检查实际生效的结果",
+      "heading": "用 resolver 检查“实际生效”的结果",
+      "content": "如果本地已经安装 BMad，可以运行共享解析器： 命令输出应包含默认配置和团队 Override 合并后的规则。再开一个全新会话，让 Developer Agent 复述它必须遵守的项目与团队约束，观察它是否会在实际任务中检查测试、输出流、退出码和旧数据。 如果 Override 没生效，先检查文件名是否与 Skill 目录名完全一致、TOML 语法是否正确、--project-root 是否指向当前项目，以及自己是否误把规则写进了个人文件。",
+      "excerpt": "如果本地已经安装 BMad，可以运行共享解析器： 命令输出应包含默认配置和团队 Override 合并后的规则。再开一个全新会话，让 Developer Agent 复述它必须遵守的项目与团队约束，观察它是否会在实际任务中检查测试、输出流、退出码和旧数据。 如果 Override 没生效，先检查文件名是否与 Skill..."
+    },
+    {
+      "id": "定制的验收标准",
+      "anchorId": "定制的验收标准",
+      "heading": "定制的验收标准",
+      "content": "一次合格的定制至少满足： 默认 Skill 文件没有被修改。 Override 只包含新增或覆盖的字段。 团队文件可提交，个人文件不进入版本库。 resolver 的结果包含目标规则。 新会话确实能读到规则。 BMad 更新后，Override 仍然存在且没有锁死整份默认配置。 这一步完成后，客户规范已经从“每次对话里提醒 Agent”变成了可版本化的团队行为。下一篇再把更完整的客户治理能力做成一个独立 Workflow Skill。 官方资料： Customize BMad BMad Method v6.12.0 Release",
+      "excerpt": "一次合格的定制至少满足： 默认 Skill 文件没有被修改。 Override 只包含新增或覆盖的字段。 团队文件可提交，个人文件不进入版本库。 resolver 的结果包含目标规则。 新会话确实能读到规则。 BMad 更新后，Override 仍然存在且没有锁死整份默认配置。 这一步完成后，客户规范已经从“每次对话里..."
+    }
+  ]
+}

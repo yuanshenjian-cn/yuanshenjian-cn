@@ -186,4 +186,4 @@ Agent Teams 更适合加速相互独立的工作，不适合省 Token。每个�
 
 成本控制最后会回到一个判断：当前上下文是否还在帮助任务完成。如果答案是否定的，重新开始通常比守着一段已经失去相关性的历史更便宜；如果答案是肯定的，保持稳定的模型、工具和项目上下文，缓存才有机会发挥作用。
 
-官方参考：[Prompt caching](https://code.claude.com/docs/en/prompt-caching)、[成本管理](https://code.claude.com/docs/en/costs)、[模型配置](https://code.claude.com/docs/en/model-config)、[上下文窗口](https://code.claude.com/docs/en/context-window)。
+缓存、用量和上下文的具体行为见[Prompt caching](https://code.claude.com/docs/en/prompt-caching)、[成本管理](https://code.claude.com/docs/en/costs)和[模型配置](https://code.claude.com/docs/en/model-config)。

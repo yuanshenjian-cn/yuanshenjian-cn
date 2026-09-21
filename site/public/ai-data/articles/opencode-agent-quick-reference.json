@@ -1,8 +1,8 @@
 {
   "slug": "opencode-agent-quick-reference",
   "title": "OpenCode Agent 速查手册",
-  "date": "2026-02-09T00:00:00.000Z",
-  "excerpt": "OpenCode 的 Sub Agent 功能让 AI 编程助手从单一对话模式升级为多代理协作系统。本文详细介绍 Primary Agent 与 Sub Agent 的区别、内置代理类型、配置方法以及实战使用技巧，帮助你构建更高效的 AI 辅助开发工作流。",
+  "date": "2026-09-19T00:00:00.000Z",
+  "excerpt": "OpenCode 的 Agent 分为直接对话的 primary agent 和由主代理调用的 subagent。内容以当前内置的 Build、Plan、General、Explore、Scout 为主线，覆盖权限边界、调用方式、配置文件和自定义审查工作流。",
   "tags": [
     "软件开发",
     "AI 编程",
@@ -13,225 +13,141 @@
       "id": "intro",
       "anchorId": "intro",
       "heading": "前言",
-      "content": "OpenCode Sub Agent 让 AI 助手实现\"分工协作\"，复杂任务并行处理，效率倍增。",
-      "excerpt": "OpenCode Sub Agent 让 AI 助手实现\"分工协作\"，复杂任务并行处理，效率倍增。"
+      "content": "选 Agent 之前先问一个问题：这次任务需要直接改代码，还是需要先读代码、查资料或拆解计划？",
+      "excerpt": "选 Agent 之前先问一个问题：这次任务需要直接改代码，还是需要先读代码、查资料或拆解计划？"
     },
     {
-      "id": "为什么需要-sub-agent",
-      "anchorId": "为什么需要-sub-agent",
-      "heading": "为什么需要 Sub Agent",
-      "content": "使用传统 AI 编程助手时，所有任务都在同一个对话中完成。分析代码、修改文件、搜索文档——这些操作串行执行，效率受限。 OpenCode 的 Sub Agent 解决了这个问题： 并行处理：多个任务同时执行 专业化分工：不同代理负责不同领域 上下文隔离：子任务不污染主对话 权限管控：精细化控制每个代理的能力",
-      "excerpt": "使用传统 AI 编程助手时，所有任务都在同一个对话中完成。分析代码、修改文件、搜索文档——这些操作串行执行，效率受限。 OpenCode 的 Sub Agent 解决了这个问题： 并行处理：多个任务同时执行 专业化分工：不同代理负责不同领域 上下文隔离：子任务不污染主对话 权限管控：精细化控制每个代理的能力"
+      "id": "两类-agent承担两种责任",
+      "anchorId": "两类-agent承担两种责任",
+      "heading": "两类 Agent，承担两种责任",
+      "content": "OpenCode 的 Agent 分成两类： 类型 作用 进入方式 --- --- --- primary agent 负责与你直接对话，推进当前会话 Tab 或配置的 agent 切换快捷键 subagent 由 primary agent 委派专门任务，也可以被 @ 提及 Task 工具或 @agent-name primary agent 负责保持主线。subagent 负责一个相对独立的研究、探索或执行单元。子会话有自己的上下文，结果返回主会话后，主代理再决定是否采用。",
+      "excerpt": "OpenCode 的 Agent 分成两类： 类型 作用 进入方式 --- --- --- primary agent 负责与你直接对话，推进当前会话 Tab 或配置的 agent 切换快捷键 subagent 由 primary agent 委派专门任务，也可以被 @ 提及 Task 工具或 @agent-name ..."
     },
     {
-      "id": "agent-类型详解",
-      "anchorId": "agent-类型详解",
-      "heading": "Agent 类型详解",
-      "content": "OpenCode 有两种 Agent 类型：Primary（主代理）和 Sub（子代理）。",
-      "excerpt": "OpenCode 有两种 Agent 类型：Primary（主代理）和 Sub（子代理）。"
+      "id": "build默认开发入口",
+      "anchorId": "build默认开发入口",
+      "heading": "Build：默认开发入口",
+      "content": "Build 是默认的 primary agent，工具权限完整，适合： 读取并修改项目文件； 执行测试、构建和 Git 命令； 完成从定位问题到验证结果的连续任务。 你可以直接在 TUI 中描述目标，也可以用 CLI： Build 的能力完整，也意味着权限范围最大。对陌生仓库使用时，先检查项目规则和工作区状态。",
+      "excerpt": "Build 是默认的 primary agent，工具权限完整，适合： 读取并修改项目文件； 执行测试、构建和 Git 命令； 完成从定位问题到验证结果的连续任务。 你可以直接在 TUI 中描述目标，也可以用 CLI： Build 的能力完整，也意味着权限范围最大。对陌生仓库使用时，先检查项目规则和工作区状态。"
     },
     {
-      "id": "primary-agent主代理",
-      "anchorId": "primary-agent主代理",
-      "heading": "Primary Agent（主代理）",
-      "content": "直接与用户交互，处理主要对话。 代理 模式 特点 ------ ------ ------ Build Primary 默认代理，拥有全部工具权限 Plan Primary 受限代理，仅分析和规划，不修改代码 切换方式：按 Tab 键循环切换。",
-      "excerpt": "直接与用户交互，处理主要对话。 代理 模式 特点 ------ ------ ------ Build Primary 默认代理，拥有全部工具权限 Plan Primary 受限代理，仅分析和规划，不修改代码 切换方式：按 Tab 键循环切换。"
+      "id": "plan先看清范围",
+      "anchorId": "plan先看清范围",
+      "heading": "Plan：先看清范围",
+      "content": "Plan 是受限的 primary agent，适合分析代码、提出方案和列出验证方式。默认情况下，文件编辑和 Bash 命令会询问许可，拒绝这些请求时可以保持只读。 Plan 不是“永远不能写”的特殊沙箱。只要你批准了权限，它仍可能执行对应操作。需要硬性只读时，应在配置中把 edit 和 bash 设为 deny，或使用只读 subagent。",
+      "excerpt": "Plan 是受限的 primary agent，适合分析代码、提出方案和列出验证方式。默认情况下，文件编辑和 Bash 命令会询问许可，拒绝这些请求时可以保持只读。 Plan 不是“永远不能写”的特殊沙箱。只要你批准了权限，它仍可能执行对应操作。需要硬性只读时，应在配置中把 edit 和 bash 设为 deny，或使..."
     },
     {
-      "id": "sub-agent子代理",
-      "anchorId": "sub-agent子代理",
-      "heading": "Sub Agent（子代理）",
-      "content": "由主代理调用，处理特定任务。 代理 用途 ------ ------ General 通用任务，支持文件修改 Explore 代码库探索，只读模式 调用方式：@agent-name 手动调用，或由主代理自动调用。",
-      "excerpt": "由主代理调用，处理特定任务。 代理 用途 ------ ------ General 通用任务，支持文件修改 Explore 代码库探索，只读模式 调用方式：@agent-name 手动调用，或由主代理自动调用。"
+      "id": "general可执行的子任务代理",
+      "anchorId": "general可执行的子任务代理",
+      "heading": "General：可执行的子任务代理",
+      "content": "General 是通用 subagent，适合研究复杂问题和执行多步任务。它可以在被允许的范围内修改文件，但默认不使用 todo 工具。复杂工作可以拆成多个 General 子任务并行处理，再由主代理整合结果。 手动调用：",
+      "excerpt": "General 是通用 subagent，适合研究复杂问题和执行多步任务。它可以在被允许的范围内修改文件，但默认不使用 todo 工具。复杂工作可以拆成多个 General 子任务并行处理，再由主代理整合结果。 手动调用："
     },
     {
-      "id": "系统代理",
-      "anchorId": "系统代理",
-      "heading": "系统代理",
-      "content": "代理 模式 状态 功能 ------ ------ ------ ------ Compaction primary 隐藏 自动压缩长上下文 Title primary 隐藏 自动生成会话标题 Summary primary 隐藏 自动创建会话摘要",
-      "excerpt": "代理 模式 状态 功能 ------ ------ ------ ------ Compaction primary 隐藏 自动压缩长上下文 Title primary 隐藏 自动生成会话标题 Summary primary 隐藏 自动创建会话摘要"
+      "id": "explore快速只读的代码探索",
+      "anchorId": "explore快速只读的代码探索",
+      "heading": "Explore：快速、只读的代码探索",
+      "content": "Explore 专门回答“代码在哪里”“哪些文件受影响”“这个符号如何被调用”。它不能修改文件，适合在动手之前查找入口： Explore 的价值是缩短定位时间，而不是代替主代理做实现决策。它返回的路径和结论仍然需要结合当前分支验证。",
+      "excerpt": "Explore 专门回答“代码在哪里”“哪些文件受影响”“这个符号如何被调用”。它不能修改文件，适合在动手之前查找入口： Explore 的价值是缩短定位时间，而不是代替主代理做实现决策。它返回的路径和结论仍然需要结合当前分支验证。"
     },
     {
-      "id": "build-代理",
-      "anchorId": "build-代理",
-      "heading": "Build 代理",
-      "content": "全能型代理，适合日常开发。 适用场景： 编写和修改代码 执行系统命令 完整的开发任务 特点：所有工具默认启用。",
-      "excerpt": "全能型代理，适合日常开发。 适用场景： 编写和修改代码 执行系统命令 完整的开发任务 特点：所有工具默认启用。"
+      "id": "scout只读的外部资料研究",
+      "anchorId": "scout只读的外部资料研究",
+      "heading": "Scout：只读的外部资料研究",
+      "content": "Scout 面向远程仓库、官方文档和依赖源码研究。需要核对库的真实实现、查 API 约定或比较上游示例时，可以使用它： Scout 适合“已知要查什么”的资料研究，不适合直接修改当前项目。",
+      "excerpt": "Scout 面向远程仓库、官方文档和依赖源码研究。需要核对库的真实实现、查 API 约定或比较上游示例时，可以使用它： Scout 适合“已知要查什么”的资料研究，不适合直接修改当前项目。"
     },
     {
-      "id": "plan-代理",
-      "anchorId": "plan-代理",
-      "heading": "Plan 代理",
-      "content": "安全分析型代理，适合代码审查。 默认权限： 文件编辑：需要确认（ask） Bash 命令：需要确认（ask） 适用场景： 代码审查 架构规划 方案设计",
-      "excerpt": "安全分析型代理，适合代码审查。 默认权限： 文件编辑：需要确认（ask） Bash 命令：需要确认（ask） 适用场景： 代码审查 架构规划 方案设计"
+      "id": "隐藏的系统-agent",
+      "anchorId": "隐藏的系统-agent",
+      "heading": "隐藏的系统 Agent",
+      "content": "OpenCode 还会在内部使用 Compaction、Title 和 Summary。它们分别负责压缩长上下文、生成会话标题和创建摘要，不会出现在普通 Agent 选择列表中，也不是用户日常开发时要切换的入口。",
+      "excerpt": "OpenCode 还会在内部使用 Compaction、Title 和 Summary。它们分别负责压缩长上下文、生成会话标题和创建摘要，不会出现在普通 Agent 选择列表中，也不是用户日常开发时要切换的入口。"
     },
     {
-      "id": "general-子代理",
-      "anchorId": "general-子代理",
-      "heading": "General 子代理",
-      "content": "通用任务处理专家。 特点： 完整工具访问（除 todo 外） 可修改文件 适合多任务并行",
-      "excerpt": "通用任务处理专家。 特点： 完整工具访问（除 todo 外） 可修改文件 适合多任务并行"
+      "id": "选择方式",
+      "anchorId": "选择方式",
+      "heading": "选择方式",
+      "content": "可以按这个表快速决定： 你的目标 推荐入口 --- --- 已经知道要改什么，想直接完成 Build 需求复杂，想先看文件和方案 Plan 只想找实现位置或调用链 Explore 需要查上游文档、依赖源码或示例 Scout 复杂任务需要拆出独立执行单元 General 需要持续推进多个阶段 Build + todo，或配置 subagent 协作 主代理可以自动调用 subagent，也可以由你在消息里用 @ 指定。调用 subagent 不会自动证明结论正确；它只是把工作拆开，让主会话少背一些无关上下文。",
+      "excerpt": "可以按这个表快速决定： 你的目标 推荐入口 --- --- 已经知道要改什么，想直接完成 Build 需求复杂，想先看文件和方案 Plan 只想找实现位置或调用链 Explore 需要查上游文档、依赖源码或示例 Scout 复杂任务需要拆出独立执行单元 General 需要持续推进多个阶段 Build + todo，或..."
     },
     {
-      "id": "explore-子代理",
-      "anchorId": "explore-子代理",
-      "heading": "Explore 子代理",
-      "content": "代码库探索专家。 特点： 只读模式，不会修改文件 快速搜索和定位 安全探索代码库",
-      "excerpt": "代码库探索专家。 特点： 只读模式，不会修改文件 快速搜索和定位 安全探索代码库"
+      "id": "json-配置-agent",
+      "anchorId": "json-配置-agent",
+      "heading": "JSON 配置 Agent",
+      "content": "Agent 配置写在 opencode.json 或 opencode.jsonc 的 agent 字段中： 配置内置 Agent 时，未写出的字段继续使用内置默认值。自定义 Agent 至少应提供 description，方便主代理判断它是否适合某个子任务。 Agent 的 mode 有三种： primary：可以作为直接对话入口； subagent：只能作为子任务代理； all：两种方式都可以。 default_agent 只能指向 primary agent。如果指向不存在的 Agent 或 subagent，OpenCode 会回退到 Build 并发出警告。",
+      "excerpt": "Agent 配置写在 opencode.json 或 opencode.jsonc 的 agent 字段中： 配置内置 Agent 时，未写出的字段继续使用内置默认值。自定义 Agent 至少应提供 description，方便主代理判断它是否适合某个子任务。 Agent 的 mode 有三种： primary：可以作..."
     },
     {
-      "id": "json-配置",
-      "anchorId": "json-配置",
-      "heading": "JSON 配置",
-      "content": "在项目根目录创建 opencode.json：",
-      "excerpt": "在项目根目录创建 opencode.json："
+      "id": "markdown-配置更适合长提示词",
+      "anchorId": "markdown-配置更适合长提示词",
+      "heading": "Markdown 配置更适合长提示词",
+      "content": "长 system prompt 不适合塞进 JSON。可以创建： 全局 Agent 放在 ~/.config/opencode/agents/，项目专用 Agent 放在 .opencode/agents/。文件名会成为 Agent 名称，例如 review.md 对应 @review。",
+      "excerpt": "长 system prompt 不适合塞进 JSON。可以创建： 全局 Agent 放在 ~/.config/opencode/agents/，项目专用 Agent 放在 .opencode/agents/。文件名会成为 Agent 名称，例如 review.md 对应 @review。"
     },
     {
-      "id": "markdown-配置",
-      "anchorId": "markdown-配置",
-      "heading": "Markdown 配置",
-      "content": "将代理配置文件保存为 .md 格式，支持两种保存位置： 全局配置：~/.config/opencode/agents/（所有项目可用） 项目配置：.opencode/agents/（当前项目专用） 例如，在全局目录创建 review.md：",
-      "excerpt": "将代理配置文件保存为 .md 格式，支持两种保存位置： 全局配置：~/.config/opencode/agents/（所有项目可用） 项目配置：.opencode/agents/（当前项目专用） 例如，在全局目录创建 review.md："
+      "id": "常用配置字段",
+      "anchorId": "常用配置字段",
+      "heading": "常用配置字段",
+      "content": "字段 用途 --- --- description 描述职责，属于自定义 Agent 的必填信息 mode primary、subagent 或 all model 指定 provider/model temperature 控制回答的随机性 top_p 调整采样范围 steps 限制 agentic 操作轮数 prompt 引用外部 system prompt 文件 permission 允许、询问或拒绝工具 hidden 隐藏 subagent 的 @ 自动补全入口 color 设置 TUI 中的显示颜色 disable 暂时停用 Agent reasoningEffort、textVerbosity 等附加字段的行为取决于目标模型和 provider；只使用官方 schema 和 provider 文档明确支持的字段。模型 ID 则统一写成 provider/model。 steps 达到上限后，Agent 会停止继续进行工具操作并总结当前工作。它是成本和范围控制，不是质量保证；仍然要配置测试和验收方式。",
+      "excerpt": "字段 用途 --- --- description 描述职责，属于自定义 Agent 的必填信息 mode primary、subagent 或 all model 指定 provider/model temperature 控制回答的随机性 top_p 调整采样范围 steps 限制 agentic 操作轮数 pro..."
     },
     {
-      "id": "temperature温度",
-      "anchorId": "temperature温度",
-      "heading": "Temperature（温度）",
-      "content": "控制输出的创造性和随机性。 范围 适用场景 ------ ---------- 0.0-0.2 代码分析、规划（确定性高） 0.3-0.5 一般开发任务（平衡） 0.6-1.0 头脑风暴、探索（创造性高） 默认值：如果未指定温度，OpenCode 使用模型默认值（大多数模型为 0，Qwen 模型为 0.55）。",
-      "excerpt": "控制输出的创造性和随机性。 范围 适用场景 ------ ---------- 0.0-0.2 代码分析、规划（确定性高） 0.3-0.5 一般开发任务（平衡） 0.6-1.0 头脑风暴、探索（创造性高） 默认值：如果未指定温度，OpenCode 使用模型默认值（大多数模型为 0，Qwen 模型为 0.55）。"
+      "id": "权限规则要写在工具层",
+      "anchorId": "权限规则要写在工具层",
+      "heading": "权限规则要写在工具层",
+      "content": "每个权限值是 allow、ask 或 deny： allow：无需再次询问； ask：执行前向用户确认； deny：不允许使用。 全局配置可以先设一个默认规则，再用更具体的模式覆盖： 匹配规则按顺序计算，最后匹配的规则生效。read、edit、glob、grep、bash、task、external_directory、lsp 和 skill 支持按模式细分；其他权限键使用简单的 allow、ask、deny。 不要只在 Agent 的 prompt 中写“不要修改文件”。真正的边界应放在 permission 中。提示词负责说明判断标准，权限负责限制工具行为。",
+      "excerpt": "每个权限值是 allow、ask 或 deny： allow：无需再次询问； ask：执行前向用户确认； deny：不允许使用。 全局配置可以先设一个默认规则，再用更具体的模式覆盖： 匹配规则按顺序计算，最后匹配的规则生效。read、edit、glob、grep、bash、task、external_directory..."
     },
     {
-      "id": "steps步数上限",
-      "anchorId": "steps步数上限",
-      "heading": "Steps（步数上限）",
-      "content": "限制代理的迭代次数，控制成本。现在应使用 steps，旧的 maxSteps 已经废弃。",
-      "excerpt": "限制代理的迭代次数，控制成本。现在应使用 steps，旧的 maxSteps 已经废弃。"
+      "id": "控制子-agent-的调用深度",
+      "anchorId": "控制子-agent-的调用深度",
+      "heading": "控制子 Agent 的调用深度",
+      "content": "主代理可以用 Task 工具调用 subagent。配置 subagent_depth 可以限制嵌套深度： 默认值 1 允许 primary agent 启动 subagent，但不允许 subagent 再启动下一层。设为 0 可以禁用子代理调用，设为 2 则允许多一层嵌套。对于只需要 Explore 或 Scout 返回资料的任务，保持浅层结构通常更容易追踪。 还可以在 Agent 上配置 permission.task，按名称允许或拒绝它调用哪些 subagent。用户仍然可以通过 @ 自动补全直接调用可见的 subagent，所以这项设置主要约束模型的自动委派。",
+      "excerpt": "主代理可以用 Task 工具调用 subagent。配置 subagent_depth 可以限制嵌套深度： 默认值 1 允许 primary agent 启动 subagent，但不允许 subagent 再启动下一层。设为 0 可以禁用子代理调用，设为 2 则允许多一层嵌套。对于只需要 Explore 或 Scout..."
     },
     {
-      "id": "permissions权限",
-      "anchorId": "permissions权限",
-      "heading": "Permissions（权限）",
-      "content": "精细控制工具权限。 权限级别： ask：执行前询问 allow：允许执行 deny：禁止执行",
-      "excerpt": "精细控制工具权限。 权限级别： ask：执行前询问 allow：允许执行 deny：禁止执行"
+      "id": "先研究再实现",
+      "anchorId": "先研究再实现",
+      "heading": "先研究，再实现",
+      "content": "让 Explore 找调用链，让 Plan 写方案，最后由 Build 实现。适合修改范围不清、风险较高的遗留代码。",
+      "excerpt": "让 Explore 找调用链，让 Plan 写方案，最后由 Build 实现。适合修改范围不清、风险较高的遗留代码。"
     },
     {
-      "id": "hidden隐藏",
-      "anchorId": "hidden隐藏",
-      "heading": "Hidden（隐藏）",
-      "content": "隐藏子代理，不让其在 @ 菜单中显示。",
-      "excerpt": "隐藏子代理，不让其在 @ 菜单中显示。"
+      "id": "先审查再合并",
+      "anchorId": "先审查再合并",
+      "heading": "先审查，再合并",
+      "content": "使用只读 review Agent 检查 diff，再让 Build 根据问题修改。review Agent 设为 edit deny，避免审查过程意外改变工作区。",
+      "excerpt": "使用只读 review Agent 检查 diff，再让 Build 根据问题修改。review Agent 设为 edit deny，避免审查过程意外改变工作区。"
     },
     {
-      "id": "top-p采样控制",
-      "anchorId": "top-p采样控制",
-      "heading": "Top P（采样控制）",
-      "content": "控制响应多样性的温度替代方案。 值范围 0.0-1.0：低值更聚焦，高值更多样。",
-      "excerpt": "控制响应多样性的温度替代方案。 值范围 0.0-1.0：低值更聚焦，高值更多样。"
+      "id": "研究和实现并行",
+      "anchorId": "研究和实现并行",
+      "heading": "研究和实现并行",
+      "content": "让 General 处理一条独立的迁移或测试任务，主会话继续处理主线。并行任务必须有不重叠的写入范围，否则两个 Agent 同时编辑同一文件，会让结果难以判断。",
+      "excerpt": "让 General 处理一条独立的迁移或测试任务，主会话继续处理主线。并行任务必须有不重叠的写入范围，否则两个 Agent 同时编辑同一文件，会让结果难以判断。"
     },
     {
-      "id": "color颜色",
-      "anchorId": "color颜色",
-      "heading": "Color（颜色）",
-      "content": "自定义代理在 UI 中的显示颜色。 支持十六进制颜色（如 #FF5733）或主题色：primary、secondary、accent、success、warning、error、info。",
-      "excerpt": "自定义代理在 UI 中的显示颜色。 支持十六进制颜色（如 #FF5733）或主题色：primary、secondary、accent、success、warning、error、info。"
+      "id": "子会话导航",
+      "anchorId": "子会话导航",
+      "heading": "子会话导航",
+      "content": "当 primary agent 创建子会话后，可以在 TUI 中查看它们： 快捷键 作用 --- --- Leader + Down 进入第一个子会话 Right 切换到下一个子会话 Left 切换到上一个子会话 Up 返回父会话 默认 Leader 是 Ctrl+X，也可以在 tui.json 中修改。子会话适合观察过程和读取结果，不代表主会话会自动采纳所有结论。",
+      "excerpt": "当 primary agent 创建子会话后，可以在 TUI 中查看它们： 快捷键 作用 --- --- Leader + Down 进入第一个子会话 Right 切换到下一个子会话 Left 切换到上一个子会话 Up 返回父会话 默认 Leader 是 Ctrl+X，也可以在 tui.json 中修改。子会话适合观察..."
     },
     {
-      "id": "disable禁用",
-      "anchorId": "disable禁用",
-      "heading": "Disable（禁用）",
-      "content": "设置为 true 禁用代理。",
-      "excerpt": "设置为 true 禁用代理。"
+      "id": "最后检查",
+      "anchorId": "最后检查",
+      "heading": "最后检查",
+      "content": "创建 Agent 前先写清它的输入、输出和禁止操作。完成后检查三件事： 它是否真的使用了预期的模型和 provider； 它是否拥有完成任务所需的最小权限； 返回结果能否通过文件、命令或测试复核。 OpenCode 的 Agent 不是越多越好。Build 和 Plan 负责主线，Explore 和 Scout 负责只读研究，General 负责明确的可执行子任务；这套边界已经足够支撑大多数项目。",
+      "excerpt": "创建 Agent 前先写清它的输入、输出和禁止操作。完成后检查三件事： 它是否真的使用了预期的模型和 provider； 它是否拥有完成任务所需的最小权限； 返回结果能否通过文件、命令或测试复核。 OpenCode 的 Agent 不是越多越好。Build 和 Plan 负责主线，Explore 和 Scout 负责只..."
     },
     {
-      "id": "task-permission代理调用权限",
-      "anchorId": "task-permission代理调用权限",
-      "heading": "Task Permission（代理调用权限）",
-      "content": "控制代理可以调用哪些子代理，使用 glob 模式匹配。",
-      "excerpt": "控制代理可以调用哪些子代理，使用 glob 模式匹配。"
-    },
-    {
-      "id": "prompt自定义提示",
-      "anchorId": "prompt自定义提示",
-      "heading": "Prompt（自定义提示）",
-      "content": "指定自定义系统提示文件。 路径相对于配置文件所在位置。",
-      "excerpt": "指定自定义系统提示文件。 路径相对于配置文件所在位置。"
-    },
-    {
-      "id": "model模型选择",
-      "anchorId": "model模型选择",
-      "heading": "Model（模型选择）",
-      "content": "为不同代理使用不同模型。 模型 ID 格式：provider/model-id。",
-      "excerpt": "为不同代理使用不同模型。 模型 ID 格式：provider/model-id。"
-    },
-    {
-      "id": "other传递给模型的参数",
-      "anchorId": "other传递给模型的参数",
-      "heading": "Other（传递给模型的参数）",
-      "content": "其他选项会直接传递给模型提供商。",
-      "excerpt": "其他选项会直接传递给模型提供商。"
-    },
-    {
-      "id": "会话导航",
-      "anchorId": "会话导航",
-      "heading": "会话导航",
-      "content": "当子代理创建子会话时： \\ +Down：进入第一个子 agent 会话 →：子会话循环 ←：子会话反向循环 ↑：返回父会话",
-      "excerpt": "当子代理创建子会话时： \\ +Down：进入第一个子 agent 会话 →：子会话循环 ←：子会话反向循环 ↑：返回父会话"
-    },
-    {
-      "id": "并行任务",
-      "anchorId": "并行任务",
-      "heading": "并行任务",
-      "content": "让 General 子代理并行处理多个独立任务：",
-      "excerpt": "让 General 子代理并行处理多个独立任务："
-    },
-    {
-      "id": "自定义代理创建",
-      "anchorId": "自定义代理创建",
-      "heading": "自定义代理创建",
-      "content": "使用命令行快速创建： 交互式流程： 选择保存位置（全局/项目） 描述代理用途 生成系统提示词 选择可用工具 创建 Markdown 配置文件",
-      "excerpt": "使用命令行快速创建： 交互式流程： 选择保存位置（全局/项目） 描述代理用途 生成系统提示词 选择可用工具 创建 Markdown 配置文件"
-    },
-    {
-      "id": "典型使用场景",
-      "anchorId": "典型使用场景",
-      "heading": "典型使用场景",
-      "content": "场景 推荐代理 配置要点 ------ ---------- ---------- 日常开发 Build 全工具开启 代码审查 Plan / 自定义 Review 只读，温度 0.1-0.2 代码探索 Explore 只读 安全审计 Security Auditor 禁止写操作，温度 0.1 文档编写 Docs Writer 禁用 bash 多任务并行 General 全工具 调试问题 Debug 禁止写操作，温度 0.2 创意探索 Creative 高温度 0.8，high top_p 快速规划 Plan (Haiku) 使用 Haiku 模型节省成本",
-      "excerpt": "场景 推荐代理 配置要点 ------ ---------- ---------- 日常开发 Build 全工具开启 代码审查 Plan / 自定义 Review 只读，温度 0.1-0.2 代码探索 Explore 只读 安全审计 Security Auditor 禁止写操作，温度 0.1 文档编写 Docs Wri..."
-    },
-    {
-      "id": "使用通配符控制工具",
-      "anchorId": "使用通配符控制工具",
-      "heading": "使用通配符控制工具",
-      "content": "禁用整个 MCP 服务器的工具：",
-      "excerpt": "禁用整个 MCP 服务器的工具："
-    },
-    {
-      "id": "精细化-bash-命令权限",
-      "anchorId": "精细化-bash-命令权限",
-      "heading": "精细化 Bash 命令权限",
-      "content": "允许特定命令，其他都需要确认：",
-      "excerpt": "允许特定命令，其他都需要确认："
-    },
-    {
-      "id": "多代理协作配置",
-      "anchorId": "多代理协作配置",
-      "heading": "多代理协作配置",
-      "content": "配置一个编排器代理控制子代理调用：",
-      "excerpt": "配置一个编排器代理控制子代理调用："
-    },
-    {
-      "id": "总结",
-      "anchorId": "总结",
-      "heading": "总结",
-      "content": "OpenCode Agent 的核心价值： 专业化分工：不同任务交给不同专家 并行处理：多任务同时执行，节省时间 权限隔离：精细化控制，安全可控 上下文管理：主对话保持清晰",
-      "excerpt": "OpenCode Agent 的核心价值： 专业化分工：不同任务交给不同专家 并行处理：多任务同时执行，节省时间 权限隔离：精细化控制，安全可控 上下文管理：主对话保持清晰"
-    },
-    {
-      "id": "参考",
-      "anchorId": "参考",
-      "heading": "参考",
-      "content": "官方文档 - 代理 官方文档 - 介绍 GitHub 社区",
-      "excerpt": "官方文档 - 代理 官方文档 - 介绍 GitHub 社区"
+      "id": "官方参考",
+      "anchorId": "官方参考",
+      "heading": "官方参考",
+      "content": "OpenCode Agents OpenCode Permissions OpenCode Config OpenCode Keybinds",
+      "excerpt": "OpenCode Agents OpenCode Permissions OpenCode Config OpenCode Keybinds"
     }
   ]
 }

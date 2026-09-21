@@ -218,4 +218,4 @@ claude --resume release-prep
 
 这样做的好处不是“让 Claude 自动完成一切”，而是让每次执行都能追溯到同一份约束。你仍然要看 diff、看测试结果，并为推送、部署、发消息或修改生产数据保留确认边界。
 
-官方参考：[常见工作流](https://code.claude.com/docs/en/common-workflows)、[最佳实践](https://code.claude.com/docs/en/best-practices)、[非交互运行](https://code.claude.com/docs/en/headless)、[会话管理](https://code.claude.com/docs/en/sessions)。
+命令和会话行为会持续细化，实际使用时可直接查阅[常见工作流](https://code.claude.com/docs/en/common-workflows)、[最佳实践](https://code.claude.com/docs/en/best-practices)和[会话管理](https://code.claude.com/docs/en/sessions)。

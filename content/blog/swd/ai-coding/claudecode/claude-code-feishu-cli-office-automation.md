@@ -190,4 +190,4 @@ Agent 不应把失败的写操作简单重试多次。消息发送、审批和�
 
 如果只是一次查询，直接运行 CLI 往往比接入完整 Agent 更简单。如果要长期运行，先把只读流程做稳，再逐步开放草稿、写入和消息动作。不要从“让 Claude 接管飞书”开始，应该从一个能明确验收、能随时人工接管的流程开始。
 
-官方资料：[lark-cli 仓库](https://github.com/larksuite/cli)、[Claude Code MCP 文档](https://code.claude.com/docs/en/mcp)、[Claude Code Skills 文档](https://code.claude.com/docs/en/skills)、[Claude Code 权限文档](https://code.claude.com/docs/en/permissions)。
+命令和 Skill 的细节以[lark-cli 官方仓库](https://github.com/larksuite/cli)为准；Claude Code 侧的权限边界可继续查阅[MCP 文档](https://code.claude.com/docs/en/mcp)、[Skills 文档](https://code.claude.com/docs/en/skills)和[权限文档](https://code.claude.com/docs/en/permissions)。

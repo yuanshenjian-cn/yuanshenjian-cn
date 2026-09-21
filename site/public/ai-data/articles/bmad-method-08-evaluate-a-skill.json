@@ -1,0 +1,57 @@
+{
+  "slug": "bmad-method-08-evaluate-a-skill",
+  "title": "BMad Builder Eval：验证 Skill 是否会正确触发和产出",
+  "date": "2026-09-19T00:00:00.000Z",
+  "excerpt": "手工跑通一次 Skill 只能证明它在一个输入上工作。本文为 aidev-risk-gate 设计 Artifact Eval 和 Trigger Eval，覆盖高风险、低风险、信息不完整和负向触发场景，说明 evals.json、triggers.json 的组织方式，以及 Runner 不可用时如何诚实区分手工验证与正式通过。",
+  "tags": [
+    "软件开发",
+    "AI 编程",
+    "BMad Method",
+    "BMad Builder",
+    "软件测试"
+  ],
+  "sections": [
+    {
+      "id": "intro",
+      "anchorId": "intro",
+      "heading": "前言",
+      "content": "Eval 的目标不是证明 Skill 没有崩溃，而是验证它在关键输入边界上会做出正确的判断。 aidev-risk-gate 已经可以手工读取 Spec 并生成报告。下一步要回答更难的问题：当输入包含不可逆生产数据迁移时，它会不会判为高风险？低风险输入会不会被过度报警？缺少信息时，它会不会为了给出漂亮结论而猜测？用户只是让它实现 Story 时，它会不会错误触发？ BMad Builder 的 Eval 分成两类：Artifact Eval 检查运行后的产物和行为；Trigger Eval 检查 Skill 在什么请求下应该触发。",
+      "excerpt": "Eval 的目标不是证明 Skill 没有崩溃，而是验证它在关键输入边界上会做出正确的判断。 aidev-risk-gate 已经可以手工读取 Spec 并生成报告。下一步要回答更难的问题：当输入包含不可逆生产数据迁移时，它会不会判为高风险？低风险输入会不会被过度报警？缺少信息时，它会不会为了给出漂亮结论而猜测？用户只..."
+    },
+    {
+      "id": "先准备三类输入文件",
+      "anchorId": "先准备三类输入文件",
+      "heading": "先准备三类输入文件",
+      "content": "目录可以这样组织： 三个 fixture 要有清晰差异： high-risk-spec.md 明确写出生产数据迁移，但没有回滚方案。 low-risk-spec.md 是范围小、可验证、没有证据表明涉及隐私或迁移的变更。 incomplete-spec.md 缺少成功条件或关键决策，不能支持确定的风险结论。 不要在 fixture 里只写“这是高风险案例”。Eval 应该让 Skill 从正文证据中推断结果，否则测试会验证提示词暗示，而不是验证治理能力。",
+      "excerpt": "目录可以这样组织： 三个 fixture 要有清晰差异： high-risk-spec.md 明确写出生产数据迁移，但没有回滚方案。 low-risk-spec.md 是范围小、可验证、没有证据表明涉及隐私或迁移的变更。 incomplete-spec.md 缺少成功条件或关键决策，不能支持确定的风险结论。 不要在 f..."
+    },
+    {
+      "id": "artifact-eval-要断言业务行为",
+      "anchorId": "artifact-eval-要断言业务行为",
+      "heading": "Artifact Eval 要断言业务行为",
+      "content": "一个精简的 evals.json 可以从下面的结构开始： 真正有价值的断言是“出现不可逆生产数据迁移且没有回滚方案时，结论必须是 FAIL，并引用对应证据”。“Skill 成功完成”只能说明进程结束，不能说明结果正确。 再为低风险和不完整输入各加一个案例： 这里还应验证输入文件未被修改。这条断言看起来机械，却能守住治理 Skill 的数据边界。",
+      "excerpt": "一个精简的 evals.json 可以从下面的结构开始： 真正有价值的断言是“出现不可逆生产数据迁移且没有回滚方案时，结论必须是 FAIL，并引用对应证据”。“Skill 成功完成”只能说明进程结束，不能说明结果正确。 再为低风险和不完整输入各加一个案例： 这里还应验证输入文件未被修改。这条断言看起来机械，却能守住治理..."
+    },
+    {
+      "id": "trigger-eval-必须有负向案例",
+      "anchorId": "trigger-eval-必须有负向案例",
+      "heading": "Trigger Eval 必须有负向案例",
+      "content": "triggers.json 不只测试“应该触发”的请求，也测试相邻但不属于它的请求： 负向案例能防止 Skill 描述越写越宽，最后抢走 bmad-build、bmad-code-review 或产品规划工作流的请求。触发率高不等于 Skill 质量高，误触发会污染上下文，增加用户判断成本。",
+      "excerpt": "triggers.json 不只测试“应该触发”的请求，也测试相邻但不属于它的请求： 负向案例能防止 Skill 描述越写越宽，最后抢走 bmad-build、bmad-code-review 或产品规划工作流的请求。触发率高不等于 Skill 质量高，误触发会污染上下文，增加用户判断成本。"
+    },
+    {
+      "id": "运行-runner-时记录真实环境",
+      "anchorId": "运行-runner-时记录真实环境",
+      "heading": "运行 Runner 时记录真实环境",
+      "content": "官方参考命令类似： Runner 可能依赖 Claude Code 的认证和执行环境。如果你的日常工具是 Codex、Cursor 或其他平台，不能因为手工案例通过就声称官方 Eval 已通过。可以保留相同的 JSON Schema，在官方 Runner 环境做兼容性回归；也可以为客户工具实现 Runner Adapter；至少要按同一组案例手工运行并保存 transcript、生成物和评分结果。 一次正式运行通常会留下： Skill 修改后，要用同一套 Eval 集合比较结果：Artifact 通过率、正向触发率、负向误触发率、执行时间、Tool Call 数量、输出稳定性，以及是否新增了无证据结论。",
+      "excerpt": "官方参考命令类似： Runner 可能依赖 Claude Code 的认证和执行环境。如果你的日常工具是 Codex、Cursor 或其他平台，不能因为手工案例通过就声称官方 Eval 已通过。可以保留相同的 JSON Schema，在官方 Runner 环境做兼容性回归；也可以为客户工具实现 Runner Adapt..."
+    },
+    {
+      "id": "读报告时不要只看总分",
+      "anchorId": "读报告时不要只看总分",
+      "heading": "读报告时不要只看总分",
+      "content": "如果 A1 通过、A2 误报隐私风险、A3 没有列出 Decision Needed，平均分仍然可能看起来不错，但这个 Skill 还不适合进入客户门禁。治理能力的失败往往不是崩溃，而是语气很确定地给出错误结论。 修正 Skill 后重复运行相同案例，保留前后报告。只有当关键行为和边界都达到预期，才可以写“Eval 通过”；Runner 未执行、只跑了部分模式或只做了手工验证时，应明确写“部分验证”。 官方资料： Eval Format Run Evals Against a Skill Builder Commands Reference",
+      "excerpt": "如果 A1 通过、A2 误报隐私风险、A3 没有列出 Decision Needed，平均分仍然可能看起来不错，但这个 Skill 还不适合进入客户门禁。治理能力的失败往往不是崩溃，而是语气很确定地给出错误结论。 修正 Skill 后重复运行相同案例，保留前后报告。只有当关键行为和边界都达到预期，才可以写“Eval 通..."
+    }
+  ]
+}

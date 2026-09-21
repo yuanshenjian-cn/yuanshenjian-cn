@@ -248,4 +248,4 @@ claude --permission-mode plan
 
 第一次使用不需要记住全部命令。能在真实项目中完成一次“理解范围—修改—验证—审查 diff”的闭环，之后再按遇到的问题补充权限、记忆和扩展配置。
 
-官方参考：[安装与更新](https://code.claude.com/docs/en/setup)、[快速开始](https://code.claude.com/docs/en/quickstart)、[CLI 参考](https://code.claude.com/docs/en/cli-reference)、[认证](https://code.claude.com/docs/en/authentication)。
+安装、认证和 CLI 参数的当前写法，见[安装与更新](https://code.claude.com/docs/en/setup)、[快速开始](https://code.claude.com/docs/en/quickstart)和[CLI 参考](https://code.claude.com/docs/en/cli-reference)。

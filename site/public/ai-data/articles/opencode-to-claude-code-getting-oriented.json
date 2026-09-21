@@ -1,8 +1,8 @@
 {
   "slug": "opencode-to-claude-code-getting-oriented",
   "title": "Claude Code 第一篇：从 OpenCode 切到 Claude Code——心智模型、迁移清单与能力地图",
-  "date": "2026-04-01T00:00:00.000Z",
-  "excerpt": "从 OpenCode 迁移到 Claude Code，不只是换一个 CLI 工具。这是一次从\"开源灵活\"到\"深度集成\"的范式转变。本文梳理两者的核心差异、Claude Code 的产品地图与功能矩阵，并提供一份可操作的迁移清单，帮你高效完成切换。",
+  "date": "2026-09-19T00:00:00.000Z",
+  "excerpt": "从 OpenCode 切到 Claude Code，变化不只在终端命令，而在模型、权限、记忆、扩展和运行入口被纳入同一套工作环境。本文先厘清两种工具的边界，再给出一份不破坏既有项目约定的迁移方法。",
   "tags": [
     "软件开发",
     "AI 编程",
@@ -13,120 +13,50 @@
       "id": "intro",
       "anchorId": "intro",
       "heading": "前言",
-      "content": "这不是换个终端工具，而是换一套工作方式。",
-      "excerpt": "这不是换个终端工具，而是换一套工作方式。"
+      "content": "从 OpenCode 切到 Claude Code，真正需要迁移的是工作边界，而不是几条命令。",
+      "excerpt": "从 OpenCode 切到 Claude Code，真正需要迁移的是工作边界，而不是几条命令。"
     },
     {
-      "id": "引言为什么这不是换个-cli",
-      "anchorId": "引言为什么这不是换个-cli",
-      "heading": "引言：为什么这不是\"换个 CLI\"",
-      "content": "如果你之前一直用 OpenCode 做 AI 辅助编程，你可能已经习惯了它的模式：在终端里输入自然语言指令，AI 帮你读代码、改文件、跑命令。切到 Claude Code 后，表面上看起来差不多——都是终端里对话、都能编辑文件、都支持 MCP。 但深入使用后你会发现，这两个工具的设计哲学截然不同： 维度 OpenCode Claude Code ------ ---------- ------------- 定位 开源社区驱动的 AI Coding Agent Anthropic 官方深度集成的编码平台 模型 支持 75+ 提供商，模型自由切换 以 Claude Sonnet/Opus 为核心，支持有限的第三方 形态 主要是终端 CLI CLI + VS Code + JetBrains + Desktop App + Web + iOS 扩展 MCP + AGENTS.md + 自定义 Agent CLAUDE.md + Skills + Sub-agents + Hooks + MCP + Plugins + Agent Teams 权限 基础的工具权限控制 细粒度权限系统 + Auto Mode + Sandbox 协作 会话分享链接 Remote Control + Channels + Dispatch + 云端会话 CI/CD 无原生支持 原生 GitHub Actions + GitLab CI/CD 集成 OpenCode 的核心优势是开放性——你可以选任何模型、任何提供商，代码完全透明。而 Claude Code 的核心优势是深度集成——它把 AI 编程从\"一个终端工具\"变成了\"一个跨平台的开发协作平台\"。 这篇文章不会手把手教你安装和使用（那是后续文章的事），而是帮你建立正确的心智模型，让你知道： 两者的核心差异在哪里 Claude Code 的全景能力地图长什么样 迁移时该关注什么、该忽略什么 这个系列 8 篇文章如何串起来",
-      "excerpt": "如果你之前一直用 OpenCode 做 AI 辅助编程，你可能已经习惯了它的模式：在终端里输入自然语言指令，AI 帮你读代码、改文件、跑命令。切到 Claude Code 后，表面上看起来差不多——都是终端里对话、都能编辑文件、都支持 MCP。 但深入使用后你会发现，这两个工具的设计哲学截然不同： 维度 OpenCod..."
-    },
-    {
-      "id": "opencode-的心智模型",
-      "anchorId": "opencode-的心智模型",
-      "heading": "OpenCode 的心智模型",
-      "content": "OpenCode 像一把开源瑞士军刀： 它的核心价值主张是\"自由\"：自由选择模型、自由配置 API Key、自由定制 Agent。你完全控制每一个环节，但也需要自己搭建和维护整个工具链。",
-      "excerpt": "OpenCode 像一把开源瑞士军刀： 它的核心价值主张是\"自由\"：自由选择模型、自由配置 API Key、自由定制 Agent。你完全控制每一个环节，但也需要自己搭建和维护整个工具链。"
+      "id": "先把两种工具放回各自的位置",
+      "anchorId": "先把两种工具放回各自的位置",
+      "heading": "先把两种工具放回各自的位置",
+      "content": "OpenCode 更像一个由使用者组装的开放式编码代理：模型、服务商、配置和扩展可以按自己的偏好组合。Claude Code 则把模型调用、文件操作、终端执行、权限判断和会话管理放在同一套产品里，再把 IDE、桌面端和云端入口接到同一个工作流上。 两者都能读代码、改文件、执行命令，也都能接入 MCP。区别不在“能不能完成一次修改”，而在默认的治理方式不同： 维度 OpenCode Claude Code ------ ---------- ------------- 核心选择 由使用者选择模型和服务商 以 Claude 模型为主，也支持 Anthropic 官方文档列出的第三方部署方式 运行入口 以终端和开放生态为中心 CLI、VS Code、JetBrains、Desktop、Web、移动端 项目上下文 由项目文件和工具配置决定 CLAUDE.md、AGENTS.md、Rules、Auto Memory 与会话上下文共同工作 权限治理 取决于具体配置和集成 allow、ask、deny、权限模式、Auto Mode 与沙箱分层控制 扩展方式 MCP、Agent 及社区扩展 Skills、Subagents、Hooks、MCP、Plugins、动态工作流和 Agent Teams 自动化入口 依赖脚本或外部集成 claude -p、GitHub Actions、GitLab CI/CD、定时任务、Channels OpenCode 的优势是选择自由，Claude Code 的优势是把一条从“理解项目”到“验证结果”的链路做得更完整。迁移前不必先判断哪个工具在所有场景都更好，先看团队真正需要的是模型自由度，还是统一的权限与协作边界。",
+      "excerpt": "OpenCode 更像一个由使用者组装的开放式编码代理：模型、服务商、配置和扩展可以按自己的偏好组合。Claude Code 则把模型调用、文件操作、终端执行、权限判断和会话管理放在同一套产品里，再把 IDE、桌面端和云端入口接到同一个工作流上。 两者都能读代码、改文件、执行命令，也都能接入 MCP。区别不在“能不能完..."
     },
     {
       "id": "claude-code-的心智模型",
       "anchorId": "claude-code-的心智模型",
       "heading": "Claude Code 的心智模型",
-      "content": "Claude Code 更像一个深度集成的开发平台： 关键的思维转变： 从\"选模型\"到\"选入口\"：OpenCode 的核心决策是选哪个模型提供商；Claude Code 的核心决策是选哪个入口和工作模式 从\"手动配置一切\"到\"渐进式扩展\"：Claude Code 开箱即用就很强，扩展是锦上添花而非必需 从\"单会话\"到\"跨端跨会话\"：你可以在终端开始，手机上继续，桌面应用里审查 从\"工具\"到\"平台\"：Claude Code 不只是一个 CLI，它是一套包含 CI/CD、定时任务、多代理协作的完整平台",
-      "excerpt": "Claude Code 更像一个深度集成的开发平台： 关键的思维转变： 从\"选模型\"到\"选入口\"：OpenCode 的核心决策是选哪个模型提供商；Claude Code 的核心决策是选哪个入口和工作模式 从\"手动配置一切\"到\"渐进式扩展\"：Claude Code 开箱即用就很强，扩展是锦上添花而非必需 从\"单会话\"到\"..."
+      "content": "用 OpenCode 时，常见的思路是“选一个模型，让它调用工具”： Claude Code 更适合用“一个工作环境”来理解： 这会带来三个实际变化。 第一，模型不再是唯一的开场决策。你还要决定任务是在本地 CLI 完成，还是交给 Desktop、Web 云会话或 IDE；是手动确认每个动作，还是用 Auto Mode 配合沙箱减少中断。 第二，项目约定应该从每次提示词里移到项目上下文。构建命令、测试要求和不能碰的目录放进 CLAUDE.md；只在处理特定文件时需要的规则放进 .claude/rules/；偶尔使用的流程则适合做成 Skill。 第三，长任务不必全部塞在一个对话里。Subagent 可以把探索、日志处理或审查放到独立上下文；动态工作流适合让多个 Subagent 交叉核验；Agent Teams 则适合需要队友直接沟通的并行工作。",
+      "excerpt": "用 OpenCode 时，常见的思路是“选一个模型，让它调用工具”： Claude Code 更适合用“一个工作环境”来理解： 这会带来三个实际变化。 第一，模型不再是唯一的开场决策。你还要决定任务是在本地 CLI 完成，还是交给 Desktop、Web 云会话或 IDE；是手动确认每个动作，还是用 Auto Mode..."
     },
     {
-      "id": "五种主要入口",
-      "anchorId": "五种主要入口",
-      "heading": "五种主要入口",
-      "content": "Claude Code 提供五种主要的使用入口，每种适合不同的场景： 入口 形态 核心优势 适合场景 ------ ------ --------- --------- Terminal CLI 终端命令行 功能最完整、可组合、支持管道 日常开发、脚本自动化、CI/CD VS Code 扩展 IDE 内嵌面板 内联 diff、@-提及、计划审查 需要可视化 diff 的开发 JetBrains 插件 IDE 内嵌面板 交互式 diff、选择上下文共享 Java/Kotlin/Python 开发者 Desktop App 独立桌面应用 可视化 diff、并行会话、Dispatch、定时任务 多任务管理、云端会话 Web 浏览器 无需本地安装、长时间运行任务 远程仓库、移动端、排队运行",
-      "excerpt": "Claude Code 提供五种主要的使用入口，每种适合不同的场景： 入口 形态 核心优势 适合场景 ------ ------ --------- --------- Terminal CLI 终端命令行 功能最完整、可组合、支持管道 日常开发、脚本自动化、CI/CD VS Code 扩展 IDE 内嵌面板 内联 d..."
+      "id": "入口不是功能清单而是工作边界",
+      "anchorId": "入口不是功能清单而是工作边界",
+      "heading": "入口不是功能清单，而是工作边界",
+      "content": "Claude Code 的不同入口共享核心引擎，但运行位置和适合的任务不同： 入口 更适合什么 需要提前想清楚的事 ------ ------------ -------------------- CLI 终端开发、脚本、远程服务器、Agent SDK 权限、Shell、MCP 和本地文件边界 VS Code / JetBrains 在编辑器里审查 diff、共享选中代码 IDE 扩展并不等同于完整 CLI 终端体验 Desktop 可视化 diff、并行会话、App 预览和 Dispatch 会话可能在本机，也可能进入云端，先确认运行位置 Web 长时间云端任务、断开后继续运行 仓库和环境在云端，不能直接访问本机文件 移动端 启动、监控云会话或 Remote Control 手机是控制端，不是本地开发环境 Remote Control 是把本地会话交给浏览器或手机继续操作；Dispatch 是从移动端让 Desktop 创建新的本地会话；Channels 则是由 MCP 服务器把 Telegram、Discord 或 Webhook 事件推入一个正在运行的 CLI 会话。三者解决的是不同问题，不能混成“手机端 Claude Code”。",
+      "excerpt": "Claude Code 的不同入口共享核心引擎，但运行位置和适合的任务不同： 入口 更适合什么 需要提前想清楚的事 ------ ------------ -------------------- CLI 终端开发、脚本、远程服务器、Agent SDK 权限、Shell、MCP 和本地文件边界 VS Code / Je..."
     },
     {
-      "id": "超越入口跨端协作能力",
-      "anchorId": "超越入口跨端协作能力",
-      "heading": "超越入口：跨端协作能力",
-      "content": "除了五种入口本身，Claude Code 还提供了一组跨端协作能力，这是 OpenCode 完全没有的维度： 能力 作用 使用场景 ------ ------ --------- Remote Control 从手机/平板/任何浏览器继续本地 CLI 会话 离开工位但想继续监控任务 Dispatch 从手机发送任务，Desktop App 自动创建会话 通勤时快速派发任务 /teleport 将 Web 会话拉入本地终端 云端跑完后想在本地继续 /desktop 将终端会话交给 Desktop App 需要可视化审查 diff Channels 从 Telegram/Discord/Webhook 推送事件到会话 外部事件触发处理 Slack 集成 在 Slack 中 @Claude 触发任务 团队协作、错误报告转 PR iOS App Claude iOS 应用中使用 Code 功能 移动端启动长时间任务 迁移者注意：如果你只是把 Claude Code 当作一个终端 CLI 来用（就像用 OpenCode 一样），你只发挥了它不到 30% 的能力。",
-      "excerpt": "除了五种入口本身，Claude Code 还提供了一组跨端协作能力，这是 OpenCode 完全没有的维度： 能力 作用 使用场景 ------ ------ --------- Remote Control 从手机/平板/任何浏览器继续本地 CLI 会话 离开工位但想继续监控任务 Dispatch 从手机发送任务，D..."
+      "id": "扩展层应该按问题添加",
+      "anchorId": "扩展层应该按问题添加",
+      "heading": "扩展层应该按问题添加",
+      "content": "Claude Code 的扩展不是一张必须一次配齐的菜单。按需求选择会更稳： 你遇到的问题 适合的能力 原因 -------------- ------------ ------ Claude 总忘记项目命令或边界 CLAUDE.md / AGENTS.md / Rules 它们提供持久的项目上下文 同一套提示词反复出现 Skill 知识和流程按需加载，也可以用 /name 调用 探索输出太多，主会话被淹没 Subagent 独立上下文只返回摘要 每次写文件后都要执行固定动作 Hook 生命周期触发比提示词更可靠 需要访问飞书、数据库或浏览器 MCP 提供外部工具和数据连接 要在多个仓库重复安装同一套能力 Plugin / Marketplace 负责打包、命名空间和分发 需要很多代理交叉检查大范围任务 Dynamic workflow 把编排过程写成可复用脚本 多个独立会话需要直接讨论 Agent Teams 队友有独立上下文、共享任务列表和消息通道 Claude Code 也能直接读取 AGENTS.md。默认情况下，项目没有可加载的 CLAUDE.md 时，它会把 AGENTS.md 当作项目指令；如果团队希望两者同时生效，可以在设置中选择对应的加载策略，或在 CLAUDE.md 中显式导入 @AGENTS.md。迁移时不需要复制两份规则。",
+      "excerpt": "Claude Code 的扩展不是一张必须一次配齐的菜单。按需求选择会更稳： 你遇到的问题 适合的能力 原因 -------------- ------------ ------ Claude 总忘记项目命令或边界 CLAUDE.md / AGENTS.md / Rules 它们提供持久的项目上下文 同一套提示词反复出..."
     },
     {
-      "id": "功能可用性矩阵",
-      "anchorId": "功能可用性矩阵",
-      "heading": "功能可用性矩阵",
-      "content": "不是所有功能在所有入口和所有计划下都可用。以下矩阵帮你快速判断： 功能 CLI VS Code JetBrains Desktop Web ------ :---: :-------: :---------: :-------: :---: 文件编辑 ✅ ✅ ✅ ✅ ✅ Shell 命令执行 ✅ ✅ ✅ ✅ ✅（云端沙箱） CLAUDE.md ✅ ✅ ✅ ✅ ✅ Skills ✅ ✅ ✅ ✅ ✅ Hooks ✅ ✅ ✅ ✅ ❌ MCP ✅ ✅ ✅ ✅ ❌ Sub-agents ✅ ✅ ✅ ✅ ✅ Agent Teams ✅ ❌ ❌ ✅ ❌ Auto Mode ✅ ✅ ✅ ✅ ✅ Remote Control ✅ ❌ ❌ ❌ ❌ Dispatch ❌ ❌ ❌ ✅ ❌ 定时任务 ✅（/loop） ❌ ❌ ✅ ✅（云端） Chrome 调试 ✅ ✅ ❌ ✅ ❌ Computer Use ✅ ❌ ❌ ✅ ❌ 说明：上表基于撰写时（2026年4月）的官方文档。Claude Code 迭代速度极快，功能可用范围可能随版本更新而扩展。 按计划类型的主要差异： 能力 Pro/Max（个人） Team Enterprise API ------ :------------: :----: :----------: :---: 基础编码功能 ✅ ✅ ✅ ✅ Auto Mode ✅ ✅ ✅ ✅ Agent Teams ✅ ✅ ✅ ❌ Computer Use ✅（Pro/Max） ❌ ❌ ❌ 云端定时任务 ✅ ✅ ✅ ❌ 第三方 Provider ✅（CLI/VS Code） ✅ ✅ N/A 托管策略 ❌ ❌ ✅ ❌",
-      "excerpt": "不是所有功能在所有入口和所有计划下都可用。以下矩阵帮你快速判断： 功能 CLI VS Code JetBrains Desktop Web ------ :---: :-------: :---------: :-------: :---: 文件编辑 ✅ ✅ ✅ ✅ ✅ Shell 命令执行 ✅ ✅ ✅ ✅ ✅（云端沙..."
+      "id": "迁移时先保住项目约定",
+      "anchorId": "迁移时先保住项目约定",
+      "heading": "迁移时，先保住项目约定",
+      "content": "迁移最容易出问题的地方不是模型，而是把旧工具的规则文件、MCP 配置和权限假设直接照搬。比较稳妥的做法是先保留现有 AGENTS.md，再增加一份很短的 CLAUDE.md，只放 Claude Code 特有的约定： MCP 服务器不要放进 settings.json 伪装成普通设置。项目共享配置使用根目录的 .mcp.json，个人或本机配置由 ~/.claude.json 管理；也可以用命令明确写入作用域： 权限规则则放在 .claude/settings.json 或 .claude/settings.local.json，并用 /permissions 检查实际生效结果。先从默认模式开始，熟悉项目后再为具体命令添加 allow，不要把 Bash(*) 当作迁移捷径。",
+      "excerpt": "迁移最容易出问题的地方不是模型，而是把旧工具的规则文件、MCP 配置和权限假设直接照搬。比较稳妥的做法是先保留现有 AGENTS.md，再增加一份很短的 CLAUDE.md，只放 Claude Code 特有的约定： MCP 服务器不要放进 settings.json 伪装成普通设置。项目共享配置使用根目录的 .mcp..."
     },
     {
-      "id": "扩展能力从-opencode-的简单到-claude-code-的丰富",
-      "anchorId": "扩展能力从-opencode-的简单到-claude-code-的丰富",
-      "heading": "扩展能力：从 OpenCode 的简单到 Claude Code 的丰富",
-      "content": "这是迁移时变化最大的部分。OpenCode 的扩展能力主要就三个：AGENTS.md、MCP、自定义 Agent。而 Claude Code 有一整套分层扩展体系：",
-      "excerpt": "这是迁移时变化最大的部分。OpenCode 的扩展能力主要就三个：AGENTS.md、MCP、自定义 Agent。而 Claude Code 有一整套分层扩展体系："
-    },
-    {
-      "id": "与-opencode-的扩展能力对照",
-      "anchorId": "与-opencode-的扩展能力对照",
-      "heading": "与 OpenCode 的扩展能力对照",
-      "content": "OpenCode 概念 Claude Code 对应 迁移说明 --------------- ----------------- --------- AGENTS.md CLAUDE.md + .claude/rules/ Claude Code 兼容读取 AGENTS.md，推荐在 CLAUDE.md 中用 @AGENTS.md 导入 MCP 服务器配置 MCP（配置方式不同） 需要重新配置，语法有差异 自定义 Agent（Sub Agent） Sub-agents + Agent Teams 能力大幅增强，支持隔离上下文和多会话协作 无对应 Skills 全新能力：可重用知识和可调用工作流 无对应 Hooks 全新能力：26 个生命周期事件的自动化 无对应 Plugins / Marketplaces 全新能力：打包和分发扩展 会话分享 Remote Control / Channels / Web 从\"分享链接\"升级到\"跨端实时协作\" 无对应 Auto Memory 全新能力：自动记忆系统 关键认知：Claude Code 的 Hooks 和 Skills 是迁移后最大的能力增量。Hooks 让你在 AI 操作的生命周期中插入自动化脚本；Skills 让你把重复的工作流封装成可调用的命令。这两个能力在 OpenCode 中完全没有对应物。",
-      "excerpt": "OpenCode 概念 Claude Code 对应 迁移说明 --------------- ----------------- --------- AGENTS.md CLAUDE.md + .claude/rules/ Claude Code 兼容读取 AGENTS.md，推荐在 CLAUDE.md 中用 @AG..."
-    },
-    {
-      "id": "术语对照表",
-      "anchorId": "术语对照表",
-      "heading": "术语对照表",
-      "content": "从 OpenCode 切换时，一些概念名称变了，一些是全新的： 概念 OpenCode 叫法 Claude Code 叫法 说明 ------ ------------- ----------------- ------ 项目指令文件 AGENTS.md CLAUDE.md Claude Code 也兼容读取 AGENTS.md 条件规则 无 .claude/rules/ 可按文件路径条件加载 自动记忆 无 Auto Memory / MEMORY.md 存储在 ~/.claude/projects/ 下 模型切换 支持 75+ 提供商 主要 Claude 系列，CLI/VS Code 支持第三方 模型选择范围大幅缩小 编辑模式 Build / Plan Normal / Plan / Auto Mode 模式更丰富 自定义 Agent Custom Agent Sub-agent 支持隔离上下文 多 Agent 协作 无 Agent Teams 实验性功能 可重用工作流 无 Skills（/命令） 支持 SKILL.md 格式 生命周期钩子 无 Hooks 26 个事件类型 扩展包 无 Plugins 打包 Skills + Hooks + MCP + Sub-agents 扩展市场 无 Marketplaces 发现和安装 Plugins 外部工具连接 MCP MCP 协议相同，配置方式不同 跨端继续会话 无 Remote Control 从任何浏览器继续本地会话 事件推送 无 Channels 外部事件推入会话 移动派发 无 Dispatch 从手机发任务到 Desktop 上下文压缩 自动 /compact 手动 + 自动 可控制压缩时机 权限控制 基础工具权限 细粒度规则 + Auto Mode 支持 allow/ask/deny 规则",
-      "excerpt": "从 OpenCode 切换时，一些概念名称变了，一些是全新的： 概念 OpenCode 叫法 Claude Code 叫法 说明 ------ ------------- ----------------- ------ 项目指令文件 AGENTS.md CLAUDE.md Claude Code 也兼容读取 AGEN..."
-    },
-    {
-      "id": "第一天基础迁移",
-      "anchorId": "第一天基础迁移",
-      "heading": "第一天：基础迁移",
-      "content": "[ ] 安装 Claude Code：推荐使用 Native Install（curl -fsSL https://claude.ai/install.sh bash） [ ] 登录认证：使用 claude.ai 账户或 API Key [ ] 迁移 AGENTS.md：在项目根目录创建 CLAUDE.md，用 @AGENTS.md 导入现有规则",
-      "excerpt": "[ ] 安装 Claude Code：推荐使用 Native Install（curl -fsSL https://claude.ai/install.sh bash） [ ] 登录认证：使用 claude.ai 账户或 API Key [ ] 迁移 AGENTS.md：在项目根目录创建 CLAUDE.md，用 @AG..."
-    },
-    {
-      "id": "第二天权限配置",
-      "anchorId": "第二天权限配置",
-      "heading": "第二天：权限配置",
-      "content": "[ ] 了解权限模式：先用默认模式（逐一确认），熟悉后可切换到 Auto Mode [ ] 配置权限规则：在 .claude/settings.json 中设置项目级权限",
-      "excerpt": "[ ] 了解权限模式：先用默认模式（逐一确认），熟悉后可切换到 Auto Mode [ ] 配置权限规则：在 .claude/settings.json 中设置项目级权限"
-    },
-    {
-      "id": "第三天mcp-迁移",
-      "anchorId": "第三天mcp-迁移",
-      "heading": "第三天：MCP 迁移",
-      "content": "[ ] 迁移 MCP 配置：Claude Code 的 MCP 配置在 .claude/settings.json 或 ~/.claude.json 中 [ ] 验证连接：使用 /mcp 命令检查所有 MCP 服务器的连接状态",
-      "excerpt": "[ ] 迁移 MCP 配置：Claude Code 的 MCP 配置在 .claude/settings.json 或 ~/.claude.json 中 [ ] 验证连接：使用 /mcp 命令检查所有 MCP 服务器的连接状态"
-    },
-    {
-      "id": "第四天探索新能力",
-      "anchorId": "第四天探索新能力",
-      "heading": "第四天：探索新能力",
-      "content": "[ ] 尝试内置 Skills：运行 /simplify、/batch、/debug 等捆绑命令 [ ] 体验 Auto Memory：让 Claude 工作一段时间，观察它自动记住的内容 [ ] 尝试 Plan Mode：在复杂任务前用 Plan Mode 先规划再执行",
-      "excerpt": "[ ] 尝试内置 Skills：运行 /simplify、/batch、/debug 等捆绑命令 [ ] 体验 Auto Memory：让 Claude 工作一段时间，观察它自动记住的内容 [ ] 尝试 Plan Mode：在复杂任务前用 Plan Mode 先规划再执行"
-    },
-    {
-      "id": "第五天高级配置",
-      "anchorId": "第五天高级配置",
-      "heading": "第五天：高级配置",
-      "content": "[ ] 创建自定义 Skill：把你最常用的工作流封装成 /命令 [ ] 配置 Hooks：为常见操作添加自动化（如保存后自动格式化） [ ] 设置 .claude/rules/：将特定于文件类型的规则拆分出来",
-      "excerpt": "[ ] 创建自定义 Skill：把你最常用的工作流封装成 /命令 [ ] 配置 Hooks：为常见操作添加自动化（如保存后自动格式化） [ ] 设置 .claude/rules/：将特定于文件类型的规则拆分出来"
-    },
-    {
-      "id": "你可能失去的以及为什么值得",
-      "anchorId": "你可能失去的以及为什么值得",
-      "heading": "你可能失去的（以及为什么值得）",
-      "content": "坦诚地说，从 OpenCode 迁移到 Claude Code，你确实会失去一些东西： 失去的 得到的 -------- -------- 75+ 模型提供商自由选择 Claude 系列模型的深度优化（代理循环专为 Claude 设计） 完全开源、代码透明 更成熟的产品体验和更快的迭代速度 免费模型（Kimi K2.5 等） 需要付费订阅（Pro/Max/Team） 社区驱动的扩展生态 官方维护的 Plugin Marketplace 简单直接的配置 更复杂但更强大的扩展体系 什么时候不该迁移： 你强烈需要使用非 Claude 的模型（如 GPT-4o、Gemini） 你的工作环境完全无法联网 你需要完全开源透明的工具链 你的团队没有预算支付 Claude 订阅 什么时候值得迁移： 你需要跨端、跨会话的协作能力 你想要自动化 CI/CD 集成 你需要细粒度的权限控制 你想利用 Hooks 和 Skills 构建自动化工作流 你的团队需要统一的 AI 编码平台",
-      "excerpt": "坦诚地说，从 OpenCode 迁移到 Claude Code，你确实会失去一些东西： 失去的 得到的 -------- -------- 75+ 模型提供商自由选择 Claude 系列模型的深度优化（代理循环专为 Claude 设计） 完全开源、代码透明 更成熟的产品体验和更快的迭代速度 免费模型（Kimi K2.5..."
-    },
-    {
-      "id": "小结",
-      "anchorId": "小结",
-      "heading": "小结",
-      "content": "从 OpenCode 到 Claude Code 的迁移，本质上是从一个\"开源灵活、模型自由\"的终端工具，切换到一个\"深度集成、跨端协作\"的 AI 编码平台。 你需要调整的不只是配置文件，更是心智模型： Claude Code 不只是一个 CLI，它是一个跨五种入口的平台 扩展能力从 OpenCode 的三层（AGENTS.md + MCP + Agent）变成了七层（CLAUDE.md + Rules + Skills + Sub-agents + Hooks + MCP + Plugins） 跨端协作（Remote Control、Channels、Dispatch）是 Claude Code 独有的维度 Hooks 和 Skills 是迁移后最大的能力增量 下一篇，我们将正式开始：安装 Claude Code，登录认证，选择最适合你的入口，然后跑通第一个真实任务。",
-      "excerpt": "从 OpenCode 到 Claude Code 的迁移，本质上是从一个\"开源灵活、模型自由\"的终端工具，切换到一个\"深度集成、跨端协作\"的 AI 编码平台。 你需要调整的不只是配置文件，更是心智模型： Claude Code 不只是一个 CLI，它是一个跨五种入口的平台 扩展能力从 OpenCode 的三层（AGEN..."
+      "id": "什么时候值得切换",
+      "anchorId": "什么时候值得切换",
+      "heading": "什么时候值得切换",
+      "content": "如果你需要自由选择不同提供商、希望所有组件都由自己掌控，OpenCode 的开放性本身就是重要价值。若你更在意以下能力，Claude Code 的整合会更有吸引力： 本地 CLI、IDE、Desktop、Web 和移动端之间切换； 权限规则、Auto Mode、沙箱和企业托管设置组成的安全边界； 用 Skills、Hooks、MCP 和 Plugins 把团队流程固化； 通过 claude -p、GitHub Actions 或 GitLab CI/CD 进入自动化； 让会话、Subagent、动态工作流和 Agent Teams 共同处理长任务。 迁移的目标不是把 OpenCode 的每个习惯逐项翻译过来，而是重新划分“哪些规则应该持久化、哪些动作必须确认、哪些任务应该隔离”。这三个问题想清楚，剩下的命令和目录结构都只是实现细节。 官方入口：Claude Code 文档、扩展能力总览、记忆系统。",
+      "excerpt": "如果你需要自由选择不同提供商、希望所有组件都由自己掌控，OpenCode 的开放性本身就是重要价值。若你更在意以下能力，Claude Code 的整合会更有吸引力： 本地 CLI、IDE、Desktop、Web 和移动端之间切换； 权限规则、Auto Mode、沙箱和企业托管设置组成的安全边界； 用 Skills、Ho..."
     }
   ]
 }

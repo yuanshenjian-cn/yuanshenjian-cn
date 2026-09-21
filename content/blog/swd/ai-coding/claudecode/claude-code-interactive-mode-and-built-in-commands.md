@@ -198,4 +198,4 @@ claude -p "只检查代码" --bare --allowedTools "Read,Grep,Glob"
 
 这套组合的重点不是流程越长越好，而是每个动作都有清楚的责任边界：模型负责推理，权限系统负责拦截，测试负责证据，人负责不可逆的发布决定。
 
-官方参考：[交互模式](https://code.claude.com/docs/en/interactive-mode)、[命令参考](https://code.claude.com/docs/en/commands)、[权限模式](https://code.claude.com/docs/en/permission-modes)、[上下文窗口](https://code.claude.com/docs/en/context-window)。
+需要查快捷键、命令边界或权限行为时，直接以[交互模式](https://code.claude.com/docs/en/interactive-mode)、[命令参考](https://code.claude.com/docs/en/commands)和[权限模式](https://code.claude.com/docs/en/permission-modes)为准。

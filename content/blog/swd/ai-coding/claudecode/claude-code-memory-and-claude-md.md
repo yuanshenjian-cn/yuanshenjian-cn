@@ -187,4 +187,4 @@ CLAUDE.md
 
 如果 Claude 仍然反复违反规则，不要继续增加提醒语气。把要求改成可验证命令、权限规则或 Hook；能被程序拦截的边界，不应依赖模型“记住”。
 
-官方参考：[记忆系统](https://code.claude.com/docs/en/memory)、[`.claude` 目录](https://code.claude.com/docs/en/claude-directory)、[上下文窗口](https://code.claude.com/docs/en/context-window)。
+记忆加载和 `.claude` 目录的具体规则见[记忆系统](https://code.claude.com/docs/en/memory)、[`.claude` 目录](https://code.claude.com/docs/en/claude-directory)和[上下文窗口](https://code.claude.com/docs/en/context-window)。

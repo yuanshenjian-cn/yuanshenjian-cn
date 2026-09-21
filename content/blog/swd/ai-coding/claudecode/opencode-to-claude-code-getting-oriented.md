@@ -119,4 +119,4 @@ claude mcp list
 
 迁移的目标不是把 OpenCode 的每个习惯逐项翻译过来，而是重新划分“哪些规则应该持久化、哪些动作必须确认、哪些任务应该隔离”。这三个问题想清楚，剩下的命令和目录结构都只是实现细节。
 
-官方入口：[Claude Code 文档](https://code.claude.com/docs/en/overview)、[扩展能力总览](https://code.claude.com/docs/en/features-overview)、[记忆系统](https://code.claude.com/docs/en/memory)。
+迁移时可以先从[Claude Code 文档](https://code.claude.com/docs/en/overview)了解入口，再看[扩展能力总览](https://code.claude.com/docs/en/features-overview)和[记忆系统](https://code.claude.com/docs/en/memory)。

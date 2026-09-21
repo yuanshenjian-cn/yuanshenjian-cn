@@ -233,4 +233,4 @@ Agent Teams 仍是实验性能力，默认关闭。需要在设置或环境变�
 
 一个现实的落地顺序是：先让 `CLAUDE.md` 变短而准确，再把重复提示词做成 Skill；当输出开始淹没主会话时引入 Subagent；只有确定性动作才写 Hook；需要外部系统时再接 MCP。Plugin、工作流和 Agent Teams 都应该在前面的边界稳定后再引入。
 
-官方参考：[扩展能力总览](https://code.claude.com/docs/en/features-overview)、[Skills](https://code.claude.com/docs/en/skills)、[Subagents](https://code.claude.com/docs/en/sub-agents)、[Hooks](https://code.claude.com/docs/en/hooks)、[MCP](https://code.claude.com/docs/en/mcp)、[Plugins](https://code.claude.com/docs/en/plugins)、[Agent Teams](https://code.claude.com/docs/en/agent-teams)。
+字段、作用域和限制以[扩展能力总览](https://code.claude.com/docs/en/features-overview)为入口，再按需查看[Skills](https://code.claude.com/docs/en/skills)、[Subagents](https://code.claude.com/docs/en/sub-agents)、[Hooks](https://code.claude.com/docs/en/hooks)、[MCP](https://code.claude.com/docs/en/mcp)和[Plugins](https://code.claude.com/docs/en/plugins)文档。

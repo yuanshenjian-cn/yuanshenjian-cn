@@ -188,4 +188,4 @@ Channels 可以作为入口把一个任务消息推入 Lead 会话，但不应�
 
 自动化的成熟标志不是“Claude 一直在跑”，而是它在边界处会停下来，并且任何人都能从日志、diff、测试和权限配置中还原它做了什么。
 
-官方参考：[Chrome](https://code.claude.com/docs/en/chrome)、[GitHub Actions](https://code.claude.com/docs/en/github-actions)、[Channels](https://code.claude.com/docs/en/channels)、[Agent Teams](https://code.claude.com/docs/en/agent-teams)、[非交互运行](https://code.claude.com/docs/en/headless)。
+Chrome、GitHub Actions、Channels 和 Agent Teams 的权限边界，分别见[官方 Chrome 文档](https://code.claude.com/docs/en/chrome)、[GitHub Actions 文档](https://code.claude.com/docs/en/github-actions)、[Channels 文档](https://code.claude.com/docs/en/channels)和[Agent Teams 文档](https://code.claude.com/docs/en/agent-teams)。

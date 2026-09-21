@@ -224,4 +224,4 @@ Prompt Cache 的目标是降低重复前缀的成本，不是替代上下文管�
 
 模型配置的核心决策可以压缩成三句：日常工作从 `sonnet` 开始，复杂判断再用 `opus`；需要长时间自主推进时考虑 `fable`；只有任务真的需要长上下文时才使用 `[1m]`。剩下的别名、环境变量和白名单，是为了让这三个判断在个人机器、团队和企业部署中保持一致。
 
-官方参考：[模型配置](https://code.claude.com/docs/en/model-config)、[设置参考](https://code.claude.com/docs/en/settings-reference)、[模型概览](https://platform.claude.com/docs/en/models/overview)、[Prompt caching](https://code.claude.com/docs/en/prompt-caching)。
+别名和模型可用性会受提供商与组织策略影响，配置时应以[模型配置](https://code.claude.com/docs/en/model-config)、[设置参考](https://code.claude.com/docs/en/settings-reference)和[模型概览](https://platform.claude.com/docs/en/models/overview)为准；缓存细节见[Prompt caching](https://code.claude.com/docs/en/prompt-caching)。

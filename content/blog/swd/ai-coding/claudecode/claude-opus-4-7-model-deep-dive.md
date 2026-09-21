@@ -169,4 +169,4 @@ Fable、Opus 5 和 Sonnet 5 都支持 1M 上下文。需要处理大仓库、长
 
 如果没有特别理由，先用 Sonnet 5；复杂度上升时切 Opus 5；只有任务本身需要长期自主性时才用 Fable 5.1。模型名称只是入口，真正决定结果的仍是范围、权限、上下文和验证标准。
 
-官方参考：[模型概览](https://platform.claude.com/docs/en/models/overview)、[Claude Code 模型配置](https://code.claude.com/docs/en/model-config)、[Claude Opus 5 发布说明](https://www.anthropic.com/news/claude-opus-5)。
+模型规格与价格以[模型概览](https://platform.claude.com/docs/en/models/overview)和[Claude Opus 5 发布说明](https://www.anthropic.com/news/claude-opus-5)为准；Claude Code 中的选择方式见[模型配置文档](https://code.claude.com/docs/en/model-config)。
