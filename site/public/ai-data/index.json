@@ -4,7 +4,7 @@
     {
       "slug": "bmad-method-09-package-a-module",
       "title": "BMad Module：把多个 Skill 打包成可分发能力",
-      "excerpt": "单个 Skill 能解决一个问题，Module 才能把一组客户能力组织成可安装、可发现、可配置的产品。本文在 aidev-risk-gate 之外增加 aidev-delivery-report，演示用 IM 规划、Workflow Builder 构建、Module Builder 打包和 Validate Module 验证，并给出干净项目安装与发布前检查清单。",
+      "excerpt": "Module 把多个 Skill 组织成可安装、可发现、可配置的能力包。本文用 aidev-risk-gate 和 aidev-delivery-report 演示 IM、Workflow Builder、CM、VM 及干净项目安装，明确哪些是示意流程，哪些需要真实验证。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -17,7 +17,7 @@
     {
       "slug": "bmad-method-08-evaluate-a-skill",
       "title": "BMad Builder Eval：验证 Skill 是否会正确触发和产出",
-      "excerpt": "手工跑通一次 Skill 只能证明它在一个输入上工作。本文为 aidev-risk-gate 设计 Artifact Eval 和 Trigger Eval，覆盖高风险、低风险、信息不完整和负向触发场景，说明 evals.json、triggers.json 的组织方式，以及 Runner 不可用时如何诚实区分手工验证与正式通过。",
+      "excerpt": "手工跑通一次 Skill 不足以证明它可靠。本文用 Artifact Eval 和 Trigger Eval 检查 aidev-risk-gate 的产物、边界、负向触发和只读行为，并说明如何诚实报告 Runner 未执行的情况。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -277,7 +277,7 @@
     {
       "slug": "bmad-method-07-build-a-risk-gate-skill",
       "title": "BMad Builder 实战：创建一个客户风险门禁 Skill",
-      "excerpt": "团队 Override 适合修改已有流程，客户治理能力则更适合封装成可复用 Skill。本文用 BMad Builder 创建 aidev-risk-gate：读取 SPEC.md、AGENTS.md、架构文档和 stories.yaml，生成带证据引用的交付风险评估，并从 Workflow 与 Agent 的边界、Guided/Headless 模式和输出结构开始设计。",
+      "excerpt": "客户治理能力适合封装成独立 Workflow Skill。本文用 BMad Builder 设计 aidev-risk-gate，读取 Spec 和治理资料，输出带证据的客户风险评估，同时划清它与官方 readiness gate 的边界。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -290,7 +290,7 @@
     {
       "slug": "bmad-method-06-customize-overrides",
       "title": "BMad Method 定制：用 Override 注入团队研发规则",
-      "excerpt": "客户团队的规则不应该散落在每次提示词里，也不应该直接修改 BMad 安装目录。本文用 bmad-customize 为 Developer Agent 和代码审查工作流增加团队约束，解释三层合并、稀疏 Override、Agent 与 Workflow 的边界，以及如何用 resolver 验证最终生效配置。",
+      "excerpt": "团队规则不该散落在每次提示词里，也不该直接改 BMad 安装目录。本文用 bmad-customize 说明 Agent Override、Workflow Override、三层合并和稀疏配置的边界。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -303,7 +303,7 @@
     {
       "slug": "bmad-method-05-retrospective-and-epic-acceptance",
       "title": "BMad Method Retro：用证据验收一个完整 Epic",
-      "excerpt": "三个 Story 分别通过，并不代表它们组合后一定满足 Epic。本文介绍 bmad-retrospective 如何读取 SPEC.md、stories.yaml、实现记录、Git 变更和测试证据，检查跨 Story 缺陷、架构漂移和真实行为，并解释 accepted、accepted-with-open-items 与 rejected 三种验收结论该如何处理。",
+      "excerpt": "Story 分别通过，不代表组合后一定满足 Epic。本文说明 bmad-retrospective 如何依据 Spec、Story 记录、Git 变更和验证证据，检查跨 Story 缺陷并给出 Epic 验收结论。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -329,7 +329,7 @@
     {
       "slug": "bmad-method-04-build-stories-and-review",
       "title": "BMad Method Build：按 Story 实现并审查一个 Epic",
-      "excerpt": "Spec 和 stories.yaml 只是共同契约，真正的实现仍然要一次完成一个 Story。本文以 Task CLI 标签 Epic 为例，演示如何用三个新会话分别运行 bmad-build，如何把旧数据兼容、退出码和 stdout/stderr 纳入验收，以及何时用 bmad-code-review 做跨 Story 的独立审查。",
+      "excerpt": "一个 Story 一个会话，先让基础 Story 稳定数据和兼容策略，再实现筛选与统计。本文说明如何用 bmad-build 实现 Task CLI 标签 Epic，并用 bmad-code-review 检查跨 Story 的组合问题。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -342,7 +342,7 @@
     {
       "slug": "bmad-method-03-spec-and-story-breakdown",
       "title": "BMad Method Spec：把一个 Epic 拆成可实现的 Story",
-      "excerpt": "当一个需求需要多次编码会话时，直接运行 bmad-build 会让上下文和决策逐渐失控。本文用 Task CLI 的标签功能演示 bmad-spec 的五段式规格、Capability 的验收条件、Spec-backed Epic 与 Story Breakdown，并给出适合独立实现的垂直 Story 切分方式。",
+      "excerpt": "当一个需求超过一次 Build 的范围，先用 bmad-spec 写下共同契约，再用 Story Breakdown 切成可独立验证的垂直切片。本文以 Task CLI 标签功能为例，说明 SPEC.md、stories.yaml 和 Story 的职责。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -355,7 +355,7 @@
     {
       "slug": "bmad-method-02-project-context",
       "title": "BMad Method 项目上下文：把团队规则写进 AGENTS.md",
-      "excerpt": "做完一次小型 Build 后，仓库已经有了真实代码和测试。本文说明如何用 bmad-project-context 把 uv、测试、CLI 输出、数据兼容性和“不跳过测试”等团队规则整理成一个小而可验证的 AGENTS.md 区块，并解释哪些信息应该留下，哪些只是重复代码。",
+      "excerpt": "项目上下文不该是代码目录说明书，而应记录 Agent 无法轻易推断、却容易造成高代价错误的团队规则。本文用 bmad-project-context 把测试、兼容性和 CLI 行为约定写进 AGENTS.md。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -367,7 +367,7 @@
     {
       "slug": "bmad-method-01-install-and-first-build",
       "title": "BMad Method 实战入门：从安装到第一次 Build",
-      "excerpt": "BMad Method 不要求每个改动都走一套重流程。本文用 Python 待办事项 CLI 做训练项目，带你安装 BMad v6.12.0、辨认稳定版与预发布渠道，并用 bmad-build 完成一次小型 Build。重点放在如何判断任务规模、审批计划、实际运行测试和保存实现证据。",
+      "excerpt": "小任务不需要完整的研发仪式。本文用 Python 待办事项 CLI 体验 BMad v6.12.0 的安装和第一次 bmad-build，重点说明如何判断任务规模、审批计划，并用真实命令验证结果。",
       "tags": [
         "软件开发",
         "AI 编程",
@@ -379,7 +379,7 @@
     {
       "slug": "bmad-method-00-overview",
       "title": "BMad Method 是什么：从 AI 编程工作流到研发体系",
-      "excerpt": "BMad Method 不是某个模型，也不是一套固定的提示词清单，而是一套让 AI 参与软件研发时保持上下文、决策和证据连续的协作方法。本文从概念、分层架构、核心理念、适用问题和版本演进讲清楚 BMad，帮助你在进入安装和实战之前先建立正确的心智模型。",
+      "excerpt": "BMad Method 不是模型，也不是 IDE，而是一套建立在敏捷实践上的 AI 研发协作方法。它通过 Agent、Workflow、Skill、Module 和可追踪产物，让需求、架构、实现、审查与验收保持连续。本文简要说明 BMad 的全称、架构、理念、适用范围和版本演进。",
       "tags": [
         "软件开发",
         "AI 编程",

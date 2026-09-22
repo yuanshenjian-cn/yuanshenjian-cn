@@ -2,7 +2,7 @@
   "slug": "bmad-method-07-build-a-risk-gate-skill",
   "title": "BMad Builder 实战：创建一个客户风险门禁 Skill",
   "date": "2026-09-18T00:00:00.000Z",
-  "excerpt": "团队 Override 适合修改已有流程，客户治理能力则更适合封装成可复用 Skill。本文用 BMad Builder 创建 aidev-risk-gate：读取 SPEC.md、AGENTS.md、架构文档和 stories.yaml，生成带证据引用的交付风险评估，并从 Workflow 与 Agent 的边界、Guided/Headless 模式和输出结构开始设计。",
+  "excerpt": "客户治理能力适合封装成独立 Workflow Skill。本文用 BMad Builder 设计 aidev-risk-gate，读取 Spec 和治理资料，输出带证据的客户风险评估，同时划清它与官方 readiness gate 的边界。",
   "tags": [
     "软件开发",
     "AI 编程",
@@ -15,50 +15,36 @@
       "id": "intro",
       "anchorId": "intro",
       "heading": "前言",
-      "content": "一个好的治理 Skill 不替团队做产品决策，它把容易遗漏的风险问题变成一份有证据、有结论边界的交付检查。 前六篇把 BMad 原生流程跑通，并把团队规则注入 Developer Agent 和 Code Review。客户项目往往还需要一层额外判断：这个 Spec 有没有不可逆数据操作？有没有隐私或权限风险？回滚、监控和发布方案是否足够？这些问题不属于通用代码 Review，也不应该每次靠人临时记忆。 这篇用 BMad Builder 创建一个叫 aidev-risk-gate 的 Workflow Skill。它读取 BMad 的规划产物，输出 RISK-ASSESSMENT.md，但不修改代码、Spec 或 Story 文件。",
-      "excerpt": "一个好的治理 Skill 不替团队做产品决策，它把容易遗漏的风险问题变成一份有证据、有结论边界的交付检查。 前六篇把 BMad 原生流程跑通，并把团队规则注入 Developer Agent 和 Code Review。客户项目往往还需要一层额外判断：这个 Spec 有没有不可逆数据操作？有没有隐私或权限风险？回滚、监..."
+      "content": "风险门禁不替团队做决定，它负责把容易遗漏的风险问题变成有证据的检查。",
+      "excerpt": "风险门禁不替团队做决定，它负责把容易遗漏的风险问题变成有证据的检查。"
     },
     {
-      "id": "先注册-bmad-builder",
-      "anchorId": "先注册-bmad-builder",
-      "heading": "先注册 BMad Builder",
-      "content": "第一次使用 Builder 时，在项目中运行： 按提示配置用户名、交互语言、Skill 输出目录和 Builder 报告目录。Setup 的作用是把 Builder 能力注册到项目和 bmad-help，不是创建客户 Skill 本身。",
-      "excerpt": "第一次使用 Builder 时，在项目中运行： 按提示配置用户名、交互语言、Skill 输出目录和 Builder 报告目录。Setup 的作用是把 Builder 能力注册到项目和 bmad-help，不是创建客户 Skill 本身。"
+      "id": "为什么选-workflow",
+      "anchorId": "为什么选-workflow",
+      "heading": "为什么选 Workflow",
+      "content": "aidev-risk-gate 有明确输入、过程和产物：读取 Spec，检查风险，生成报告。它不需要长期记忆和固定人格，因此更像 Workflow；需要跨会话积累偏好的协作伙伴，才更像 Agent。 第一次使用 Builder，先运行：",
+      "excerpt": "aidev-risk-gate 有明确输入、过程和产物：读取 Spec，检查风险，生成报告。它不需要长期记忆和固定人格，因此更像 Workflow；需要跨会话积累偏好的协作伙伴，才更像 Agent。 第一次使用 Builder，先运行："
     },
     {
-      "id": "这个能力为什么选择-workflow",
-      "anchorId": "这个能力为什么选择-workflow",
-      "heading": "这个能力为什么选择 Workflow",
-      "content": "aidev-risk-gate 有明确的输入、过程和产物：读取 Spec，检查风险，生成报告。它不需要记住某个用户上次聊过什么，也没有一个需要长期陪伴的固定人格，所以选择 Workflow 比选择 Agent 更贴切。 可以用下面的判断： 更像 Agent 更像 Workflow --- --- 用户会跨会话持续回来交流 一次执行产生一个明确结果 记忆和人格会改变使用价值 无状态即可完成 能力彼此松散，依赖长期关系 所有步骤服务同一个目标 风险门禁属于后者。以后如果需要一个长期记忆客户偏好的治理顾问，再考虑在 Workflow 之上包一层 Agent。",
-      "excerpt": "aidev-risk-gate 有明确的输入、过程和产物：读取 Spec，检查风险，生成报告。它不需要记住某个用户上次聊过什么，也没有一个需要长期陪伴的固定人格，所以选择 Workflow 比选择 Agent 更贴切。 可以用下面的判断： 更像 Agent 更像 Workflow --- --- 用户会跨会话持续回来交..."
+      "id": "定义风险门禁的边界",
+      "anchorId": "定义风险门禁的边界",
+      "heading": "定义风险门禁的边界",
+      "content": "这个 Skill 应该聚焦客户特有的安全、合规、数据迁移和回滚风险。“Epic 是否可以进入实现”属于官方 bmad-sprint-planning 的 readiness gate，不应让自定义 Skill 抢占。Break Work into Stories",
+      "excerpt": "这个 Skill 应该聚焦客户特有的安全、合规、数据迁移和回滚风险。“Epic 是否可以进入实现”属于官方 bmad-sprint-planning 的 readiness gate，不应让自定义 Skill 抢占。Break Work into Stories"
     },
     {
-      "id": "让-workflow-builder-先做需求发现",
-      "anchorId": "让-workflow-builder-先做需求发现",
-      "heading": "让 Workflow Builder 先做需求发现",
-      "content": "运行： Guided 模式的价值不是让 Builder 多问几轮，而是把生产能力里容易遗漏的选择提前显式化。它可能继续询问：风险级别如何定义、CONCERNS 和 FAIL 的边界、缺少回滚信息时是否阻塞、输出目录是否可配置，以及 Headless 结果需要哪些稳定字段。",
-      "excerpt": "运行： Guided 模式的价值不是让 Builder 多问几轮，而是把生产能力里容易遗漏的选择提前显式化。它可能继续询问：风险级别如何定义、CONCERNS 和 FAIL 的边界、缺少回滚信息时是否阻塞、输出目录是否可配置，以及 Headless 结果需要哪些稳定字段。"
+      "id": "把报告结构固定下来",
+      "anchorId": "把报告结构固定下来",
+      "heading": "把报告结构固定下来",
+      "content": "SKILL.md：触发条件、输入和流程边界。 resources/：风险规则和客户检查表。 templates/：报告结构。 scripts/：文件、字段和机器状态的确定性校验。 报告至少区分：Evidence Inventory、Findings、Decision Needed 和 Verdict。PASS / CONCERNS / FAIL 是这个客户 Skill 的判定规则，不是 BMad 所有门禁的统一结论。",
+      "excerpt": "SKILL.md：触发条件、输入和流程边界。 resources/：风险规则和客户检查表。 templates/：报告结构。 scripts/：文件、字段和机器状态的确定性校验。 报告至少区分：Evidence Inventory、Findings、Decision Needed 和 Verdict。PASS / CO..."
     },
     {
-      "id": "把判断规则和执行细节分开",
-      "anchorId": "把判断规则和执行细节分开",
-      "heading": "把判断规则和执行细节分开",
-      "content": "Builder 可能生成这样的目录： 不需要为了凑齐目录而强行创建所有文件。可以按职责分： SKILL.md 只保留触发条件、输入、流程路由和输出契约。 resources/ 放风险分级、客户检查表字段和长篇解释，按需加载。 templates/ 固定报告结构，避免每次输出标题漂移。 scripts/ 处理文件存在性、报告字段和机器可读状态等机械检查。 语义判断留给模型，但每个结论都必须回指输入文件中的证据。 一个简单的报告结构可以是： 报告本身不应该修改 Spec 的 Non-goals，也不应该替用户自动关闭 Open Question。它的职责是把“现在有什么证据”和“还缺什么决定”分开写清楚。",
-      "excerpt": "Builder 可能生成这样的目录： 不需要为了凑齐目录而强行创建所有文件。可以按职责分： SKILL.md 只保留触发条件、输入、流程路由和输出契约。 resources/ 放风险分级、客户检查表字段和长篇解释，按需加载。 templates/ 固定报告结构，避免每次输出标题漂移。 scripts/ 处理文件存在性、..."
-    },
-    {
-      "id": "passconcerns-和-fail-要有边界",
-      "anchorId": "passconcerns-和-fail-要有边界",
-      "heading": "PASS、CONCERNS 和 FAIL 要有边界",
-      "content": "可以先定一个简单规则，再让客户项目补充领域标准： PASS：已知范围可验证，没有证据表明存在阻塞风险，测试和回滚信息足够当前阶段使用。 CONCERNS：存在需要处理的风险或缺口，但团队可以在实现前补充决定，不必直接否定整个 Epic。 FAIL：发现明确的高风险事实，例如不可逆生产数据迁移却没有回滚方案，或安全/合规约束与当前方案直接冲突。 缺少信息不等于低风险。若 Spec 没有成功条件、没有说明数据权限，报告应放入 Decision Needed，并说明为什么暂时不能支持一个确定结论。",
-      "excerpt": "可以先定一个简单规则，再让客户项目补充领域标准： PASS：已知范围可验证，没有证据表明存在阻塞风险，测试和回滚信息足够当前阶段使用。 CONCERNS：存在需要处理的风险或缺口，但团队可以在实现前补充决定，不必直接否定整个 Epic。 FAIL：发现明确的高风险事实，例如不可逆生产数据迁移却没有回滚方案，或安全/合规..."
-    },
-    {
-      "id": "手工试运行时检查只读边界",
-      "anchorId": "手工试运行时检查只读边界",
-      "heading": "手工试运行时检查“只读”边界",
-      "content": "把 Skill 安装到实际工具的 Skill 目录后，在新会话中运行： 验收重点不是报告写得像不像咨询文档，而是： 能否准确触发，而不是抢占普通 bmad-build 请求。 是否生成 RISK-ASSESSMENT.md。 每个发现能否引用 Spec 或其他输入文件的具体位置。 输入信息不足时是否列出 Decision Needed，而不是编造结论。 Spec、Story 和代码是否保持未修改。 Guided 和 Headless 两种路径是否都能结束在稳定产物上。 一个治理 Skill 只有在证据不足时敢于降低结论确定性，才有资格进入客户交付流程。下一篇会为它编写 Artifact Eval 和 Trigger Eval，验证这种边界能否稳定保持。 官方资料： What Are BMad Workflows? Builder Commands Reference BMad Builder",
-      "excerpt": "把 Skill 安装到实际工具的 Skill 目录后，在新会话中运行： 验收重点不是报告写得像不像咨询文档，而是： 能否准确触发，而不是抢占普通 bmad-build 请求。 是否生成 RISK-ASSESSMENT.md。 每个发现能否引用 Spec 或其他输入文件的具体位置。 输入信息不足时是否列出 Decisio..."
+      "id": "试运行看三件事",
+      "anchorId": "试运行看三件事",
+      "heading": "试运行看三件事",
+      "content": "检查它是否： 能识别客户风险请求，不抢占普通 Build 或 Code Review。 每个发现都引用输入文件。 信息不足时降低确定性，不编造安全结论。 只生成报告，不修改输入文件。 Workflow 的职责是产出可靠的风险判断材料，而不是增加更多流程。What Are BMad Workflows?",
+      "excerpt": "检查它是否： 能识别客户风险请求，不抢占普通 Build 或 Code Review。 每个发现都引用输入文件。 信息不足时降低确定性，不编造安全结论。 只生成报告，不修改输入文件。 Workflow 的职责是产出可靠的风险判断材料，而不是增加更多流程。What Are BMad Workflows?"
     }
   ]
 }
