@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BMad Method 的架构图与工作协作交互图">
+  <title>BMad Method · 架构与协作交互图</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3f5f2;
+      --card: #fbfcfa;
+      --ink: #142b31;
+      --muted: #607276;
+      --line: #c8d5d1;
+      --accent: #d8663d;
+      --cyan: #1b8b9a;
+      --violet: #5752a4;
+      --shadow: 0 18px 60px rgba(20, 43, 49, 0.12);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --paper: #101b20;
+        --card: #16262c;
+        --ink: #e4efec;
+        --muted: #9bb0ad;
+        --line: #30464c;
+        --accent: #f08054;
+        --cyan: #50c0c7;
+        --violet: #9a96e3;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--cyan) 12%, transparent), transparent 28rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0 64px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.2rem, 6vw, 4.8rem);
+      font-weight: 500;
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+    }
+
+    .lede {
+      max-width: 680px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .back:hover,
+    .back:focus-visible {
+      border-color: var(--accent);
+      color: var(--ink);
+      transform: translateY(-2px);
+    }
+
+    .workspace {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      box-shadow: var(--shadow);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 88%, var(--cyan));
+    }
+
+    .tab {
+      cursor: pointer;
+      padding: 10px 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .tab:hover,
+    .tab:focus-visible {
+      color: var(--ink);
+    }
+
+    .tab[aria-selected="true"] {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+      color: var(--ink);
+      background: color-mix(in srgb, var(--accent) 12%, var(--card));
+    }
+
+    .panel {
+      display: none;
+      padding: clamp(18px, 4vw, 42px);
+    }
+
+    .panel.is-active {
+      display: block;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .panel-kicker {
+      margin-bottom: 8px;
+      color: var(--cyan);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.6rem, 4vw, 2.5rem);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+    }
+
+    .panel-note {
+      max-width: 440px;
+      margin: 2px 0 0;
+      padding-left: 16px;
+      border-left: 2px solid color-mix(in srgb, var(--accent) 60%, var(--line));
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .diagram-wrap {
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        linear-gradient(color-mix(in srgb, var(--line) 56%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--line) 56%, transparent) 1px, transparent 1px),
+        color-mix(in srgb, var(--card) 96%, var(--cyan));
+      background-size: 32px 32px;
+      background-position: -1px -1px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 900px;
+      height: auto;
+    }
+
+    .diagram-line {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 2;
+    }
+
+    .diagram-line.dashed {
+      stroke-dasharray: 7 7;
+    }
+
+    .diagram-label {
+      fill: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .diagram-small {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .hotspot {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .hotspot rect,
+    .hotspot circle {
+      fill: var(--card);
+      stroke: var(--line);
+      stroke-width: 2;
+      transition: stroke 160ms ease, fill 160ms ease;
+    }
+
+    .hotspot:hover rect,
+    .hotspot:hover circle,
+    .hotspot:focus rect,
+    .hotspot:focus circle,
+    .hotspot.is-active rect,
+    .hotspot.is-active circle {
+      fill: color-mix(in srgb, var(--accent) 12%, var(--card));
+      stroke: var(--accent);
+    }
+
+    .hotspot-title {
+      fill: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .hotspot-copy {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .lane {
+      fill: color-mix(in srgb, var(--card) 82%, var(--cyan));
+      stroke: var(--line);
+      stroke-width: 1;
+    }
+
+    .lane-label {
+      fill: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .detail {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-left: 3px solid var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, var(--card));
+    }
+
+    .detail-mark {
+      color: var(--accent);
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .detail strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .detail p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .footer a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 20px, 1180px);
+        padding-top: 24px;
+      }
+
+      .masthead {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-head {
+        display: block;
+      }
+
+      .panel-note {
+        margin-top: 10px;
+      }
+
+      .back {
+        justify-self: start;
+      }
+
+      .footer {
+        display: block;
+      }
+
+      .footer span {
+        display: block;
+        margin-top: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">BMad / Field Guide</p>
+        <h1>BMad 架构与协作交互</h1>
+        <p class="lede">两张图看懂 BMad 如何把 AI 编程工具、研发 Skill、规划产物和人工判断连接起来。</p>
+      </div>
+      <a class="back" href="/articles/bmad-method-00-overview">← 返回文章</a>
+    </header>
+
+    <section class="workspace" aria-label="BMad Method 交互图">
+      <div class="tabs" role="tablist" aria-label="图表视图">
+        <button class="tab" id="architecture-tab" role="tab" aria-selected="true" aria-controls="architecture-panel">01
+          · 架构图</button>
+        <button class="tab" id="collaboration-tab" role="tab" aria-selected="false"
+          aria-controls="collaboration-panel">02 · 协作交互图</button>
+      </div>
+
+      <section class="panel is-active" id="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab">
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">The system</div>
+            <h2>工具之上，方法之中</h2>
+          </div>
+          <p class="panel-note">BMad 不替代 AI 编程工具，而是为工具增加可复用的能力入口、上下文和交付证据。</p>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 1160 620" role="img" aria-labelledby="architecture-title architecture-desc">
+            <title id="architecture-title">BMad Method 分层架构图</title>
+            <desc id="architecture-desc">从 AI 编程工具，经由 BMad Core 和模块，到 Skill 与研发产物的关系。</desc>
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+              </marker>
+            </defs>
+            <path class="diagram-line" marker-end="url(#arrow)" d="M250 150 H355" />
+            <path class="diagram-line" marker-end="url(#arrow)" d="M530 150 H635" />
+            <path class="diagram-line" marker-end="url(#arrow)" d="M810 150 H915" />
+            <path class="diagram-line" marker-end="url(#arrow)" d="M730 245 V300 H475 V325" />
+            <path class="diagram-line" marker-end="url(#arrow)" d="M730 245 V300 H935 V325" />
+
+            <g class="hotspot" tabindex="0" data-title="AI 编程工具"
+              data-copy="提供会话、文件、命令和模型调用能力。Claude Code、Codex、Cursor 都属于这一层。">
+              <rect x="55" y="90" width="195" height="120" rx="16" />
+              <text class="hotspot-title" x="78" y="132">AI 编程工具</text>
+              <text class="hotspot-copy" x="78" y="160">会话 · 文件 · 命令 · 模型</text>
+              <text class="diagram-small" x="78" y="184">Claude Code / Codex / Cursor</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="BMad Core" data-copy="提供帮助、定制和通用协作能力，让不同模块共享相同的运行方式。">
+              <rect x="355" y="90" width="175" height="120" rx="16" />
+              <text class="hotspot-title" x="380" y="132">BMad Core</text>
+              <text class="hotspot-copy" x="380" y="160">Help · Customize</text>
+              <text class="diagram-small" x="380" y="184">通用协作内核</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Modules" data-copy="BMM 负责研发主流程，BMB 负责创建和分发自定义能力，其他模块提供领域扩展。">
+              <rect x="635" y="90" width="175" height="120" rx="16" />
+              <text class="hotspot-title" x="660" y="132">Modules</text>
+              <text class="hotspot-copy" x="660" y="160">BMM · BMB · Extensions</text>
+              <text class="diagram-small" x="660" y="184">能力边界与配置</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Skills"
+              data-copy="用户实际调用的能力入口，例如 bmad-build、bmad-spec、bmad-code-review。">
+              <rect x="915" y="90" width="190" height="120" rx="16" />
+              <text class="hotspot-title" x="940" y="132">Skills</text>
+              <text class="hotspot-copy" x="940" y="160">Agent · Workflow · Task</text>
+              <text class="diagram-small" x="940" y="184">可调用的工作单元</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="研发产物" data-copy="Spec、Story、代码、测试、Review 和 Retro 让上下文与证据跨会话延续。">
+              <rect x="270" y="340" width="410" height="120" rx="16" />
+              <text class="hotspot-title" x="300" y="382">研发产物</text>
+              <text class="hotspot-copy" x="300" y="410">SPEC · Story · Code · Tests · Review · Retro</text>
+              <text class="diagram-small" x="300" y="436">上下文与证据的载体</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="人工判断" data-copy="人负责产品目标、架构取舍、开放问题和最终验收；AI 扩大执行与反馈能力。">
+              <rect x="780" y="340" width="325" height="120" rx="16" />
+              <text class="hotspot-title" x="810" y="382">人工判断</text>
+              <text class="hotspot-copy" x="810" y="410">Intent · Decisions · Approval</text>
+              <text class="diagram-small" x="810" y="436">人保留方向和承诺</text>
+            </g>
+            <text class="diagram-label" x="55" y="45">入口</text>
+            <text class="diagram-label" x="635" y="45">组织能力</text>
+            <text class="diagram-label" x="270" y="300">交付证据</text>
+          </svg>
+        </div>
+        <div class="detail" aria-live="polite">
+          <div class="detail-mark">✦</div>
+          <div><strong id="architecture-detail-title">点击节点</strong>
+            <p id="architecture-detail-copy">选择上方任意节点，查看它在 BMad 中承担的职责。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="collaboration-panel" role="tabpanel" aria-labelledby="collaboration-tab" hidden>
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">The collaboration</div>
+            <h2>判断留下，工作流前进</h2>
+          </div>
+          <p class="panel-note">BMad 的协作不是把人移出循环，而是把决策点、执行单元和验收证据放在同一条线上。</p>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 1160 720" role="img" aria-labelledby="collaboration-title collaboration-desc">
+            <title id="collaboration-title">BMad Method 工作协作交互图</title>
+            <desc id="collaboration-desc">人类、规划、实现、审查和项目仓库之间的交互与产物流转。</desc>
+            <defs>
+              <marker id="arrow-collab" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+              </marker>
+            </defs>
+            <rect class="lane" x="35" y="70" width="1090" height="92" rx="14" />
+            <rect class="lane" x="35" y="178" width="1090" height="92" rx="14" />
+            <rect class="lane" x="35" y="286" width="1090" height="92" rx="14" />
+            <rect class="lane" x="35" y="394" width="1090" height="92" rx="14" />
+            <rect class="lane" x="35" y="502" width="1090" height="92" rx="14" />
+            <text class="lane-label" x="58" y="124">人类</text>
+            <text class="lane-label" x="58" y="232">规划</text>
+            <text class="lane-label" x="58" y="340">实现</text>
+            <text class="lane-label" x="58" y="448">审查</text>
+            <text class="lane-label" x="58" y="556">仓库 / 产物</text>
+
+            <path class="diagram-line" marker-end="url(#arrow-collab)" d="M180 116 H325" />
+            <path class="diagram-line" marker-end="url(#arrow-collab)" d="M455 224 H600" />
+            <path class="diagram-line" marker-end="url(#arrow-collab)" d="M730 332 H875" />
+            <path class="diagram-line" marker-end="url(#arrow-collab)" d="M995 440 V545" />
+            <path class="diagram-line dashed" marker-end="url(#arrow-collab)" d="M805 548 H650 V116 H455" />
+            <path class="diagram-line dashed" marker-end="url(#arrow-collab)" d="M650 548 H455 V440 H325" />
+
+            <g class="hotspot" tabindex="0" data-title="Intent" data-copy="人类提供目标、约束和成功信号；不要求一开始就写成完美的技术方案。">
+              <rect x="150" y="92" width="180" height="48" rx="12" />
+              <text class="hotspot-title" x="190" y="122">Intent</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Spec / Story"
+              data-copy="规划能力把意图压缩成实现可读的契约，并把 Epic 拆成可独立验证的 Story。">
+              <rect x="325" y="200" width="180" height="48" rx="12" />
+              <text class="hotspot-title" x="360" y="230">Spec / Story</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Build"
+              data-copy="Developer Agent 实现一个直接意图或一个计划好的 Story，保持单元边界。">
+              <rect x="600" y="308" width="180" height="48" rx="12" />
+              <text class="hotspot-title" x="655" y="338">Build</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Review / Triage" data-copy="审查变更、记录证据，修复当前范围内的问题，把其他问题延后或交回上游。">
+              <rect x="875" y="416" width="180" height="48" rx="12" />
+              <text class="hotspot-title" x="908" y="446">Review / Triage</text>
+            </g>
+            <g class="hotspot" tabindex="0" data-title="Artifacts" data-copy="代码、测试、实现记录和 Retro 让后续会话能从证据继续，而不是从记忆猜测。">
+              <rect x="875" y="524" width="180" height="48" rx="12" />
+              <text class="hotspot-title" x="920" y="554">Artifacts</text>
+            </g>
+            <text class="diagram-small" x="180" y="680">实线：当前工作单元的推进　·　虚线：证据回流与下一轮判断</text>
+          </svg>
+        </div>
+        <div class="detail" aria-live="polite">
+          <div class="detail-mark">✦</div>
+          <div><strong id="collaboration-detail-title">点击节点</strong>
+            <p id="collaboration-detail-copy">选择上方任意节点，查看它在协作中的作用。</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <footer class="footer">
+      <span>Interactive companion · BMad Method</span>
+      <a href="/articles/bmad-method-00-overview">回到《BMad Method 是什么》</a>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll(".tab")];
+      const panels = [...document.querySelectorAll(".panel")];
+
+      function selectTab(tab) {
+        const targetId = tab.getAttribute("aria-controls");
+        tabs.forEach((item) => item.setAttribute("aria-selected", item === tab ? "true" : "false"));
+        panels.forEach((panel) => {
+          const active = panel.id === targetId;
+          panel.classList.toggle("is-active", active);
+          panel.hidden = !active;
+        });
+      }
+
+      tabs.forEach((tab) => tab.addEventListener("click", () => selectTab(tab)));
+      tabs.forEach((tab) => tab.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        event.preventDefault();
+        const index = tabs.indexOf(tab);
+        const next = tabs[(index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+        next.focus();
+        selectTab(next);
+      }));
+
+      document.querySelectorAll(".panel").forEach((panel) => {
+        const title = panel.querySelector("[id$='detail-title']");
+        const copy = panel.querySelector("[id$='detail-copy']");
+        panel.querySelectorAll(".hotspot").forEach((hotspot) => {
+          const activate = () => {
+            panel.querySelectorAll(".hotspot").forEach((item) => item.classList.remove("is-active"));
+            hotspot.classList.add("is-active");
+            title.textContent = hotspot.dataset.title || "";
+            copy.textContent = hotspot.dataset.copy || "";
+          };
+          hotspot.addEventListener("click", activate);
+          hotspot.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              activate();
+            }
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>

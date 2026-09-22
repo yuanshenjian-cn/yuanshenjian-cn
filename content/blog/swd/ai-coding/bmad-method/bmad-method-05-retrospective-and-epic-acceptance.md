@@ -9,102 +9,43 @@ tags:
   - 代码审查
 published: true
 brief: >-
-  三个 Story 分别通过，并不代表它们组合后一定满足 Epic。本文介绍 bmad-retrospective 如何读取 SPEC.md、stories.yaml、实现记录、Git 变更和测试证据，检查跨 Story 缺陷、架构漂移和真实行为，并解释 accepted、accepted-with-open-items 与 rejected 三种验收结论该如何处理。
+  Story 分别通过，不代表组合后一定满足 Epic。本文说明 bmad-retrospective 如何依据 Spec、Story 记录、Git 变更和验证证据，检查跨 Story 缺陷并给出 Epic 验收结论。
 ---
 
-> Story Review 关注“这一块是否正确”，Epic Retro 关注“这些正确的块拼起来是否交付了原本承诺的结果”。
+> Story Review 关注局部正确，Epic Retro 关注整体结果。
 
-Task CLI 的标签 Epic 已经完成三个 Story。每个会话都运行过测试，也做过局部 Review。现在还差一个容易被跳过的动作：把整个 Epic 当成一个交付物重新验收。
+单个 Story 可能各自通过，却在组合时重复实现同一逻辑、采用不同数据规则，或遗漏用户路径。Retro 就是补上这个检查。
 
-单个 Story 不会看到所有组合关系。S1 可能写出一套标签表示，S2 以另一种方式比较大小写，S3 又复制一套读取逻辑；每个局部测试都能变绿，组合后仍然可能出现不一致。Retro 就是用 Epic 级证据补上这个缺口。
+## 运行 Spec-backed Retro
 
-## 运行前先确认输入完整
-
-对于 Spec-backed Epic，至少检查这些材料已经存在：
-
-- `_bmad-output/specs/spec-task-tags/SPEC.md`
-- 同目录的 `stories.yaml`
-- 每个 Story 的实现记录
-- Epic 开始前后的 Git 范围或提交记录
-- 完整测试的实际输出
-- 关键 CLI 行为的实际执行记录
-- 没有未处理的高风险 Review 发现
-
-如果 `stories.yaml` 里还有未完成 Story，Retro 不应该替你把 Epic 判成完成。先修正追踪状态或完成缺失的实现。
-
-## 让 Retrospective 读取整个 Spec 目录
-
-在新的 AI 会话中运行：
+确认 Spec、Story 清单、Story 实现记录、Git 变更和测试证据都在，再运行：
 
 ```text
 /bmad-retrospective _bmad-output/specs/spec-task-tags/
 ```
 
-当前工作流会读取父级 `SPEC.md`、有序的 `stories.yaml`、Story 实现记录、Git diff、提交和测试证据。Spec-backed 路径通常在同一个目录生成：
+`stories.yaml` 是有序清单；Story 是否完成，以对应的 Story 实现记录为准。Retro 会读取这些记录、父级 Spec、完整 diff、提交和验证证据，并生成 `RETROSPECTIVE.md`。[Finish an Epic](https://docs.bmad-method.org/build/finish-an-epic/)
 
-```text
-_bmad-output/specs/spec-task-tags/
-├── SPEC.md
-├── stories.yaml
-├── stories/
-│   ├── S1-*.md
-│   ├── S2-*.md
-│   └── S3-*.md
-└── RETROSPECTIVE.md
-```
+## Retro 重点看什么
 
-实际文件名以运行结果为准。不要为了匹配示意树手工创建空记录。
+| 检查 | 典型问题 |
+| --- | --- |
+| 组合缺陷 | S1、S2、S3 对标签规则的理解是否一致 |
+| 架构漂移 | 后续 Story 是否绕开了基础实现，重复创建辅助逻辑 |
+| Spec 偏离 | 是否偷偷加入标签删除、重命名等 Non-goal |
+| 真实行为 | 改变后的用户路径是否真正运行过 |
+| 行动项 | 上一个 Epic 的改进是否落地 |
 
-## Retro 要看测试之外的五类问题
+每个发现都应该有来源：文件、行号、提交、日志或测试结果。测试通过不能代替用户行为验证。
 
-**跨 Story 的组合缺陷**：多个 Story 是否对标签规范化、数据读取或输出格式做了不同假设。
+## 三种结论
 
-**架构漂移**：S1 建立的实现模式有没有被 S2、S3 绕开，是否出现重复的 JSON 解析和业务规则。
+| Verdict | 含义 |
+| --- | --- |
+| `accepted` | 满足 Epic 验收条件 |
+| `accepted-with-open-items` | 主结果可接受，但有明确后续项 |
+| `rejected` | 验收条件不满足，或仍有未完成 Story |
 
-**Spec 偏离**：代码是否实现了约束和 Non-goals，是否悄悄加入标签删除、重命名或云同步等范围外能力。
+Retro 提出行动项，不自动修改代码、Spec 或 Story。问题属于需求契约，就回到 Spec；属于实现缺陷，就创建修复任务；属于团队规则，才更新 Project Context 或 Override。
 
-**真实行为**：测试通过之外，添加、筛选、完成后统计等用户路径是否真的运行过。通过测试不能代替运行改变后的系统行为。
-
-**行动项落实**：上一个 Epic 的行动项是否已经完成，还是只是留在报告里。
-
-每个发现都应该有来源：文件、行号、提交、日志或测试结果。没有证据的“可能存在问题”不能直接进入确定性结论。
-
-## 三种结论对应三种后续动作
-
-当前 BMad 的 Spec-backed Retro 会给出三种主要 Verdict：
-
-| Verdict | 说明 | 后续动作 |
-| --- | --- | --- |
-| `accepted` | 满足 Epic 的验收条件，没有需要阻塞下一步的开放项 | 可以进入下一 Epic |
-| `accepted-with-open-items` | 主结果可接受，但有明确、可追踪的后续项 | 把行动项变成修复任务或新 Story |
-| `rejected` | 验收条件不满足，或存在未完成 Story | 先修复并重新验证 |
-
-Retro 只提出行动项，不替你修改代码、Spec 或 stories。这样做是为了保留决策责任：如果问题属于需求契约，就更新 Spec；如果是实现缺陷，就创建修复工作；如果是团队流程问题，才考虑更新项目上下文或 Override。
-
-## 用一个交付检查表读报告
-
-打开 `RETROSPECTIVE.md` 后，可以按下面的顺序读：
-
-1. 先看 Evidence inventory，确认报告确实读到了预期的输入。
-2. 再看每个 finding 的来源，区分事实、推断和缺少的信息。
-3. 核对 verdict 是否与未完成 Story、测试证据和行为验证一致。
-4. 把行动项分成当前修复、新 Story、新 Epic、Project Context 更新和流程改进。
-5. 只有当结论与 Git diff 和实际命令结果相符时，才把它当成 Epic 的验收依据。
-
-如果所有测试都是绿色，但统计命令从未真正执行过，报告不应把“用户行为已验证”写成事实。如果一个 Story 看起来完成，`stories.yaml` 却仍是未完成，Epic 也不应被安静地接受。
-
-## 从三层证据判断“完成”
-
-这组练习把完成定义成三层：
-
-- **实现层**：代码和单元测试完成，Story 有实现记录。
-- **变更层**：独立 Review 检查了跨 Story 的组合结果。
-- **交付层**：Retro 按父级 Spec 验收用户结果，并给出带证据的 Verdict。
-
-少任何一层，结论都应该缩小范围。可以记录为“单元测试通过”，不能把它扩大成“整个 Epic 已验收”。
-
-官方资料：
-
-- [Finish an Epic](https://docs.bmad-method.org/build/finish-an-epic/)
-- [Review a Change](https://docs.bmad-method.org/build/review-a-change/)
-- [Break Work into Stories and Track It](https://docs.bmad-method.org/plan/break-work-into-stories-and-track-it/)
+Story 通过是实现层结论，Code Review 是变更层结论，Retro 才是 Epic 层结论。三者不要混用。

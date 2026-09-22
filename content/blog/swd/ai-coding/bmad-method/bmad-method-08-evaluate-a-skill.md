@@ -9,169 +9,70 @@ tags:
   - 软件测试
 published: true
 brief: >-
-  手工跑通一次 Skill 只能证明它在一个输入上工作。本文为 aidev-risk-gate 设计 Artifact Eval 和 Trigger Eval，覆盖高风险、低风险、信息不完整和负向触发场景，说明 evals.json、triggers.json 的组织方式，以及 Runner 不可用时如何诚实区分手工验证与正式通过。
+  手工跑通一次 Skill 不足以证明它可靠。本文用 Artifact Eval 和 Trigger Eval 检查 aidev-risk-gate 的产物、边界、负向触发和只读行为，并说明如何诚实报告 Runner 未执行的情况。
 ---
 
-> Eval 的目标不是证明 Skill 没有崩溃，而是验证它在关键输入边界上会做出正确的判断。
+> Eval 要验证业务判断，不只是验证 Skill 没有崩溃。
 
-`aidev-risk-gate` 已经可以手工读取 Spec 并生成报告。下一步要回答更难的问题：当输入包含不可逆生产数据迁移时，它会不会判为高风险？低风险输入会不会被过度报警？缺少信息时，它会不会为了给出漂亮结论而猜测？用户只是让它实现 Story 时，它会不会错误触发？
+## 两类 Eval
 
-BMad Builder 的 Eval 分成两类：Artifact Eval 检查运行后的产物和行为；Trigger Eval 检查 Skill 在什么请求下应该触发。
-
-## 先准备三类输入文件
+| 类型 | 检查什么 |
+| --- | --- |
+| Artifact Eval | 报告是否存在、结论是否正确、证据是否完整 |
+| Trigger Eval | 该触发时是否触发，不该触发时是否保持安静 |
 
 目录可以这样组织：
 
 ```text
-evals/
-└── aidev-risk-gate/
-    ├── evals.json
-    ├── triggers.json
-    └── files/
-        ├── high-risk-spec.md
-        ├── low-risk-spec.md
-        └── incomplete-spec.md
+evals/aidev-risk-gate/
+├── evals.json
+├── triggers.json
+└── files/
+    ├── high-risk-spec.md
+    ├── low-risk-spec.md
+    └── incomplete-spec.md
 ```
 
-三个 fixture 要有清晰差异：
+## Artifact Eval 要写强断言
 
-- `high-risk-spec.md` 明确写出生产数据迁移，但没有回滚方案。
-- `low-risk-spec.md` 是范围小、可验证、没有证据表明涉及隐私或迁移的变更。
-- `incomplete-spec.md` 缺少成功条件或关键决策，不能支持确定的风险结论。
-
-不要在 fixture 里只写“这是高风险案例”。Eval 应该让 Skill 从正文证据中推断结果，否则测试会验证提示词暗示，而不是验证治理能力。
-
-## Artifact Eval 要断言业务行为
-
-一个精简的 `evals.json` 可以从下面的结构开始：
+高风险案例应明确写出不可逆生产数据迁移，却没有回滚方案。断言可以是：
 
 ```json
 {
-  "skill_name": "aidev-risk-gate",
-  "evals": [
-    {
-      "id": "A1",
-      "prompt": "Run headless. Evaluate files/high-risk-spec.md with aidev-risk-gate.",
-      "expected_output": "A RISK-ASSESSMENT.md report with a FAIL verdict.",
-      "files": ["evals/aidev-risk-gate/files/high-risk-spec.md"],
-      "expectations": [
-        "RISK-ASSESSMENT.md exists",
-        "The verdict is FAIL",
-        "The report identifies the irreversible production-data migration",
-        "The report identifies the missing rollback plan",
-        "Every finding cites evidence from high-risk-spec.md",
-        "The supplied spec remains unchanged"
-      ],
-      "timeout": 900
-    }
-  ]
-}
-```
-
-真正有价值的断言是“出现不可逆生产数据迁移且没有回滚方案时，结论必须是 FAIL，并引用对应证据”。“Skill 成功完成”只能说明进程结束，不能说明结果正确。
-
-再为低风险和不完整输入各加一个案例：
-
-```json
-{
-  "id": "A2",
-  "prompt": "Run headless. Evaluate files/low-risk-spec.md with aidev-risk-gate.",
-  "expected_output": "A report without invented high-risk findings.",
-  "files": ["evals/aidev-risk-gate/files/low-risk-spec.md"],
+  "id": "A1",
+  "prompt": "Run headless. Evaluate files/high-risk-spec.md with aidev-risk-gate.",
+  "files": ["evals/aidev-risk-gate/files/high-risk-spec.md"],
   "expectations": [
-    "The verdict is PASS or CONCERNS",
-    "No privacy or migration risk is invented without evidence",
-    "The report evaluates verification and rollback",
+    "RISK-ASSESSMENT.md exists",
+    "The verdict is FAIL",
+    "The report cites the migration and missing rollback plan",
     "The supplied spec remains unchanged"
   ]
 }
 ```
 
-```json
-{
-  "id": "A3",
-  "prompt": "Run headless. Evaluate files/incomplete-spec.md with aidev-risk-gate.",
-  "expected_output": "A report that surfaces missing decisions.",
-  "files": ["evals/aidev-risk-gate/files/incomplete-spec.md"],
-  "expectations": [
-    "Missing success conditions appear under Decision Needed",
-    "The report explains why a final verdict is not fully supported",
-    "Every conclusion distinguishes evidence from uncertainty"
-  ]
-}
-```
+低风险案例要检查 Skill 不会凭空制造隐私或迁移风险；不完整案例要把缺少的成功条件列为 `Decision Needed`。官方格式使用 `expectations` 做独立评分，称为 Eval JSON 格式，不必把它误写成产品 JSON Schema。[Eval Format](https://bmad-builder-docs.bmad-method.org/reference/eval-format/)
 
-这里还应验证输入文件未被修改。这条断言看起来机械，却能守住治理 Skill 的数据边界。
-
-## Trigger Eval 必须有负向案例
-
-`triggers.json` 不只测试“应该触发”的请求，也测试相邻但不属于它的请求：
+## Trigger Eval 必须包含负向案例
 
 ```json
 [
-  {
-    "query": "请评估这个 BMad Spec 的交付风险",
-    "should_trigger": true
-  },
-  {
-    "query": "运行客户研发风险门禁",
-    "should_trigger": true
-  },
-  {
-    "query": "这个 Epic 是否可以进入实现？",
-    "should_trigger": true
-  },
-  {
-    "query": "帮我实现 Story S2",
-    "should_trigger": false
-  },
-  {
-    "query": "审查当前 Git diff 中的代码缺陷",
-    "should_trigger": false
-  },
-  {
-    "query": "帮我写一个产品 PRD",
-    "should_trigger": false
-  }
+  { "query": "评估这个 Spec 的客户数据和回滚风险", "should_trigger": true },
+  { "query": "运行客户合规风险门禁", "should_trigger": true },
+  { "query": "帮我实现 Story S2", "should_trigger": false },
+  { "query": "审查当前 Git diff 的代码缺陷", "should_trigger": false }
 ]
 ```
 
-负向案例能防止 Skill 描述越写越宽，最后抢走 `bmad-build`、`bmad-code-review` 或产品规划工作流的请求。触发率高不等于 Skill 质量高，误触发会污染上下文，增加用户判断成本。
+负向案例能防止 Skill 抢占 `bmad-build`、`bmad-code-review` 和 `bmad-sprint-planning` 的请求。
 
-## 运行 Runner 时记录真实环境
-
-官方参考命令类似：
+## 诚实记录 Runner 结果
 
 ```bash
-bmad-eval-runner ./skills/aidev-risk-gate --workers 4
 bmad-eval-runner ./skills/aidev-risk-gate --mode artifact
 bmad-eval-runner ./skills/aidev-risk-gate --mode trigger
 ```
 
-Runner 可能依赖 Claude Code 的认证和执行环境。如果你的日常工具是 Codex、Cursor 或其他平台，不能因为手工案例通过就声称官方 Eval 已通过。可以保留相同的 JSON Schema，在官方 Runner 环境做兼容性回归；也可以为客户工具实现 Runner Adapter；至少要按同一组案例手工运行并保存 transcript、生成物和评分结果。
+官方 Runner 依赖 Claude Code 执行环境。使用 Codex 或其他工具时，可以保留同一套 Eval JSON 格式，或实现自己的 Runner Adapter，但手工试跑不能冒充正式通过。[Run Evals Against a Skill](https://bmad-builder-docs.bmad-method.org/how-to/run-evals-against-a-skill/)
 
-一次正式运行通常会留下：
-
-```text
-run.json
-report.html
-案例 prompt 和 transcript
-生成的 artifacts
-grading.json
-metrics.json
-triggers-result.json
-```
-
-Skill 修改后，要用同一套 Eval 集合比较结果：Artifact 通过率、正向触发率、负向误触发率、执行时间、Tool Call 数量、输出稳定性，以及是否新增了无证据结论。
-
-## 读报告时不要只看总分
-
-如果 A1 通过、A2 误报隐私风险、A3 没有列出 Decision Needed，平均分仍然可能看起来不错，但这个 Skill 还不适合进入客户门禁。治理能力的失败往往不是崩溃，而是语气很确定地给出错误结论。
-
-修正 Skill 后重复运行相同案例，保留前后报告。只有当关键行为和边界都达到预期，才可以写“Eval 通过”；Runner 未执行、只跑了部分模式或只做了手工验证时，应明确写“部分验证”。
-
-官方资料：
-
-- [Eval Format](https://bmad-builder-docs.bmad-method.org/reference/eval-format/)
-- [Run Evals Against a Skill](https://bmad-builder-docs.bmad-method.org/how-to/run-evals-against-a-skill/)
-- [Builder Commands Reference](https://bmad-builder-docs.bmad-method.org/reference/builder-commands/)
+真正值得比较的是业务断言通过率、误触发率、执行时间和无证据结论，而不是单看总分。

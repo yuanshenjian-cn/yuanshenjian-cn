@@ -9,179 +9,105 @@ tags:
   - 研发治理
 published: true
 brief: >-
-  BMad Method 不是某个模型，也不是一套固定的提示词清单，而是一套让 AI 参与软件研发时保持上下文、决策和证据连续的协作方法。本文从概念、分层架构、核心理念、适用问题和版本演进讲清楚 BMad，帮助你在进入安装和实战之前先建立正确的心智模型。
+  BMad Method 不是模型，也不是 IDE，而是一套建立在敏捷实践上的 AI 研发协作方法。它通过 Agent、Workflow、Skill、Module 和可追踪产物，让需求、架构、实现、审查与验收保持连续。本文简要说明 BMad 的全称、架构、理念、适用范围和版本演进。
 ---
 
-> BMad 解决的核心问题，不是让 AI 多写几行代码，而是让它在跨会话、跨角色和跨阶段协作时，持续知道要交付什么、为什么这样做，以及怎样证明做对了。
+> BMad 的核心价值，是让 AI 在持续参与研发时保持上下文、决策和证据的连续。
 
-如果只记住 `bmad-build`、`bmad-spec` 和 `bmad-retrospective` 这些命令，学到的只是 BMad 的操作表面。理解它为什么把工作拆成 Skill、Agent、Workflow 和一组中间产物，才能判断什么时候该直接 Build，什么时候该先写 Spec，什么时候应该停下来补充团队规则。
+这篇是 BMad Method 实战系列的序章。后续文章会用 Task CLI 展开具体实践。
 
-这篇是 BMad Method 实战系列的序章。后面的文章会用一个 Python 待办事项 CLI，走完从一次小型 Build、一个多 Story Epic，到自定义 Skill、Eval 和 Module 的完整路径。
+> [打开 BMad 架构与协作交互图（HTML 版）](/interactive/bmad-method/overview.html)
 
-## BMad 不是模型，也不是另一个 IDE
+## BMad 是什么
 
-BMad Method 是一套运行在 AI 编程工具之上的研发协作方法。官方文档把它概括为面向 AI 软件开发的“上下文工程”（context engineering）：把需求、约束、架构决策、实现记录和验收证据组织成后续 Agent 能继续使用的上下文。[官方工作流图](https://docs.bmad-method.org/workflow-map-diagram.html)把它放在四个阶段中：可选的分析、规划、方案设计和迭代实施。
+BMad 的全称是 **Breakthrough Method of Agile AI-driven Development**，即“敏捷 AI 驱动开发的突破性方法”。
 
-BMad 依赖 AI 编程工具执行 Skill，但它本身不等于 Claude Code、Codex 或 Cursor，也不绑定某一家模型。安装器把模块中的 Agent、Workflow、Task 和 Tool 生成到具体工具的 Skill 目录里；用户通过 `/bmad-build` 这样的 Skill 名称启动能力。Skill 是入口，真正的行为由它加载的角色定义、工作流文件和资源决定。[官方 Skills 参考](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/docs/reference/commands.md)把这几种形态区分得很清楚。
+BMad Method 是建立在敏捷实践上的开源、可定制 Agent 与 Workflow 集合，覆盖意图澄清、规划、架构、实现和验证。[官方方法介绍](https://www.bmadcode.com/method)将它定位为一套让人保留判断、让 AI 承担协作与执行的开发方法。
 
-可以用三层来理解：
+它不是模型、IDE 或单一命令，而是运行在 AI 编程工具之上的研发方法。
 
-| 层次 | 负责什么 | 例子 |
+| 名称 | 含义 |
+| --- | --- |
+| BMad Method / BMM | 软件研发主模块，提供研发阶段、Agent、Workflow 和 Skill |
+| BMad Builder / BMB | 创建、验证和分发自定义 Agent、Workflow 与 Module |
+| Skill | 在 AI 编程工具中调用的能力入口，如 `bmad-build`、`bmad-spec` |
+| Module | 组织一组 Skill、配置和帮助注册信息的可安装单元 |
+
+## 架构：模块、Skill 与产物
+
+BMad 可以用三层理解：
+
+| 层次 | 职责 | 示例 |
 | --- | --- | --- |
-| AI 编程工具 | 提供会话、文件、命令和模型调用能力 | Claude Code、Codex、Cursor |
-| BMad Skill | 把一个角色、工作流或工具能力接入当前项目 | `bmad-build`、`bmad-spec` |
-| BMad 方法 | 决定什么时候需要什么上下文、产物和人工判断 | Spec、Story、Review、Retro |
+| AI 编程工具 | 提供会话、文件、命令和模型调用 | Claude Code、Codex、Cursor |
+| BMad Skill | 接入 Agent、Workflow 或独立工具能力 | `bmad-build`、`bmad-spec` |
+| BMad 方法 | 规定上下文、决策、产物和验证如何衔接 | Spec、Story、Review、Retro |
 
-模型能力会变化，工具入口也会变化；这三层的职责不应混在一起。BMad 的价值主要在后两层。
+Skill 是入口，Agent、Workflow、Task 和 Tool 是不同的能力形态；Module 负责组织、配置和分发这些能力。
 
-## BMad 的架构是“模块 + Skill + 产物”
-
-### 模块负责组织能力边界
-
-BMad 不是一个不可拆分的巨大工作流。它把能力放进 Module：BMM（BMad Method）负责软件研发主流程，BMB（BMad Builder）负责创建和打包自定义 Skill，其他模块可以补充测试、创意或特定领域能力。
-
-模块还承担配置和发现职责。安装器读取模块清单，为选定的 AI 工具生成 Skill；`bmad-help` 读取注册信息，帮助用户判断下一步有哪些可用能力。这样，新增一个模块不会要求所有用户重新学习一套完全不同的入口。
-
-### Skill 是执行入口，不是全部实现
-
-用户看到的是一个命令：
+产物链可以概括为：
 
 ```text
-/bmad-build
+意图
+  ↓
+Spec / PRD / UX / Architecture
+  ↓
+Epic / Story / stories.yaml
+  ↓
+代码 / 测试 / Review / 实现记录
+  ↓
+Retro / Verdict / Action Items
 ```
 
-Skill 背后可能加载不同类型的能力：
+这些产物让新的会话能够回到明确的需求、约束和证据，而不是只依赖聊天摘要。
 
-- **Agent**：带有角色、职责、沟通方式和菜单的长期协作入口。
-- **Workflow**：有明确开始和结束，以某个过程或产物为中心的工作流。
-- **Task / Tool**：独立完成一个操作，例如帮助、校验或文件处理。
+## 四个阶段
 
-这解释了为什么 BMad Builder 要先问“应该做成 Agent 还是 Workflow”。一个一次性生成风险报告的能力，更像 Workflow；一个会跨会话积累偏好的协作伙伴，才更像 Agent。把所有能力都做成 Agent，会让角色和记忆承担本来不需要的复杂度。
-
-### 产物负责携带上下文
-
-BMad 的流程不会只留下聊天记录。不同阶段会产生可以被后续工作读取的文件：
-
-```text
-意图 / 需求
-    ↓
-Spec、PRD、UX、架构等规划产物
-    ↓
-Epic、Story、stories.yaml
-    ↓
-一次会话一个实现单元
-    ↓
-代码、测试、Review 结果和实现记录
-    ↓
-Epic Retro、Verdict 和行动项
-```
-
-这些文件不是为了让仓库显得正式，而是为了解决会话边界带来的信息损失。一个新的 Build 会话不需要相信上一个会话的摘要，它可以回到 `SPEC.md`、Story 记录和测试证据，重新获得必要上下文。
-
-## 四个阶段表达的是上下文如何逐渐变具体
-
-官方工作流图把 BMM 组织成四个阶段。它们不是每个任务都必须完整经过的审批关卡，而是不同规模工作可以进入的上下文层次。
-
-### 分析：先判断问题是否值得做
-
-分析阶段可以包含头脑风暴、调研、产品 Brief 或 PRFAQ。它适合目标尚不清楚、需要比较多个方向的工作。一个已经明确的修复任务不需要为了形式再做一轮发散。
-
-### 规划：把“做什么”说清楚
-
-PRD 适合多个角色需要共同确认产品能力的场景；`bmad-spec` 则把一个明确意图压缩成实现可读的短契约。Spec 记录 Why、Capabilities、Constraints、Non-goals 和 Success signal，但不替实现者规定每个类名和函数名。
-
-### 方案设计：让不同实现会话遵守共同决策
-
-有多个 Epic、多个系统或明显架构取舍时，需要把 UX 和架构决策单独记录下来。它们的作用是让后续 Story 不各自发明一套接口、数据模型或交互规则。
-
-### 实施：一次只处理一个可验证单元
-
-`bmad-build` 处理一个直接意图或一个计划好的 Story。它会调查上下文、决定流程深度、实现并审查这一单元。它不负责替你选择整个 backlog，也不意味着一次命令会自动完成一个 Epic。
-
-一个 Epic 的整体质量，要靠 Story 之间的共享 Spec、独立 Review、真实行为验证和最后的 `bmad-retrospective` 来判断。把单元级完成误认为产品级完成，是使用 BMad 时最常见的概念错误之一。
-
-## BMad 想改变的是 AI 研发中的五个失真点
-
-### 需求失真：代码开始得太早
-
-自然语言需求常常同时混着目标、约束、例外和暂时想到的实现方式。Agent 如果直接写代码，容易把其中一句细节当成全部目标。Spec 和人工 checkpoint 的作用，是在实现前把用户结果与技术选择分开。
-
-### 上下文失真：每个会话重新猜一遍
-
-长会话会积累噪声，短会话又会丢失决策。BMad 用小型、可追踪的文件把真正需要延续的内容留下来；代码中能直接读出的事实不必重复写进上下文，代码无法表达的意图、约束和已否决方案才值得沉淀。
-
-### 规模失真：小改动和大项目使用同一套仪式
-
-BMad 的重要判断是让流程匹配风险。一个几行的安全修复可以直接进入 Build；跨多个系统、涉及数据迁移或需要多人协调的变更，应先经过更完整的规划。流程不是越多越专业，过重的流程同样会消耗团队注意力。
-
-### 质量失真：把测试绿色当成全部正确
-
-测试能证明被覆盖的行为没有失败，不能单独证明需求理解正确、跨 Story 没有组合缺陷，或用户路径真的跑过。BMad 把实现 Review、独立 Code Review、行为验证和 Epic Retro 分成不同层次，让“代码没报错”和“交付结果成立”不再是同一个结论。
-
-### 规则失真：团队约定只存在于口头提醒
-
-通过 `AGENTS.md` 的项目上下文、Agent Override、Workflow Override 和自定义 Skill，团队可以把高代价的规则变成可审查、可版本化的配置。规则不需要复制默认 BMad，应该只补充项目或客户真正特殊的部分。
-
-## 它背后的理念不是“让 AI 自主决定一切”
-
-BMad 的核心理念可以压缩成几句话：
-
-- **人负责选择和承诺，AI 负责扩大执行能力。** 计划审批、开放问题、架构取舍和验收结论不能因为 Agent 看起来有把握就自动消失。
-- **上下文要有来源，结论要有证据。** Spec、代码、测试、Git diff 和报告各自承担不同证明责任；没有来源的确定性判断应该降级为待决定事项。
-- **保持小批量、短反馈和可回退。** 一个 Story 是一次可审查的实现单元，发现上游契约错误时回到 Spec，而不是在代码里堆补丁。
-- **默认能力与团队定制分离。** 升级 BMad 时保留官方改进，客户规则通过稀疏 Override 和独立 Module 注入。
-- **方法要能降级。** 没有 BMM 或没有某个外部服务时，自定义治理 Skill 仍应允许用户手工提供输入文件，不能把安装复杂度伪装成业务能力。
-
-这些理念也说明 BMad 不会自动消除研发判断。它只是把判断放到更明确的位置，并让后续执行者能看见判断留下的证据。
-
-## BMad 的来龙去脉：从提示词集合走向模块化方法
-
-公开版本记录能看出 BMad 的演进方向，而不是一条突然出现的产品线。
-
-| 阶段 | 演进重点 | 对使用者的影响 |
+| 阶段 | 关注点 | 常见产物 |
 | --- | --- | --- |
-| v4（2025 年） | 形成 npm 安装、模块化、跨工具的分发框架 | BMad 从一组本地提示词走向可安装的研发框架 |
-| v6 Alpha / Beta（2025 年末至 2026 年初） | Skill 命名统一、安装器重构、`bmad-help` 和模块生态成形 | 用户通过统一 Skill 入口发现和调用能力 |
-| v6.11（2026-08） | Quick Dev 主线收敛到 `bmad-build`，旧实施入口进入迁移期 | 新教程应围绕 Build、Spec、Review 和 Retro 编写 |
-| v6.12（2026-09） | Build 更强调调查后按风险决定流程深度，Review 加强证据化分流 | 简单任务可以更轻，审查结论更容易追溯 |
+| Analysis | 问题、方向和证据 | Brief、PRFAQ、Research |
+| Planning | 产品目标和需求契约 | PRD、SPEC.md |
+| Solutioning | UX、架构和 Epic 协调 | DESIGN.md、Architecture、Epics |
+| Implementation | 单元实现、审查和 Epic 验收 | Code、Tests、Review、Retro |
 
-v4 的模块化转型、v6 Beta 的安装器和 Skill 体系、v6.11 与 v6.12 的流程收敛，都记录在官方仓库的 [Releases](https://github.com/bmad-code-org/BMAD-METHOD/releases) 和 [CHANGELOG](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/CHANGELOG.md) 中。这里的历史判断只覆盖公开版本记录能支持的部分，不把社区讨论里的偏好当成官方路线。
+四个阶段是可伸缩的上下文层次，不是所有任务都必须完整经过的审批链。小改动可以直接进入 Build；大型变更才需要更多规划产物。[官方 Workflow Map](https://docs.bmad-method.org/workflow-map-diagram.html)
 
-## BMad 能解决什么，不能解决什么
+## 核心理念
 
-它比较适合这些场景：
+- **人保留判断**：产品目标、架构取舍、开放问题和验收结论不能交给 Agent 猜测。
+- **上下文有来源**：需求、约束、代码、测试和 Review 结果分别承担不同证明责任。
+- **流程匹配风险**：小任务少些仪式，大任务增加规划、协调和验证。
+- **小批量交付**：一个 Story 是可实现、可审查、可验证的工作单元。
+- **规则可以定制**：官方 Skill 负责通用流程，`AGENTS.md`、Override 和自定义 Module 承载项目差异。
 
-- AI 需要跨多个会话持续参与同一个功能或 Epic。
-- 团队希望把需求、架构、测试和验收放进同一条可追踪路径。
+## BMad 适合什么场景
+
+- AI 需要跨多个会话参与同一个功能或 Epic。
+- 需求、架构、实现和验收需要保持可追踪。
 - AI 生成代码的速度已经超过团队审查和验证能力。
-- 企业或客户项目有额外的安全、合规、回滚和发布规则。
-- 团队想把成熟做法封装成 Skill，并用 Eval 验证它没有越界。
+- 项目存在安全、合规、回滚或发布约束。
+- 团队希望把成熟做法封装成 Skill，并用 Eval 检验边界。
 
-它不适合被当成以下东西：
+BMad 不能替代产品判断、架构决策和真实用户反馈，也不适合给几分钟即可审完的低风险修改套上完整 Epic 流程。
 
-- 自动替产品负责人决定用户真正需要什么。
-- 用一堆文档替代架构师、开发者和用户之间的真实讨论。
-- 给一次性、低风险、几分钟能审完的修改增加完整 Epic 流程。
-- 让 Agent 通过更多提示词绕过测试、权限和人工批准。
+## 版本演进
 
-判断 BMad 是否值得接入，可以先问一个问题：这项工作的失败成本，是否已经高到值得保留决策和验证证据？如果答案是否定的，直接修改并自行 Review 往往更合适；如果答案是肯定的，BMad 提供了一套可以逐步增加深度的协作骨架。
+| 阶段 | 变化 |
+| --- | --- |
+| v4（2025） | 形成 npm 安装、模块化和跨工具分发框架 |
+| v6 Alpha / Beta（2025 年末至 2026 年初） | Skill 命名、安装器、`bmad-help` 和模块生态逐步统一 |
+| v6.11（2026-08） | Quick Dev 主线收敛为 `bmad-build`，旧实施入口进入迁移期 |
+| v6.12（2026-09） | Build 按调查结果决定流程深度，Review 强化证据化分流 |
 
-## 从哪里开始学
+详细变化见官方 [Releases](https://github.com/bmad-code-org/BMAD-METHOD/releases) 和 [CHANGELOG](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/CHANGELOG.md)。
 
-先建立概念，再进入实战，阅读顺序会更顺：
+## 一句话理解
 
-- 想看一次小变更如何落地，读安装和第一次 Build。
-- 想理解多人或多会话如何共享判断，读 Project Context、Spec 和 Story Breakdown。
-- 想学习交付验收，读 Story Build、Code Review 和 Epic Retro。
-- 想为团队注入规则，读 Override。
-- 想把客户治理能力产品化，继续读 Workflow Skill、Eval 和 Module。
-
-后面的例子会一直使用同一个 Task CLI。这样读者看到的不是十个孤立命令，而是一组随着项目变大逐步增加的上下文和证据。
+BMad 给人和 AI 之间的协作增加了一套可伸缩的上下文、决策和证据结构。后续系列会在这个框架上加入 Build、Spec、Story、Review、Retro、Override、Skill、Eval 和 Module。
 
 官方资料：
 
 - [BMad Method README](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/README.md)
+- [BMad Method](https://www.bmadcode.com/method)
 - [BMad Workflow Map](https://docs.bmad-method.org/workflow-map-diagram.html)
-- [Workflow Map Reference](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/docs/reference/workflow-map.md)
 - [Skills Reference](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/docs/reference/commands.md)
-- [BMad Method Releases](https://github.com/bmad-code-org/BMAD-METHOD/releases)

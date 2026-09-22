@@ -8,120 +8,80 @@ tags:
   - AGENTS.md
 published: true
 brief: >-
-  做完一次小型 Build 后，仓库已经有了真实代码和测试。本文说明如何用 bmad-project-context 把 uv、测试、CLI 输出、数据兼容性和“不跳过测试”等团队规则整理成一个小而可验证的 AGENTS.md 区块，并解释哪些信息应该留下，哪些只是重复代码。
+  项目上下文不该是代码目录说明书，而应记录 Agent 无法轻易推断、却容易造成高代价错误的团队规则。本文用 bmad-project-context 把测试、兼容性和 CLI 行为约定写进 AGENTS.md。
 ---
 
-> AGENTS.md 的价值不在于描述仓库有多少文件，而在于提前告诉 Agent 哪些错误代价高、又无法从代码中直接推断。
+> AGENTS.md 记录的不是“仓库里有什么”，而是“哪些错误不能再犯”。
 
-上一篇完成了 Task CLI 的第一次 Build。现在仓库已经从空目录变成了一个现有代码库：有 Python 入口、有 JSON 存储、有 pytest 测试，也有一组不能随意改变的用户行为。
+Task CLI 完成第一次 Build 后，仓库已经有真实代码、测试和用户行为。此时补充项目上下文，能让后续会话少猜几次。
 
-这正是 `bmad-project-context` 的使用时机。它不负责生成一份“系统百科全书”，而是把少量经过验证的项目规则放进 `AGENTS.md`，让后续每次开发都能先看到这些规则。
+## 什么值得写进 AGENTS.md
 
-## 项目上下文应该保存什么
+适合长期保留：
 
-代码适合表达“现在怎么运行”，不擅长表达“为什么这样约定”以及“哪些行为不能破坏”。可以用下面的标准筛选内容：
-
-> 如果删掉这一行，Agent 是否更容易做出一件代价较高的错误？
-
-适合写入的规则包括：
-
-- 所有 Python 命令通过 `uv` 运行。
+- Python 命令统一通过 `uv` 运行。
 - 完整测试命令是 `uv run pytest`。
-- CLI 正常输出写入 stdout，错误写入 stderr。
-- 修改 JSON 存储格式时必须保持旧数据可读，或提供显式迁移。
-- 这个 CLI 不允许访问网络。
-- 用户可观察行为变化必须增加或更新测试。
-- 测试未完整执行时，最终报告必须明确写出验证范围。
+- CLI 正常输出写 stdout，错误写 stderr。
+- JSON 存储格式必须兼容旧数据，或提供显式迁移。
+- 用户可观察行为变化必须有测试。
+- 测试未完整执行时，报告必须写明验证范围。
 
-不适合写入的内容包括：
+不必重复：
 
-- 把目录树重新抄一遍。
-- 把 `pyproject.toml` 中已经写明的依赖再重复一遍。
-- 罗列代码中一眼就能看出的类名和函数名。
-- “变量名要有意义”这类没有项目边界的通用建议。
+- 目录树和依赖列表。
+- 代码中一眼能看出的类名、函数名。
+- “变量名要有意义”这类通用建议。
 
-上下文越长，Agent 每次真正执行任务时要筛选的噪声越多。短小不是形式要求，而是为了让高价值规则保持可见。
+判断标准很简单：删掉这条规则后，Agent 是否更容易做出代价高的错误？
 
-## 让 bmad-project-context 先调查再写入
+## 让 bmad-project-context 保留高价值规则
 
-在新的 AI 会话中运行：
+在新的会话中输入：
 
 ```text
 /bmad-project-context
 
-请接管当前仓库的项目上下文。
+请检查当前仓库的项目上下文。
 
-需要记录的团队规则：
-1. 所有 Python 命令通过 uv 运行。
-2. 完整测试命令是 `uv run pytest`。
-3. CLI 正常输出必须写 stdout，错误写 stderr。
-4. 修改 JSON 存储格式时必须保持向后兼容，或者提供显式迁移。
-5. 不允许访问网络。
-6. 每次改变用户可观察行为，都必须增加或更新测试。
-7. 不要为了通过检查而跳过或禁用测试。
-8. 如果测试未运行完整，不得声称测试通过。
+需要记录的规则：
+- Python 命令通过 uv 运行，测试命令是 `uv run pytest`。
+- CLI 正常结果写 stdout，错误写 stderr。
+- JSON 存储格式必须兼容旧数据。
+- 用户可观察行为变化必须更新测试。
+- 测试不完整时不得声称测试通过。
 
-请先调查并验证这些规则，再向我展示准备写入 AGENTS.md 的完整区块。
+请先检查仓库，再展示准备写入 AGENTS.md 的完整区块。
 ```
 
-当前版本的工作方式是：读取已有的 `AGENTS.md`、`CLAUDE.md`、编辑器规则、项目配置和 CI；检查规则里写到的命令与路径；把扫描无法判断的团队约定留给人确认；最后展示完整区块，等待批准后才写文件。
-
-它会把 BMad 管理的内容放在标记之间：
+当前版本会读取已有的 `AGENTS.md`、编辑器规则、项目配置和 CI，验证命令与路径，并在获得批准后写入 BMad 管理区块：
 
 ```markdown
 <!-- bmad:context -->
-
-这里是经过验证的项目规则。
-
+项目特有的、经过验证的规则
 <!-- /bmad:context -->
 ```
 
-标记之外的手写内容应保持原样。这个边界很实用：团队可以继续在 `AGENTS.md` 维护其他规则，而后续刷新上下文时不会被整体覆盖。
+标记之外的手写内容不会被刷新覆盖。[Project Context 文档](https://docs.bmad-method.org/existing-codebases/set-and-maintain-project-context/)
 
-## 审核每一条规则的证据
+## AGENTS.md、Override 和 central config
 
-Agent 说“已经验证”还不够。你可以把规则分成三类逐项看：
+三者职责不同：
 
-**命令事实**：例如 `uv run pytest` 是否真的能运行，项目入口是否真的支持 `--db`。
+| 位置 | 适合放什么 |
+| --- | --- |
+| `AGENTS.md` | 整个仓库都要遵守的规则 |
+| `_bmad/custom/<skill>.toml` | 某个 Agent 或 Workflow 的行为定制 |
+| central config | 安装答案和模块级配置 |
 
-**行为契约**：例如 stdout/stderr 分流和非法任务 ID 的退出码。这些需要结合测试和手工命令确认。
+同一条规则不要在三处重复维护。全仓库的测试和兼容性要求放 `AGENTS.md`；只有 Developer Agent 特有的提醒，才放进它的 `persistent_facts`。[Customize BMad](https://docs.bmad-method.org/customize/customize-bmad/)
 
-**团队决定**：例如禁止网络访问、禁止跳过测试。这些可能无法从代码推出，需要团队明确批准。
-
-如果某一行只是把代码再说一遍，就删掉。如果某一行描述了代码目前碰巧如此，却没有团队意图或兼容性要求，也不要急着固化。项目上下文应该记录会影响未来决策的事实，而不是冻结所有当前实现细节。
-
-## 写入之后做两次验证
-
-先检查上下文的差异，再运行项目测试：
+## 写入后检查
 
 ```bash
 git diff -- AGENTS.md
 uv run pytest
 ```
 
-确认没有大段重复说明、没有被误删的手写内容，也没有把“建议”写成“必须”。`bmad-project-context` 本身不会提交文件，是否提交由团队决定；如果这组规则是共享治理的一部分，通常应随代码一起进入版本控制：
+确认没有删除手写规则，也没有把实现细节写成永久约束。共享规则应提交 Git；个人偏好应放在个人配置中。
 
-```bash
-git add AGENTS.md
-git commit -m "docs: add verified agent project context"
-```
-
-下一次开启全新会话时，可以直接问：
-
-```text
-请列出你本次开发必须遵守的项目规则，并指出每条规则的验证依据。
-```
-
-这不是为了测试 Agent 的背诵能力，而是确认它能把规则转化为实际行为：使用 `uv`、保留 stdout/stderr 契约、为行为变化写测试，并在测试不完整时诚实报告。
-
-## 旧教程里的两个名称为什么要替换
-
-`bmad-generate-project-context` 和 `bmad-document-project` 仍可能在旧安装中作为兼容入口存在，但当前维护路径是 `bmad-project-context`。前者倾向于生成一份单独的项目上下文文件，后者会把代码库整理成大篇幅文档；新流程更强调一个小的、经验证的规则区块。
-
-这类命令迁移是学习 BMad 时很容易忽略的细节。教程可以保留旧名帮助读者理解历史，但示例命令应以当前稳定版为准。
-
-官方资料：
-
-- [Set and Maintain Project Context](https://docs.bmad-method.org/existing-codebases/set-and-maintain-project-context/)
-- [The Theory of Project Context](https://docs.bmad-method.org/existing-codebases/theory-of-project-context/)
-- [Start in an Existing Codebase](https://docs.bmad-method.org/existing-codebases/start-in-an-existing-codebase/)
+旧教程里的 `bmad-generate-project-context` 和 `bmad-document-project` 已由 `bmad-project-context` 接替，新项目使用当前入口即可。

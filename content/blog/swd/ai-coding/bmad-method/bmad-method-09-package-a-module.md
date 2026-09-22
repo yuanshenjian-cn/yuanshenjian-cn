@@ -9,109 +9,36 @@ tags:
   - 研发治理
 published: true
 brief: >-
-  单个 Skill 能解决一个问题，Module 才能把一组客户能力组织成可安装、可发现、可配置的产品。本文在 aidev-risk-gate 之外增加 aidev-delivery-report，演示用 IM 规划、Workflow Builder 构建、Module Builder 打包和 Validate Module 验证，并给出干净项目安装与发布前检查清单。
+  Module 把多个 Skill 组织成可安装、可发现、可配置的能力包。本文用 aidev-risk-gate 和 aidev-delivery-report 演示 IM、Workflow Builder、CM、VM 及干净项目安装，明确哪些是示意流程，哪些需要真实验证。
 ---
 
-> Module 的价值不只是把几个 Skill 放进同一个目录，而是让能力有稳定的注册、配置、发现和升级路径。
+> Skill 解决一个问题，Module 负责让一组能力可以被安装、发现和维护。
 
-前一篇的 `aidev-risk-gate` 负责实现前的风险判断。客户交付还需要另一个能力：Epic 完成后，读取 `SPEC.md`、`stories.yaml`、Story 实现记录、Code Review 和 `RETROSPECTIVE.md`，生成 `DELIVERY-REPORT.md`。
+`aidev-risk-gate` 负责实现前的客户风险评估。再增加一个 `aidev-delivery-report`，读取 Spec、Story 记录、Review 和 Retro，生成客户交付报告；它只汇总证据，不重新审查代码。
 
-它不重新判断代码质量，只汇总已经存在的证据。两个职责边界清楚的 Workflow 放在一起，就有了一个值得打包的 Module：`AI Delivery Governance`，模块代码设为 `aidev`。
+## 先确定两个 Skill 的边界
 
-## 先规划能力之间的边界
-
-如果模块结构还没有定型，可以运行：
-
-```text
-/bmad-module-builder
-```
-
-选择 Ideate Module（`IM`），描述目标用户、能力边界、配置项和依赖：
-
-```text
-我想创建一个 BMM 扩展模块：
-
-名称：AI Delivery Governance
-代码：aidev
-
-目标用户：
-采用 BMad 做企业研发交付的团队。
-
-包含能力：
-1. aidev-risk-gate：实现前客户风险门禁。
-2. aidev-delivery-report：Epic 完成后的客户交付报告。
-
-模块类型：
-BMM expansion；没有 BMM 时也能优雅降级，允许用户手工提供输入文件。
-
-共享配置：
-- 风险阈值
-- 客户合规检查表路径
-- 报告输出目录
-- 客户名称
-- 是否要求回滚计划
-
-外部依赖：
-无强制外部服务。
-```
-
-IM 适合用来确认愿景、Skill 边界、配置责任和前后顺序。如果目录已经明确，也可以跳过 IM，直接进入 Create Module；官方 Builder 允许两条路径。
-
-## 第二个 Skill 只做证据汇总
-
-用 Workflow Builder 创建 `aidev-delivery-report` 时，要求它只读取和汇总：
-
-```text
-/bmad-workflow-builder
-
-请创建 aidev-delivery-report Workflow Skill。
-
-输入：
-- SPEC.md
-- stories.yaml
-- 每个 Story 的实现记录
-- bmad-code-review 结果
-- RETROSPECTIVE.md
-
-输出：
-- 在 Epic 目录生成 DELIVERY-REPORT.md
-
-要求：
-- 汇总已有证据，不重新审查代码质量。
-- 缺少输入文件时列出缺失项，不猜测完成状态。
-- 报告区分已验证事实、开放项和客户需要确认的决定。
-- 支持 Guided 和 Headless 模式。
-```
-
-把“风险判断”和“交付汇总”拆成两个 Skill，有两个直接收益：每个 Skill 更容易写 Eval，也不会让一个超长工作流同时承担实现前和实现后的不同判断。
-
-## 多 Skill Module 会生成 Setup Skill
-
-建议先分别完成并试运行两个 Skill，再把它们放到统一目录：
+模块名为 `AI Delivery Governance`，代码为 `aidev`。结构可以是：
 
 ```text
 ai-delivery-governance/
 └── skills/
     ├── aidev-risk-gate/
-    │   ├── SKILL.md
-    │   └── ...
     └── aidev-delivery-report/
-        ├── SKILL.md
-        └── ...
 ```
 
-在 Module Builder 中选择 Create Module（`CM`）：
+结构还不稳定时，用 Module Builder 的 IM 先确定愿景、能力、配置项和依赖；两个 Skill 本身用 Workflow Builder 构建。
+
+## 用 CM 打包
 
 ```text
+/bmad-module-builder
+
 请将以下目录打包为多 Skill Module：
-
 <绝对路径>/ai-delivery-governance/skills
-
-模块规划：
-<IM 生成的模块规划文档路径>
 ```
 
-Builder 会读取每个 `SKILL.md`，识别这是多 Skill 输入，并生成专用 Setup Skill：
+多 Skill 模块通常会生成 Setup Skill：
 
 ```text
 skills/
@@ -119,45 +46,25 @@ skills/
 ├── aidev-delivery-report/
 └── aidev-setup/
     ├── SKILL.md
-    ├── assets/
-    │   ├── module.yaml
-    │   └── module-help.csv
+    ├── assets/module.yaml
+    ├── assets/module-help.csv
     └── scripts/
 ```
 
-具体输出可能随 Builder 版本变化，不要把示意目录当成固定模板。多 Skill 模块需要 Setup Skill 负责注册；只有一个 Skill 时，Builder 更可能采用嵌入式自注册路径。
+`module.yaml` 保存模块身份和配置变量；`module-help.csv` 让 `bmad-help` 发现能力；`marketplace.json` 负责分发路径。具体目录以 Builder 的实际输出为准。[Build Your First Module](https://bmad-builder-docs.bmad-method.org/tutorials/build-your-first-module/)
 
-## 读懂三份注册信息
-
-`module.yaml` 是模块身份和配置变量的来源，通常包含模块代码、版本、配置问题和变量定义。这里放“不同项目可能不同”的信息，例如报告输出目录和客户名称；不要把可以运行时推断的值都做成安装问题。
-
-`module-help.csv` 告诉 `bmad-help` 有哪些能力、每项怎么描述、什么时候使用，以及和其他能力的前后关系。描述必须足够窄，避免用户问普通代码 Review 时也被推荐风险门禁。
-
-`.claude-plugin/marketplace.json` 是分发层的清单。目录名来自 Claude Code 的插件约定，但 BMad 安装器支持从本地路径和 Git 主机安装自定义 Module；发布前要检查清单里的相对路径，而不是写死某台电脑的绝对路径。
-
-## 用 Validate Module 做真正的验收
-
-在 Module Builder 中选择 Validate Module（`VM`）：
+## 用 VM 验证模块
 
 ```text
-验证以下 Module：
+/bmad-module-builder
 
+验证以下 Module：
 <绝对路径>/ai-delivery-governance/skills
 ```
 
-它会检查：
+VM 检查结构、引用、Help 条目、配置变量和描述质量。目录看起来完整，不能替代真实 VM 结果；文章中的目录和命令是示意流程。
 
-- 目录和必需文件是否完整。
-- Skill 引用、路径和注册项是否断裂。
-- Help CSV 是否有重复或缺失条目。
-- 配置变量是否和 Skill 的实际使用一致。
-- 描述是否准确，能力边界是否清楚。
-
-只有 VM 实际报告通过，才能说 Module 验证通过。目录看起来完整、手工运行过一个 Skill，都不能替代 VM。
-
-## 在干净项目中做安装测试
-
-不要只在 Builder 自己所在的项目里验证。创建另一个干净项目，用本地 Module 安装：
+## 在干净项目里安装
 
 ```bash
 npx bmad-method install \
@@ -168,37 +75,22 @@ npx bmad-method install \
   --yes
 ```
 
-然后运行：
+安装后运行：
 
 ```text
 /aidev-setup
 /bmad-help
-
-我准备实现一个客户 Epic，除了 BMad 默认流程，还有哪些客户治理能力可用？
 ```
 
-预期帮助结果能找到 `aidev-risk-gate` 和 `aidev-delivery-report`，并给出合理的前后顺序。再用一份真实 Spec 和一组 Story 记录验证两个 Skill，最后检查升级或重复安装不会破坏其他 Module 的配置。
+确认 `aidev-risk-gate` 和 `aidev-delivery-report` 能被发现，输入文件缺失时会明确提示，升级或重复安装也不会破坏其他 Module。
 
-## 发布前的边界检查
+## 发布前检查
 
-发布到 Git 前，至少确认：
+- Skill 名称、触发条件和输出路径稳定。
+- 没有客户机密、Token 或真实业务数据。
+- 两个 Skill 都有 Artifact Eval 和 Trigger Eval。
+- VM 和干净项目安装都实际运行过。
+- README 说明依赖、配置和数据边界。
+- 发布使用 Git tag 或明确版本，而不是永远跟随主分支。
 
-- 两个 Skill 的名称、触发条件和输出路径稳定。
-- `module.yaml` 版本正确，后续升级有明确版本策略。
-- `module-help.csv` 的排序和描述准确。
-- `marketplace.json` 使用相对路径，没有硬编码本机目录。
-- 仓库不包含客户机密、Token、凭据或真实业务数据。
-- 两个 Skill 都有 Artifact 和 Trigger Eval，结果已保存。
-- VM 通过，干净项目本地安装成功。
-- `bmad-help` 能发现能力，缺少 BMM 时也能按手工输入降级运行。
-- README 写清前置依赖、输入文件边界、配置项和数据处理方式。
-
-正式客户环境使用 Git tag 或明确版本，不要让安装器永远跟随主分支。Module 不是一次性提示词的压缩包，而是需要像软件一样维护版本、测试分发和升级边界的交付产品。
-
-到这里，原教程的 13 个学习目标就形成了一个可复用路径：用 BMad 原生流程交付一个 Epic，用 Project Context 和 Override 注入团队规则，用 Skill、Eval 和 Module 把客户治理能力产品化。
-
-官方资料：
-
-- [Build Your First Module](https://bmad-builder-docs.bmad-method.org/tutorials/build-your-first-module/)
-- [What Are BMad Modules?](https://bmad-builder-docs.bmad-method.org/explanation/what-are-modules/)
-- [Builder Commands Reference](https://bmad-builder-docs.bmad-method.org/reference/builder-commands/)
+到这里，BMad 的原生流程和扩展方式就连起来了：方法负责研发协作，Skill 负责具体能力，Eval 负责回归，Module 负责分发。[What Are BMad Modules?](https://bmad-builder-docs.bmad-method.org/explanation/what-are-modules/)
