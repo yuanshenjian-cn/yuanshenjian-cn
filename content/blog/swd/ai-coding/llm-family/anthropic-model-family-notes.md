@@ -1,6 +1,6 @@
 ---
 title: "Anthropic：Claude 为什么越来越像长跑型 Agent"
-date: '2026-09-06'
+date: '2026-09-23'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-   这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5、Sonnet 5、Fable 5.1 / Mythos 5.1 的完整主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。
+   这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5.5、Sonnet 5、Fable 5.1 / Mythos 5.1 的主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。
 ---
 
 > 如果 OpenAI 这条线给人的感觉是“越来越会干活”，那 Anthropic 这条线更像“越来越能把长活干稳”。Claude 这几年最明显的差异，不是某一个跑分突然炸裂，而是它在长任务、长上下文和代码 Agent 上的稳定性一路被做厚了。
@@ -36,6 +36,7 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中/读 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
+| Claude Opus 5.5 | 2026-09-22 | $4 / 1M | $0.20 / 1M | $20 / 1M | 在 Agentic Coding、电脑操作和知识工作上推进 Opus 5，同时降低 token 与任务成本 |
 | Claude Fable 5.1 / Mythos 5.1 | 2026-09-01 | $10 / 1M | $0.25 / 1M | $50 / 1M | Fable 面向公开使用，Mythos 面向受信计划；同一底层模型把长程编码、知识工作和研究再往前推 |
 | Claude Opus 5 | 2026-07-24 | $5 / 1M | $0.50 / 1M | $25 / 1M | 在 Opus 4.8 基础上明显推进深度推理、长程 Agent 和编码效率，1M context 与 thinking 默认开启 |
 | Claude Sonnet 5 | 2026-06-30 | $2 / 1M | $0.20 / 1M | $10 / 1M | 迄今最 Agentic 的 Sonnet，能力接近 Opus 4.8 但价格更低；原定涨价未发生 |
@@ -51,7 +52,19 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 | Claude 3.5 Sonnet | 2024-06-20 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
 | Claude 3 Opus | 2024-03-04 | $15 / 1M | 官方未公布 | $75 / 1M | Claude 3 家族旗舰，把长上下文和多模态能力打进前沿区 |
 
-<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面、官方模型文档与 Release Notes，查询日期 2026-09-06。Claude Fable 5.1 / Mythos 5.1 于 2026-09-01 发布，输入/输出价格为 $10/$50 每百万 token，缓存读 $0.25/1M、缓存写 $12.50/1M；Mythos 5.1 仅面向 Project Glasswing 等受信计划。Claude Opus 5 的输入/输出价格为 $5/$25 每百万 token，缓存读 $0.50/1M、缓存写 $6.25/1M，来自官方 pricing 页。Claude Sonnet 5 自 2026-08-10 起将 $2/$10 的 intro 价格改为标准价格，原定 2026-09-01 上调至 $3/$15 未发生；缓存读 $0.20/1M、缓存写 $2.50/1M，来自官方 pricing 页与 Release Notes。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问，2026-06-30 指令解除，2026-07-01 恢复全球访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方定价页；Sonnet 4.5 的缓存读 $0.30/1M，按官方当前 pricing 页修正。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面、官方模型文档与 Release Notes。既有模型数据查询日期为 2026-09-06，Claude Opus 5.5 新增数据查询日期为 2026-09-23。Claude Opus 5.5 于 2026-09-22 发布，输入/输出价格为 $4/$20 每百万 token，缓存读 $0.20/1M、缓存写 $5/1M；官方称其典型工作负载成本比 Opus 5 低 40%。Claude Fable 5.1 / Mythos 5.1 于 2026-09-01 发布，输入/输出价格为 $10/$50 每百万 token，缓存读 $0.25/1M、缓存写 $12.50/1M；Mythos 5.1 仅面向 Project Glasswing 等受信计划。Claude Opus 5 的输入/输出价格为 $5/$25 每百万 token，缓存读 $0.50/1M、缓存写 $6.25/1M，来自官方 pricing 页。Claude Sonnet 5 自 2026-08-10 起将 $2/$10 的 intro 价格改为标准价格，原定 2026-09-01 上调至 $3/$15 未发生；缓存读 $0.20/1M、缓存写 $2.50/1M，来自官方 pricing 页与 Release Notes。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问，2026-06-30 指令解除，2026-07-01 恢复全球访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方定价页；Sonnet 4.5 的缓存读 $0.30/1M，按官方当前 pricing 页修正。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+
+## Claude Opus 5.5：把长程工作做得更快、单价更低
+
+Claude Opus 5.5 于 2026 年 9 月 22 日发布，是 Claude 5.5 家族的首个型号。Anthropic 将它定位在长时间编码 Agent 和知识工作场景，API 型号为 `claude-opus-5-5`。[官方发布页](https://www.anthropic.com/claude-opus-5-5)给出的单价是输入 $4、缓存读取 $0.20、输出 $20 / 百万 token，缓存写入为 $5。
+
+官方公开的几项结果覆盖了这份档案关注的不同工作：
+
+- 编码：Terminal-Bench 4.0 得分 66.4%，Opus 5 为 52.3%；该项使用 xhigh effort。
+- 电脑操作：OSWorld 2.0 的 partial score 为 81.8%，Opus 5 为 74.0%。
+- 知识工作：GDPval-AA v2.1 得分 1846 Elo，Opus 5 为 1708。
+
+这些分数来自 Anthropic 发布页所列的评测设置，不宜脱离测试条件横向等同为普遍任务成功率。价格方面，输入和输出单价比 Opus 5 低 20%，缓存读取低 60%；官方估算默认设置下的典型任务总成本低约 40%。
 
 ## Claude Fable 5.1 / Mythos 5.1：把 Fable 线推向更长的自主工作
 
@@ -309,6 +322,7 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 
 - Anthropic Pricing: `https://claude.com/pricing#api`
 - Introducing Claude Fable 5.1 and Claude Mythos 5.1: `https://www.anthropic.com/claude-fable-and-mythos-5-1`
+- Introducing Claude Opus 5.5: `https://www.anthropic.com/claude-opus-5-5`
 - What's new in Claude Fable 5.1: `https://platform.claude.com/docs/en/models/fable-5-1/whats-new-fable-5-1`
 - Claude Platform release notes: `https://platform.claude.com/docs/en/release-notes/overview`
 - Introducing Claude Opus 5: `https://www.anthropic.com/news/claude-opus-5`
