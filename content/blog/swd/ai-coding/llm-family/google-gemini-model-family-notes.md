@@ -1,6 +1,6 @@
 ---
 title: "Google Gemini：从长上下文到 agentic era 的主线怎么走"
-date: '2026-09-06'
+date: '2026-09-28'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.8 Flash、Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。
+  这是一份按代际持续维护的 Google Gemini 模型档案。覆盖 Gemini 3.8 Live、Gemini 3.8 Flash、Gemini 3.7 Flash、Gemini 3.6 Flash、Gemini 3.5 Flash、Gemini 3.1 Flash-Lite、Gemini 2.5 Pro、Gemini 2.5 Flash、Gemini 2.0 Flash 和 Gemini 1.5 Pro，重点记录官方发布时间、Gemini API 定价、上下文与多模态能力，以及 Google 这条线从长上下文走向 Agent 的演化重点。
 ---
 
 > Google 这条线最容易让人记住的两个词，一个是长上下文，一个是原生多模态。但如果你把最近几代串起来看，会发现它真正的主线是：先把“能吃下更多信息”做好，再把“能带工具去做事”推出来。
@@ -36,6 +36,7 @@ Google 不是每一代都把“编码最强”挂在最前面，它更像是在�
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存相关价格 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
+| Gemini 3.8 Live / 3.8 Live Extended Thinking | 2026-09-15 | 文本 $0.75；音频 $3.00（或 $0.005/分钟）；图像/视频 $1.00（或 $0.002/分钟）/ 1M | 不支持上下文缓存 | 文本 $4.50；音频 $12.00（或 $0.018/分钟）/ 1M | 面向实时语音 Agent；Live 侧重低延迟对话，Extended Thinking 支持后台多步推理 |
 | Gemini 3.8 Flash | 2026-09-02 | Intro $0.75 / 1M（至 2026-12-31）；标准 $1.50 / 1M | 官方未公布 | Intro $3.75 / 1M（至 2026-12-31）；标准 $7.50 / 1M | Flash 系最新主力：面向长程 coding、agentic workflow 和专业推理，价格与 3.7 Flash 相同 |
 | Gemini 3.7 Flash | 2026-08-13 | Intro $0.75 / 1M（至 2026-12-31）；标准 $1.50 / 1M | 官方未公布 | Intro $3.75 / 1M（至 2026-12-31）；标准 $7.50 / 1M | Flash 系主力：coding/agent/web dev 全面超越 3.6 Flash，intro 价格反而比 3.6 Flash 便宜一半 |
 | Gemini 3.6 Flash | 2026-07-21 | $1.50 / 1M | Context caching $0.15 / 1M，storage $1.00 / 1M tokens / hour | $7.50 / 1M | Flash 系原最新主力：输出 token 少 17%、输出单价从 $9 降到 $7.50，computer use 变内置工具 |
@@ -47,7 +48,13 @@ Google 不是每一代都把“编码最强”挂在最前面，它更像是在�
 | Gemini 2.0 Flash | 2024-12-11 | $0.10 / 1M（text/image/video）或 $0.70 / 1M（audio） | Context caching $0.025 / 1M 或 $0.175 / 1M，storage $1.00 / 1M tokens / hour | $0.40 / 1M | 正式把 Gemini 推向 agentic era，原生工具调用和多模态输出上台面 |
 | Gemini 1.5 Pro | 2024-02-15 | 官方未公布 | 官方未公布 | 官方未公布 | 1M context 的分水岭，Google 长上下文路线真正成型 |
 
-<small>*数据来源：Google 官方 Gemini API Changelog、Gemini API Pricing 页面与官方博客，查询日期 2026-09-06。Gemini 3.8 Flash 于 2026-09-02 发布，官方给出的 intro 定价为输入 $0.75、输出 $3.75 / 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格在官方发布页和当前定价页均未直接公布，按“官方未公布”处理。Gemini 3.8 Flash Cyber 是面向 Fairwind Program 受信防御者的限定变体，官方未公布公开 API 单价。Gemini 3.7 Flash 于 2026-08-13 发布，intro 定价 $0.75/$3.75 per 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格官方博客未直接公布，按“官方未公布”处理。Gemini 3.6 Flash 与 Gemini 3.5 Flash-Lite 于 2026-07-21 同日发布，均为 GA；官方同时宣布 Gemini 3.5 Pro 仍在与合作伙伴测试中。3.5 Flash Cyber 为限定试点模型（仅面向政府与受信合作伙伴），不在公开 API 定价中。Gemini 1.5 Pro 首发阶段官方只说明测试期与后续 pricing tiers，未给稳定模型级单价。Gemini 3.1 Flash-Lite 的 preview 版本发布于 2026-03-03，GA 版本发布于 2026-05-07。*</small>
+<small>*数据来源：Google 官方 Gemini API Changelog、Gemini API Pricing 页面与官方博客。Gemini 3.8 Flash 等既有记录首次查询日期为 2026-09-06；本次补充 Gemini 3.8 Live 系列的查询日期为 2026-09-28。Gemini 3.8 Live 与 Gemini 3.8 Live Extended Thinking 于 2026-09-15 发布，官方定价页按文本、音频、图像/视频分别计价；模型文档注明不支持上下文缓存。Gemini 3.8 Flash 于 2026-09-02 发布，intro 定价为输入 $0.75、输出 $3.75 / 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格在官方发布页和当前定价页均未直接公布，按“官方未公布”处理。Gemini 3.8 Flash Cyber 是面向 Fairwind Program 受信防御者的限定变体，官方未公布公开 API 单价。Gemini 3.7 Flash 于 2026-08-13 发布，intro 定价 $0.75/$3.75 per 1M（有效期至 2026-12-31），2027-01-01 起恢复标准价 $1.50/$7.50 per 1M；其 context caching / storage 价格官方博客未直接公布，按“官方未公布”处理。Gemini 3.6 Flash 与 Gemini 3.5 Flash-Lite 于 2026-07-21 同日发布，均为 GA；官方同时宣布 Gemini 3.5 Pro 仍在与合作伙伴测试中。3.5 Flash Cyber 为限定试点模型（仅面向政府与受信合作伙伴），不在公开 API 定价中。Gemini 1.5 Pro 首发阶段官方只说明测试期与后续 pricing tiers，未给稳定模型级单价。Gemini 3.1 Flash-Lite 的 preview 版本发布于 2026-03-03，GA 版本发布于 2026-05-07。*</small>
+
+## Gemini 3.8 Live 与 Extended Thinking：把实时语音对话推进到后台推理
+
+Gemini 3.8 Live 与 Gemini 3.8 Live Extended Thinking 于 2026 年 9 月 15 日发布。两者是面向实时语音 Agent 的 audio-to-audio 模型：Live 面向低延迟、自然对话；Extended Thinking 面向需要后台多步推理的复杂任务。[Google 官方发布页](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-8-live-gemini-3-8-live-extended-thinking/)介绍了两款模型的定位。
+
+模型 ID 分别为 `gemini-3.8-live` 和 `gemini-3.8-live-extended-thinking`。Live 支持交错推理、异步函数调用和会话内容更新；Extended Thinking 可在实时语音交互中继续后台推理和调用工具。两者的标准 API 价格相同：输入文本 $0.75、音频 $3.00（或 $0.005/分钟）、图像/视频 $1.00（或 $0.002/分钟）/ 1M tokens；输出文本 $4.50、音频 $12.00（或 $0.018/分钟）/ 1M tokens。官方模型文档注明不支持上下文缓存。[官方定价页](https://ai.google.dev/gemini-api/docs/pricing)与[模型文档](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-live)列出了费率和能力。
 
 ## Gemini 3.8 Flash：把 Flash 系推向长程 coding 和自主 Agent
 

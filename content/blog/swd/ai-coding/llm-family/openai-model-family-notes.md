@@ -1,6 +1,6 @@
 ---
 title: "OpenAI：从 GPT-4 Turbo 到 GPT-6 Astra 的主线演进"
-date: '2026-09-23'
+date: '2026-09-28'
 tags:
   - AI前沿
   - LLM
@@ -54,6 +54,8 @@ brief: >-
 OpenAI 于 2026 年 9 月 22 日扩展 GPT-6 家族，发布 Sol 与 Luna。官方把 Sol 定位为复杂编码和 Agent 工作流模型，把 Luna 定位为面向高频任务的高效率型号；两者都支持文本和图像输入、1.05M 上下文及 128K 最大输出。[官方模型目录](https://developers.openai.com/api/docs/models)列出了两款型号及各自定位。
 
 按输入不超过 272K token 的标准 API 价格计算，Sol 的输入、缓存读取和输出分别为 $2、$0.20、$10 / 百万 token；Luna 分别为 $0.10、$0.01、$0.50。缓存写入价格分别为 $2.50 和 $0.125。超过 272K 输入 token 后，输入与缓存价格加倍，输出价格为标准价的 1.5 倍。[官方 API 定价](https://developers.openai.com/api/docs/pricing)给出了两档上下文对应的完整费率。
+
+OpenAI 的 [API Changelog](https://developers.openai.com/api/docs/changelog) 于 2026 年 9 月 25 日记录了 GPT-6 Sol 与 Luna 的图像编码修复：此前的错误会降低图像理解效果，修复后改善了 API 与 Codex 中的视觉任务结果。官方建议依赖图像输入的工作流重新评估。
 
 我会把 Sol 看作复杂编码与多步工具任务的成本档，把 Luna 看作高频、成本敏感任务的选择。两者都保留 GPT-6 的长上下文和工具能力，但官方资料把它们的差异主要落在工作负载定位和价格上。
 

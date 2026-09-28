@@ -1,6 +1,6 @@
 ---
 title: "DeepSeek：从 V3 到 V4.1，这家最锋利的地方不只是便宜"
-date: '2026-09-16'
+date: '2026-09-28'
 tags:
   - AI前沿
   - LLM
@@ -42,7 +42,7 @@ DeepSeek 这几年更新很快，而且型号分支也不少。
 | DeepSeek-R1 | 2025-01-20 | $0.55 / 1M | $0.14 / 1M | $2.19 / 1M | 推理线正式成型，是后来 R1-0528 的基线 |
 | DeepSeek-V3 | 2024-12-26 | $0.27 / 1M（2 月 8 日后） | $0.07 / 1M（2 月 8 日后） | $1.10 / 1M（2 月 8 日后） | 后续 V3.x 演进的起点 |
 
-<small>*数据来源：DeepSeek 官方 API News 与 Pricing 页面，首次查询日期 2026-08-17，本次查询日期 2026-09-16。DeepSeek-V4 系列于 2026-08-13 正式 GA，模型版本更新为 DeepSeek-V4-Pro-0813 与 DeepSeek-V4-Flash-0731，API 调用名保持 `deepseek-v4-pro` 与 `deepseek-v4-flash` 不变。新版 pricing 引入 peak / off-peak 结构，2026-08-16 16:00 UTC 生效：peak hours 为 01:00–04:00 与 06:00–10:00 UTC，其余为 off-peak；off-peak 价格约为 peak 的 50%。表格中 V4 价格已按 GA 后官方 pricing 图更新，旧 preview 阶段价格（Flash 未命中 $0.14、输出 $0.28；Pro 未命中 $0.435、输出 $0.87）保留在本页文字记录中。V4-Flash-Vision-Exp 发布公告说明图像按 V4-Flash 价格计费，表格沿用 2026-08-13 GA 费率；V4.1-Flash 价格取自本次查询时的官方 Pricing 页面，当前页面将旧的 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标为退役，并说明请求由 V4.1-Flash 提供服务、按 Flash 价格计费。DeepSeek-R1 与 DeepSeek-V3 的价格取自各自发布公告；其中 DeepSeek-V3 公告只明确给出 2025-02-08 起执行的价格。其余历史型号很多价格已不在当前定价页保留，因此按“官方未公布”或“官方现页未保留”处理。*</small>
+<small>*数据来源：DeepSeek 官方 API News 与 Pricing 页面，首次查询日期 2026-08-17，本次查询日期 2026-09-28。DeepSeek-V4 系列于 2026-08-13 正式 GA，模型版本更新为 DeepSeek-V4-Pro-0813 与 DeepSeek-V4-Flash-0731，API 调用名保持 `deepseek-v4-pro` 与 `deepseek-v4-flash` 不变。新版 pricing 引入 peak / off-peak 结构，2026-08-16 16:00 UTC 生效：peak hours 为 01:00–04:00 与 06:00–10:00 UTC，其余为 off-peak；off-peak 价格约为 peak 的 50%。表格中 V4 价格已按 GA 后官方 pricing 图更新，旧 preview 阶段价格（Flash 未命中 $0.14、输出 $0.28；Pro 未命中 $0.435、输出 $0.87）保留在本页文字记录中。V4-Flash-Vision-Exp 发布公告说明图像按 V4-Flash 价格计费，表格沿用 2026-08-13 GA 费率；V4.1-Flash 价格取自本次查询时的官方 Pricing 页面，当前页面将旧的 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标为退役，并说明请求由 V4.1-Flash 提供服务、按 Flash 价格计费。官方当前[Pricing 页面](https://api-docs.deepseek.com/quick_start/pricing)仍列出 `deepseek-v4-pro`（V4-Pro-0813），并注明 2026-09-14 后继续提供 API 服务、计费方式不变。DeepSeek-R1 与 DeepSeek-V3 的价格取自各自发布公告；其中 DeepSeek-V3 公告只明确给出 2025-02-08 起执行的价格。其余历史型号很多价格已不在当前定价页保留，因此按“官方未公布”或“官方现页未保留”处理。*</small>
 
 ## DeepSeek-V4.1-Flash：把视觉理解并进 Flash 主线
 
@@ -61,7 +61,7 @@ V4.1-Flash 在 2026 年 9 月 10 日发布，API 调用名为 `deepseek-flash`�
 | Off-Peak | $0.003 | $0.15 | $0.60 |
 | Peak | $0.006 | $0.30 | $1.20 |
 
-官方随后把 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标记为退役，旧调用名暂时路由到 V4.1-Flash。这意味着 V4.1-Flash 不只是增加一个视觉入口，而是在收拢 V4 Flash 这条产品线：新的 API 主入口变成 `deepseek-flash`，视觉和文本 Agent 能力被放进同一条主线上。
+官方随后把 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标记为退役，旧调用名暂时路由到 V4.1-Flash。这意味着 V4.1-Flash 不只是增加一个视觉入口，而是在收拢 V4 Flash 这条产品线：新的 API 主入口变成 `deepseek-flash`，视觉和文本 Agent 能力被放进同一条主线上。官方当前 Pricing 页面仍将 `deepseek-v4-pro` 列为 V4-Pro-0813，并注明 2026 年 9 月 14 日后继续提供 API 服务、计费方式不变，因此表中保留其 GA 后价格。
 
 ## DeepSeek-V4-Flash-Vision-Exp：一次实验性的多模态 Agent 插入
 
