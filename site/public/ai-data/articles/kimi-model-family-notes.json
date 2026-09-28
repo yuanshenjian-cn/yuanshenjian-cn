@@ -1,8 +1,8 @@
 {
   "slug": "kimi-model-family-notes",
   "title": "Kimi：月之暗面这条线最特别的地方，是 Agent 味越来越重",
-  "date": "2026-08-17T00:00:00.000Z",
-  "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。首版覆盖 Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
+  "date": "2026-09-28T00:00:00.000Z",
+  "excerpt": "这是一份按代际持续维护的 Kimi 模型档案。现覆盖 Kimi K2.8 Preview、Kimi K3、Kimi K2.7 Code、Kimi K2.6、Kimi K2.5、Kimi K2、Kimi K2 Thinking、Kimi K2-0905、Kimi K2-0711 和 Moonshot V1，集中记录官方价格、上下文、Agent 能力和官方资料可确认的代际变化，后续新模型只追加不删历史。",
   "tags": [
     "AI前沿",
     "LLM",
@@ -29,8 +29,15 @@
       "id": "kimi-最近几代主线总表",
       "anchorId": "kimi-最近几代主线总表",
       "heading": "Kimi 最近几代主线总表",
-      "content": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K3 2026-07-16 ¥20.00 / 1M ¥2.00 / 1M ¥100.00 / 1M 2.8T 参数，首个开源 3T 级模型；Kimi Delta Attention，1M context；前沿级长程编码与知识工作 Kimi K2.7 Code 2026-06-25 ¥6.50 / 1M ¥1.30 / 1M ¥27.00 / 1M Kimi 迄今最智能的 Coding 模型，仅思考模式，支持文本/图片/视频输入，thinking token 减少 30% Kimi K2.6 2026-04-20 ¥6.50 / 1M ¥1.10 / 1M ¥27.00 / 1M 当前主力开源 coding/agent 模型，长程执行能力明显拉升 Kimi K2.5 2026-01-27 ¥4.00 / 1M ¥0.70 / 1M ¥21.00 / 1M 视觉 Agent 与多步工具能力成型，Agent Swarm 100 并行 Kimi K2 Thinking 2025-11-06 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M thinking 专门型号，支持 reasoning_content 与多步工具 Kimi K2-0905 2025-09-05 官方页面未保留 官方页面未保留 官方页面未保留 Agentic Coding 增强，256K context（2026-05-25 已下线） Kimi K2 2025-07 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M Open Agentic Intelligence 的公开起点（2026-05-25 已下线） Kimi K2-0711 2025-07-11 官方页面未保留 官方页面未保留 官方页面未保留 K2 基础模型预览版，128K context（2026-05-25 已下线） Moonshot V1 官方页面未直接标注 ¥2 / ¥5 / ¥10 每 1M 官方未公布 ¥10 / ¥20 / ¥30 每 1M K 系列之前的经典生成线，更像老一代基础盘 数据来源：Kimi 官方平台文档、官方 pricing 页面、官方博客与官方资源页，查询日期 2026-08-17。Kimi K3 的发布日期 2026-07-16 与定价 $0.30/$3.00/$15.00（缓存命中/未命中输入/输出，约合 ¥2/¥20/¥100）来自 K3 发布博客。Kimi K2.7 Code 的官方发布日期 2026-06-25 来自官方资源页（kimi.com/resources/kimi-k2-7-code）标注的“8 min read 2026-06-25”。官方模型列表另列有 kimi-k2.7-code-highspeed，输出速度约 180 tokens/s（短上下文可达 260 tokens/s），定价与 K2.7 Code 一致，属于同一型号的 speed 变体。K2 系列（kimi-k2、kimi-k2-0905-preview、kimi-k2-0711-preview 等）已于 2026-05-25 下线；官方模型列表同时提示 kimi-k2.5 与 moonshot-v1 系列将于 2026-08-31 全平台下线。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。",
-      "excerpt": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K3 2026-07-16 ¥20.00 / 1M ¥2.00 / 1M ¥100.00 / 1M ..."
+      "content": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.8 Preview（Kimi Code） 2026-09-11 官方未公布 官方未公布 官方未公布 Coding / Agent 能力接近 K3、思考效率优于 K2.7 Code，支持最长 1M context；沿用 kimi-for-coding ID Kimi K3 2026-07-16 ¥20.00 / 1M ¥2.00 / 1M ¥100.00 / 1M 2.8T 参数，首个开源 3T 级模型；Kimi Delta Attention，1M context；前沿级长程编码与知识工作 Kimi K2.7 Code 2026-06-25 ¥6.50 / 1M ¥1.30 / 1M ¥27.00 / 1M Kimi 迄今最智能的 Coding 模型，仅思考模式，支持文本/图片/视频输入，thinking token 减少 30% Kimi K2.6 2026-04-20 ¥6.50 / 1M ¥1.10 / 1M ¥27.00 / 1M 当前主力开源 coding/agent 模型，长程执行能力明显拉升 Kimi K2.5 2026-01-27 ¥4.00 / 1M ¥0.70 / 1M ¥21.00 / 1M 视觉 Agent 与多步工具能力成型，Agent Swarm 100 并行（2026-08-31 已下线） Kimi K2 Thinking 2025-11-06 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M thinking 专门型号，支持 reasoning_content 与多步工具 Kimi K2-0905 2025-09-05 官方页面未保留 官方页面未保留 官方页面未保留 Agentic Coding 增强，256K context（2026-05-25 已下线） Kimi K2 2025-07 ¥4.00 / 1M ¥1.00 / 1M ¥16.00 / 1M Open Agentic Intelligence 的公开起点（2026-05-25 已下线） Kimi K2-0711 2025-07-11 官方页面未保留 官方页面未保留 官方页面未保留 K2 基础模型预览版，128K context（2026-05-25 已下线） Moonshot V1 官方页面未直接标注 ¥2 / ¥5 / ¥10 每 1M 官方未公布 ¥10 / ¥20 / ¥30 每 1M K 系列之前的经典生成线，更像老一代基础盘（系列 2026-08-31 已下线） 数据来源：Kimi 官方平台文档、官方 pricing 页面、官方博客与官方资源页。既有模型数据查询日期为 2026-08-17，本次查询日期为 2026-09-28。Kimi K2.8 Preview 于 2026-09-11 在 Kimi Code 全量推出，沿用 kimi-for-coding ID，最长 1M context；官方未公布该预览型号单独的输入、缓存与输出 token 价格。Kimi K3 的发布日期 2026-07-16 与定价 $0.30/$3.00/$15.00（缓存命中/未命中输入/输出，约合 ¥2/¥20/¥100）来自 K3 发布博客。Kimi K2.7 Code 的官方发布日期 2026-06-25 来自官方资源页（kimi.com/resources/kimi-k2-7-code）标注的“8 min read 2026-06-25”。官方模型列表另列有 kimi-k2.7-code-highspeed，输出速度约 180 tokens/s（短上下文可达 260 tokens/s），定价与 K2.7 Code 一致，属于同一型号的 speed 变体。K2 系列（kimi-k2、kimi-k2-0905-preview、kimi-k2-0711-preview 等）已于 2026-05-25 下线；官方当前模型文档确认 kimi-k2.5 与 moonshot-v1 系列均已于 2026-08-31 下线，本文保留其历史记录与价格。若官方博客页未直接给发布日期，则明确写“官方页面未直接标注”。",
+      "excerpt": "模型 官方发布日期 输入价格 缓存命中 输出价格 这一代最该记住的事 ------ ------------- --------- --------- --------- ------------------ Kimi K2.8 Preview（Kimi Code） 2026-09-11 官方未公布 官方未公布 官方未..."
+    },
+    {
+      "id": "kimi-k28-previewkimi-code-把编码模型推进到接近-k3",
+      "anchorId": "kimi-k28-previewkimi-code-把编码模型推进到接近-k3",
+      "heading": "Kimi K2.8 Preview：Kimi Code 把编码模型推进到接近 K3",
+      "content": "Kimi Code 于 2026 年 9 月 11 日全量推出 K2.8 Preview。官方称它的 Coding 与 Agent 能力接近 K3，思考效率明显优于 K2.7 Code；可调 low、high、max thinking effort，最长支持 1M context。官方 What's New记录了这次发布。 它沿用 kimi-for-coding 模型 ID，因此是 Kimi Code 内的预览型号更新，而不是新增独立 API 名称。官方模型配置页确认了该型号及上下文规格，但没有单列每百万 token 的输入、缓存或输出价格；调用入口为 Kimi Code API，费用按对应会员配额计算。官方模型配置",
+      "excerpt": "Kimi Code 于 2026 年 9 月 11 日全量推出 K2.8 Preview。官方称它的 Coding 与 Agent 能力接近 K3，思考效率明显优于 K2.7 Code；可调 low、high、max thinking effort，最长支持 1M context。官方 What's New记录了这次发..."
     },
     {
       "id": "kimi-k3首个开源的-3t-级模型kimi-迄今最强大的旗舰",
