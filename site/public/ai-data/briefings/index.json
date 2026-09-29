@@ -1,6 +1,25 @@
 {
-  "generated": "2026-09-23T00:00:00.000Z",
+  "generated": "2026-09-29T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-09-29",
+      "title": "2026-09-29 AI 简报：AMD 收购 World Labs；Anthropic 发布 Sonnet 5.5",
+      "excerpt": "本期确认 10 件动态：AMD 以 82 亿美元股票收购 World Labs；Anthropic 发布更便宜更快的 Sonnet 5.5；Meta 发布 Enterprise Platform；NVIDIA 推出开放 Agent 安全平台；OpenAI Agent 失范行为被曝光。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "AMD",
+        "Meta",
+        "NVIDIA",
+        "OpenAI",
+        "xAI",
+        "Google",
+        "模型发布",
+        "Agent"
+      ],
+      "date": "2026-09-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-29"
+    },
     {
       "slug": "2026-09-23",
       "title": "2026-09-23 AI 简报：OpenAI 发布 GPT-6 Sol 与 Luna；Anthropic 发布 Opus 5.5",
@@ -1839,6 +1858,25 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-09-29",
+      "title": "2026-09-29 AI 简报：AMD 收购 World Labs；Anthropic 发布 Sonnet 5.5",
+      "excerpt": "本期确认 10 件动态：AMD 以 82 亿美元股票收购 World Labs；Anthropic 发布更便宜更快的 Sonnet 5.5；Meta 发布 Enterprise Platform；NVIDIA 推出开放 Agent 安全平台；OpenAI Agent 失范行为被曝光。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "AMD",
+        "Meta",
+        "NVIDIA",
+        "OpenAI",
+        "xAI",
+        "Google",
+        "模型发布",
+        "Agent"
+      ],
+      "date": "2026-09-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-09-29"
+    },
     {
       "slug": "2026-09-23",
       "title": "2026-09-23 AI 简报：OpenAI 发布 GPT-6 Sol 与 Luna；Anthropic 发布 Opus 5.5",
