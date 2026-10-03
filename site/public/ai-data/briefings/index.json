@@ -1,6 +1,23 @@
 {
-  "generated": "2026-09-30T00:00:00.000Z",
+  "generated": "2026-10-03T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-03",
+      "title": "2026-10-03 AI 简报：Google 发布 Gemini 4 Argon；Meta 开源 Muse 硬件 SDK",
+      "excerpt": "本期确认 7 件动态：Google 发布前沿模型 Gemini 4 Argon；Gemini Live 上线 Guided Vision；Google AI Overviews 反垄断诉讼被驳回；Meta 开源 Muse Gadget SDK；Apple 将收紧 macOS 磁盘访问控制；OpenAI 与三名安全研究员结束关系；Google Research 发布 Diffusion Controller。",
+      "tags": [
+        "AI",
+        "Google",
+        "Gemini",
+        "Meta",
+        "Apple",
+        "OpenAI",
+        "Agent",
+        "模型发布"
+      ],
+      "date": "2026-10-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-03"
+    },
     {
       "slug": "2026-09-30",
       "title": "2026-09-30 AI 简报：OpenAI DevDay 发布 GPT-6.1 Sol 与 Agents API 更新；Meta 推出 Muse for Small Business",
@@ -1873,6 +1890,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-03",
+      "title": "2026-10-03 AI 简报：Google 发布 Gemini 4 Argon；Meta 开源 Muse 硬件 SDK",
+      "excerpt": "本期确认 7 件动态：Google 发布前沿模型 Gemini 4 Argon；Gemini Live 上线 Guided Vision；Google AI Overviews 反垄断诉讼被驳回；Meta 开源 Muse Gadget SDK；Apple 将收紧 macOS 磁盘访问控制；OpenAI 与三名安全研究员结束关系；Google Research 发布 Diffusion Controller。",
+      "tags": [
+        "AI",
+        "Google",
+        "Gemini",
+        "Meta",
+        "Apple",
+        "OpenAI",
+        "Agent",
+        "模型发布"
+      ],
+      "date": "2026-10-03T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-03"
+    },
     {
       "slug": "2026-09-30",
       "title": "2026-09-30 AI 简报：OpenAI DevDay 发布 GPT-6.1 Sol 与 Agents API 更新；Meta 推出 Muse for Small Business",
