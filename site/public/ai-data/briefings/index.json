@@ -1,6 +1,19 @@
 {
-  "generated": "2026-10-03T00:00:00.000Z",
+  "generated": "2026-10-04T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-04",
+      "title": "2026-10-04 AI 简报：Anthropic 一亿美元培养万名部署工程师",
+      "excerpt": "本期确认 1 件动态：Anthropic 启动 Claude Frontier Academy，拟投入 1 亿美元，2027 年底前培训约一万名前沿部署工程师。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Agent",
+        "人才"
+      ],
+      "date": "2026-10-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-04"
+    },
     {
       "slug": "2026-10-03",
       "title": "2026-10-03 AI 简报：Google 发布 Gemini 4 Argon；Meta 开源 Muse 硬件 SDK",
@@ -1890,6 +1903,19 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-04",
+      "title": "2026-10-04 AI 简报：Anthropic 一亿美元培养万名部署工程师",
+      "excerpt": "本期确认 1 件动态：Anthropic 启动 Claude Frontier Academy，拟投入 1 亿美元，2027 年底前培训约一万名前沿部署工程师。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "Agent",
+        "人才"
+      ],
+      "date": "2026-10-04T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-04"
+    },
     {
       "slug": "2026-10-03",
       "title": "2026-10-03 AI 简报：Google 发布 Gemini 4 Argon；Meta 开源 Muse 硬件 SDK",
