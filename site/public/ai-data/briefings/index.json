@@ -1,6 +1,22 @@
 {
-  "generated": "2026-10-04T00:00:00.000Z",
+  "generated": "2026-10-06T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-06",
+      "title": "2026-10-06 AI 简报：OpenAI 为欧盟文本加水印并测试视觉广告；特朗普宣布 Super Intelligence Force",
+      "excerpt": "本期确认 5 件动态：OpenAI 为欧盟文本输出添加隐形水印，并测试图片生成结果旁的视觉广告；特朗普宣布 Super Intelligence Force。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "政策",
+        "广告",
+        "Agent",
+        "Google",
+        "Wikimedia"
+      ],
+      "date": "2026-10-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-06"
+    },
     {
       "slug": "2026-10-04",
       "title": "2026-10-04 AI 简报：Anthropic 一亿美元培养万名部署工程师",
@@ -1903,6 +1919,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-06",
+      "title": "2026-10-06 AI 简报：OpenAI 为欧盟文本加水印并测试视觉广告；特朗普宣布 Super Intelligence Force",
+      "excerpt": "本期确认 5 件动态：OpenAI 为欧盟文本输出添加隐形水印，并测试图片生成结果旁的视觉广告；特朗普宣布 Super Intelligence Force。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "政策",
+        "广告",
+        "Agent",
+        "Google",
+        "Wikimedia"
+      ],
+      "date": "2026-10-06T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-06"
+    },
     {
       "slug": "2026-10-04",
       "title": "2026-10-04 AI 简报：Anthropic 一亿美元培养万名部署工程师",
