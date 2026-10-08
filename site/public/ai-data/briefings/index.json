@@ -1,6 +1,22 @@
 {
-  "generated": "2026-10-06T00:00:00.000Z",
+  "generated": "2026-10-08T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-08",
+      "title": "2026-10-08 AI 简报：GPT-6 携 Intelligent UI 进入 ChatGPT 全线；Mistral 发布 Large 4",
+      "excerpt": "本期确认 10 件动态：OpenAI 将 GPT-6 系列推入 ChatGPT 全线并上线 Intelligent UI；Mistral 发布 Large 4 并承诺月底开源权重。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Mistral",
+        "Anthropic",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-10-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-08"
+    },
     {
       "slug": "2026-10-06",
       "title": "2026-10-06 AI 简报：OpenAI 为欧盟文本加水印并测试视觉广告；特朗普宣布 Super Intelligence Force",
@@ -1919,6 +1935,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-08",
+      "title": "2026-10-08 AI 简报：GPT-6 携 Intelligent UI 进入 ChatGPT 全线；Mistral 发布 Large 4",
+      "excerpt": "本期确认 10 件动态：OpenAI 将 GPT-6 系列推入 ChatGPT 全线并上线 Intelligent UI；Mistral 发布 Large 4 并承诺月底开源权重。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Mistral",
+        "Anthropic",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-10-08T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-08"
+    },
     {
       "slug": "2026-10-06",
       "title": "2026-10-06 AI 简报：OpenAI 为欧盟文本加水印并测试视觉广告；特朗普宣布 Super Intelligence Force",
