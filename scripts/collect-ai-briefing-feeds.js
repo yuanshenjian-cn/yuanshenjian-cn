@@ -212,6 +212,35 @@ function parseFeedXmlWithMetadata(xml, source, options = {}) {
     });
   }
 
+  const candidateEventTime = (candidate) =>
+    candidate.eventAt
+      ? new Date(candidate.eventAt).getTime()
+      : new Date(`${candidate.sourceDate}T00:00:00Z`).getTime();
+
+  const keptByCandidateId = new Map();
+  const dedupedCandidates = [];
+  for (const candidate of candidates) {
+    const kept = keptByCandidateId.get(candidate.candidateId);
+    if (!kept) {
+      keptByCandidateId.set(candidate.candidateId, candidate);
+      dedupedCandidates.push(candidate);
+      continue;
+    }
+    const dropped = candidateEventTime(kept) >= candidateEventTime(candidate) ? candidate : kept;
+    const retained = dropped === candidate ? kept : candidate;
+    if (retained !== kept) {
+      dedupedCandidates[dedupedCandidates.indexOf(kept)] = retained;
+      keptByCandidateId.set(candidate.candidateId, retained);
+    }
+    rejectedItems.push({
+      sourceId: source.id,
+      itemIdentity: dropped.guid || dropped.candidateId,
+      reasonCode: "duplicate-candidate-id",
+      reason: "同一源内出现相同 candidateId 的重复条目，保留发布时间最新的一条",
+    });
+  }
+  candidates = dedupedCandidates;
+
   return { items: candidates, rejectedItems, rawItemCount, itemLimitReached };
 }
 
