@@ -1,6 +1,22 @@
 {
-  "generated": "2026-10-08T00:00:00.000Z",
+  "generated": "2026-10-09T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-09",
+      "title": "2026-10-09 AI 简报：Google 发布企业通用 Gemini Agent；Anthropic 收紧使用政策",
+      "excerpt": "本期确认 6 件动态：Google 发布可跨业务系统执行任务的企业通用 Gemini Agent；Anthropic 更新使用政策；OpenAI 瓦解两起“假旗”影响力行动。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "Agent",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-10-09T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-09"
+    },
     {
       "slug": "2026-10-08",
       "title": "2026-10-08 AI 简报：GPT-6 携 Intelligent UI 进入 ChatGPT 全线；Mistral 发布 Large 4",
@@ -1935,6 +1951,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-09",
+      "title": "2026-10-09 AI 简报：Google 发布企业通用 Gemini Agent；Anthropic 收紧使用政策",
+      "excerpt": "本期确认 6 件动态：Google 发布可跨业务系统执行任务的企业通用 Gemini Agent；Anthropic 更新使用政策；OpenAI 瓦解两起“假旗”影响力行动。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "Agent",
+        "安全",
+        "产品"
+      ],
+      "date": "2026-10-09T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-09"
+    },
     {
       "slug": "2026-10-08",
       "title": "2026-10-08 AI 简报：GPT-6 携 Intelligent UI 进入 ChatGPT 全线；Mistral 发布 Large 4",
