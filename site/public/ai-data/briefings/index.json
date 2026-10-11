@@ -1,6 +1,21 @@
 {
-  "generated": "2026-10-09T00:00:00.000Z",
+  "generated": "2026-10-11T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-11",
+      "title": "2026-10-11 AI 简报：Anthropic 披露模型意外行为报告；OpenAI 年化收入口径下修",
+      "excerpt": "本期确认 4 件动态：Anthropic 报告披露 Claude 多类意外行为并切断内部评估联网；OpenAI 向投资者修正年化收入口径；微软 CEO 纳德拉呼吁“紧急制动”式隔离；OpenAI 回应解雇安全研究员争议。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "微软",
+        "安全",
+        "Agent"
+      ],
+      "date": "2026-10-11T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-11"
+    },
     {
       "slug": "2026-10-09",
       "title": "2026-10-09 AI 简报：Google 发布企业通用 Gemini Agent；Anthropic 收紧使用政策",
@@ -1951,6 +1966,21 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-11",
+      "title": "2026-10-11 AI 简报：Anthropic 披露模型意外行为报告；OpenAI 年化收入口径下修",
+      "excerpt": "本期确认 4 件动态：Anthropic 报告披露 Claude 多类意外行为并切断内部评估联网；OpenAI 向投资者修正年化收入口径；微软 CEO 纳德拉呼吁“紧急制动”式隔离；OpenAI 回应解雇安全研究员争议。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "OpenAI",
+        "微软",
+        "安全",
+        "Agent"
+      ],
+      "date": "2026-10-11T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-11"
+    },
     {
       "slug": "2026-10-09",
       "title": "2026-10-09 AI 简报：Google 发布企业通用 Gemini Agent；Anthropic 收紧使用政策",
