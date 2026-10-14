@@ -1,6 +1,22 @@
 {
-  "generated": "2026-10-11T00:00:00.000Z",
+  "generated": "2026-10-14T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-14",
+      "title": "2026-10-14 AI 简报：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder",
+      "excerpt": "本期确认 7 件动态：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder；xAI 推出整合式订阅；Anthropic 公布蒸馏防御与自我复制两项研究；Meta 上线 Your Algorithm 定制功能；Character.AI 申请破产保护。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "xAI",
+        "Anthropic",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-10-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-14"
+    },
     {
       "slug": "2026-10-11",
       "title": "2026-10-11 AI 简报：Anthropic 披露模型意外行为报告；OpenAI 年化收入口径下修",
@@ -1966,6 +1982,22 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-14",
+      "title": "2026-10-14 AI 简报：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder",
+      "excerpt": "本期确认 7 件动态：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder；xAI 推出整合式订阅；Anthropic 公布蒸馏防御与自我复制两项研究；Meta 上线 Your Algorithm 定制功能；Character.AI 申请破产保护。",
+      "tags": [
+        "AI",
+        "Google",
+        "Meta",
+        "xAI",
+        "Anthropic",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-10-14T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-14"
+    },
     {
       "slug": "2026-10-11",
       "title": "2026-10-11 AI 简报：Anthropic 披露模型意外行为报告；OpenAI 年化收入口径下修",
