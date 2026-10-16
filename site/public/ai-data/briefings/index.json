@@ -1,6 +1,23 @@
 {
-  "generated": "2026-10-14T00:00:00.000Z",
+  "generated": "2026-10-16T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-16",
+      "title": "2026-10-16 AI 简报：Meta 发布开放权重模型 Muse Spark Open；xAI 发布 Grok Voice 3.0",
+      "excerpt": "本期确认 6 件动态：Meta 发布开放权重多模态模型 Muse Spark Open，可在 Mac 本地运行；xAI 发布 Grok Voice 3.0；Google DeepMind 与新加坡共建端侧诈骗检测模型；OpenAI 推出 Rosalind 学术计划；Anthropic 公布独立评估方访问方案，并为美国中期选举补充保障。",
+      "tags": [
+        "AI",
+        "Meta",
+        "xAI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-10-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-16"
+    },
     {
       "slug": "2026-10-14",
       "title": "2026-10-14 AI 简报：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder",
@@ -1982,6 +1999,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-16",
+      "title": "2026-10-16 AI 简报：Meta 发布开放权重模型 Muse Spark Open；xAI 发布 Grok Voice 3.0",
+      "excerpt": "本期确认 6 件动态：Meta 发布开放权重多模态模型 Muse Spark Open，可在 Mac 本地运行；xAI 发布 Grok Voice 3.0；Google DeepMind 与新加坡共建端侧诈骗检测模型；OpenAI 推出 Rosalind 学术计划；Anthropic 公布独立评估方访问方案，并为美国中期选举补充保障。",
+      "tags": [
+        "AI",
+        "Meta",
+        "xAI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "模型",
+        "安全"
+      ],
+      "date": "2026-10-16T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-16"
+    },
     {
       "slug": "2026-10-14",
       "title": "2026-10-14 AI 简报：Google 发布 Gemini 4 Argon；Meta 发布首个前沿模型 Muse Wonder",
