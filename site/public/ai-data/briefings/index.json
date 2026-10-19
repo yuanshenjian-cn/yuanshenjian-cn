@@ -1,6 +1,23 @@
 {
-  "generated": "2026-10-16T00:00:00.000Z",
+  "generated": "2026-10-19T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-19",
+      "title": "2026-10-19 AI 简报：Anthropic 设立公益基金；DeepSeek 更新开源 Flash 模型",
+      "excerpt": "本期确认 3 件动态：Anthropic 将 5% 股份投入公益基金；DeepSeek 发布 V4.1-Flash-1017 并开放搜索与抓取 API；OpenAI 向所有 API 客户开放文字描述定制语音。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "DeepSeek",
+        "OpenAI",
+        "模型",
+        "开源",
+        "API",
+        "治理"
+      ],
+      "date": "2026-10-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-19"
+    },
     {
       "slug": "2026-10-16",
       "title": "2026-10-16 AI 简报：Meta 发布开放权重模型 Muse Spark Open；xAI 发布 Grok Voice 3.0",
@@ -1999,6 +2016,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-19",
+      "title": "2026-10-19 AI 简报：Anthropic 设立公益基金；DeepSeek 更新开源 Flash 模型",
+      "excerpt": "本期确认 3 件动态：Anthropic 将 5% 股份投入公益基金；DeepSeek 发布 V4.1-Flash-1017 并开放搜索与抓取 API；OpenAI 向所有 API 客户开放文字描述定制语音。",
+      "tags": [
+        "AI",
+        "Anthropic",
+        "DeepSeek",
+        "OpenAI",
+        "模型",
+        "开源",
+        "API",
+        "治理"
+      ],
+      "date": "2026-10-19T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-19"
+    },
     {
       "slug": "2026-10-16",
       "title": "2026-10-16 AI 简报：Meta 发布开放权重模型 Muse Spark Open；xAI 发布 Grok Voice 3.0",
