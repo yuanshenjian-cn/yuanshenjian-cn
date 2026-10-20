@@ -1,6 +1,23 @@
 {
-  "generated": "2026-10-19T00:00:00.000Z",
+  "generated": "2026-10-20T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-20",
+      "title": "2026-10-20 AI 简报：Amazon 发布 TorchNeuron；据报道 Anthropic 再签巨额算力协议",
+      "excerpt": "本期确认 5 件动态：OpenAI 改进低资源编程语言编码；Perplexity 上线 Ultrafast Computer 档与 Decisions API；Amazon 发布 TorchNeuron；据报道 Tenstorrent 以 62 亿美元估值继续融资；据报道 Anthropic 与 Nscale 接近再签 450 亿美元算力协议。",
+      "tags": [
+        "AI",
+        "Amazon",
+        "Anthropic",
+        "OpenAI",
+        "Perplexity",
+        "芯片",
+        "算力",
+        "API"
+      ],
+      "date": "2026-10-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-20"
+    },
     {
       "slug": "2026-10-19",
       "title": "2026-10-19 AI 简报：Anthropic 设立公益基金；DeepSeek 更新开源 Flash 模型",
@@ -2016,6 +2033,23 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-20",
+      "title": "2026-10-20 AI 简报：Amazon 发布 TorchNeuron；据报道 Anthropic 再签巨额算力协议",
+      "excerpt": "本期确认 5 件动态：OpenAI 改进低资源编程语言编码；Perplexity 上线 Ultrafast Computer 档与 Decisions API；Amazon 发布 TorchNeuron；据报道 Tenstorrent 以 62 亿美元估值继续融资；据报道 Anthropic 与 Nscale 接近再签 450 亿美元算力协议。",
+      "tags": [
+        "AI",
+        "Amazon",
+        "Anthropic",
+        "OpenAI",
+        "Perplexity",
+        "芯片",
+        "算力",
+        "API"
+      ],
+      "date": "2026-10-20T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-20"
+    },
     {
       "slug": "2026-10-19",
       "title": "2026-10-19 AI 简报：Anthropic 设立公益基金；DeepSeek 更新开源 Flash 模型",
