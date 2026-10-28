@@ -1,6 +1,25 @@
 {
-  "generated": "2026-10-20T00:00:00.000Z",
+  "generated": "2026-10-28T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-28",
+      "title": "2026-10-28 AI 简报：OpenAI 发布 GPT-6.1 Terra；DeepMind 推出 Genie 4",
+      "excerpt": "本期确认 6 件动态：OpenAI 发布 GPT-6.1 Terra；Google DeepMind 推出 Genie 4 世界模型；Anthropic 递交 S-1 启动上市流程；月之暗面发布 Kimi K3.1 Pro；OpenAI 模型进入 Google Cloud Model Garden；Mistral 发布 Voxtral 3 语音家族。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Anthropic",
+        "月之暗面",
+        "Mistral",
+        "模型",
+        "IPO",
+        "开源",
+        "API"
+      ],
+      "date": "2026-10-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-28"
+    },
     {
       "slug": "2026-10-20",
       "title": "2026-10-20 AI 简报：Amazon 发布 TorchNeuron；据报道 Anthropic 再签巨额算力协议",
@@ -2033,6 +2052,25 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-28",
+      "title": "2026-10-28 AI 简报：OpenAI 发布 GPT-6.1 Terra；DeepMind 推出 Genie 4",
+      "excerpt": "本期确认 6 件动态：OpenAI 发布 GPT-6.1 Terra；Google DeepMind 推出 Genie 4 世界模型；Anthropic 递交 S-1 启动上市流程；月之暗面发布 Kimi K3.1 Pro；OpenAI 模型进入 Google Cloud Model Garden；Mistral 发布 Voxtral 3 语音家族。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Google",
+        "Anthropic",
+        "月之暗面",
+        "Mistral",
+        "模型",
+        "IPO",
+        "开源",
+        "API"
+      ],
+      "date": "2026-10-28T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-28"
+    },
     {
       "slug": "2026-10-20",
       "title": "2026-10-20 AI 简报：Amazon 发布 TorchNeuron；据报道 Anthropic 再签巨额算力协议",
