@@ -1,6 +1,24 @@
 {
-  "generated": "2026-10-28T00:00:00.000Z",
+  "generated": "2026-10-29T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-10-29",
+      "title": "2026-10-29 AI 简报：Google 发布 Gemini 4 Carbon；Connected Apps 平台开放预览",
+      "excerpt": "本期确认 5 件动态：Google 发布网络安全前沿模型 Gemini 4 Carbon；Google 开放 Connected Apps 平台预览；OpenAI 与 ServiceNow 扩大企业工作流合作；Anthropic 将 AI for Science 扩展到 20 家机构；Meta 的 Muse 在新加坡上线。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "模型",
+        "安全",
+        "Agent",
+        "企业服务"
+      ],
+      "date": "2026-10-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-29"
+    },
     {
       "slug": "2026-10-28",
       "title": "2026-10-28 AI 简报：OpenAI 发布 GPT-6.1 Terra；DeepMind 推出 Genie 4",
@@ -2052,6 +2070,24 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-10-29",
+      "title": "2026-10-29 AI 简报：Google 发布 Gemini 4 Carbon；Connected Apps 平台开放预览",
+      "excerpt": "本期确认 5 件动态：Google 发布网络安全前沿模型 Gemini 4 Carbon；Google 开放 Connected Apps 平台预览；OpenAI 与 ServiceNow 扩大企业工作流合作；Anthropic 将 AI for Science 扩展到 20 家机构；Meta 的 Muse 在新加坡上线。",
+      "tags": [
+        "AI",
+        "Google",
+        "OpenAI",
+        "Anthropic",
+        "Meta",
+        "模型",
+        "安全",
+        "Agent",
+        "企业服务"
+      ],
+      "date": "2026-10-29T00:00:00.000Z",
+      "url": "/ai/briefings/2026-10-29"
+    },
     {
       "slug": "2026-10-28",
       "title": "2026-10-28 AI 简报：OpenAI 发布 GPT-6.1 Terra；DeepMind 推出 Genie 4",
