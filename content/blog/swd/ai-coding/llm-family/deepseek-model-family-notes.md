@@ -1,6 +1,6 @@
 ---
 title: "DeepSeek：从 V3 到 V4.1，这家最锋利的地方不只是便宜"
-date: '2026-09-28'
+date: '2026-10-28'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 开源权重
 published: true
 brief: >-
-  这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，本次追加 DeepSeek-V4.1-Flash 与 DeepSeek-V4-Flash-Vision-Exp，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。
+  这是一份按代际持续维护的 DeepSeek 模型档案。首版覆盖 DeepSeek-V4、DeepSeek-V3.2、DeepSeek-V3.2-Exp、DeepSeek-V3.1、DeepSeek-R1-0528、DeepSeek-R1、DeepSeek-V3 等最近主线，后续追加 DeepSeek-V4.1-Flash 与 DeepSeek-V4-Flash-Vision-Exp，本次补记 2026-10-17 的 DeepSeek-V4.1-Flash-1017 同代更新，重点记录官方发布时间、现有官方价格、Agent 与编码能力，以及后续只追加不删历史的维护规则。
 ---
 
 > DeepSeek 这条线最容易被人记成“便宜”。但如果你只记住便宜，就会错过它真正锋利的地方：它是在用更低的价格，把前沿级别的 Agent 编码和推理工作负载硬生生压进更广的使用门槛里。
@@ -32,7 +32,7 @@ DeepSeek 这几年更新很快，而且型号分支也不少。
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
-| DeepSeek-V4.1-Flash（API: `deepseek-flash`） | 2026-09-10 | Off-peak $0.15 / peak $0.30 | Off-peak $0.003 / peak $0.006 | Off-peak $0.60 / peak $1.20 | 新架构与原生视觉理解并进，旧 V4 Flash 系列调用名转为兼容路由 |
+| DeepSeek-V4.1-Flash（API: `deepseek-flash`，现由 V4.1-Flash-1017 提供服务） | 2026-09-10 | Off-peak $0.15 / peak $0.30 | Off-peak $0.003 / peak $0.006 | Off-peak $0.60 / peak $1.20 | 新架构与原生视觉理解并进，旧 V4 Flash 系列调用名转为兼容路由；2026-10-17 迭代至 V4.1-Flash-1017，官方称性能与成本 Pareto 改进、价格未变 |
 | DeepSeek-V4-Flash-Vision-Exp | 2026-08-21 | Off-peak $0.22 / peak $0.44（沿用 V4-Flash GA） | Off-peak $0.007 / peak $0.014（沿用 V4-Flash GA） | Off-peak $0.66 / peak $1.32（沿用 V4-Flash GA） | 实验性多模态 Agent 模型，现已退役并转由 V4.1-Flash 路由 |
 | DeepSeek-V4-Flash / V4-Pro | Preview 2026-04-24；GA 2026-08-13 | Flash off-peak $0.22 / peak $0.44，Pro off-peak $0.66 / peak $1.32 | Flash off-peak $0.007 / peak $0.014，Pro off-peak $0.022 / peak $0.044 | Flash off-peak $0.66 / peak $1.32，Pro off-peak $1.98 / peak $3.96 | V4-Pro 正式 GA，引入 peak/off-peak 定价，输出价格大幅上调 |
 | DeepSeek-V3.2 / V3.2-Speciale | 2025-12-01 | 官方现页未保留 | 官方现页未保留 | 官方现页未保留 | 把 thinking 直接并进 tool-use，明确往 agents 走 |
@@ -42,7 +42,7 @@ DeepSeek 这几年更新很快，而且型号分支也不少。
 | DeepSeek-R1 | 2025-01-20 | $0.55 / 1M | $0.14 / 1M | $2.19 / 1M | 推理线正式成型，是后来 R1-0528 的基线 |
 | DeepSeek-V3 | 2024-12-26 | $0.27 / 1M（2 月 8 日后） | $0.07 / 1M（2 月 8 日后） | $1.10 / 1M（2 月 8 日后） | 后续 V3.x 演进的起点 |
 
-<small>*数据来源：DeepSeek 官方 API News 与 Pricing 页面，首次查询日期 2026-08-17，本次查询日期 2026-09-28。DeepSeek-V4 系列于 2026-08-13 正式 GA，模型版本更新为 DeepSeek-V4-Pro-0813 与 DeepSeek-V4-Flash-0731，API 调用名保持 `deepseek-v4-pro` 与 `deepseek-v4-flash` 不变。新版 pricing 引入 peak / off-peak 结构，2026-08-16 16:00 UTC 生效：peak hours 为 01:00–04:00 与 06:00–10:00 UTC，其余为 off-peak；off-peak 价格约为 peak 的 50%。表格中 V4 价格已按 GA 后官方 pricing 图更新，旧 preview 阶段价格（Flash 未命中 $0.14、输出 $0.28；Pro 未命中 $0.435、输出 $0.87）保留在本页文字记录中。V4-Flash-Vision-Exp 发布公告说明图像按 V4-Flash 价格计费，表格沿用 2026-08-13 GA 费率；V4.1-Flash 价格取自本次查询时的官方 Pricing 页面，当前页面将旧的 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标为退役，并说明请求由 V4.1-Flash 提供服务、按 Flash 价格计费。官方当前[Pricing 页面](https://api-docs.deepseek.com/quick_start/pricing)仍列出 `deepseek-v4-pro`（V4-Pro-0813），并注明 2026-09-14 后继续提供 API 服务、计费方式不变。DeepSeek-R1 与 DeepSeek-V3 的价格取自各自发布公告；其中 DeepSeek-V3 公告只明确给出 2025-02-08 起执行的价格。其余历史型号很多价格已不在当前定价页保留，因此按“官方未公布”或“官方现页未保留”处理。*</small>
+<small>*数据来源：DeepSeek 官方 API News 与 Pricing 页面，首次查询日期 2026-08-17，本次查询日期 2026-10-28。DeepSeek-V4 系列于 2026-08-13 正式 GA，模型版本更新为 DeepSeek-V4-Pro-0813 与 DeepSeek-V4-Flash-0731，API 调用名保持 `deepseek-v4-pro` 与 `deepseek-v4-flash` 不变。新版 pricing 引入 peak / off-peak 结构，2026-08-16 16:00 UTC 生效：peak hours 为 01:00–04:00 与 06:00–10:00 UTC，其余为 off-peak；off-peak 价格约为 peak 的 50%。表格中 V4 价格已按 GA 后官方 pricing 图更新，旧 preview 阶段价格（Flash 未命中 $0.14、输出 $0.28；Pro 未命中 $0.435、输出 $0.87）保留在本页文字记录中。V4-Flash-Vision-Exp 发布公告说明图像按 V4-Flash 价格计费，表格沿用 2026-08-13 GA 费率；V4.1-Flash 价格取自本次查询时的官方 Pricing 页面，当前页面将旧的 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标为退役，并说明请求由 V4.1-Flash 提供服务、按 Flash 价格计费；2026-10-17 起 `deepseek-flash` 的模型版本更新为 DeepSeek-V4.1-Flash-1017，官方 Pricing 页价格未变。官方当前[Pricing 页面](https://api-docs.deepseek.com/quick_start/pricing)仍列出 `deepseek-v4-pro`（V4-Pro-0813），并注明 2026-09-14 后继续提供 API 服务、计费方式不变。DeepSeek-R1 与 DeepSeek-V3 的价格取自各自发布公告；其中 DeepSeek-V3 公告只明确给出 2025-02-08 起执行的价格。其余历史型号很多价格已不在当前定价页保留，因此按“官方未公布”或“官方现页未保留”处理。*</small>
 
 ## DeepSeek-V4.1-Flash：把视觉理解并进 Flash 主线
 
@@ -62,6 +62,22 @@ V4.1-Flash 在 2026 年 9 月 10 日发布，API 调用名为 `deepseek-flash`�
 | Peak | $0.006 | $0.30 | $1.20 |
 
 官方随后把 `deepseek-v4-flash` 与 `deepseek-v4-flash-vision-exp` 标记为退役，旧调用名暂时路由到 V4.1-Flash。这意味着 V4.1-Flash 不只是增加一个视觉入口，而是在收拢 V4 Flash 这条产品线：新的 API 主入口变成 `deepseek-flash`，视觉和文本 Agent 能力被放进同一条主线上。官方当前 Pricing 页面仍将 `deepseek-v4-pro` 列为 V4-Pro-0813，并注明 2026 年 9 月 14 日后继续提供 API 服务、计费方式不变，因此表中保留其 GA 后价格。
+
+**2026-10-17 更新：DeepSeek-V4.1-Flash-1017 同代迭代，官方称性能与成本 Pareto 改进**
+
+2026 年 10 月 17 日，`deepseek-flash` 背后的模型版本更新为 `DeepSeek-V4.1-Flash-1017`。官方给出的描述很克制：基准表现更强、任务完成更快、输出更短，是性能与成本上的 Pareto 改进；网页、App 和 API 同步上线。
+
+这不是新代际，而是同一代 Flash 主线上的版本迭代，因此总表不新增行，价格也保持不变。当前官方 Pricing 页面显示的模型版本已经是 `DeepSeek-V4.1-Flash-1017`，费率仍是 off-peak 输入 $0.15、缓存命中 $0.003、输出 $0.60，peak 翻倍。
+
+这次更新有两个值得单独记的点。
+
+一是工程链路适配：官方点名针对 DeepSeek Harness、腾讯 CodeBuddy、WorkBuddy 做了优化，并建议把 DeepSeek Harness 升级到 v0.2.1-rc.1 或更高版本。模型迭代开始和自家 Agent 工具链的版本节奏绑在一起，这比单看 benchmark 更能说明它的产品化程度。
+
+二是端到端项目开发：官方称用带自反馈的强化学习加强了从零搭建完整项目的能力，示例覆盖 3D 建模、网页赛车游戏、用 Godot 复刻 Portal 2，以及一条从史前到现代的 3D 场景时间线。这类演示不等于独立评测，但方向很清楚——它想把“写几个函数”推进到“交付一个能跑的项目”。
+
+模型已开源，权重发布在 Hugging Face 与 ModelScope。
+
+同一天官方还宣布 Search & Fetch API 面向所有用户开放：Search 与 Fetch 两个端点分别按 $0.75 / 1,000 calls 计费，底层是 DeepSeek 自建搜索引擎。通过 DeepSeek Harness、Claude Code、Codex 的服务端工具发起的调用目前免费，2026 年 10 月 31 日 16:00 UTC 起开始计费。对做 Agent 和 RAG 的团队来说，这条比模型分数更直接：搜索与抓取不再是外挂，而是进入同一套 API 计费体系。
 
 ## DeepSeek-V4-Flash-Vision-Exp：一次实验性的多模态 Agent 插入
 
@@ -189,6 +205,8 @@ V3 则是 2024 年 12 月 26 日通用线的重要起点。
 
 DeepSeek 这条线最大的变量，不只是模型能力，而是成本结构。
 
+2026 年 10 月 17 日的 V4.1-Flash-1017 是个很典型的例子：官方没有涨价，而是用同代迭代把性能、速度和输出长度一起往更划算的方向推。这种“不换代际、只压单位任务成本”的节奏，可能比一次大版本发布更能说明它想守住什么位置。
+
 这会带来一个非常现实的后果：很多以前只能在大厂内部或者高预算团队里跑的工作流，开始有机会被更便宜地复刻出来。
 
 所以我看 DeepSeek，不会只问“它是不是绝对最强”，我更关心的是：
@@ -208,6 +226,8 @@ DeepSeek 这条线最大的变量，不只是模型能力，而是成本结构�
 ## 官方来源
 
 - DeepSeek Pricing: `https://api-docs.deepseek.com/quick_start/pricing`
+- DeepSeek-V4.1-Flash-1017 Release: `https://api-docs.deepseek.com/news/news261017`
+- DeepSeek Search & Fetch Guide: `https://api-docs.deepseek.com/guides/search`
 - DeepSeek-V4.1-Flash Release: `https://api-docs.deepseek.com/news/news260910`
 - DeepSeek-V4-Flash-Vision-Exp Release: `https://api-docs.deepseek.com/news/news260821`
 - DeepSeek News: `https://api-docs.deepseek.com/news/news260813`

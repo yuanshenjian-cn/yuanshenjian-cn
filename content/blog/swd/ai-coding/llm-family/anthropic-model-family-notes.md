@@ -1,6 +1,6 @@
 ---
 title: "Anthropic：Claude 为什么越来越像长跑型 Agent"
-date: '2026-09-23'
+date: '2026-10-28'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-   这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude Opus 5.5、Sonnet 5、Fable 5.1 / Mythos 5.1 的主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。
+   这是一份按代际持续维护的 Anthropic 模型档案，覆盖从 Claude 3 Opus 到 Claude 5.5 家族（Opus 5.5、Sonnet 5.5、Haiku 5.5）以及 Fable 5.1 / Mythos 5.1 的主线代际，重点记录官方发布时间、API 价格、编码与 Agent 侧能力，以及后续只追加不删历史的维护规则。
 ---
 
 > 如果 OpenAI 这条线给人的感觉是“越来越会干活”，那 Anthropic 这条线更像“越来越能把长活干稳”。Claude 这几年最明显的差异，不是某一个跑分突然炸裂，而是它在长任务、长上下文和代码 Agent 上的稳定性一路被做厚了。
@@ -20,7 +20,7 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 
 这篇也是长期档案。
 
-目前已整理从 Claude 3 Opus 到 Claude Fable 5.1 / Mythos 5.1 的完整主线代际，后面新模型继续追加，不删旧记录。
+目前已整理从 Claude 3 Opus 到 Claude 5.5 家族与 Claude Fable 5.1 / Mythos 5.1 的完整主线代际，后面新模型继续追加，不删旧记录。
 
 ## 我用同一套 5 个维度看 Claude
 
@@ -36,6 +36,8 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中/读 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|-------------|---------|------------------|
+| Claude Haiku 5.5 | 2026-10-07 | $0.10 / 1M（≤100K）；$0.50 / 1M（>100K） | $0.01 / 1M（≤100K）；$0.05 / 1M（>100K） | $0.50 / 1M（≤100K）；$2.50 / 1M（>100K） | 迄今最快的小模型，首次加入可调 effort，主打高并发、成本敏感与子 Agent 场景 |
+| Claude Sonnet 5.5 | 2026-09-28 | $2 / 1M | $0.10 / 1M（10-07 起减半） | $10 / 1M | 比 Sonnet 5 快 30%+，Terminal-Bench 4.0 从 10.3% 跃升至 70.6%，同价但任务成本更低 |
 | Claude Opus 5.5 | 2026-09-22 | $4 / 1M | $0.20 / 1M | $20 / 1M | 在 Agentic Coding、电脑操作和知识工作上推进 Opus 5，同时降低 token 与任务成本 |
 | Claude Fable 5.1 / Mythos 5.1 | 2026-09-01 | $10 / 1M | $0.25 / 1M | $50 / 1M | Fable 面向公开使用，Mythos 面向受信计划；同一底层模型把长程编码、知识工作和研究再往前推 |
 | Claude Opus 5 | 2026-07-24 | $5 / 1M | $0.50 / 1M | $25 / 1M | 在 Opus 4.8 基础上明显推进深度推理、长程 Agent 和编码效率，1M context 与 thinking 默认开启 |
@@ -52,7 +54,25 @@ OpenAI 更像频繁重组产品线，Anthropic 则更像在一条主线上持续
 | Claude 3.5 Sonnet | 2024-06-20 | $3 / 1M | 官方未公布 | $15 / 1M | 用 Sonnet 定位打出接近甚至超过旧旗舰的性价比拐点 |
 | Claude 3 Opus | 2024-03-04 | $15 / 1M | 官方未公布 | $75 / 1M | Claude 3 家族旗舰，把长上下文和多模态能力打进前沿区 |
 
-<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面、官方模型文档与 Release Notes。既有模型数据查询日期为 2026-09-06，Claude Opus 5.5 新增数据查询日期为 2026-09-23。Claude Opus 5.5 于 2026-09-22 发布，输入/输出价格为 $4/$20 每百万 token，缓存读 $0.20/1M、缓存写 $5/1M；官方称其典型工作负载成本比 Opus 5 低 40%。Claude Fable 5.1 / Mythos 5.1 于 2026-09-01 发布，输入/输出价格为 $10/$50 每百万 token，缓存读 $0.25/1M、缓存写 $12.50/1M；Mythos 5.1 仅面向 Project Glasswing 等受信计划。Claude Opus 5 的输入/输出价格为 $5/$25 每百万 token，缓存读 $0.50/1M、缓存写 $6.25/1M，来自官方 pricing 页。Claude Sonnet 5 自 2026-08-10 起将 $2/$10 的 intro 价格改为标准价格，原定 2026-09-01 上调至 $3/$15 未发生；缓存读 $0.20/1M、缓存写 $2.50/1M，来自官方 pricing 页与 Release Notes。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问，2026-06-30 指令解除，2026-07-01 恢复全球访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方定价页；Sonnet 4.5 的缓存读 $0.30/1M，按官方当前 pricing 页修正。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+<small>*数据来源：Anthropic 官方新闻页、官方 Pricing 页面、官方模型文档与 Release Notes。既有模型数据查询日期为 2026-09-06，Claude Opus 5.5 新增数据查询日期为 2026-09-23，Claude Sonnet 5.5 与 Haiku 5.5 新增数据查询日期为 2026-10-28。Claude Sonnet 5.5 于 2026-09-28 发布，输入/输出 $2/$10，缓存写 $2.50/1M，缓存读在 2026-10-07 从 $0.20/1M 下调至 $0.10/1M。Claude Haiku 5.5 于 2026-10-07 发布，按 100K prompt 分档：输入 $0.10/$0.50、输出 $0.50/$2.50、缓存读 $0.01/$0.05、缓存写 $0.125/$0.625（每 1M token）。Claude Opus 5.5 于 2026-09-22 发布，输入/输出价格为 $4/$20 每百万 token，缓存读 $0.20/1M、缓存写 $5/1M；官方称其典型工作负载成本比 Opus 5 低 40%。Claude Fable 5.1 / Mythos 5.1 于 2026-09-01 发布，输入/输出价格为 $10/$50 每百万 token，缓存读 $0.25/1M、缓存写 $12.50/1M；Mythos 5.1 仅面向 Project Glasswing 等受信计划。Claude Opus 5 的输入/输出价格为 $5/$25 每百万 token，缓存读 $0.50/1M、缓存写 $6.25/1M，来自官方 pricing 页。Claude Sonnet 5 自 2026-08-10 起将 $2/$10 的 intro 价格改为标准价格，原定 2026-09-01 上调至 $3/$15 未发生；缓存读 $0.20/1M、缓存写 $2.50/1M，来自官方 pricing 页与 Release Notes。Claude Fable 5 / Mythos 5 的缓存读 $1/1M、缓存写 $12.50/1M 来自官方 pricing 页；该模型自 2026-06-12 起被美国政府指令暂停访问，2026-06-30 指令解除，2026-07-01 恢复全球访问。Sonnet 4.6 的缓存读 $0.30/1M、缓存写 $3.75/1M 来自官方定价页；Sonnet 4.5 的缓存读 $0.30/1M，按官方当前 pricing 页修正。部分旧代缓存读价格官方发布页未单列，按“官方未公布”处理。Claude Opus 4.8 与 Opus 4.7 价格均沿用官方 pricing 当前页口径。*</small>
+
+## Claude Haiku 5.5：小模型第一次把“快”和“能干活”同时做进主线
+
+Claude Haiku 5.5 于 2026 年 10 月 7 日发布，API 型号为 `claude-haiku-5-5`。Anthropic 把它定位成迄今最快、最便宜也最能干的小模型，面向高并发、成本敏感的任务：摘要、上下文压缩、数据库查询、分类，以及给 Opus 5.5 / Sonnet 5.5 当编码子 Agent。
+
+这一代最值得记的是价格结构。Haiku 5.5 按 100K prompt 分档：输入 $0.10/1M（超过 100K 为 $0.50）、输出 $0.50/1M（超过为 $2.50）、缓存读 $0.01/1M（超过为 $0.05）、缓存写 $0.125/1M（超过为 $0.625）。官方称平均运行成本比 Haiku 4.5 低约 75%，100K 以内低 90%。
+
+能力侧，官方给出的对比很直接：GDPval-AA v2.1 从 Haiku 4.5 的 735 升到 1620，OSWorld 2.1 从 15.7% 升到 72.4%，Terminal-Bench 4.0 从 0.0% 升到 39.2%。它也是首个带可调 effort 的 Haiku，并支持 1M context、128K 输出和 adaptive thinking。我的理解是，Haiku 5.5 的价值不在替代 Opus，而在于把“值得调用模型”的任务边界往下扩了一大截。
+
+## Claude Sonnet 5.5：用 Sonnet 的价格，把 Agent 编码差距大幅收窄
+
+Claude Sonnet 5.5 于 2026 年 9 月 28 日发布，是 Claude 5.5 家族的第二款模型，API 型号为 `claude-sonnet-5-5`。官方定位很明确：Opus 5.5 负责需要审慎判断的复杂工作，Sonnet 5.5 负责边界清晰、节奏更快的日常任务、修 bug，以及文档、幻灯片和表格产出。
+
+价格保持 Sonnet 5 的输入 $2/1M、输出 $10/1M，缓存写 $2.50/1M；缓存读在发布时为 $0.20/1M，2026 年 10 月 7 日随 Haiku 5.5 发布下调至 $0.10/1M。官方称输出速度快 30%+，由于每任务 token 更少，典型任务成本最多低 30%。
+
+官方基准里最抓眼的是编码：Terminal-Bench 4.0 从 Sonnet 5 的 10.3% 升到 70.6%，已经略高于 Opus 5.5 的 66.4%；FrontierCode 1.1 为 46.2%（Max effort），仍低于 Opus 5.5 的 54.4%。知识工作上，GDPval-AA v2.1 为 1844，几乎追平 Opus 5.5 的 1846；OSWorld 2.1 为 80.1%。它还是首个在只看截图的情况下打通《Pokémon Red》的 Sonnet。
+
+这代还有一个容易被忽略的信号：Sonnet 5.5 是首个带着 Opus 级网络安全护栏和推理提取防护上线的 Sonnet。Anthropic 在把 Sonnet 的能力往 Opus 推的同时，也开始把高级模型的滥用防护一起下放。
 
 ## Claude Opus 5.5：把长程工作做得更快、单价更低
 
@@ -275,7 +295,7 @@ Claude 3 Opus 是 2024 年 3 月 4 日发布的。
 
 ## 我对 Anthropic 这条线的实际判断
 
-Anthropic 从 Claude 3 Opus 到 Claude Opus 5、Fable 5 / Mythos 5 的完整主线，核心不是”功能越来越花”，而是”复杂任务越来越稳”。
+Anthropic 从 Claude 3 Opus 到 Claude Opus 5.5、Fable 5.1 / Mythos 5.1 的完整主线，核心不是”功能越来越花”，而是”复杂任务越来越稳”。
 
 这是 Claude 和其他头部厂商最值得单独看的地方。
 
@@ -292,6 +312,8 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 
 从谱系看，这条线的演进很清晰：
 
+- Claude Haiku 5.5：小模型线首次加入可调 effort，100K 以内输入 $0.10/1M，主打高并发与子 Agent
+- Claude Sonnet 5.5：Terminal-Bench 4.0 升至 70.6%，同价但缓存读减半，任务成本更低
 - Claude Fable 5.1 / Mythos 5.1：长程编码、知识工作和研究能力继续上探，缓存读降至 $0.25/1M；Fable 面向公开使用，Mythos 面向受信计划
 - Claude Opus 5：深度推理、长程 Agent 和编码效率的代际升级，1M context 与 thinking 默认开启
 - Claude 3 Opus：把长上下文和多模态带进旗舰叙事
@@ -321,6 +343,9 @@ Anthropic 则更像在把一位高水平工程师的工作习惯做厚：
 ## 官方来源
 
 - Anthropic Pricing: `https://claude.com/pricing#api`
+- Introducing Claude Haiku 5.5: `https://www.anthropic.com/claude-haiku-5-5`
+- Introducing Claude Sonnet 5.5: `https://www.anthropic.com/claude-sonnet-5-5`
+- Claude models overview: `https://platform.claude.com/docs/en/about-claude/models/overview`
 - Introducing Claude Fable 5.1 and Claude Mythos 5.1: `https://www.anthropic.com/claude-fable-and-mythos-5-1`
 - Introducing Claude Opus 5.5: `https://www.anthropic.com/claude-opus-5-5`
 - What's new in Claude Fable 5.1: `https://platform.claude.com/docs/en/models/fable-5-1/whats-new-fable-5-1`
