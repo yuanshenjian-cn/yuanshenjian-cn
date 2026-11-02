@@ -1,6 +1,25 @@
 {
-  "generated": "2026-10-29T00:00:00.000Z",
+  "generated": "2026-11-02T00:00:00.000Z",
   "items": [
+    {
+      "slug": "2026-11-02",
+      "title": "2026-11-02 AI 简报：OpenAI 上线 GPT-6 Rosalind；Mistral 开放 Le Chonk 权重",
+      "excerpt": "本期确认 5 件动态：OpenAI 上线生命科学模型 GPT-6 Rosalind；Mistral 开放 Le Chonk 权重；Google 将 Computer Use 推向正式可用；OpenAI 支持共享 robots.txt 训练偏好信号；Meta 与 CNIB 合作推广 AI 眼镜。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Mistral",
+        "Google",
+        "Meta",
+        "模型",
+        "生命科学",
+        "开源",
+        "Agent",
+        "无障碍"
+      ],
+      "date": "2026-11-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-11-02"
+    },
     {
       "slug": "2026-10-29",
       "title": "2026-10-29 AI 简报：Google 发布 Gemini 4 Carbon；Connected Apps 平台开放预览",
@@ -2070,6 +2089,25 @@
     }
   ],
   "briefings": [
+    {
+      "slug": "2026-11-02",
+      "title": "2026-11-02 AI 简报：OpenAI 上线 GPT-6 Rosalind；Mistral 开放 Le Chonk 权重",
+      "excerpt": "本期确认 5 件动态：OpenAI 上线生命科学模型 GPT-6 Rosalind；Mistral 开放 Le Chonk 权重；Google 将 Computer Use 推向正式可用；OpenAI 支持共享 robots.txt 训练偏好信号；Meta 与 CNIB 合作推广 AI 眼镜。",
+      "tags": [
+        "AI",
+        "OpenAI",
+        "Mistral",
+        "Google",
+        "Meta",
+        "模型",
+        "生命科学",
+        "开源",
+        "Agent",
+        "无障碍"
+      ],
+      "date": "2026-11-02T00:00:00.000Z",
+      "url": "/ai/briefings/2026-11-02"
+    },
     {
       "slug": "2026-10-29",
       "title": "2026-10-29 AI 简报：Google 发布 Gemini 4 Carbon；Connected Apps 平台开放预览",
