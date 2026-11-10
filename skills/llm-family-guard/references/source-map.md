@@ -8,6 +8,7 @@
 - 官方发布页：`https://openai.com/index/`
 - 官方价格页：`https://openai.com/api/pricing/`
 - 官方开发文档变更：`https://developers.openai.com/api/docs/changelog`
+- 官方产品发布说明：`https://openai.com/products/release-notes`（受控专用型号如 GPT-6 Rosalind Research 常只在此以 Codex Preview 条目发布，news 与 pricing 页均无记录）
 - GPT-5.6 GA 发布页：`https://openai.com/index/gpt-5-6/`
 - GPT-5.6 Preview 发布页：`https://openai.com/index/previewing-gpt-5-6-sol/`
 - GPT-5.6 System Card：`https://deploymentsafety.openai.com/gpt-5-6`
@@ -28,6 +29,7 @@
 ## DeepSeek
 
 - 官方新闻：`https://api-docs.deepseek.com/news/`
+- 官方 Change Log：`https://api-docs.deepseek.com/updates`（按日期倒序的完整时间线；`/news/` 当前会落到 Quick Start 首页，核对最新条目以 Change Log 为准）
 - 官方价格页：`https://api-docs.deepseek.com/quick_start/pricing`
 - DeepSeek-V4.1-Flash Release：`https://api-docs.deepseek.com/news/news260910`
 - DeepSeek-V4-Flash-Vision-Exp Release：`https://api-docs.deepseek.com/news/news260821`
@@ -43,6 +45,7 @@
 - 官方博客：`https://www.kimi.com/blog/`
 - 官方模型列表：`https://platform.kimi.com/docs/models.md`
 - 官方价格页目录：`https://platform.kimi.com/docs/pricing/`
+- 官方平台变更日志：`https://platform.kimi.com/docs/changelog/index.md`（平台功能与新模型覆盖范围，部分条目只标到月）
 
 ## 小米 MiMo
 
@@ -52,9 +55,11 @@
 - 官方开放平台：`https://platform.xiaomimimo.com`
 - 官方模型定价：`https://platform.xiaomimimo.com/docs/zh-CN/pricing`
 - 官方开放平台文档：`https://platform.xiaomimimo.com/docs/zh-CN/welcome`
+- 官方模型发布日志：`https://mimo.mi.com/docs/zh-CN/updates/model`（Model Release，按日期的权威时间线；首页与 welcome 公告多为相对时间或不含日期）
 
 ## 智谱 AI / GLM
 
-- 官方发布日志：`https://docs.bigmodel.cn/cn/update/new-releases.md`
+- 官方发布日志：`https://docs.bigmodel.cn/cn/update/new-releases.md`（每条均标注 `YYYY-MM-DD`）
 - 官方模型文档目录：`https://docs.bigmodel.cn/cn/guide/models/text/`
+- 官方模型概览：`https://docs.bigmodel.cn/cn/guide/start/model-overview.md`（当前最新旗舰以这里的卡片为准）
 - 官方定价页：`https://www.bigmodel.cn/pricing`

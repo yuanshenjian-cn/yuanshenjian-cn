@@ -1,6 +1,6 @@
 ---
 title: "OpenAI：从 GPT-4 Turbo 到 GPT-6.1 的主线演进"
-date: '2026-10-28'
+date: '2026-11-10'
 tags:
   - AI前沿
   - LLM
@@ -9,7 +9,7 @@ tags:
   - 模型评测
 published: true
 brief: >-
-  这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-6.1 Sol / Terra、GPT-6 Astra 的主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景，后续新模型只追加，不覆盖旧记录。
+  这是一份按代际持续维护的 OpenAI 模型档案，覆盖从 GPT-4 Turbo 到 GPT-6.1 Sol / Terra、GPT-6 Astra 的主线代际，集中记录官方发布时间、API 价格、能力侧重点和适用场景；另按只追加原则记录 GPT-6 Cyber 与 GPT-6 Rosalind Research 两条受控专用型号，后续新模型只追加，不覆盖旧记录。
 ---
 
 > 如果你只想快速判断 OpenAI 这一家最近在往哪里卷，先看结论：它的主线已经从“更强聊天模型”转成“更像专业执行者的工作模型”，最新几代几乎都围着编码、工具调用、电脑操作和长上下文在打。
@@ -34,6 +34,8 @@ brief: >-
 
 | 模型 | 官方发布日期 | 输入价格 | 缓存命中 | 输出价格 | 这一代最该记住的事 |
 |------|-------------|---------|---------|---------|------------------|
+| GPT-6 Cyber（受控专用型号） | 2026-11-05 | 官方未公布 | 官方未公布 | 官方未公布 | 网络安全专用前沿模型，ExploitGym 48.5%（GPT-5.6 Cyber 为 32.1%），Preparedness Framework 网安风险升至 Critical；仅向获批 Daybreak Red 客户开放 |
+| GPT-6 Rosalind Research（受控专用型号） | 2026-10-30 | 官方未公布 | 官方未公布 | 官方未公布 | 生命科学专用，把生物学推理与科学工具使用合到一起；Codex Preview / 两周 Admin Preview、默认关闭，仅 trusted-access 获批机构可用 |
 | GPT-6.1 Terra | 2026-10-26 | $1.00 / 1M | $0.05 / 1M | $5.00 / 1M | 面向视觉推理、电脑操作与写作的高性价比型号；Terminal-Bench 4.0 50.3%，任务速度超过 Astra 与 Sol 三倍 |
 | GPT-6.1 Sol | 2026-09-29 | $2.00 / 1M | $0.10 / 1M | $10.00 / 1M | 以 Astra 约五分之一的价格接近其 Agent 编码、电脑操作与专业工作能力，缓存输入降至 $0.10 |
 | GPT-6 Sol / GPT-6 Luna | 2026-09-22 | Sol $2.00 / Luna $0.10 / 1M | Sol $0.20 / Luna $0.01 / 1M | Sol $10.00 / Luna $0.50 / 1M | Sol 面向复杂 Coding 与 Agent 工作流；Luna 面向高频、成本敏感任务 |
@@ -49,7 +51,27 @@ brief: >-
 | GPT-4o | 2024-05-13 | $5.00 / 1M | 官方未公布 | $15.00 / 1M | 真正把原生多模态和实时语音推到主线位置 |
 | GPT-4 Turbo | 2023-11-06 | $10.00 / 1M | 官方未公布 | $30.00 / 1M | 128K context、JSON mode、并行 function calling 的起点 |
 
-<small>*数据来源：OpenAI 官方发布页、Developer Docs API Pricing 与 API Changelog。既有模型数据查询日期为 2026-09-06，GPT-6 Sol / Luna 新增数据查询日期为 2026-09-23，GPT-6.1 Sol / Terra 新增数据查询日期为 2026-10-28。GPT-6.1 Sol 于 2026-09-29 发布，标准价格（输入不超过 272K token）为输入 $2、缓存读 $0.10、缓存写 $2.50、输出 $10 / 1M；超过 272K 输入 token 时输入与缓存价格加倍、输出为 1.5 倍；支持 1,050,000 context、128K 输出，Ultrafast 价格为标准的 6 倍。GPT-6.1 Terra 于 2026-10-26 发布，标准价格为输入 $1、缓存读 $0.05、缓存写 $1.25（30 分钟保留）/ $2.50（12 小时保留）、输出 $5 / 1M；超过 272K 输入 token 的加价规则与 Sol 相同，Fast mode 价格为标准的 2 倍。GPT-6 Astra 于 2026-09-03 发布，标准短上下文价格为输入 $10、缓存读 $1、输出 $50 / 1M，缓存写为 $12.50 / 1M；超过 272K 输入 token 时，官方价格为输入 $20、缓存读 $2、缓存写 $25、输出 $75 / 1M。GPT-6 Sol 与 Luna 于 2026-09-22 发布；输入不超过 272K token 时，Sol 价格为输入 $2、缓存读 $0.20、缓存写 $2.50、输出 $10 / 1M，Luna 为输入 $0.10、缓存读 $0.01、缓存写 $0.125、输出 $0.50 / 1M；超过 272K 输入 token 后，输入和缓存价格加倍，输出价格为标准价的 1.5 倍。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格；2026-08-21 又将 Sol 标准短上下文价格调整为输入 $4、缓存读 $0.40、输出 $20 / 1M，促销价至少持续到 2026-11-21，此前口径保留为历史价格。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。*</small>
+<small>*数据来源：OpenAI 官方发布页、Developer Docs API Pricing 与 API Changelog。既有模型数据查询日期为 2026-09-06，GPT-6 Sol / Luna 新增数据查询日期为 2026-09-23，GPT-6.1 Sol / Terra 新增数据查询日期为 2026-10-28。GPT-6.1 Sol 于 2026-09-29 发布，标准价格（输入不超过 272K token）为输入 $2、缓存读 $0.10、缓存写 $2.50、输出 $10 / 1M；超过 272K 输入 token 时输入与缓存价格加倍、输出为 1.5 倍；支持 1,050,000 context、128K 输出，Ultrafast 价格为标准的 6 倍。GPT-6.1 Terra 于 2026-10-26 发布，标准价格为输入 $1、缓存读 $0.05、缓存写 $1.25（30 分钟保留）/ $2.50（12 小时保留）、输出 $5 / 1M；超过 272K 输入 token 的加价规则与 Sol 相同，Fast mode 价格为标准的 2 倍。GPT-6 Astra 于 2026-09-03 发布，标准短上下文价格为输入 $10、缓存读 $1、输出 $50 / 1M，缓存写为 $12.50 / 1M；超过 272K 输入 token 时，官方价格为输入 $20、缓存读 $2、缓存写 $25、输出 $75 / 1M。GPT-6 Sol 与 Luna 于 2026-09-22 发布；输入不超过 272K token 时，Sol 价格为输入 $2、缓存读 $0.20、缓存写 $2.50、输出 $10 / 1M，Luna 为输入 $0.10、缓存读 $0.01、缓存写 $0.125、输出 $0.50 / 1M；超过 272K 输入 token 后，输入和缓存价格加倍，输出价格为标准价的 1.5 倍。GPT-5.6 系列于 2026-06-26 以 limited preview 首发，并于 2026-07-09 转为正式 GA；preview 阶段三档 per-1M 价格（Sol $5/$30、Terra $2.50/$15、Luna $1/$6）来自当时发布页。2026-07-30 OpenAI 官方下调 Terra / Luna 的 API 价格；2026-08-21 又将 Sol 标准短上下文价格调整为输入 $4、缓存读 $0.40、输出 $20 / 1M，促销价至少持续到 2026-11-21，此前口径保留为历史价格。GPT-5.6 Sol Pro 为 ChatGPT Pro / Enterprise 的最高质量档，官方未在 API 定价中单列其 per-token 价格。GPT-5.4 mini 与 GPT-5.4 nano 价格来自 2026-03-17 官方发布页。GPT-4o 的价格由官方发布页“比 GPT-4 Turbo 便宜 50%”与 GPT-4 Turbo 官方定价共同推得；官方未单列 cached input。GPT-6 Cyber 与 GPT-6 Rosalind Research 新增数据查询日期为 2026-11-10，分别依据 2026-11-05 官方发布页与 2026-10-30 官方 Release Notes 的 Codex Preview 条目；两者都是受控访问的专用型号，不属于主线代际。官方发布页、Release Notes 与当前 API Pricing 页均未列出这两款模型的输入、缓存命中与输出价格，按“官方未公布”处理，不以非官方口径补空。*</small>
+
+## GPT-6 Cyber：把最强网安能力锁进受控访问里
+
+OpenAI 于 2026 年 11 月 5 日发布 GPT-6 Cyber，定位是网络安全专用前沿模型：发现、验证并修复漏洞，同时尽量留在研究者设定的授权边界内。[官方发布页](https://openai.com/index/introducing-gpt-6-cyber/) 给出的可比数字是 ExploitGym 48.5%，GPT-5.6 Cyber 为 32.1%，相对提升 51%；在单独的对齐评测里，不带 deployment prompt 时 99.93% 的测试未越界使用范围外服务，带 prompt 为 100%。官方据此把它的网安风险等级在 Preparedness Framework 下从 High 调到 Critical，并称多数 cyber tasks 上超过 GPT-6 Astra。
+
+准入比跑分更值得记。首发只通过 API 与 Codex 向获批的 Daybreak Red 客户开放，API 访问默认要求 IP allowlisting，另新增面向关键基础设施防御者的 Daybreak Red for Critical Infrastructure 分组。这不是一个能在公开价目表里选型、比价的型号。
+
+价格方面，官方发布页、Release Notes 与当前 API Pricing 页都未列出输入、缓存命中与输出单价，本档案按“官方未公布”记录，不做推算；官方页面也未直接标注独立的 API model ID。
+
+我的判断：Cyber 说明“专用前沿模型 + 受控分发”正在变成 OpenAI 的常规做法。对这份档案来说，它不该被读成 GPT-6.1 之后的新一代主力，而是一条并行分支；真正影响工程选型的仍是 Sol / Terra 这一档。
+
+## GPT-6 Rosalind Research：生命科学专用线的第六代，但还在预览里
+
+OpenAI 在 2026 年 10 月 30 日的 [官方 Release Notes](https://openai.com/products/release-notes) 中以 Codex Preview 条目记录了 “Released GPT-6 Rosalind”：把专业生物学推理与科学工具使用结合起来，服务复杂生命科学研究，是既有 Rosalind 研究线从 5.5 到 6 的代际升级。
+
+它的开放范围比型号名窄得多：仅向通过 trusted-access program 获批 Rosalind Research 的机构开放，供授权用户做内部研究；先进入为期两周的 Admin Preview、默认关闭，管理员需显式为获批用户启用，且不在 Chat 标签页提供。现有工作流仍可继续使用 GPT-5.5 Rosalind Research。
+
+官方 Release Notes 与当前 API Pricing 页均未列出输入、缓存命中与输出价格，本档案按“官方未公布”处理；官方页面也未直接标注独立的 API model ID。
+
+我的判断：记下它是为了保留这条专用线的代际痕迹，而不是把它当成可选型的主力。生命科学这类高风险领域，OpenAI 明显选择先让获批机构用起来、再谈公开定价，这跟 GPT-6 Cyber 是同一套分发逻辑。
 
 ## GPT-6.1 Terra：把视觉、电脑操作和写作压到 $1/$5 这一档
 
@@ -312,6 +334,9 @@ GPT-4o 仍然值得保留在历史档案里，但它更像转型节点，而不�
 
 ## 官方来源
 
+- Introducing GPT-6 Cyber: `https://openai.com/index/introducing-gpt-6-cyber/`
+- OpenAI Release Notes（GPT-6 Rosalind Research，2026-10-30）: `https://openai.com/products/release-notes`
+- OpenAI News: `https://openai.com/news/`
 - OpenAI API Pricing: `https://openai.com/api/pricing/`
 - OpenAI API Pricing（Developer Docs）: `https://developers.openai.com/api/docs/pricing`
 - Introducing GPT-6.1 Terra: `https://openai.com/index/introducing-gpt-6-1-terra/`
