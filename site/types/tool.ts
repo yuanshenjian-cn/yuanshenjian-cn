@@ -23,6 +23,8 @@ export interface ToolMeta {
   tags?: string[];
   /** 上线日期（YYYY-MM-DD），用于排序 */
   addedAt?: string;
-  /** 置顶展示 */
+  /** 手动排序位，数值小的靠前；设置后优先于 featured 与 addedAt */
+  order?: number;
+  /** 置顶展示（未设置 order 时生效） */
   featured?: boolean;
 }

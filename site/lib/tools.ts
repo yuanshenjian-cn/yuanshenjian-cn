@@ -72,7 +72,14 @@ function normalizeTool(raw: ToolMeta, index: number): ToolMeta {
   };
 }
 
-/** 获取全部小工具（置顶优先，其次按上线日期倒序） */
+/**
+ * 获取全部小工具。
+ *
+ * 排序优先级：
+ * 1. `order` 升序（显式指定的展示位，小在前）
+ * 2. 未设置 `order` 的排在最后，其中 `featured` 优先
+ * 3. 其余按上线日期倒序，同日期按标题排序
+ */
 export function getAllTools(): ToolMeta[] {
   if (cachedTools) {
     return cachedTools;
@@ -93,9 +100,23 @@ export function getAllTools(): ToolMeta[] {
     seen.add(tool.slug);
   }
 
+  const orderOf = (tool: ToolMeta): number =>
+    typeof tool.order === "number" && Number.isFinite(tool.order)
+      ? tool.order
+      : Number.POSITIVE_INFINITY;
+
   tools.sort((a, b) => {
-    if (Boolean(a.featured) !== Boolean(b.featured)) {
-      return a.featured ? -1 : 1;
+    const orderA = orderOf(a);
+    const orderB = orderOf(b);
+
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    // 都未设置 order 时，才回落到 featured
+    if (orderA === Number.POSITIVE_INFINITY) {
+      if (Boolean(a.featured) !== Boolean(b.featured)) {
+        return a.featured ? -1 : 1;
+      }
     }
     return (b.addedAt ?? "").localeCompare(a.addedAt ?? "") || a.title.localeCompare(b.title);
   });

@@ -37,16 +37,36 @@ describe("Tools Registry", () => {
       });
     });
 
-    it("置顶工具排在最前，其余按上线日期倒序", () => {
+    it("按 order 升序排列，缺省时回落到置顶与上线日期", () => {
       const tools = getAllTools();
-      const firstNonFeaturedIndex = tools.findIndex((tool) => !tool.featured);
-      if (firstNonFeaturedIndex !== -1) {
-        expect(tools.slice(firstNonFeaturedIndex).some((tool) => tool.featured)).toBe(false);
-      }
+      const firstWithoutOrder = tools.findIndex((tool) => typeof tool.order !== "number");
+      const ordered = firstWithoutOrder === -1 ? tools : tools.slice(0, firstWithoutOrder);
+      const rest = firstWithoutOrder === -1 ? [] : tools.slice(firstWithoutOrder);
 
-      const rest = tools.filter((tool) => !tool.featured);
-      const dates = rest.map((tool) => tool.addedAt ?? "");
-      expect([...dates].sort((a, b) => b.localeCompare(a))).toEqual(dates);
+      // 显式指定 order 的一段必须严格升序，且排在最前
+      const orders = ordered.map((tool) => tool.order as number);
+      expect([...orders].sort((a, b) => a - b)).toEqual(orders);
+
+      // 未指定 order 的一段：featured 在前，其余按上线日期倒序
+      if (rest.length > 0) {
+        expect(rest.every((tool) => typeof tool.order !== "number")).toBe(true);
+
+        const firstNonFeaturedIndex = rest.findIndex((tool) => !tool.featured);
+        if (firstNonFeaturedIndex !== -1) {
+          expect(rest.slice(firstNonFeaturedIndex).some((tool) => tool.featured)).toBe(false);
+        }
+
+        const dates = rest.filter((tool) => !tool.featured).map((tool) => tool.addedAt ?? "");
+        expect([...dates].sort((a, b) => b.localeCompare(a))).toEqual(dates);
+      }
+    });
+
+    it("order 不重复，展示顺序才可确定", () => {
+      const orders = getAllTools()
+        .filter((tool) => typeof tool.order === "number")
+        .map((tool) => tool.order);
+
+      expect(new Set(orders).size).toBe(orders.length);
     });
   });
 

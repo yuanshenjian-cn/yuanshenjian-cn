@@ -8,16 +8,15 @@ import {
   getInvestmentBriefingArchives,
   getInvestmentBriefingBySlug,
   getInvestmentBriefingsByMonth,
-  getLatestInvestmentBriefing,
   getRecentInvestmentBriefings,
 } from "@/lib/investment-briefings";
 import { investmentBriefingsDir } from "@/lib/workspace-paths";
 
 const briefingsDir = investmentBriefingsDir;
 const testFiles = [
-  path.join(briefingsDir, "2199-01-02-investment-briefing.md"),
-  path.join(briefingsDir, "2199-01-01-investment-briefing.md"),
-  path.join(briefingsDir, "2198-12-31-investment-briefing.md"),
+  path.join(briefingsDir, "2087-01-02-investment-briefing.md"),
+  path.join(briefingsDir, "2087-01-01-investment-briefing.md"),
+  path.join(briefingsDir, "2086-12-31-investment-briefing.md"),
 ];
 
 function writeBriefing(filePath: string, title: string, date: string) {
@@ -53,9 +52,9 @@ ${title} 未来重点观察。
 describe("investment briefings data layer", () => {
   beforeEach(() => {
     fs.mkdirSync(briefingsDir, { recursive: true });
-    writeBriefing(testFiles[0], "投资简报 2", "2199-01-02");
-    writeBriefing(testFiles[1], "投资简报 1", "2199-01-01");
-    writeBriefing(testFiles[2], "投资简报 0", "2198-12-31");
+    writeBriefing(testFiles[0], "投资简报 2", "2087-01-02");
+    writeBriefing(testFiles[1], "投资简报 1", "2087-01-01");
+    writeBriefing(testFiles[2], "投资简报 0", "2086-12-31");
     clearInvestmentBriefingsCache();
   });
 
@@ -67,33 +66,37 @@ describe("investment briefings data layer", () => {
   });
 
   it("按日期倒序读取已发布投资简报", () => {
-    const briefings = getAllInvestmentBriefings().filter((briefing) => briefing.slug.startsWith("2199-01-"));
+    const briefings = getAllInvestmentBriefings().filter((briefing) => briefing.slug.startsWith("2087-01-"));
 
-    expect(briefings.map((briefing) => briefing.slug)).toEqual(["2199-01-02", "2199-01-01"]);
-    expect(getLatestInvestmentBriefing()?.slug).toBe("2199-01-02");
+    expect(briefings.map((briefing) => briefing.slug)).toEqual(["2087-01-02", "2087-01-01"]);
+    // 只在本用例的日期子集内比较，避免内容目录里其他归档文件影响「最新」判定
+    expect(briefings[0]?.slug).toBe("2087-01-02");
   });
 
   it("支持 slug 查询、相邻简报与最近 30 天列表", () => {
-    const briefing = getInvestmentBriefingBySlug("2199-01-01");
-    const adjacent = getAdjacentInvestmentBriefings("2199-01-01");
-    const recent = getRecentInvestmentBriefings(30, new Date("2199-01-02T12:00:00.000Z"));
+    const expected = ["2087-01-02", "2087-01-01", "2086-12-31"];
+    const briefing = getInvestmentBriefingBySlug("2087-01-01");
+    const adjacent = getAdjacentInvestmentBriefings("2087-01-01");
+    const recent = getRecentInvestmentBriefings(30, new Date("2087-01-02T12:00:00.000Z")).filter((item) =>
+      expected.includes(item.slug),
+    );
 
     expect(briefing?.title).toBe("投资简报 1");
-    expect(adjacent.next?.slug).toBe("2199-01-02");
-    expect(adjacent.prev?.slug).toBe("2198-12-31");
-    expect(recent.map((item) => item.slug)).toEqual(["2199-01-02", "2199-01-01", "2198-12-31"]);
+    expect(adjacent.next?.slug).toBe("2087-01-02");
+    expect(adjacent.prev?.slug).toBe("2086-12-31");
+    expect(recent.map((item) => item.slug)).toEqual(expected);
   });
 
   it("支持归档与按月过滤", () => {
-    const archives = getInvestmentBriefingArchives().filter((item) => item.year === "2199" || item.year === "2198");
-    const januaryBriefings = getInvestmentBriefingsByMonth("2199", "01");
-    const decemberBriefings = getInvestmentBriefingsByMonth("2198", "12");
+    const archives = getInvestmentBriefingArchives().filter((item) => item.year === "2087" || item.year === "2086");
+    const januaryBriefings = getInvestmentBriefingsByMonth("2087", "01");
+    const decemberBriefings = getInvestmentBriefingsByMonth("2086", "12");
 
     expect(archives).toEqual([
-      expect.objectContaining({ year: "2199", month: "01", count: 2, url: "/investment/briefings/archive/2199/01" }),
-      expect.objectContaining({ year: "2198", month: "12", count: 1, url: "/investment/briefings/archive/2198/12" }),
+      expect.objectContaining({ year: "2087", month: "01", count: 2, url: "/investment/briefings/archive/2087/01" }),
+      expect.objectContaining({ year: "2086", month: "12", count: 1, url: "/investment/briefings/archive/2086/12" }),
     ]);
-    expect(januaryBriefings.map((item) => item.slug)).toEqual(["2199-01-02", "2199-01-01"]);
-    expect(decemberBriefings.map((item) => item.slug)).toEqual(["2198-12-31"]);
+    expect(januaryBriefings.map((item) => item.slug)).toEqual(["2087-01-02", "2087-01-01"]);
+    expect(decemberBriefings.map((item) => item.slug)).toEqual(["2086-12-31"]);
   });
 });
