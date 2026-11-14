@@ -40,7 +40,7 @@
 
   body {
     margin: 0;
-    padding: clamp(28px, 7vh, 72px) 24px 56px;
+    padding: clamp(12px, 2vh, 20px) 24px 36px;
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
@@ -146,6 +146,32 @@
     pointer-events: none;
   }
   .card > * { position: relative; }
+
+  /* 卡片右上角的提示音开关：只用一个铃铛图标表达开 / 关 */
+  .card .icon-toggle {
+    position: absolute;
+    top: 23px;
+    right: 16px;
+    z-index: 2;
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .card .icon-toggle:hover {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--ink);
+  }
+  .card .icon-toggle .bell-off { display: none; }
+  .card .icon-toggle[aria-checked="false"] .bell-on { display: none; }
+  .card .icon-toggle[aria-checked="false"] .bell-off { display: block; }
 
   .tabs {
     display: flex;
@@ -309,11 +335,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 14px;
     margin: 16px 0 0;
     font-size: 12px;
     line-height: 18px;
     color: var(--muted);
+  }
+  .hint-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .kbd {
     display: inline-flex;
@@ -511,13 +542,13 @@
   }
 
   @media (max-width: 420px) {
-    body { padding: 24px 16px 40px; }
+    body { padding: 12px 16px 32px; }
     .card { padding: 18px 16px 20px; border-radius: 20px; }
     .tab { padding: 0 8px; }
     .row, .toggle-row, .settings-head, .settings-foot { padding-inline: 14px; }
   }
   @media (max-width: 360px) {
-    body { padding: 20px 12px 32px; }
+    body { padding: 10px 12px 28px; }
     .card { padding: 16px 12px 18px; }
     .tab { padding: 0 6px; font-size: 12px; }
     .row, .toggle-row, .settings-head, .settings-foot { padding-inline: 12px; }
@@ -542,7 +573,6 @@
   <header class="head">
     <div>
       <h1 class="title">番茄钟</h1>
-      <p class="subtitle">一次只做一件事</p>
     </div>
     <button type="button" class="icon-button" id="settingsButton" aria-label="计时设置" title="计时设置" aria-expanded="false" aria-controls="settings">
       <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
@@ -555,6 +585,20 @@
   </header>
 
   <main class="card">
+    <button type="button" class="icon-toggle" id="sound" role="switch" aria-checked="true"
+            aria-label="提示音" title="提示音">
+      <svg class="bell-on" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+      <svg class="bell-off" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="m2 2 20 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+    </button>
+
     <div class="tabs" role="group" aria-label="计时类型">
       <button type="button" class="tab" data-mode="focus" aria-pressed="true">专注</button>
       <button type="button" class="tab" data-mode="rest" aria-pressed="false">休息</button>
@@ -627,10 +671,6 @@
       <span class="row-label">自动开始专注</span>
       <span class="switch" aria-hidden="true"></span>
     </button>
-    <button type="button" class="toggle-row" id="sound" role="switch" aria-checked="true">
-      <span class="row-label">完成时播放提示音</span>
-      <span class="switch" aria-hidden="true"></span>
-    </button>
 
     <div class="settings-foot">
       <span class="settings-note">设置会自动保存在当前浏览器。</span>
@@ -638,7 +678,10 @@
     </div>
   </section>
 
-  <p class="hint"><kbd class="kbd">空格</kbd><span>开始或暂停</span></p>
+  <p class="hint">
+    <span class="hint-group"><kbd class="kbd">空格</kbd><span>开始或暂停</span></span>
+    <span class="hint-group"><kbd class="kbd">R</kbd><span>重置</span></span>
+  </p>
   <div class="sr" id="live" role="status" aria-live="polite"></div>
 </div>
 
@@ -886,6 +929,39 @@
     }
   }
 
+  /** 点击开始时的一记轻提示：专注偏高、休息偏低，音量比结束铃更收敛 */
+  function playStartTone() {
+    if (!settings.sound) return
+    try {
+      primeAudio()
+      if (audioContext === null) return
+      const play = () => {
+        if (audioContext === null || audioContext.state !== 'running') return
+        try {
+          const at = audioContext.currentTime + 0.01
+          const oscillator = audioContext.createOscillator()
+          const gain = audioContext.createGain()
+          oscillator.type = 'sine'
+          oscillator.frequency.value = mode === 'rest' ? 587.33 : 880
+          gain.gain.setValueAtTime(0.0001, at)
+          gain.gain.exponentialRampToValueAtTime(0.07, at + 0.015)
+          gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.28)
+          oscillator.connect(gain)
+          gain.connect(audioContext.destination)
+          oscillator.start(at)
+          oscillator.stop(at + 0.3)
+        } catch (_error) {
+          // 静默降级
+        }
+      }
+      // 首次点击时 AudioContext 可能刚创建或仍在 resume，等它真正 running 再发声
+      if (audioContext.state === 'running') play()
+      else void audioContext.resume().then(play).catch(() => {})
+    } catch (_error) {
+      // 音频不可用时静默降级
+    }
+  }
+
   function primeAudio() {
     try {
       if (audioContext === null) {
@@ -950,6 +1026,7 @@
       if (remainingMs <= 0) remainingMs = sessionDurationMs
       endAt = now + remainingMs
       status = 'running'
+      playStartTone()
       announce(wasPaused ? '继续计时' : mode === 'focus' ? '专注开始' : '休息开始')
     }
     commit()
@@ -1151,12 +1228,18 @@
       closeSettings()
       return
     }
-    if (event.key !== ' ' && event.code !== 'Space') return
     if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return
     const target = event.target
-    // 焦点在按钮或输入控件上时，保留浏览器原生的空格行为。
+    // 焦点在按钮或输入控件上时，保留浏览器原生行为。
     if (target instanceof Element
       && target.closest('button, input, textarea, select, [contenteditable="true"]') !== null) return
+
+    if (event.key === 'r' || event.key === 'R') {
+      event.preventDefault()
+      reset()
+      return
+    }
+    if (event.key !== ' ' && event.code !== 'Space') return
     event.preventDefault()
     toggle()
   })
