@@ -208,6 +208,11 @@
     font-size: 14px;
     color: var(--muted);
   }
+  .label-unit {
+    margin-left: 3px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--muted) 62%, transparent);
+  }
   .row-value {
     display: flex;
     align-items: baseline;
@@ -286,8 +291,88 @@
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
-  .rate-grid .row { padding: 0 12px; }
+  .rate-grid .row { padding: 0 10px; }
   .rate-grid .row-label { font-size: 13px; }
+
+  /* 利率步进控件：数值居中，两侧按钮紧贴，整体宽度只够放下数字 */
+  .stepper {
+    display: inline-flex;
+    align-items: stretch;
+    flex: none;
+    width: auto;
+    max-width: 100%;
+    height: 32px;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .stepper:has(:focus-visible) {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .stepper .row-value {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 5px;
+    border-left: 1px solid var(--border-soft);
+    border-right: 1px solid var(--border-soft);
+  }
+  .stepper .num {
+    display: inline-block;
+    width: 2.7em;
+    height: auto;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .stepper .unit {
+    vertical-align: middle;
+  }
+
+  .step-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: color-mix(in srgb, var(--ink) 62%, var(--muted));
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background-color .12s ease, color .12s ease;
+  }
+  .step-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:active:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:disabled {
+    color: color-mix(in srgb, var(--muted) 30%, transparent);
+    cursor: default;
+  }
+  .step-btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: -3px;
+    border-radius: 8px;
+  }
 
   .rate-foot {
     display: flex;
@@ -488,6 +573,20 @@
   }
   .foot span { color: color-mix(in srgb, var(--ink) 70%, var(--muted)); }
 
+  @media (max-width: 420px) {
+    /* 手机上两格并排放不下「标签 + 减 / 加」的完整结构，改为上下两行 */
+    .rate-grid { grid-template-columns: 1fr; }
+    /* 触屏按钮放大到 36px，单手拇指更好按 */
+    .stepper { height: 34px; }
+    .step-btn { width: 36px; font-size: 18px; }
+    /* 窄屏只留 10 / 20 / 30 / 50 四个代表档位，中间档用滑块选 */
+    #years-chips .chip:nth-child(4),
+    #years-chips .chip:nth-child(5),
+    #years-chips .chip:nth-child(6) {
+      display: none;
+    }
+  }
+
   @media (max-width: 380px) {
     .card { padding: 16px 14px 18px; }
     .metric dd { font-size: 13px; }
@@ -548,30 +647,45 @@
 
       <div class="rate-grid" id="rate-commercial">
         <div class="row">
-          <label class="row-label" for="lpr">LPR</label>
-          <span class="row-value">
-            <input id="lpr" class="num" type="number" inputmode="decimal"
-                   min="0" max="20" step="0.05" value="3.5" aria-label="5 年期以上 LPR，百分比">
-            <span class="unit">%</span>
-          </span>
+          <label class="row-label" for="lpr">LPR<span class="label-unit">%</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="lpr" data-step="-0.05"
+                    aria-label="LPR 下调 0.05 个百分点">−</button>
+            <span class="row-value">
+              <input id="lpr" class="num" type="number" inputmode="decimal"
+                     min="0" max="20" step="0.05" value="3.5" aria-label="5 年期以上 LPR，百分比">
+            </span>
+            <button type="button" class="step-btn" data-step-target="lpr" data-step="0.05"
+                    aria-label="LPR 上调 0.05 个百分点">+</button>
+          </div>
         </div>
         <div class="row">
-          <label class="row-label" for="spread">基点</label>
-          <span class="row-value">
-            <input id="spread" class="num" type="number" inputmode="decimal"
-                   min="-300" max="300" step="5" value="-40" aria-label="商贷利率加减基点，1 基点等于 0.01%">
-            <span class="unit">BP</span>
-          </span>
+          <label class="row-label" for="spread">基点<span class="label-unit">BP</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="spread" data-step="-5"
+                    aria-label="基点减少 5">−</button>
+            <span class="row-value">
+              <input id="spread" class="num" type="number" inputmode="decimal"
+                     min="-300" max="300" step="5" value="-40" aria-label="商贷利率加减基点，1 基点等于 0.01%">
+            </span>
+            <button type="button" class="step-btn" data-step-target="spread" data-step="5"
+                    aria-label="基点增加 5">+</button>
+          </div>
         </div>
       </div>
 
       <div class="row" id="row-fund-rate">
-        <label class="row-label" for="fund-rate">公积金利率</label>
-        <span class="row-value">
-          <input id="fund-rate" class="num" type="number" inputmode="decimal"
-                 min="0" max="24" step="0.01" value="2.6" aria-label="公积金贷款年利率，百分比">
-          <span class="unit">%</span>
-        </span>
+        <label class="row-label" for="fund-rate">公积金利率<span class="label-unit">%</span></label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="fund-rate" data-step="-0.05"
+                  aria-label="公积金利率下调 0.05 个百分点">−</button>
+          <span class="row-value">
+            <input id="fund-rate" class="num" type="number" inputmode="decimal"
+                   min="0" max="24" step="0.05" value="2.6" aria-label="公积金贷款年利率，百分比">
+          </span>
+          <button type="button" class="step-btn" data-step-target="fund-rate" data-step="0.05"
+                  aria-label="公积金利率上调 0.05 个百分点">+</button>
+        </div>
       </div>
 
       <div class="rate-foot">
@@ -592,6 +706,8 @@
              value="30" aria-label="拖动调整贷款年限">
 
       <div class="chips" id="years-chips" role="group" aria-label="常见贷款年限">
+        <button type="button" class="chip" data-years="10">10年</button>
+        <button type="button" class="chip" data-years="20">20年</button>
         <button type="button" class="chip" data-years="30" aria-pressed="true">30年</button>
         <button type="button" class="chip" data-years="35">35年</button>
         <button type="button" class="chip" data-years="40">40年</button>
@@ -660,7 +776,7 @@
   var RANGE_MAX = 1000;
   var YEAR_MIN = 1;
   var YEAR_MAX = 50;
-  var YEARS = [30, 35, 40, 45, 50];
+  var YEARS = [10, 20, 30, 35, 40, 45, 50];
   var LOAN_TYPES = ["commercial", "fund", "mixed"];
   var METHODS = ["annuity", "linear"];
 
@@ -709,6 +825,11 @@
 
   function clamp(n, min, max) {
     return Math.min(max, Math.max(min, n));
+  }
+
+  /** 消掉 0.05 这类步长反复累加产生的浮点尾巴 */
+  function round2(n) {
+    return Math.round(n * 100) / 100;
   }
 
   function money(n) {
@@ -986,6 +1107,7 @@
 
   function update() {
     render();
+    paintStepButtons();
     save();
   }
 
@@ -1037,6 +1159,96 @@
   bindRate(el.lpr, "lpr", 0, 20);
   bindRate(el.spread, "spread", -300, 300);
   bindRate(el.fundRate, "fundRate", 0, 24);
+
+  /* 利率步进：一次 5 个基点（0.05%），与 LPR 报价的最小变动单位一致。
+     200 万 / 30 年下每档约影响月供 60 元，既看得见又不至于调过头。 */
+  var rateSteps = {
+    lpr: { key: "lpr", min: 0, max: 20 },
+    spread: { key: "spread", min: -300, max: 300 },
+    "fund-rate": { key: "fundRate", min: 0, max: 24 },
+  };
+
+  var stepButtons = Array.prototype.slice.call(document.querySelectorAll(".step-btn"));
+
+  function paintStepButtons() {
+    stepButtons.forEach(function (btn) {
+      var conf = rateSteps[btn.getAttribute("data-step-target")];
+      if (!conf) return;
+      var delta = Number(btn.getAttribute("data-step"));
+      var next = round2(state[conf.key] + delta);
+      btn.disabled = !isFinite(next) || next < conf.min || next > conf.max;
+    });
+  }
+
+  function applyStep(btn) {
+    var target = btn.getAttribute("data-step-target");
+    var conf = rateSteps[target];
+    if (!conf) return;
+    var delta = Number(btn.getAttribute("data-step"));
+    if (!isFinite(delta)) return;
+
+    var next = round2(clamp(state[conf.key] + delta, conf.min, conf.max));
+    if (next === state[conf.key]) {
+      paintStepButtons();
+      return;
+    }
+    state[conf.key] = next;
+
+    var input = document.getElementById(target);
+    if (input) input.value = String(next);
+
+    paintStepButtons();
+    update();
+  }
+
+  /* 单击走一格，按住 420ms 后每 90ms 连走一格，长按快速调到底。 */
+  var HOLD_DELAY = 420;
+  var HOLD_INTERVAL = 90;
+
+  stepButtons.forEach(function (btn) {
+    var delayTimer = null;
+    var repeatTimer = null;
+
+    function stopHold() {
+      if (delayTimer !== null) {
+        window.clearTimeout(delayTimer);
+        delayTimer = null;
+      }
+      if (repeatTimer !== null) {
+        window.clearInterval(repeatTimer);
+        repeatTimer = null;
+      }
+    }
+
+    btn.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0 || btn.disabled) return;
+      applyStep(btn);
+      delayTimer = window.setTimeout(function () {
+        delayTimer = null;
+        repeatTimer = window.setInterval(function () {
+          if (btn.disabled) {
+            stopHold();
+            return;
+          }
+          applyStep(btn);
+        }, HOLD_INTERVAL);
+      }, HOLD_DELAY);
+    });
+
+    ["pointerup", "pointerleave", "pointercancel"].forEach(function (name) {
+      btn.addEventListener(name, stopHold);
+    });
+
+    // 指针点击已在 pointerdown 处理；detail 为 0 说明是键盘触发。
+    btn.addEventListener("click", function (event) {
+      if (event.detail > 0) return;
+      applyStep(btn);
+    });
+
+    btn.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+    });
+  });
 
   el.range.addEventListener("input", function () {
     var value = Number(el.range.value);
@@ -1176,6 +1388,7 @@
   paintControls();
   paintSlider();
   paintYearSlider();
+  paintStepButtons();
   render();
 })();
 </script>
