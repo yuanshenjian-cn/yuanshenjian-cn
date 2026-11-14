@@ -2,7 +2,7 @@
   "tools": [
     {
       "slug": "body",
-      "title": "健康指示器",
+      "title": "身体指标",
       "description": "BMI、体脂、腰高比与五区心率一次算清，附同龄心肺适能对照",
       "emoji": "🫀",
       "tags": [
