@@ -11,6 +11,17 @@
       ],
       "addedAt": "2026-11-14",
       "featured": true
+    },
+    {
+      "slug": "mortgage",
+      "title": "房贷计算器",
+      "description": "商贷 / 公积金 / 组合贷三种口径，LPR 与基点可加减，等额本息与等额本金随时切换。",
+      "emoji": "🏠",
+      "tags": [
+        "理财",
+        "计算"
+      ],
+      "addedAt": "2026-11-14"
     }
   ]
 }

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>房贷计算器</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 15 16 5l11 10' fill='none' stroke='%232f7fe0' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8.5 14.5V26h15V14.5' fill='none' stroke='%232f7fe0' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light dark;
+    --page-bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f1f2f4;
+    --border: #e3e5e9;
+    --border-soft: #eef0f2;
+    --ink: #1c2026;
+    --muted: #68707b;
+    --accent: #2f7fe0;
+    --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #101114;
+      --surface: #191b1f;
+      --surface-2: #22252a;
+      --border: #2d3137;
+      --border-soft: #24272c;
+      --ink: #eceef2;
+      --muted: #9aa1ac;
+      --accent: #6bb0ff;
+      --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: clamp(22px, 4.5vh, 44px) 20px 44px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .head {
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    transition: background-color .15s ease, color .15s ease,
+      border-color .15s ease;
+  }
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px 20px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -110px;
+    left: 50%;
+    width: 280px;
+    height: 220px;
+    background: radial-gradient(circle,
+      color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 68%);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .card > * {
+    position: relative;
+  }
+
+  /* ---- 贷款类型 / 还款方式 ---- */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    width: min(300px, 100%);
+    margin: 0 auto;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+  .tab {
+    flex: 1;
+    height: 30px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tab:hover:not([aria-pressed="true"]) {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    color: var(--ink);
+  }
+  .tab[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+    font-weight: 500;
+  }
+
+  .seg-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .seg {
+    padding: 0 2px 3px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    cursor: pointer;
+  }
+  .seg:hover:not([aria-pressed="true"]) { color: var(--ink); }
+  .seg[aria-pressed="true"] {
+    border-bottom-color: var(--accent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .seg-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  /* ---- 输入 ---- */
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background: var(--surface-2);
+    cursor: text;
+    transition: border-color .15s ease;
+  }
+  .row:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .row-label {
+    flex: none;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .row-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+  }
+  .num {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    outline: none;
+  }
+  .num::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+  .unit {
+    flex: none;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    margin: 8px 0 14px;
+    border-radius: 999px;
+    background: linear-gradient(to right,
+      var(--accent) var(--pct, 20%), var(--surface-2) var(--pct, 20%));
+    cursor: pointer;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 1px 5px rgba(17, 24, 39, .22);
+    cursor: grab;
+  }
+  .slider::-webkit-slider-thumb:active { cursor: grabbing; }
+  .slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 1px 5px rgba(17, 24, 39, .22);
+    cursor: grab;
+  }
+  .slider:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    outline-offset: 4px;
+  }
+
+  .rate-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .rate-grid .row { padding: 0 12px; }
+  .rate-grid .row-label { font-size: 13px; }
+
+  .rate-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 18px;
+    padding: 0 2px;
+  }
+  .rate-summary {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .rate-summary strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .rate-hint {
+    flex: none;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+
+  .chips {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .chip {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip:hover:not([aria-pressed="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ---- 结果 ---- */
+  .result {
+    margin-top: 16px;
+    padding: 15px 15px 13px;
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .result-label {
+    margin: 0;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+  .result-value {
+    margin: 2px 0 0;
+    font-size: clamp(30px, 9.4vw, 40px);
+    line-height: 1.16;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .result-value .cny {
+    margin-right: 2px;
+    font-size: .52em;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .result-note {
+    margin: 3px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 13px 0 0;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+  }
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .metric dt {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .metric dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  /* ---- 明细 ---- */
+  .schedule {
+    margin-top: 10px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .schedule summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    list-style: none;
+    cursor: pointer;
+    transition: color .15s ease;
+  }
+  .schedule summary::-webkit-details-marker { display: none; }
+  .schedule summary:hover { color: var(--ink); }
+  .schedule summary .caret { transition: transform .18s ease; }
+  .schedule[open] summary .caret { transform: rotate(180deg); }
+
+  .schedule-body {
+    margin-top: 8px;
+  }
+  .schedule table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    line-height: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+  .schedule th,
+  .schedule td {
+    padding: 6px 4px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .schedule th {
+    font-weight: 500;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .schedule td {
+    color: var(--ink);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .schedule th:first-child,
+  .schedule td:first-child {
+    text-align: left;
+    color: var(--muted);
+  }
+  .schedule tr:last-child td { border-bottom: 0; }
+  .schedule-note {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .foot {
+    margin: 12px 0 0;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .foot span { color: color-mix(in srgb, var(--ink) 70%, var(--muted)); }
+
+  @media (max-width: 380px) {
+    .card { padding: 16px 14px 18px; }
+    .metric dd { font-size: 13px; }
+    .chip { font-size: 12px; }
+    .tab { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <h1 class="title">房贷计算器</h1>
+    <p class="subtitle">商贷 / 公积金 / 组合贷，算清月供</p>
+  </header>
+
+  <main class="card">
+    <div class="tabs" role="group" aria-label="贷款类型">
+      <button type="button" class="tab" data-loan="commercial" aria-pressed="true">商贷</button>
+      <button type="button" class="tab" data-loan="fund" aria-pressed="false">公积金</button>
+      <button type="button" class="tab" data-loan="mixed" aria-pressed="false">组合贷</button>
+    </div>
+
+    <div class="seg-line" role="group" aria-label="还款方式">
+      <button type="button" class="seg" data-method="annuity" aria-pressed="true">等额本息</button>
+      <span class="seg-dot" aria-hidden="true"></span>
+      <button type="button" class="seg" data-method="linear" aria-pressed="false">等额本金</button>
+    </div>
+
+    <div class="fields">
+      <div class="row" id="row-commercial">
+        <label class="row-label" for="amount-commercial" id="label-commercial">贷款金额</label>
+        <span class="row-value">
+          <input id="amount-commercial" class="num" type="number" inputmode="decimal"
+                 min="0" step="10" value="200" aria-label="商业贷款金额，单位万元">
+          <span class="unit">万元</span>
+        </span>
+      </div>
+
+      <div class="row" id="row-fund">
+        <label class="row-label" for="amount-fund" id="label-fund">贷款金额</label>
+        <span class="row-value">
+          <input id="amount-fund" class="num" type="number" inputmode="decimal"
+                 min="0" step="10" value="100" aria-label="公积金贷款金额，单位万元">
+          <span class="unit">万元</span>
+        </span>
+      </div>
+
+      <input id="amount-range" class="slider" type="range" min="5" max="1000" step="5"
+             value="200" aria-label="拖动调整贷款金额">
+
+      <div class="chips" id="amount-chips" role="group" aria-label="常见贷款金额">
+        <button type="button" class="chip" data-amount="50">50万</button>
+        <button type="button" class="chip" data-amount="100">100万</button>
+        <button type="button" class="chip" data-amount="200" aria-pressed="true">200万</button>
+        <button type="button" class="chip" data-amount="300">300万</button>
+        <button type="button" class="chip" data-amount="500">500万</button>
+      </div>
+
+      <div class="rate-grid" id="rate-commercial">
+        <div class="row">
+          <label class="row-label" for="lpr">LPR</label>
+          <span class="row-value">
+            <input id="lpr" class="num" type="number" inputmode="decimal"
+                   min="0" max="20" step="0.05" value="3.5" aria-label="5 年期以上 LPR，百分比">
+            <span class="unit">%</span>
+          </span>
+        </div>
+        <div class="row">
+          <label class="row-label" for="spread">基点</label>
+          <span class="row-value">
+            <input id="spread" class="num" type="number" inputmode="decimal"
+                   min="-300" max="300" step="5" value="-40" aria-label="商贷利率加减基点，1 基点等于 0.01%">
+            <span class="unit">BP</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="row" id="row-fund-rate">
+        <label class="row-label" for="fund-rate">公积金利率</label>
+        <span class="row-value">
+          <input id="fund-rate" class="num" type="number" inputmode="decimal"
+                 min="0" max="24" step="0.01" value="2.6" aria-label="公积金贷款年利率，百分比">
+          <span class="unit">%</span>
+        </span>
+      </div>
+
+      <div class="rate-foot">
+        <span class="rate-summary" id="rate-summary"></span>
+        <span class="rate-hint" id="rate-hint"></span>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="years">贷款年限</label>
+        <span class="row-value">
+          <input id="years" class="num" type="number" inputmode="numeric"
+                 min="1" max="50" step="1" value="30" aria-label="贷款年限，年">
+          <span class="unit">年</span>
+        </span>
+      </div>
+
+      <input id="years-range" class="slider" type="range" min="1" max="50" step="1"
+             value="30" aria-label="拖动调整贷款年限">
+
+      <div class="chips" id="years-chips" role="group" aria-label="常见贷款年限">
+        <button type="button" class="chip" data-years="30" aria-pressed="true">30年</button>
+        <button type="button" class="chip" data-years="35">35年</button>
+        <button type="button" class="chip" data-years="40">40年</button>
+        <button type="button" class="chip" data-years="45">45年</button>
+        <button type="button" class="chip" data-years="50">50年</button>
+      </div>
+    </div>
+
+    <section class="result" aria-live="polite">
+      <p class="result-label" id="result-label">每月月供</p>
+      <p class="result-value" id="result-value"><span class="cny">¥</span>—</p>
+      <p class="result-note" id="result-note">—</p>
+      <dl class="metrics">
+        <div class="metric">
+          <dt>总利息</dt>
+          <dd id="m-interest">—</dd>
+        </div>
+        <div class="metric">
+          <dt>还款总额</dt>
+          <dd id="m-total">—</dd>
+        </div>
+        <div class="metric">
+          <dt>利息占比</dt>
+          <dd id="m-ratio">—</dd>
+        </div>
+      </dl>
+    </section>
+
+    <details class="schedule" id="schedule">
+      <summary>
+        <span class="toggle-label">查看还款明细</span>
+        <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="schedule-body">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">年份</th>
+              <th scope="col">已还本金</th>
+              <th scope="col">已还利息</th>
+              <th scope="col">剩余本金</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-body"></tbody>
+        </table>
+      </div>
+      <p class="schedule-note">金额单位：万元 · 每年按 12 期汇总</p>
+    </details>
+  </main>
+
+  <p class="foot">
+    默认利率参考 2026 年 11 月：5 年期以上 LPR 3.5%、公积金首套 5 年以上 2.6%<br>
+    <span>按月计息，结果仅供参考；实际以银行合同为准</span>
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "ysj-mortgage-input-v2";
+
+  var RANGE_MIN = 5;
+  var RANGE_MAX = 1000;
+  var YEAR_MIN = 1;
+  var YEAR_MAX = 50;
+  var YEARS = [30, 35, 40, 45, 50];
+  var LOAN_TYPES = ["commercial", "fund", "mixed"];
+  var METHODS = ["annuity", "linear"];
+
+  var el = {
+    typeTabs: Array.prototype.slice.call(document.querySelectorAll(".tab[data-loan]")),
+    methodSegs: Array.prototype.slice.call(document.querySelectorAll(".seg[data-method]")),
+    rowCommercial: document.getElementById("row-commercial"),
+    labelCommercial: document.getElementById("label-commercial"),
+    amountCommercial: document.getElementById("amount-commercial"),
+    rowFund: document.getElementById("row-fund"),
+    labelFund: document.getElementById("label-fund"),
+    amountFund: document.getElementById("amount-fund"),
+    range: document.getElementById("amount-range"),
+    rateCommercial: document.getElementById("rate-commercial"),
+    lpr: document.getElementById("lpr"),
+    spread: document.getElementById("spread"),
+    rowFundRate: document.getElementById("row-fund-rate"),
+    fundRate: document.getElementById("fund-rate"),
+    rateSummary: document.getElementById("rate-summary"),
+    rateHint: document.getElementById("rate-hint"),
+    yearsChips: Array.prototype.slice.call(document.querySelectorAll("#years-chips .chip")),
+    amountChips: Array.prototype.slice.call(document.querySelectorAll("#amount-chips .chip")),
+    amountChipsWrap: document.getElementById("amount-chips"),
+    yearsInput: document.getElementById("years"),
+    yearsRange: document.getElementById("years-range"),
+    label: document.getElementById("result-label"),
+    value: document.getElementById("result-value"),
+    note: document.getElementById("result-note"),
+    interest: document.getElementById("m-interest"),
+    total: document.getElementById("m-total"),
+    ratio: document.getElementById("m-ratio"),
+    tbody: document.getElementById("schedule-body"),
+    schedule: document.getElementById("schedule"),
+  };
+
+  var state = {
+    loanType: "commercial",
+    method: "annuity",
+    years: 30,
+    commercialAmount: 200,
+    fundAmount: 100,
+    lpr: 3.5,
+    spread: -40,
+    fundRate: 2.6,
+  };
+
+  function clamp(n, min, max) {
+    return Math.min(max, Math.max(min, n));
+  }
+
+  function money(n) {
+    return "¥" + Math.round(n).toLocaleString("zh-CN");
+  }
+
+  function wan(n) {
+    return (n / 10000).toFixed(1);
+  }
+
+  /** 商贷实际年利率 = LPR + 基点 / 100 */
+  function commercialRate() {
+    var rate = state.lpr + state.spread / 100;
+    if (!isFinite(rate) || rate < 0) return 0;
+    return clamp(rate, 0, 24);
+  }
+
+  /* ---------- 计算 ---------- */
+
+  /** 单笔贷款按月摊还，返回逐月明细 */
+  function buildRows(principal, monthlyRate, months, method) {
+    var rows = [];
+    var balance = principal;
+    var totalInterest = 0;
+    var i, interest, principalPart, pay;
+
+    if (method === "annuity") {
+      var fixed;
+      if (monthlyRate === 0) {
+        fixed = principal / months;
+      } else {
+        var growth = Math.pow(1 + monthlyRate, months);
+        fixed = (principal * monthlyRate * growth) / (growth - 1);
+      }
+      for (i = 1; i <= months; i++) {
+        interest = balance * monthlyRate;
+        principalPart = i === months ? balance : fixed - interest;
+        if (principalPart > balance) principalPart = balance;
+        balance = balance - principalPart;
+        totalInterest += interest;
+        rows.push({ principal: principalPart, interest: interest, balance: balance });
+      }
+      return { rows: rows, totalInterest: totalInterest, monthlyPay: fixed, firstPay: fixed };
+    }
+
+    var step = principal / months;
+    var first = 0;
+    var last = 0;
+    for (i = 1; i <= months; i++) {
+      interest = balance * monthlyRate;
+      principalPart = i === months ? balance : step;
+      if (principalPart > balance) principalPart = balance;
+      balance = balance - principalPart;
+      totalInterest += interest;
+      pay = principalPart + interest;
+      if (i === 1) first = pay;
+      if (i === months) last = pay;
+      rows.push({ principal: principalPart, interest: interest, balance: balance });
+    }
+    return {
+      rows: rows,
+      totalInterest: totalInterest,
+      monthlyPay: first,
+      firstPay: first,
+      lastPay: last,
+      stepDown: step * monthlyRate,
+    };
+  }
+
+  /** 把贷款按类型拆成若干「本金 + 年利率」段 */
+  function loanSegments() {
+    var segments = [];
+    if (state.loanType === "commercial" || state.loanType === "mixed") {
+      if (state.commercialAmount > 0) {
+        segments.push({ principal: state.commercialAmount * 10000, rate: commercialRate() });
+      }
+    }
+    if (state.loanType === "fund" || state.loanType === "mixed") {
+      if (state.fundAmount > 0) {
+        segments.push({ principal: state.fundAmount * 10000, rate: state.fundRate });
+      }
+    }
+    return segments;
+  }
+
+  function summarize(rows, monthCount) {
+    var years = [];
+    for (var y = 0; y < monthCount / 12; y++) {
+      var slice = rows.slice(y * 12, y * 12 + 12);
+      var principal = 0;
+      var interest = 0;
+      for (var k = 0; k < slice.length; k++) {
+        principal += slice[k].principal;
+        interest += slice[k].interest;
+      }
+      years.push({
+        year: y + 1,
+        principal: principal,
+        interest: interest,
+        balance: slice[slice.length - 1].balance,
+      });
+    }
+    return years;
+  }
+
+  /* ---------- 渲染 ---------- */
+
+  function renderSchedule(years) {
+    var html = "";
+    for (var i = 0; i < years.length; i++) {
+      var y = years[i];
+      html +=
+        "<tr>" +
+        "<td>第 " + y.year + " 年</td>" +
+        "<td>" + wan(y.principal) + "</td>" +
+        "<td>" + wan(y.interest) + "</td>" +
+        "<td>" + wan(y.balance) + "</td>" +
+        "</tr>";
+    }
+    el.tbody.innerHTML = html;
+  }
+
+  function renderSummaryText() {
+    if (state.loanType === "commercial") {
+      el.rateSummary.innerHTML = "实际年利率 <strong>" + commercialRate().toFixed(2) + "%</strong>";
+      el.rateHint.textContent = "基点可正可负";
+    } else if (state.loanType === "fund") {
+      el.rateSummary.innerHTML = "公积金年利率 <strong>" + state.fundRate.toFixed(2) + "%</strong>";
+      el.rateHint.textContent = "5 年以上首套 2.6%";
+    } else {
+      el.rateSummary.innerHTML =
+        "商贷 <strong>" + commercialRate().toFixed(2) + "%</strong> · 公积金 <strong>" +
+        state.fundRate.toFixed(2) + "%</strong>";
+      el.rateHint.textContent = "";
+    }
+  }
+
+  function clearResult(message) {
+    el.label.textContent = "每月月供";
+    el.value.innerHTML = '<span class="cny">¥</span>—';
+    el.note.textContent = message || "请填写贷款金额";
+    el.interest.textContent = "—";
+    el.total.textContent = "—";
+    el.ratio.textContent = "—";
+    el.tbody.innerHTML = "";
+  }
+
+  function render() {
+    var months = state.years * 12;
+    renderSummaryText();
+
+    var segments = loanSegments();
+    if (!segments.length || !(months > 0)) {
+      clearResult();
+      return;
+    }
+
+    var parts = [];
+    var principalSum = 0;
+    var totalInterest = 0;
+    var firstPaySum = 0;
+    var lastPaySum = 0;
+    var stepSum = 0;
+
+    for (var i = 0; i < segments.length; i++) {
+      var seg = segments[i];
+      var result = buildRows(seg.principal, seg.rate / 100 / 12, months, state.method);
+      parts.push(result);
+      principalSum += seg.principal;
+      totalInterest += result.totalInterest;
+      firstPaySum += result.firstPay;
+      lastPaySum += result.lastPay || result.firstPay;
+      stepSum += result.stepDown || 0;
+    }
+
+    var total = principalSum + totalInterest;
+    var ratio = total > 0 ? (totalInterest / total) * 100 : 0;
+
+    if (state.method === "annuity") {
+      el.label.textContent = "每月月供";
+      el.note.textContent = "等额本息 · 共 " + months + " 期 · 月供固定";
+    } else {
+      el.label.textContent = "首月月供";
+      el.note.textContent =
+        "末月 " + money(lastPaySum) + " · 每月递减 " + Math.round(stepSum) + " 元";
+    }
+
+    el.value.innerHTML = '<span class="cny">¥</span>' +
+      Math.round(firstPaySum).toLocaleString("zh-CN");
+    el.interest.textContent = money(totalInterest);
+    el.total.textContent = money(total);
+    el.ratio.textContent = ratio.toFixed(1) + "%";
+
+    /* 多段贷款按年合并 */
+    var merged = [];
+    for (var p = 0; p < parts.length; p++) {
+      var yearRows = summarize(parts[p].rows, months);
+      for (var y = 0; y < yearRows.length; y++) {
+        if (!merged[y]) {
+          merged[y] = { year: y + 1, principal: 0, interest: 0, balance: 0 };
+        }
+        merged[y].principal += yearRows[y].principal;
+        merged[y].interest += yearRows[y].interest;
+        merged[y].balance += yearRows[y].balance;
+      }
+    }
+    renderSchedule(merged);
+  }
+
+  /* ---------- 交互 ---------- */
+
+  function syncVisibility() {
+    var isMixed = state.loanType === "mixed";
+    var hasCommercial = state.loanType === "commercial" || isMixed;
+    var hasFund = state.loanType === "fund" || isMixed;
+
+    el.rowCommercial.hidden = !hasCommercial;
+    el.rowFund.hidden = !hasFund;
+    el.range.hidden = isMixed;
+    el.amountChipsWrap.hidden = isMixed;
+    el.rateCommercial.hidden = !hasCommercial;
+    el.rowFundRate.hidden = !hasFund;
+
+    el.labelCommercial.textContent = isMixed ? "商贷金额" : "贷款金额";
+    el.labelFund.textContent = isMixed ? "公积金金额" : "贷款金额";
+  }
+
+  function paintControls() {
+    el.typeTabs.forEach(function (tab) {
+      tab.setAttribute("aria-pressed", String(tab.getAttribute("data-loan") === state.loanType));
+    });
+    el.methodSegs.forEach(function (seg) {
+      seg.setAttribute("aria-pressed", String(seg.getAttribute("data-method") === state.method));
+    });
+    paintAmountChips();
+    el.yearsChips.forEach(function (chip) {
+      chip.setAttribute("aria-pressed", String(Number(chip.getAttribute("data-years")) === state.years));
+    });
+  }
+
+  function paintAmountChips() {
+    var amount = activeAmount();
+    el.amountChips.forEach(function (chip) {
+      chip.setAttribute("aria-pressed", String(Number(chip.getAttribute("data-amount")) === amount));
+    });
+  }
+
+  /** 滑块跟随当前贷款类型对应金额 */
+  function activeAmount() {
+    return state.loanType === "fund" ? state.fundAmount : state.commercialAmount;
+  }
+
+  function paintSlider() {
+    var value = clamp(activeAmount(), RANGE_MIN, RANGE_MAX);
+    el.range.value = String(value);
+    var pct = ((value - RANGE_MIN) / (RANGE_MAX - RANGE_MIN)) * 100;
+    el.range.style.setProperty("--pct", pct.toFixed(2) + "%");
+    paintAmountChips();
+  }
+
+  function paintYearSlider() {
+    var value = clamp(state.years, YEAR_MIN, YEAR_MAX);
+    el.yearsRange.value = String(value);
+    var pct = ((value - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * 100;
+    el.yearsRange.style.setProperty("--pct", pct.toFixed(2) + "%");
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      /* 隐私模式下忽略 */
+    }
+  }
+
+  function update() {
+    render();
+    save();
+  }
+
+  /** 绑定金额输入：空值按 0 处理，失焦时回写规范化后的值 */
+  function bindAmount(input, key) {
+    input.addEventListener("input", function () {
+      var raw = input.value.trim();
+      if (raw === "") {
+        state[key] = 0;
+        render();
+        return;
+      }
+      var value = Number(raw);
+      if (!isFinite(value) || value < 0) return;
+      state[key] = value;
+      paintSlider();
+      update();
+    });
+    input.addEventListener("blur", function () {
+      if (state[key] < 0) state[key] = 0;
+      input.value = String(state[key]);
+      paintSlider();
+      update();
+    });
+  }
+
+  /** 绑定利率类输入，min 为负表示允许负数（基点） */
+  function bindRate(input, key, min, max) {
+    input.addEventListener("input", function () {
+      var raw = input.value.trim();
+      if (raw === "") {
+        state[key] = 0;
+        render();
+        return;
+      }
+      var value = Number(raw);
+      if (!isFinite(value)) return;
+      state[key] = clamp(value, min, max);
+      update();
+    });
+    input.addEventListener("blur", function () {
+      input.value = String(state[key]);
+      update();
+    });
+  }
+
+  bindAmount(el.amountCommercial, "commercialAmount");
+  bindAmount(el.amountFund, "fundAmount");
+  bindRate(el.lpr, "lpr", 0, 20);
+  bindRate(el.spread, "spread", -300, 300);
+  bindRate(el.fundRate, "fundRate", 0, 24);
+
+  el.range.addEventListener("input", function () {
+    var value = Number(el.range.value);
+    if (state.loanType === "fund") {
+      state.fundAmount = value;
+      el.amountFund.value = String(value);
+    } else {
+      state.commercialAmount = value;
+      el.amountCommercial.value = String(value);
+    }
+    paintSlider();
+    update();
+  });
+
+  el.typeTabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      var type = tab.getAttribute("data-loan");
+      if (LOAN_TYPES.indexOf(type) === -1) return;
+      state.loanType = type;
+      syncVisibility();
+      paintControls();
+      paintSlider();
+      update();
+    });
+  });
+
+  el.methodSegs.forEach(function (seg) {
+    seg.addEventListener("click", function () {
+      var method = seg.getAttribute("data-method");
+      if (METHODS.indexOf(method) === -1) return;
+      state.method = method;
+      paintControls();
+      update();
+    });
+  });
+
+  el.yearsChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var years = Number(chip.getAttribute("data-years"));
+      if (YEARS.indexOf(years) === -1) return;
+      state.years = years;
+      el.yearsInput.value = String(years);
+      paintYearSlider();
+      paintControls();
+      update();
+    });
+  });
+
+  el.amountChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var amount = Number(chip.getAttribute("data-amount"));
+      if (!isFinite(amount) || amount <= 0) return;
+      if (state.loanType === "fund") {
+        state.fundAmount = amount;
+        el.amountFund.value = String(amount);
+      } else {
+        state.commercialAmount = amount;
+        el.amountCommercial.value = String(amount);
+      }
+      paintSlider();
+      paintAmountChips();
+      update();
+    });
+  });
+
+  el.yearsInput.addEventListener("input", function () {
+    var raw = el.yearsInput.value.trim();
+    if (raw === "") return;
+    var value = Number(raw);
+    if (!isFinite(value)) return;
+    state.years = clamp(Math.round(value), YEAR_MIN, YEAR_MAX);
+    paintYearSlider();
+    paintControls();
+    update();
+  });
+  el.yearsInput.addEventListener("blur", function () {
+    el.yearsInput.value = String(state.years);
+    paintYearSlider();
+    update();
+  });
+
+  el.yearsRange.addEventListener("input", function () {
+    state.years = Number(el.yearsRange.value);
+    el.yearsInput.value = String(state.years);
+    paintYearSlider();
+    paintControls();
+    update();
+  });
+
+  el.schedule.addEventListener("toggle", function () {
+    var label = el.schedule.querySelector(".toggle-label");
+    label.textContent = el.schedule.open ? "收起还款明细" : "查看还款明细";
+  });
+
+  /* ---------- 初始化 ---------- */
+
+  (function restore() {
+    var saved;
+    try {
+      saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    } catch (e) {
+      saved = null;
+    }
+    if (!saved || typeof saved !== "object") return;
+
+    if (LOAN_TYPES.indexOf(saved.loanType) !== -1) state.loanType = saved.loanType;
+    if (METHODS.indexOf(saved.method) !== -1) state.method = saved.method;
+    if (typeof saved.years === "number" && isFinite(saved.years)) {
+      state.years = clamp(Math.round(saved.years), YEAR_MIN, YEAR_MAX);
+    }
+
+    if (typeof saved.commercialAmount === "number" && isFinite(saved.commercialAmount) && saved.commercialAmount >= 0) {
+      state.commercialAmount = saved.commercialAmount;
+    }
+    if (typeof saved.fundAmount === "number" && isFinite(saved.fundAmount) && saved.fundAmount >= 0) {
+      state.fundAmount = saved.fundAmount;
+    }
+    if (typeof saved.lpr === "number" && isFinite(saved.lpr)) {
+      state.lpr = clamp(saved.lpr, 0, 20);
+    }
+    if (typeof saved.spread === "number" && isFinite(saved.spread)) {
+      state.spread = clamp(saved.spread, -300, 300);
+    }
+    if (typeof saved.fundRate === "number" && isFinite(saved.fundRate)) {
+      state.fundRate = clamp(saved.fundRate, 0, 24);
+    }
+  })();
+
+  el.amountCommercial.value = String(state.commercialAmount);
+  el.amountFund.value = String(state.fundAmount);
+  el.lpr.value = String(state.lpr);
+  el.spread.value = String(state.spread);
+  el.fundRate.value = String(state.fundRate);
+  el.yearsInput.value = String(state.years);
+
+  syncVisibility();
+  paintControls();
+  paintSlider();
+  paintYearSlider();
+  render();
+})();
+</script>
+</body>
+</html>
