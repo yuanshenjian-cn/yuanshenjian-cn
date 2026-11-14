@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>个税计算器</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='4' width='18' height='24' rx='3' fill='none' stroke='%2312936f' stroke-width='2.4'/%3E%3Cpath d='M12 11h8M12 16h8M12 21h4' stroke='%2312936f' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light dark;
+    --page-bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f1f2f4;
+    --border: #e3e5e9;
+    --border-soft: #eef0f2;
+    --ink: #1c2026;
+    --muted: #68707b;
+    --accent: #12936f;
+    --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #101114;
+      --surface: #191b1f;
+      --surface-2: #22252a;
+      --border: #2d3137;
+      --border-soft: #24272c;
+      --ink: #eceef2;
+      --muted: #9aa1ac;
+      --accent: #45c79b;
+      --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: clamp(12px, 2vh, 20px) 20px 36px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .head {
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    transition: background-color .15s ease, color .15s ease,
+      border-color .15s ease;
+  }
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card + .card { margin-top: 12px; }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 280px;
+    height: 220px;
+    background: radial-gradient(circle,
+      color-mix(in srgb, var(--accent) 11%, transparent) 0%, transparent 68%);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .card > * { position: relative; }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0 0 2px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+  .card-title {
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .card-total {
+    margin-left: auto;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .caret {
+    flex: none;
+    color: var(--muted);
+    transform: rotate(0deg);
+    transition: transform .2s ease;
+  }
+  .card-head[aria-expanded="false"] .caret { transform: rotate(-90deg); }
+
+  /* ---- 输入 ---- */
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background: var(--surface-2);
+    cursor: text;
+    transition: border-color .15s ease;
+  }
+  .row:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .row-label {
+    flex: none;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .label-unit {
+    margin-left: 3px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--muted) 62%, transparent);
+  }
+  .row-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+  }
+  .num {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    outline: none;
+  }
+  .num::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+  .unit {
+    flex: none;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* ---- 步进胶囊 ---- */
+  .stepper {
+    display: inline-flex;
+    align-items: stretch;
+    flex: none;
+    height: 32px;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .stepper:has(:focus-visible) {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .stepper .row-value {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 5px;
+    border-left: 1px solid var(--border-soft);
+    border-right: 1px solid var(--border-soft);
+  }
+  .stepper .num {
+    display: inline-block;
+    width: 4.2em;
+    height: auto;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .stepper .num.is-count { width: 1.5em; }
+  .stepper .unit { font-size: 12px; }
+  .step-count {
+    min-width: 1.1em;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--ink);
+  }
+  .step-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: color-mix(in srgb, var(--ink) 62%, var(--muted));
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background-color .12s ease, color .12s ease;
+  }
+  .step-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:active:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:disabled {
+    color: color-mix(in srgb, var(--muted) 30%, transparent);
+    cursor: default;
+  }
+  .step-btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: -3px;
+    border-radius: 8px;
+  }
+
+  /* ---- chips ---- */
+  .chips {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .chips.is-wide { justify-content: space-between; }
+  .chip {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip:hover:not([aria-pressed="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ---- 五险一金 ---- */
+  .row.is-button {
+    width: 100%;
+    border: 1px solid transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .row.is-button:hover { border-color: var(--border); }
+  .row.is-button[aria-expanded="true"] {
+    border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+    background: color-mix(in srgb, var(--accent) 5%, var(--surface-2));
+  }
+  .total-rate {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    margin-left: auto;
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .total-rate .unit { font-size: 12px; }
+  .row.is-button .caret {
+    flex: none;
+    margin-left: 6px;
+    color: var(--muted);
+  }
+  .row.is-button[aria-expanded="true"] .caret { transform: rotate(180deg); }
+
+  .rate-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 16px;
+    padding: 0 2px;
+  }
+  .rate-summary {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .rate-summary strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .social-panel {
+    margin-top: 8px;
+    padding: 0 12px 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .city-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0 5px;
+  }
+  .city-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .city-state {
+    font-size: 11px;
+    line-height: 16px;
+    color: color-mix(in srgb, var(--accent) 82%, var(--ink));
+  }
+  .city-chips {
+    gap: 3px;
+    margin-bottom: 5px;
+    padding: 2px;
+    border-radius: 12px;
+  }
+  .city-chips .chip {
+    flex: 1 1 0;
+    min-width: 36px;
+    height: 26px;
+    padding: 0 4px;
+    border-radius: 9px;
+    font-size: 12px;
+  }
+  .social-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 46px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .social-item:last-of-type { border-bottom: 0; }
+  .social-name {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink);
+  }
+  .social-name small {
+    display: block;
+    margin-top: 1px;
+    font-size: 10.5px;
+    line-height: 15px;
+    color: var(--muted);
+  }
+  .social-note {
+    margin: 2px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 10.5px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+
+  /* ---- 专项附加扣除列表 ---- */
+  .ded-body {
+    margin-top: 8px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .ded {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 50px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .ded:last-child { border-bottom: 0; padding-bottom: 2px; }
+  .ded-main {
+    min-width: 0;
+  }
+  .ded-label {
+    display: block;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--ink);
+  }
+  .ded-desc {
+    display: block;
+    margin-top: 1px;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .ded .chips {
+    flex: none;
+    padding: 2px;
+  }
+  .ded .chip {
+    flex: none;
+    height: 26px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+  .stepper.is-compact { height: 28px; border-radius: 9px; }
+  .stepper.is-compact .step-btn { width: 26px; font-size: 15px; }
+  .stepper.is-compact .row-value { padding: 0 2px; }
+
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 50px;
+    padding: 9px 0;
+    border: 0;
+    border-bottom: 1px solid var(--border-soft);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+  .switch {
+    position: relative;
+    flex: none;
+    width: 38px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+    transition: background-color .18s ease, border-color .18s ease;
+  }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(17, 24, 39, .24);
+    transition: transform .18s ease;
+  }
+  [aria-checked="true"] > .switch {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  [aria-checked="true"] > .switch::after { transform: translateX(16px); }
+
+  .inline-input {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    flex: none;
+  }
+  .inline-input .num {
+    width: 92px;
+    height: 32px;
+    padding: 0 9px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    font-size: 15px;
+    text-align: right;
+  }
+  .inline-input .num:focus {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  /* ---- 结果 ---- */
+  .result {
+    text-align: center;
+  }
+  .result-label {
+    margin: 0;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+  .result-value {
+    margin: 2px 0 0;
+    font-size: clamp(30px, 9vw, 38px);
+    line-height: 1.16;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .result-value .cny {
+    margin-right: 2px;
+    font-size: .52em;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .result-note {
+    margin: 3px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 13px 0 0;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .metric { min-width: 0; }
+  .metric dt {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .metric dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  /* ---- 年终奖对比 ---- */
+  .compare {
+    margin-top: 13px;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+  }
+  .compare-title {
+    margin: 0 0 7px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .plan {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 8px 11px;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background: var(--surface-2);
+    text-align: left;
+    cursor: pointer;
+  }
+  .plan + .plan { margin-top: 6px; }
+  .plan[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+  .plan-name {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .plan[aria-pressed="true"] .plan-name {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .plan-tax {
+    margin-left: auto;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .plan-tag {
+    flex: none;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: color-mix(in srgb, var(--accent) 82%, var(--ink));
+    font-size: 10px;
+    line-height: 15px;
+  }
+  .compare-note {
+    margin: 8px 0 0;
+    font-size: 11.5px;
+    line-height: 17px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ---- 明细 ---- */
+  .breakdown {
+    margin-top: 10px;
+    border-top: 1px solid var(--border-soft);
+    text-align: left;
+  }
+  .breakdown > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    list-style: none;
+    cursor: pointer;
+  }
+  .breakdown > summary::-webkit-details-marker { display: none; }
+  .breakdown > summary .caret { transition: transform .2s ease; }
+  .breakdown[open] > summary .caret { transform: rotate(180deg); }
+  .bd-rows { padding-top: 7px; }
+  .bd-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .bd-row b {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .bd-row.is-total {
+    margin-top: 4px;
+    padding-top: 7px;
+    border-top: 1px dashed var(--border);
+    color: var(--ink);
+  }
+  .bd-row.is-total b { font-weight: 500; }
+
+  /* ---- 底部 ---- */
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 0 4px;
+  }
+  .foot-note {
+    margin: 0;
+    font-size: 11px;
+    line-height: 17px;
+    color: var(--muted);
+  }
+  .text-button {
+    flex: none;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font-size: 12px;
+    line-height: 18px;
+    cursor: pointer;
+  }
+  .text-button:hover { text-decoration: underline; }
+
+  .policy {
+    margin-top: 8px;
+    padding: 0 4px;
+    font-size: 11.5px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .policy > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 0;
+    list-style: none;
+    cursor: pointer;
+  }
+  .policy > summary::-webkit-details-marker { display: none; }
+  .policy[open] > summary .caret { transform: rotate(180deg); }
+  .policy ul {
+    margin: 4px 0 0;
+    padding: 10px 12px 10px 26px;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .policy li { margin: 2px 0; }
+  .policy p {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 17px;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 12px 14px 32px; }
+    .card { padding: 14px 14px 16px; border-radius: 20px; }
+    .row { padding: 0 12px; }
+    .ded { gap: 8px; }
+    .ded .chip { padding: 0 7px; font-size: 11.5px; }
+    .stepper .num { width: 4.6em; }
+  }
+  @media (max-width: 360px) {
+    body { padding: 10px 12px 28px; }
+    .card { padding: 12px 12px 14px; }
+    .ded .chip { padding: 0 6px; font-size: 11px; }
+    .metric dd { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <h1 class="title">个税计算器</h1>
+  </header>
+
+  <!-- 收入 -->
+  <section class="card" aria-label="收入与五险一金">
+    <div class="fields">
+      <div class="row">
+        <label class="row-label" for="salary">税前月薪</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="salary" data-step="-1000"
+                  aria-label="月薪减少 1000 元">−</button>
+          <span class="row-value">
+            <input id="salary" class="num" type="number" inputmode="decimal" min="0" step="100"
+                   value="20000" aria-label="税前月薪，单位元">
+            <span class="unit">元</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="salary" data-step="1000"
+                  aria-label="月薪增加 1000 元">+</button>
+        </div>
+      </div>
+
+      <div class="chips is-wide" id="salary-chips" role="group" aria-label="月薪快捷选择">
+        <button type="button" class="chip" data-salary="10000">1 万</button>
+        <button type="button" class="chip" data-salary="20000">2 万</button>
+        <button type="button" class="chip" data-salary="30000">3 万</button>
+        <button type="button" class="chip" data-salary="50000">5 万</button>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="bonus">年终奖 <span class="label-unit">可选</span></label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="bonus" data-step="-10000"
+                  aria-label="年终奖减少 10000 元">−</button>
+          <span class="row-value">
+            <input id="bonus" class="num" type="number" inputmode="decimal" min="0" step="1000"
+                   value="0" aria-label="全年一次性奖金，单位元">
+            <span class="unit">元</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="bonus" data-step="10000"
+                  aria-label="年终奖增加 10000 元">+</button>
+        </div>
+      </div>
+
+      <button type="button" class="row is-button" id="social-toggle"
+              title="展开或收起五险一金分项"
+              aria-expanded="false" aria-controls="social-panel">
+        <span class="row-label">五险一金 <span class="label-unit">个人合计</span></span>
+        <span class="total-rate"><span id="social-total">17.5</span><span class="unit">%</span></span>
+        <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="rate-foot">
+        <span class="rate-summary" id="social-summary">每月约 <strong>¥3,500</strong></span>
+      </div>
+
+      <div class="social-panel" id="social-panel" hidden>
+        <div class="city-row">
+          <span class="city-label">城市预设</span>
+          <span class="city-state" id="city-state" hidden>已手动调整</span>
+        </div>
+        <div class="chips city-chips" id="city-chips" role="group" aria-label="按城市填充五险一金比例">
+          <button type="button" class="chip" data-city="shanghai" aria-pressed="true">上海</button>
+          <button type="button" class="chip" data-city="beijing">北京</button>
+          <button type="button" class="chip" data-city="shenzhen">深圳</button>
+          <button type="button" class="chip" data-city="guangzhou">广州</button>
+          <button type="button" class="chip" data-city="hangzhou">杭州</button>
+          <button type="button" class="chip" data-city="chengdu">成都</button>
+          <button type="button" class="chip" data-city="national">全国</button>
+        </div>
+
+        <div class="social-item">
+          <span class="social-name">养老保险<small>个人 8%，全国统一</small></span>
+          <div class="stepper is-compact">
+            <button type="button" class="step-btn" data-step-target="social-pension" data-step="-0.5"
+                    aria-label="养老保险比例减少 0.5 个百分点">−</button>
+            <span class="row-value">
+              <input id="social-pension" class="num" type="number" inputmode="decimal"
+                     min="0" max="12" step="0.5" value="8" aria-label="养老保险个人缴纳比例">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="social-pension" data-step="0.5"
+                    aria-label="养老保险比例增加 0.5 个百分点">+</button>
+          </div>
+        </div>
+
+        <div class="social-item">
+          <span class="social-name">医疗保险<small>多数城市 2%，深圳二档 0.5%</small></span>
+          <div class="stepper is-compact">
+            <button type="button" class="step-btn" data-step-target="social-medical" data-step="-0.5"
+                    aria-label="医疗保险比例减少 0.5 个百分点">−</button>
+            <span class="row-value">
+              <input id="social-medical" class="num" type="number" inputmode="decimal"
+                     min="0" max="12" step="0.5" value="2" aria-label="医疗保险个人缴纳比例">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="social-medical" data-step="0.5"
+                    aria-label="医疗保险比例增加 0.5 个百分点">+</button>
+          </div>
+        </div>
+
+        <div class="social-item">
+          <span class="social-name">失业保险<small>各地 0.2%–0.5%</small></span>
+          <div class="stepper is-compact">
+            <button type="button" class="step-btn" data-step-target="social-unemployment" data-step="-0.1"
+                    aria-label="失业保险比例减少 0.1 个百分点">−</button>
+            <span class="row-value">
+              <input id="social-unemployment" class="num" type="number" inputmode="decimal"
+                     min="0" max="3" step="0.1" value="0.5" aria-label="失业保险个人缴纳比例">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="social-unemployment" data-step="0.1"
+                    aria-label="失业保险比例增加 0.1 个百分点">+</button>
+          </div>
+        </div>
+
+        <div class="social-item">
+          <span class="social-name">住房公积金<small>单位在 5%–12% 内自定</small></span>
+          <div class="stepper is-compact">
+            <button type="button" class="step-btn" data-step-target="social-fund" data-step="-0.5"
+                    aria-label="住房公积金比例减少 0.5 个百分点">−</button>
+            <span class="row-value">
+              <input id="social-fund" class="num" type="number" inputmode="decimal"
+                     min="0" max="12" step="0.5" value="7" aria-label="住房公积金个人缴纳比例">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="social-fund" data-step="0.5"
+                    aria-label="住房公积金比例增加 0.5 个百分点">+</button>
+          </div>
+        </div>
+
+        <div class="social-item">
+          <span class="social-name">其他<small>补充公积金、大额医疗等</small></span>
+          <div class="stepper is-compact">
+            <button type="button" class="step-btn" data-step-target="social-other" data-step="-0.5"
+                    aria-label="其他扣除比例减少 0.5 个百分点">−</button>
+            <span class="row-value">
+              <input id="social-other" class="num" type="number" inputmode="decimal"
+                     min="0" max="10" step="0.5" value="0" aria-label="其他个人缴纳比例">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="social-other" data-step="0.5"
+                    aria-label="其他扣除比例增加 0.5 个百分点">+</button>
+          </div>
+        </div>
+
+        <p class="social-note">工伤、生育保险个人不缴。合计由各项相加得出，不可直接填写；比例为常见参考值，实际以当地社保、公积金中心为准。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 专项附加扣除 -->
+  <section class="card" aria-label="专项附加扣除">
+    <button type="button" class="card-head" id="deduction-toggle"
+            aria-expanded="true" aria-controls="deduction-body">
+      <span class="card-title">专项附加扣除</span>
+      <span class="card-total" id="deduction-total">¥0 / 月</span>
+      <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+           stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <div class="ded-body" id="deduction-body">
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">子女教育</span>
+          <span class="ded-desc">2,000 元 / 孩 / 月</span>
+        </span>
+        <div class="stepper is-compact">
+          <button type="button" class="step-btn" data-step-target="childEdu" data-step="-1"
+                  aria-label="子女数量减少 1">−</button>
+          <span class="row-value">
+            <span class="step-count" id="childEdu-value">0</span>
+            <span class="unit">孩</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="childEdu" data-step="1"
+                  aria-label="子女数量增加 1">+</button>
+        </div>
+      </div>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">3 岁以下照护</span>
+          <span class="ded-desc">2,000 元 / 孩 / 月</span>
+        </span>
+        <div class="stepper is-compact">
+          <button type="button" class="step-btn" data-step-target="babyCare" data-step="-1"
+                  aria-label="婴幼儿数量减少 1">−</button>
+          <span class="row-value">
+            <span class="step-count" id="babyCare-value">0</span>
+            <span class="unit">孩</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="babyCare" data-step="1"
+                  aria-label="婴幼儿数量增加 1">+</button>
+        </div>
+      </div>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">赡养老人</span>
+          <span class="ded-desc">独生 3,000 · 非独生每人 ≤1,500</span>
+        </span>
+        <div class="chips" id="elder-chips" role="group" aria-label="赡养老人扣除">
+          <button type="button" class="chip" data-elder="0">无</button>
+          <button type="button" class="chip" data-elder="1500">1,500</button>
+          <button type="button" class="chip" data-elder="3000">3,000</button>
+        </div>
+      </div>
+
+      <button type="button" class="switch-row" id="loan-row" role="switch" aria-checked="false">
+        <span class="ded-main">
+          <span class="ded-label">住房贷款利息</span>
+          <span class="ded-desc">1,000 元 / 月，与住房租金不可同享</span>
+        </span>
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">住房租金</span>
+          <span class="ded-desc">按城市档位，每月 800 / 1,100 / 1,500</span>
+        </span>
+        <div class="chips" id="rent-chips" role="group" aria-label="住房租金扣除">
+          <button type="button" class="chip" data-rent="0">无</button>
+          <button type="button" class="chip" data-rent="800">800</button>
+          <button type="button" class="chip" data-rent="1100">1,100</button>
+          <button type="button" class="chip" data-rent="1500">1,500</button>
+        </div>
+      </div>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">继续教育</span>
+          <span class="ded-desc">学历 400 / 月 · 职业资格 3,600 / 年</span>
+        </span>
+        <div class="chips" id="edu-chips" role="group" aria-label="继续教育扣除">
+          <button type="button" class="chip" data-edu="0">无</button>
+          <button type="button" class="chip" data-edu="400">学历</button>
+          <button type="button" class="chip" data-edu="300">资格</button>
+        </div>
+      </div>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">大病医疗</span>
+          <span class="ded-desc">自付超 1.5 万部分，年度上限 8 万</span>
+        </span>
+        <span class="inline-input">
+          <input id="medical" class="num" type="number" inputmode="decimal" min="0" step="1000"
+                 value="0" aria-label="年度医保目录内自付医疗费用，单位元">
+          <span class="unit">元</span>
+        </span>
+      </div>
+
+      <div class="ded">
+        <span class="ded-main">
+          <span class="ded-label">个人养老金</span>
+          <span class="ded-desc">年度缴存最高 12,000 元据实扣除</span>
+        </span>
+        <span class="inline-input">
+          <input id="pension" class="num" type="number" inputmode="decimal" min="0" max="12000"
+                 step="1000" value="0" aria-label="年度个人养老金缴存额，单位元">
+          <span class="unit">元</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="card result" aria-label="计算结果">
+    <p class="result-label">全年应纳个税</p>
+    <p class="result-value"><span class="cny">¥</span><span id="tax-total">0</span></p>
+    <p class="result-note" id="tax-note">按年收入折算</p>
+
+    <dl class="metrics">
+      <div class="metric">
+        <dt>税后年收入</dt>
+        <dd id="after-tax">¥0</dd>
+      </div>
+      <div class="metric">
+        <dt>月均到手</dt>
+        <dd id="monthly-net">¥0</dd>
+      </div>
+      <div class="metric">
+        <dt>实际税负</dt>
+        <dd id="burden">0%</dd>
+      </div>
+    </dl>
+
+    <div class="compare" id="compare" hidden>
+      <p class="compare-title">年终奖计税方式</p>
+      <button type="button" class="plan" id="plan-separate" aria-pressed="false">
+        <span class="plan-name">单独计税</span>
+        <span class="plan-tag" id="tag-separate" hidden>更省</span>
+        <span class="plan-tax" id="tax-separate">¥0</span>
+      </button>
+      <button type="button" class="plan" id="plan-merged" aria-pressed="false">
+        <span class="plan-name">并入综合所得</span>
+        <span class="plan-tag" id="tag-merged" hidden>更省</span>
+        <span class="plan-tax" id="tax-merged">¥0</span>
+      </button>
+      <p class="compare-note" id="compare-note"></p>
+    </div>
+
+    <details class="breakdown">
+      <summary>
+        计算明细
+        <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="bd-rows" id="breakdown-rows"></div>
+    </details>
+  </section>
+
+  <div class="foot">
+    <p class="foot-note">数据只保存在当前浏览器</p>
+    <button type="button" class="text-button" id="reset-defaults">恢复默认</button>
+  </div>
+
+  <details class="policy">
+    <summary>
+      政策依据（2026 年现行）
+      <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+           stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <ul>
+      <li>减除费用：每年 60,000 元（每月 5,000 元）</li>
+      <li>综合所得适用 3%–45% 七级超额累进税率</li>
+      <li>子女教育、3 岁以下婴幼儿照护：每孩每月 2,000 元</li>
+      <li>赡养老人：每月 3,000 元；非独生子女分摊，每人不超过 1,500 元</li>
+      <li>住房贷款利息：每月 1,000 元；住房租金：每月 1,500 / 1,100 / 800 元，二者不可同时享受</li>
+      <li>继续教育：学历教育每月 400 元；职业资格取证当年 3,600 元</li>
+      <li>大病医疗：医保目录内自付超 15,000 元的部分，年度上限 80,000 元</li>
+      <li>个人养老金：每年最高 12,000 元据实扣除</li>
+      <li>五险一金个人比例按城市常见档位预填：养老 8%、医疗多为 2%、失业 0.2%–0.5%、公积金 5%–12% 由单位自定；合计随分项自动加总</li>
+      <li>全年一次性奖金单独计税政策执行至 2027 年 12 月 31 日</li>
+    </ul>
+    <p>结果为估算：未考虑五险一金缴费基数上下限、专项附加扣除的夫妻分摊比例、公益慈善捐赠、减免税额等个案因素。实际以个税 App 与扣缴义务人申报为准。</p>
+  </details>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'ysj-tax-calc-v2';
+
+  /** 各城市个人缴纳比例参考值（公积金为单位在 5%–12% 内的常见档位） */
+  var CITY_PRESETS = {
+    shanghai: { label: '上海', pension: 8, medical: 2, unemployment: 0.5, fund: 7, other: 0 },
+    beijing: { label: '北京', pension: 8, medical: 2, unemployment: 0.2, fund: 12, other: 0 },
+    shenzhen: { label: '深圳', pension: 8, medical: 2, unemployment: 0.2, fund: 5, other: 0 },
+    guangzhou: { label: '广州', pension: 8, medical: 2, unemployment: 0.2, fund: 5, other: 0 },
+    hangzhou: { label: '杭州', pension: 8, medical: 2, unemployment: 0.5, fund: 12, other: 0 },
+    chengdu: { label: '成都', pension: 8, medical: 2, unemployment: 0.4, fund: 6, other: 0 },
+    national: { label: '全国通用', pension: 8, medical: 2, unemployment: 0.5, fund: 7, other: 0 }
+  };
+
+  var SOCIAL_ITEMS = [
+    { key: 'pension', target: 'social-pension', min: 0, max: 12, step: 0.5 },
+    { key: 'medical', target: 'social-medical', min: 0, max: 12, step: 0.5 },
+    { key: 'unemployment', target: 'social-unemployment', min: 0, max: 3, step: 0.1 },
+    { key: 'fund', target: 'social-fund', min: 0, max: 12, step: 0.5 },
+    { key: 'other', target: 'social-other', min: 0, max: 10, step: 0.5 }
+  ];
+
+  var DEFAULTS = {
+    salary: 20000,
+    bonus: 0,
+    city: 'shanghai',
+    social: { pension: 8, medical: 2, unemployment: 0.5, fund: 7, other: 0 },
+    childEdu: 0,
+    babyCare: 0,
+    elder: 0,
+    housingLoan: false,
+    rent: 0,
+    edu: 0,
+    medical: 0,
+    pension: 0,
+    plan: 'auto'
+  };
+
+  function cloneDefaults() {
+    var copy = Object.assign({}, DEFAULTS);
+    copy.social = Object.assign({}, DEFAULTS.social);
+    return copy;
+  }
+
+  var state = cloneDefaults();
+
+  var ANNUAL_BRACKETS = [
+    { limit: 36000, rate: 0.03, quick: 0 },
+    { limit: 144000, rate: 0.10, quick: 2520 },
+    { limit: 300000, rate: 0.20, quick: 16920 },
+    { limit: 420000, rate: 0.25, quick: 31920 },
+    { limit: 660000, rate: 0.30, quick: 52920 },
+    { limit: 960000, rate: 0.35, quick: 85920 },
+    { limit: Infinity, rate: 0.45, quick: 181920 }
+  ];
+
+  var MONTH_BRACKETS = [
+    { limit: 3000, rate: 0.03, quick: 0 },
+    { limit: 12000, rate: 0.10, quick: 210 },
+    { limit: 25000, rate: 0.20, quick: 1410 },
+    { limit: 35000, rate: 0.25, quick: 2660 },
+    { limit: 55000, rate: 0.30, quick: 4410 },
+    { limit: 80000, rate: 0.35, quick: 7160 },
+    { limit: Infinity, rate: 0.45, quick: 15160 }
+  ];
+
+  var el = {
+    salary: document.getElementById('salary'),
+    bonus: document.getElementById('bonus'),
+    socialTotal: document.getElementById('social-total'),
+    socialSummary: document.getElementById('social-summary'),
+    socialToggle: document.getElementById('social-toggle'),
+    socialPanel: document.getElementById('social-panel'),
+    cityChips: document.getElementById('city-chips'),
+    cityState: document.getElementById('city-state'),
+    salaryChips: document.getElementById('salary-chips'),
+    elderChips: document.getElementById('elder-chips'),
+    rentChips: document.getElementById('rent-chips'),
+    eduChips: document.getElementById('edu-chips'),
+    loanRow: document.getElementById('loan-row'),
+    medical: document.getElementById('medical'),
+    pension: document.getElementById('pension'),
+    childEduValue: document.getElementById('childEdu-value'),
+    babyCareValue: document.getElementById('babyCare-value'),
+    deductionToggle: document.getElementById('deduction-toggle'),
+    deductionBody: document.getElementById('deduction-body'),
+    deductionTotal: document.getElementById('deduction-total'),
+    taxTotal: document.getElementById('tax-total'),
+    taxNote: document.getElementById('tax-note'),
+    afterTax: document.getElementById('after-tax'),
+    monthlyNet: document.getElementById('monthly-net'),
+    burden: document.getElementById('burden'),
+    compare: document.getElementById('compare'),
+    planSeparate: document.getElementById('plan-separate'),
+    planMerged: document.getElementById('plan-merged'),
+    taxSeparate: document.getElementById('tax-separate'),
+    taxMerged: document.getElementById('tax-merged'),
+    tagSeparate: document.getElementById('tag-separate'),
+    tagMerged: document.getElementById('tag-merged'),
+    compareNote: document.getElementById('compare-note'),
+    breakdownRows: document.getElementById('breakdown-rows'),
+    resetDefaults: document.getElementById('reset-defaults')
+  };
+
+  SOCIAL_ITEMS.forEach(function (item) {
+    item.input = document.getElementById(item.target);
+  });
+
+  // ── 工具函数 ────────────────────────────────────────────────
+  function clamp(n, min, max) {
+    return Math.min(max, Math.max(min, n));
+  }
+
+  function toNumber(value) {
+    var n = Number(value);
+    return isFinite(n) ? n : 0;
+  }
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function fmt(n) {
+    return Math.round(n).toLocaleString('zh-CN');
+  }
+
+  function money(n) {
+    return '¥' + fmt(n);
+  }
+
+  function trimNumber(n) {
+    return String(round2(n));
+  }
+
+  function annualBracket(taxable) {
+    for (var i = 0; i < ANNUAL_BRACKETS.length; i++) {
+      if (taxable <= ANNUAL_BRACKETS[i].limit) return ANNUAL_BRACKETS[i];
+    }
+    return ANNUAL_BRACKETS[ANNUAL_BRACKETS.length - 1];
+  }
+
+  function monthBracket(monthly) {
+    for (var i = 0; i < MONTH_BRACKETS.length; i++) {
+      if (monthly <= MONTH_BRACKETS[i].limit) return MONTH_BRACKETS[i];
+    }
+    return MONTH_BRACKETS[MONTH_BRACKETS.length - 1];
+  }
+
+  // ── 计算内核 ────────────────────────────────────────────────
+  /** 五险一金合计只由各分项加总得出，不接受直接编辑 */
+  function socialRateTotal() {
+    var total = 0;
+    SOCIAL_ITEMS.forEach(function (item) {
+      total += clamp(toNumber(state.social[item.key]), item.min, item.max);
+    });
+    return round2(total);
+  }
+
+  function socialMonthly(salary) {
+    return Math.max(salary, 0) * socialRateTotal() / 100;
+  }
+
+  function specialMonthly() {
+    var children = state.childEdu * 2000 + state.babyCare * 2000;
+    var housing = state.housingLoan ? 1000 : state.rent;
+    var medical = clamp(state.medical - 15000, 0, 80000) / 12;
+    return children + state.elder + housing + state.edu + medical;
+  }
+
+  function otherAnnual() {
+    return clamp(state.pension, 0, 12000);
+  }
+
+  function calc() {
+    var salary = Math.max(toNumber(state.salary), 0);
+    var bonus = Math.max(toNumber(state.bonus), 0);
+    var income = salary * 12;
+    var social = socialMonthly(salary) * 12;
+    var special = specialMonthly() * 12;
+    var other = otherAnnual();
+
+    var baseTaxable = Math.max(0, income - 60000 - social - special - other);
+    var base = annualBracket(baseTaxable);
+    var baseTax = Math.max(0, baseTaxable * base.rate - base.quick);
+
+    var monthlyBonus = bonus / 12;
+    var bonusBracket = monthBracket(monthlyBonus);
+    var bonusTax = bonus > 0 ? Math.max(0, bonus * bonusBracket.rate - bonusBracket.quick) : 0;
+
+    var separateTotal = baseTax + bonusTax;
+    var mergedTaxable = Math.max(0, baseTaxable + bonus);
+    var mergedBracket = annualBracket(mergedTaxable);
+    var mergedTotal = Math.max(0, mergedTaxable * mergedBracket.rate - mergedBracket.quick);
+
+    var best = separateTotal <= mergedTotal ? 'separate' : 'merged';
+    var plan = (state.plan === 'separate' || state.plan === 'merged') ? state.plan : best;
+    var tax = plan === 'separate' ? separateTotal : mergedTotal;
+    var taxable = plan === 'separate' ? baseTaxable : mergedTaxable;
+    var bracket = plan === 'separate' ? base : mergedBracket;
+    var gross = income + bonus;
+
+    return {
+      salary: salary,
+      bonus: bonus,
+      income: income,
+      social: social,
+      socialMonth: socialMonthly(salary),
+      special: special,
+      specialMonth: specialMonthly(),
+      other: other,
+      baseTaxable: baseTaxable,
+      baseTax: baseTax,
+      bonusBracket: bonusBracket,
+      bonusTax: bonusTax,
+      separateTotal: separateTotal,
+      mergedTotal: mergedTotal,
+      best: best,
+      plan: plan,
+      tax: tax,
+      taxable: taxable,
+      bracket: bracket,
+      gross: gross,
+      net: gross - social - tax,
+      burden: gross > 0 ? tax / gross : 0
+    };
+  }
+
+  // ── 渲染 ────────────────────────────────────────────────────
+  function paintChips(container, attribute, value) {
+    Array.prototype.forEach.call(container.querySelectorAll('.chip'), function (chip) {
+      var match = Number(chip.getAttribute(attribute)) === value;
+      chip.setAttribute('aria-pressed', String(match));
+    });
+  }
+
+  function markCityCustom() {
+    state.city = 'custom';
+    paintCityChips();
+  }
+
+  function paintCityChips() {
+    Array.prototype.forEach.call(el.cityChips.querySelectorAll('.chip'), function (chip) {
+      chip.setAttribute('aria-pressed', String(chip.getAttribute('data-city') === state.city));
+    });
+    el.cityState.hidden = state.city !== 'custom';
+  }
+
+  function paintSocialTotal() {
+    el.socialTotal.textContent = trimNumber(socialRateTotal());
+    el.socialSummary.innerHTML = '每月约 <strong>' +
+      money(socialMonthly(Math.max(toNumber(state.salary), 0))) + '</strong>';
+  }
+
+  function paintControls() {
+    paintChips(el.salaryChips, 'data-salary', state.salary);
+    paintChips(el.elderChips, 'data-elder', state.elder);
+    paintChips(el.rentChips, 'data-rent', state.rent);
+    paintChips(el.eduChips, 'data-edu', state.edu);
+    el.loanRow.setAttribute('aria-checked', String(state.housingLoan));
+
+    el.childEduValue.textContent = String(state.childEdu);
+    el.babyCareValue.textContent = String(state.babyCare);
+
+    SOCIAL_ITEMS.forEach(function (item) {
+      item.input.value = trimNumber(state.social[item.key]);
+    });
+    paintCityChips();
+    paintSocialTotal();
+    paintSteppers();
+  }
+
+  function stepConfig(target) {
+    switch (target) {
+      case 'salary':
+        return { value: state.salary, min: 0, max: 1000000, step: 1000, input: el.salary };
+      case 'bonus':
+        return { value: state.bonus, min: 0, max: 10000000, step: 10000, input: el.bonus };
+      case 'childEdu':
+        return { value: state.childEdu, min: 0, max: 10, step: 1 };
+      case 'babyCare':
+        return { value: state.babyCare, min: 0, max: 10, step: 1 };
+      default:
+        break;
+    }
+
+    for (var i = 0; i < SOCIAL_ITEMS.length; i++) {
+      var item = SOCIAL_ITEMS[i];
+      if (item.target === target) {
+        return {
+          value: state.social[item.key],
+          min: item.min,
+          max: item.max,
+          step: item.step,
+          input: item.input,
+          socialKey: item.key
+        };
+      }
+    }
+    return null;
+  }
+
+  function paintSteppers() {
+    Array.prototype.forEach.call(document.querySelectorAll('.step-btn'), function (btn) {
+      var conf = stepConfig(btn.getAttribute('data-step-target'));
+      if (!conf) return;
+      var delta = Number(btn.getAttribute('data-step'));
+      var next = round2(conf.value + delta);
+      btn.disabled = !isFinite(next) || next < conf.min || next > conf.max;
+    });
+  }
+
+  function applyStep(target, delta) {
+    var conf = stepConfig(target);
+    if (!conf) return;
+    var next = round2(clamp(conf.value + delta, conf.min, conf.max));
+
+    switch (target) {
+      case 'salary':
+        state.salary = next;
+        el.salary.value = trimNumber(next);
+        break;
+      case 'bonus':
+        state.bonus = next;
+        el.bonus.value = trimNumber(next);
+        break;
+      case 'social':
+        // 旧的单一总比例入口已废弃，改由各分项分别加减
+        return;
+      case 'childEdu':
+        state.childEdu = next;
+        break;
+      case 'babyCare':
+        state.babyCare = next;
+        break;
+      default:
+        if (!conf.socialKey) return;
+        state.social[conf.socialKey] = next;
+        markCityCustom();
+        break;
+    }
+
+    paintControls();
+    update();
+  }
+
+  function breakdownRow(label, value, isTotal) {
+    return '<div class="bd-row' + (isTotal ? ' is-total' : '') + '">' +
+      '<span>' + label + '</span><b>' + value + '</b></div>';
+  }
+
+  function render(result) {
+    el.taxTotal.textContent = fmt(result.tax);
+    el.taxNote.textContent = result.tax > 0
+      ? '适用税率 ' + Math.round(result.bracket.rate * 100) + '% · 速算扣除数 ' + money(result.bracket.quick)
+      : '未达起征点，无需缴税';
+    el.afterTax.textContent = money(result.net);
+    el.monthlyNet.textContent = money(result.net / 12);
+    el.burden.textContent = (result.burden * 100).toFixed(1) + '%';
+    el.deductionTotal.textContent = money(result.specialMonth + result.other / 12) + ' / 月';
+    el.socialSummary.innerHTML = '每月约 <strong>' + money(result.socialMonth) + '</strong>';
+
+    // 年终奖对比
+    if (result.bonus > 0) {
+      el.compare.hidden = false;
+      el.taxSeparate.textContent = money(result.separateTotal);
+      el.taxMerged.textContent = money(result.mergedTotal);
+      el.planSeparate.setAttribute('aria-pressed', String(result.plan === 'separate'));
+      el.planMerged.setAttribute('aria-pressed', String(result.plan === 'merged'));
+      el.tagSeparate.hidden = result.best !== 'separate';
+      el.tagMerged.hidden = result.best !== 'merged';
+
+      var diff = Math.abs(result.separateTotal - result.mergedTotal);
+      if (diff < 1) {
+        el.compareNote.textContent = '两种方式税额相同，可任选其一';
+      } else if (result.plan === result.best) {
+        el.compareNote.textContent = '已选更省的方式，少缴 ' + money(diff);
+      } else {
+        el.compareNote.textContent = '当前方式比更省方案多缴 ' + money(diff);
+      }
+    } else {
+      el.compare.hidden = true;
+    }
+
+    // 计算明细
+    var rows = '';
+    rows += breakdownRow('年度收入合计', money(result.gross));
+    rows += breakdownRow('减除费用', '−' + money(60000));
+    rows += breakdownRow('五险一金（个人 ' + trimNumber(socialRateTotal()) + '%）',
+      '−' + money(result.social));
+    rows += breakdownRow('专项附加扣除', '−' + money(result.special));
+    if (result.other > 0) {
+      rows += breakdownRow('其他扣除（个人养老金）', '−' + money(result.other));
+    }
+    rows += breakdownRow('应纳税所得额', money(result.taxable));
+    rows += breakdownRow('适用税率', Math.round(result.bracket.rate * 100) + '%');
+    rows += breakdownRow('速算扣除数', money(result.bracket.quick));
+    if (result.bonus > 0 && result.plan === 'separate') {
+      rows += breakdownRow('其中：年终奖单独计税', money(result.bonusTax));
+    }
+    rows += breakdownRow('全年应纳个税', money(result.tax), true);
+    el.breakdownRows.innerHTML = rows;
+  }
+
+  function update() {
+    var result = calc();
+    render(result);
+    paintSteppers();
+    save();
+  }
+
+  // ── 持久化 ──────────────────────────────────────────────────
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (_error) {
+      // 隐私模式下可能不可写，忽略
+    }
+  }
+
+  function restore() {
+    var raw;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (_error) {
+      return;
+    }
+    if (!raw) return;
+
+    var saved;
+    try {
+      saved = JSON.parse(raw);
+    } catch (_error) {
+      return;
+    }
+    if (!saved || typeof saved !== 'object') return;
+
+    if (isFinite(saved.salary) && saved.salary >= 0) state.salary = saved.salary;
+    if (isFinite(saved.bonus) && saved.bonus >= 0) state.bonus = saved.bonus;
+    if (typeof saved.city === 'string' &&
+        (saved.city === 'custom' || CITY_PRESETS[saved.city])) {
+      state.city = saved.city;
+    }
+    if (saved.social && typeof saved.social === 'object') {
+      SOCIAL_ITEMS.forEach(function (item) {
+        if (isFinite(saved.social[item.key])) {
+          state.social[item.key] = clamp(saved.social[item.key], item.min, item.max);
+        }
+      });
+    }
+    if (isFinite(saved.childEdu)) state.childEdu = clamp(Math.round(saved.childEdu), 0, 10);
+    if (isFinite(saved.babyCare)) state.babyCare = clamp(Math.round(saved.babyCare), 0, 10);
+    if ([0, 1500, 3000].indexOf(saved.elder) !== -1) state.elder = saved.elder;
+    if (typeof saved.housingLoan === 'boolean') state.housingLoan = saved.housingLoan;
+    if ([0, 800, 1100, 1500].indexOf(saved.rent) !== -1) state.rent = saved.rent;
+    if ([0, 400, 300].indexOf(saved.edu) !== -1) state.edu = saved.edu;
+    if (isFinite(saved.medical)) state.medical = clamp(saved.medical, 0, 10000000);
+    if (isFinite(saved.pension)) state.pension = clamp(saved.pension, 0, 12000);
+    if (saved.plan === 'separate' || saved.plan === 'merged' || saved.plan === 'auto') {
+      state.plan = saved.plan;
+    }
+  }
+
+  // ── 事件绑定 ────────────────────────────────────────────────
+  function bindNumberInput(input, key, min, max, normalize) {
+    input.addEventListener('input', function () {
+      var raw = input.value.trim();
+      if (raw === '' || raw === '-') {
+        state[key] = 0;
+        paintControls();
+        update();
+        return;
+      }
+      var value = Number(raw);
+      if (!isFinite(value)) return;
+      state[key] = value;
+      paintControls();
+      update();
+    });
+
+    input.addEventListener('blur', function () {
+      var value = clamp(toNumber(state[key]), min, max);
+      state[key] = normalize ? normalize(value) : value;
+      input.value = trimNumber(state[key]);
+      paintControls();
+      update();
+    });
+  }
+
+  bindNumberInput(el.salary, 'salary', 0, 1000000);
+  bindNumberInput(el.bonus, 'bonus', 0, 10000000);
+  bindNumberInput(el.medical, 'medical', 0, 10000000);
+  bindNumberInput(el.pension, 'pension', 0, 12000);
+
+  // 五险一金分项：逐项可编辑，合计自动加总
+  SOCIAL_ITEMS.forEach(function (item) {
+    item.input.addEventListener('input', function () {
+      var raw = item.input.value.trim();
+      if (raw === '' || raw === '-') {
+        state.social[item.key] = 0;
+      } else {
+        var value = Number(raw);
+        if (!isFinite(value)) return;
+        state.social[item.key] = clamp(value, item.min, item.max);
+      }
+      markCityCustom();
+      paintSocialTotal();
+      update();
+    });
+
+    item.input.addEventListener('blur', function () {
+      state.social[item.key] = round2(clamp(toNumber(state.social[item.key]), item.min, item.max));
+      item.input.value = trimNumber(state.social[item.key]);
+      paintSocialTotal();
+      update();
+    });
+  });
+
+  // 城市预设一键填充各项比例
+  el.cityChips.addEventListener('click', function (event) {
+    var chip = event.target.closest('.chip');
+    if (!chip) return;
+    var key = chip.getAttribute('data-city');
+    var preset = CITY_PRESETS[key];
+    if (!preset) return;
+    state.city = key;
+    SOCIAL_ITEMS.forEach(function (item) {
+      state.social[item.key] = preset[item.key];
+      item.input.value = trimNumber(preset[item.key]);
+    });
+    paintCityChips();
+    paintSocialTotal();
+    update();
+  });
+
+  // 五险一金总览：整行可点，展开 / 收起分项
+  function syncSocialPanel() {
+    el.socialToggle.setAttribute('aria-expanded', String(!el.socialPanel.hidden));
+  }
+
+  function toggleSocialPanel() {
+    el.socialPanel.hidden = !el.socialPanel.hidden;
+    syncSocialPanel();
+  }
+
+  el.socialToggle.addEventListener('click', toggleSocialPanel);
+
+  // 快捷 chips
+  el.salaryChips.addEventListener('click', function (event) {
+    var chip = event.target.closest('.chip');
+    if (!chip) return;
+    state.salary = Number(chip.getAttribute('data-salary'));
+    el.salary.value = String(state.salary);
+    paintControls();
+    update();
+  });
+
+  el.elderChips.addEventListener('click', function (event) {
+    var chip = event.target.closest('.chip');
+    if (!chip) return;
+    state.elder = Number(chip.getAttribute('data-elder'));
+    paintControls();
+    update();
+  });
+
+  el.rentChips.addEventListener('click', function (event) {
+    var chip = event.target.closest('.chip');
+    if (!chip) return;
+    var rent = Number(chip.getAttribute('data-rent'));
+    state.rent = rent;
+    if (rent > 0) state.housingLoan = false;
+    paintControls();
+    update();
+  });
+
+  el.eduChips.addEventListener('click', function (event) {
+    var chip = event.target.closest('.chip');
+    if (!chip) return;
+    state.edu = Number(chip.getAttribute('data-edu'));
+    paintControls();
+    update();
+  });
+
+  el.loanRow.addEventListener('click', function () {
+    state.housingLoan = !state.housingLoan;
+    if (state.housingLoan) state.rent = 0;
+    paintControls();
+    update();
+  });
+
+  // 步进按钮：单击走一档，按住连走
+  Array.prototype.forEach.call(document.querySelectorAll('.step-btn'), function (btn) {
+    var holdTimer = null;
+    var repeatTimer = null;
+
+    function stopHold() {
+      if (holdTimer !== null) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      if (repeatTimer !== null) {
+        clearInterval(repeatTimer);
+        repeatTimer = null;
+      }
+    }
+
+    btn.addEventListener('pointerdown', function (event) {
+      if (event.button !== 0 || btn.disabled) return;
+      applyStep(btn.getAttribute('data-step-target'), Number(btn.getAttribute('data-step')));
+      stopHold();
+      holdTimer = setTimeout(function () {
+        repeatTimer = setInterval(function () {
+          if (btn.disabled) {
+            stopHold();
+            return;
+          }
+          applyStep(btn.getAttribute('data-step-target'), Number(btn.getAttribute('data-step')));
+        }, 90);
+      }, 420);
+    });
+
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (name) {
+      btn.addEventListener(name, stopHold);
+    });
+
+    btn.addEventListener('click', function (event) {
+      // 指针点击已在 pointerdown 处理，这里只接键盘触发
+      if (event.detail === 0) {
+        applyStep(btn.getAttribute('data-step-target'), Number(btn.getAttribute('data-step')));
+      }
+    });
+  });
+
+  // 年终奖方案切换
+  el.planSeparate.addEventListener('click', function () {
+    state.plan = 'separate';
+    update();
+  });
+  el.planMerged.addEventListener('click', function () {
+    state.plan = 'merged';
+    update();
+  });
+
+  // 收起 / 展开专项附加扣除
+  el.deductionToggle.addEventListener('click', function () {
+    var open = el.deductionBody.hidden;
+    el.deductionBody.hidden = !open;
+    el.deductionToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  // 恢复默认
+  el.resetDefaults.addEventListener('click', function () {
+    state = cloneDefaults();
+    el.salary.value = trimNumber(state.salary);
+    el.bonus.value = trimNumber(state.bonus);
+    el.medical.value = trimNumber(state.medical);
+    el.pension.value = trimNumber(state.pension);
+    // 重置后展开扣除面板，让用户看到确实回到了初始状态
+    el.deductionBody.hidden = false;
+    el.deductionToggle.setAttribute('aria-expanded', 'true');
+    el.socialPanel.hidden = true;
+    syncSocialPanel();
+    paintControls();
+    update();
+  });
+
+  // ── 启动 ────────────────────────────────────────────────────
+  restore();
+  el.salary.value = trimNumber(state.salary);
+  el.bonus.value = trimNumber(state.bonus);
+  el.medical.value = trimNumber(state.medical);
+  el.pension.value = trimNumber(state.pension);
+  syncSocialPanel();
+  paintControls();
+  update();
+})();
+</script>
+</body>
+</html>
