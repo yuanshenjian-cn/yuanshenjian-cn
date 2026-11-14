@@ -6,9 +6,38 @@
 <meta name="color-scheme" content="light dark">
 <title>房贷计算器</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 15 16 5l11 10' fill='none' stroke='%232f7fe0' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8.5 14.5V26h15V14.5' fill='none' stroke='%232f7fe0' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    /* 主题：与站点开关共用 theme-preference（light / dark / system），未设置时跟随系统 */
+    (function () {
+      var KEY = "theme-preference";
+      function isDark() {
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+        if (stored === "dark") return true;
+        if (stored === "light") return false;
+        try {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch (e) {
+          return false;
+        }
+      }
+      function apply() {
+        document.documentElement.classList.toggle("dark", isDark());
+      }
+      apply();
+      // 站点切换开关写入 localStorage 后，同源的其他文档会收到 storage 事件
+      window.addEventListener("storage", function (event) {
+        if (event.key === KEY) apply();
+      });
+      // 选择「跟随系统」时，系统外观变化也要同步
+      try {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", apply);
+      } catch (e) {}
+    })();
+  </script>
 <style>
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
     --page-bg: #f4f5f7;
     --surface: #ffffff;
     --surface-2: #f1f2f4;
@@ -19,18 +48,17 @@
     --accent: #2f7fe0;
     --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --page-bg: #101114;
-      --surface: #191b1f;
-      --surface-2: #22252a;
-      --border: #2d3137;
-      --border-soft: #24272c;
-      --ink: #eceef2;
-      --muted: #9aa1ac;
-      --accent: #6bb0ff;
-      --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
-    }
+  .dark {
+    color-scheme: dark;
+    --page-bg: #101114;
+    --surface: #191b1f;
+    --surface-2: #22252a;
+    --border: #2d3137;
+    --border-soft: #24272c;
+    --ink: #eceef2;
+    --muted: #9aa1ac;
+    --accent: #6bb0ff;
+    --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
   }
 
   * { box-sizing: border-box; }

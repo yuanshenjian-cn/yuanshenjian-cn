@@ -6,9 +6,38 @@
 <meta name="color-scheme" content="light dark">
 <title>身体指标</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 18h6l3-8 4 14 3-6h8' fill='none' stroke='%230e8496' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    /* 主题：与站点开关共用 theme-preference（light / dark / system），未设置时跟随系统 */
+    (function () {
+      var KEY = "theme-preference";
+      function isDark() {
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+        if (stored === "dark") return true;
+        if (stored === "light") return false;
+        try {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch (e) {
+          return false;
+        }
+      }
+      function apply() {
+        document.documentElement.classList.toggle("dark", isDark());
+      }
+      apply();
+      // 站点切换开关写入 localStorage 后，同源的其他文档会收到 storage 事件
+      window.addEventListener("storage", function (event) {
+        if (event.key === KEY) apply();
+      });
+      // 选择「跟随系统」时，系统外观变化也要同步
+      try {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", apply);
+      } catch (e) {}
+    })();
+  </script>
 <style>
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
     --page-bg: #f4f5f7;
     --surface: #ffffff;
     --surface-2: #f1f2f4;
@@ -40,39 +69,38 @@
     --hr5-ink: #a23f38;
     --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --page-bg: #101114;
-      --surface: #191b1f;
-      --surface-2: #22252a;
-      --border: #2d3137;
-      --border-soft: #24272c;
-      --ink: #eceef2;
-      --muted: #9aa1ac;
-      --accent: #43c6db;
-      --accent-ink: #7ddcec;
-      --ok: #4cc79b;
-      --ok-ink: #7fe0bc;
-      --warn: #e0ae62;
-      --warn-ink: #eec48c;
-      --risk: #e88f86;
-      --risk-ink: #f2ada6;
-      --z-under: #7fb0d8;
-      --z-ideal: #45c79b;
-      --z-over: #e0b45e;
-      --z-high: #e3897f;
-      --hr1: #8fb6d8;
-      --hr2: #4cc79b;
-      --hr3: #e6be66;
-      --hr4: #f0995c;
-      --hr5: #e88f86;
-      --hr1-ink: #a9cbea;
-      --hr2-ink: #71ddb6;
-      --hr3-ink: #f0cf88;
-      --hr4-ink: #f6b98e;
-      --hr5-ink: #f4b3ac;
-      --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
-    }
+  .dark {
+    color-scheme: dark;
+    --page-bg: #101114;
+    --surface: #191b1f;
+    --surface-2: #22252a;
+    --border: #2d3137;
+    --border-soft: #24272c;
+    --ink: #eceef2;
+    --muted: #9aa1ac;
+    --accent: #43c6db;
+    --accent-ink: #7ddcec;
+    --ok: #4cc79b;
+    --ok-ink: #7fe0bc;
+    --warn: #e0ae62;
+    --warn-ink: #eec48c;
+    --risk: #e88f86;
+    --risk-ink: #f2ada6;
+    --z-under: #7fb0d8;
+    --z-ideal: #45c79b;
+    --z-over: #e0b45e;
+    --z-high: #e3897f;
+    --hr1: #8fb6d8;
+    --hr2: #4cc79b;
+    --hr3: #e6be66;
+    --hr4: #f0995c;
+    --hr5: #e88f86;
+    --hr1-ink: #a9cbea;
+    --hr2-ink: #71ddb6;
+    --hr3-ink: #f0cf88;
+    --hr4-ink: #f6b98e;
+    --hr5-ink: #f4b3ac;
+    --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
   }
 
   * { box-sizing: border-box; }
@@ -635,10 +663,8 @@
     background: var(--surface);
     box-shadow: 0 32px 70px -28px rgba(17, 24, 39, .55);
   }
-  @media (prefers-color-scheme: dark) {
-    .sheet::backdrop { background: rgba(0, 0, 0, .62); }
-    .sheet-inner { box-shadow: 0 32px 70px -20px rgba(0, 0, 0, .85); }
-  }
+  .dark .sheet::backdrop { background: rgba(0, 0, 0, .62); }
+  .dark .sheet-inner { box-shadow: 0 32px 70px -20px rgba(0, 0, 0, .85); }
   .sheet-head {
     display: flex;
     align-items: center;

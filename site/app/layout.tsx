@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { BackToTop } from "@/components/system/BackToTop";
 import { ServiceWorkerRegistration } from "@/components/system/ServiceWorkerRegistration";
 import { config } from "@/lib/config";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 const inter = localFont({
   src: "./fonts/Inter-Variable.ttf",
@@ -47,12 +48,12 @@ export const metadata: Metadata = {
   },
   // 添加性能优化相关的 meta 标签
   other: {
-    "color-scheme": "dark light",
+    "color-scheme": "light dark",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -63,6 +64,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-sans min-h-screen flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <ThemeProvider>
           <Header />
           <div className="flex-1">{children}</div>

@@ -1,60 +1,81 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-
-type Theme = "light" | "dark";
-
-function isTheme(value: string | null): value is Theme {
-  return value === "light" || value === "dark";
-}
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { THEME_STORAGE_KEY, isTheme, type Theme } from "@/lib/theme";
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
-  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
   setTheme: () => {},
   toggleTheme: () => {},
-  mounted: false,
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [preference, setPreference] = useState<Theme | null>(null);
+  const [systemTheme, setSystemTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    // Check localStorage or system preference
-    const stored = localStorage.getItem("theme");
-    if (isTheme(stored)) {
-      setTheme(stored);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => setSystemTheme(media.matches ? "dark" : "light");
+
+    handleChange();
+
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (isTheme(stored)) {
+        setPreference(stored);
+      }
+    } catch {
+      // localStorage 不可用时保持跟随系统
     }
+
+    setMounted(true);
+    media.addEventListener("change", handleChange);
+
+    return () => media.removeEventListener("change", handleChange);
   }, []);
+
+  const theme: Theme = preference ?? systemTheme;
 
   useEffect(() => {
     if (!mounted) return;
 
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+    document.documentElement.classList.toggle("dark", theme === "dark");
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
+    }
+  }, [mounted, theme]);
+
+  const setTheme = useCallback((next: Theme) => {
+    setPreference(next);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {
+      // 隐私模式等写入失败时，选择仍保留在当前会话中
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === "light" ? "dark" : "light");
+  }, [setTheme, theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

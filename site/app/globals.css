@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   /* Minimal light theme */
   --background: 0 0% 100%;
   --foreground: 0 0% 10%;
@@ -27,6 +28,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /* Minimal dark theme */
   --background: 0 0% 8%;
   --foreground: 0 0% 95%;
