@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>番茄钟</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='10' fill='%23e5484d'/%3E%3Cpath d='M16 8c2-4 6-4 7-4-1 3-3 5-7 4Z' fill='%232f9e6a'/%3E%3Ccircle cx='16' cy='18' r='6' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Cpath d='M16 14v4l2.5 1.5' stroke='%23fff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light dark;
+    --page-bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f1f2f4;
+    --border: #e3e5e9;
+    --border-soft: #eef0f2;
+    --ink: #1c2026;
+    --muted: #68707b;
+    --focus-accent: #e5484d;
+    --rest-accent: #2f9e6a;
+    --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #101114;
+      --surface: #191b1f;
+      --surface-2: #22252a;
+      --border: #2d3137;
+      --border-soft: #24272c;
+      --ink: #eceef2;
+      --muted: #9aa1ac;
+      --focus-accent: #ff6369;
+      --rest-accent: #3dd68c;
+      --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: clamp(28px, 7vh, 72px) 24px 56px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .page[data-mode="focus"] { --accent: var(--focus-accent); }
+  .page[data-mode="rest"] { --accent: var(--rest-accent); }
+
+  .head {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  .head .icon-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  .title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ink) 48%, transparent);
+    outline-offset: 2px;
+  }
+
+  .icon-button {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .icon-button:hover,
+  .icon-button[aria-expanded="true"] {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--ink);
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 22px 24px 24px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -96px;
+    left: 50%;
+    width: 340px;
+    height: 340px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 13%, transparent) 0%, transparent 68%);
+    pointer-events: none;
+  }
+  .card > * { position: relative; }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    width: min(200px, 100%);
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+  .tab {
+    flex: 1;
+    height: 30px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tab:hover:not(:disabled):not([aria-pressed="true"]) {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+  .tab[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+    font-weight: 500;
+  }
+
+  .durations {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .duration {
+    min-width: 52px;
+    height: 30px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .duration:hover:not(:disabled):not([aria-pressed="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .duration[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 11%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .tab:disabled,
+  .duration:disabled {
+    opacity: .45;
+    cursor: default;
+  }
+  .duration:disabled[aria-pressed="true"] { opacity: .75; }
+
+  .dial {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(280px, 100%);
+    aspect-ratio: 1;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+  .ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+  }
+  .ring-track { stroke: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .ring-progress {
+    stroke: var(--accent);
+    transition: stroke-dashoffset .25s linear, opacity .15s ease;
+  }
+  .ring-progress.is-paused { opacity: .5; }
+
+  .center {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .time {
+    font-size: clamp(42px, 13vw, 56px);
+    line-height: 1.14;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .state {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--muted);
+    transition: color .15s ease;
+  }
+  .state.is-live {
+    color: color-mix(in srgb, var(--accent) 60%, var(--ink));
+  }
+
+  .dial-reset {
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    opacity: .75;
+    cursor: pointer;
+    transform: translateX(-50%);
+    transition: background-color .15s ease, border-color .15s ease,
+      color .15s ease, opacity .15s ease, transform .08s ease;
+  }
+  .dial-reset:hover {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--ink);
+    opacity: 1;
+  }
+  .dial-reset:active { transform: translateX(-50%) scale(.94); }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 16px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+
+  .settings {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: reveal .18s ease-out;
+  }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+  .settings-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px 4px;
+  }
+  .settings-title {
+    margin: 0;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .settings-close {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .settings-close:hover {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--ink);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 18px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .row-label {
+    min-width: 0;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--ink);
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+  .step {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .step:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .step:disabled {
+    opacity: .35;
+    cursor: default;
+  }
+  .step-value {
+    min-width: 76px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 12px 18px;
+    border: 0;
+    border-top: 1px solid var(--border-soft);
+    background: transparent;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: left;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+  .toggle-row:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .toggle-row:focus-visible { outline-offset: -2px; }
+  .switch {
+    position: relative;
+    flex: none;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    transition: background-color .16s ease;
+  }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform .16s ease, background-color .16s ease;
+  }
+  .toggle-row[aria-checked="true"] .switch { background: var(--ink); }
+  .toggle-row[aria-checked="true"] .switch::after {
+    transform: translateX(16px);
+    background: var(--surface);
+  }
+
+  .settings-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    padding: 10px 18px 12px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .settings-note {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .text-button {
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 18px;
+    cursor: pointer;
+  }
+  .text-button:hover {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    color: var(--ink);
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 24px 16px 40px; }
+    .card { padding: 18px 16px 20px; border-radius: 20px; }
+    .tab { padding: 0 8px; }
+    .row, .toggle-row, .settings-head, .settings-foot { padding-inline: 14px; }
+  }
+  @media (max-width: 360px) {
+    body { padding: 20px 12px 32px; }
+    .card { padding: 16px 12px 18px; }
+    .tab { padding: 0 6px; font-size: 12px; }
+    .row, .toggle-row, .settings-head, .settings-foot { padding-inline: 12px; }
+    .duration { min-width: 46px; padding: 0 12px; }
+    .step-value { min-width: 64px; }
+  }
+  @media (hover: none) {
+    .hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+    .dial-reset:active { transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+<div class="page" id="page" data-mode="focus" role="region" aria-label="番茄钟">
+  <header class="head">
+    <div>
+      <h1 class="title">番茄钟</h1>
+      <p class="subtitle">一次只做一件事</p>
+    </div>
+    <button type="button" class="icon-button" id="settingsButton" aria-label="计时设置" title="计时设置" aria-expanded="false" aria-controls="settings">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+        <path d="M3 5h3.5M10.5 5h6.5M3 10h8M15 10h2M3 15h1.5M8.5 15h8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8.5" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="13" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="6.5" cy="15" r="2" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="card">
+    <div class="tabs" role="group" aria-label="计时类型">
+      <button type="button" class="tab" data-mode="focus" aria-pressed="true">专注</button>
+      <button type="button" class="tab" data-mode="rest" aria-pressed="false">休息</button>
+    </div>
+
+    <div class="durations" id="durations" role="group" aria-label="专注时长"></div>
+
+    <div class="dial" id="dial" title="开始">
+      <svg class="ring" viewBox="0 0 280 280" aria-hidden="true" focusable="false">
+        <circle class="ring-track" cx="140" cy="140" r="124" fill="none" stroke-width="10"/>
+        <circle class="ring-progress" id="ringProgress" cx="140" cy="140" r="124" fill="none" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="779.11" stroke-dashoffset="0"/>
+      </svg>
+      <div class="center">
+        <div class="time" id="time" role="timer" aria-label="剩余时间 25:00">25:00</div>
+        <div class="state" id="state">准备专注</div>
+      </div>
+      <button type="button" class="dial-reset" id="resetButton" aria-label="重置计时" title="重置计时">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 3v5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+  </main>
+
+  <section class="settings" id="settings" aria-label="设置" hidden>
+    <div class="settings-head">
+      <h2 class="settings-title">设置</h2>
+      <button type="button" class="settings-close" id="settingsClose" aria-label="收起设置" title="收起设置">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="row">
+      <span class="row-label">专注时长</span>
+      <div class="stepper" role="group" aria-label="专注时长">
+        <button type="button" class="step" id="focusMinus" aria-label="减少" title="减少">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <span class="step-value" id="focusValue" aria-live="polite">25 分钟</span>
+        <button type="button" class="step" id="focusPlus" aria-label="增加" title="增加">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="row-label">休息时长</span>
+      <div class="stepper" role="group" aria-label="休息时长">
+        <button type="button" class="step" id="restMinus" aria-label="减少" title="减少">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <span class="step-value" id="restValue" aria-live="polite">5 分钟</span>
+        <button type="button" class="step" id="restPlus" aria-label="增加" title="增加">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="toggle-row" id="autoRest" role="switch" aria-checked="true">
+      <span class="row-label">自动开始休息</span>
+      <span class="switch" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="toggle-row" id="autoFocus" role="switch" aria-checked="false">
+      <span class="row-label">自动开始专注</span>
+      <span class="switch" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="toggle-row" id="sound" role="switch" aria-checked="true">
+      <span class="row-label">完成时播放提示音</span>
+      <span class="switch" aria-hidden="true"></span>
+    </button>
+
+    <div class="settings-foot">
+      <span class="settings-note">设置会自动保存在当前浏览器。</span>
+      <button type="button" class="text-button" id="restoreDefaults">恢复默认</button>
+    </div>
+  </section>
+
+  <p class="hint"><kbd class="kbd">空格</kbd><span>开始或暂停</span></p>
+  <div class="sr" id="live" role="status" aria-live="polite"></div>
+</div>
+
+<noscript><p style="text-align:center">请启用 JavaScript 使用番茄钟。</p></noscript>
+
+<script>
+(() => {
+  'use strict'
+
+  const SETTINGS_KEY = 'pomodoro-standalone.settings.v1'
+  const TIMER_KEY = 'pomodoro-standalone.timer.v1'
+  const FOCUS_PRESETS = [25, 45, 60]
+  const REST_PRESETS = [5, 10, 15]
+  const DEFAULTS = {
+    focusMin: 25,
+    restMin: 5,
+    autoStartBreak: true,
+    autoStartFocus: false,
+    sound: true,
+  }
+  const LIMITS = {
+    focusMin: { min: 10, max: 60, step: 5 },
+    restMin: { min: 1, max: 30, step: 1 },
+  }
+  const CIRCUMFERENCE = 2 * Math.PI * 124
+
+  const page = document.getElementById('page')
+  const settingsPanel = document.getElementById('settings')
+  const settingsButton = document.getElementById('settingsButton')
+  const settingsClose = document.getElementById('settingsClose')
+  const restoreButton = document.getElementById('restoreDefaults')
+  const tabButtons = Array.from(document.querySelectorAll('.tab'))
+  const durations = document.getElementById('durations')
+  const dial = document.getElementById('dial')
+  const timeEl = document.getElementById('time')
+  const stateEl = document.getElementById('state')
+  const ring = document.getElementById('ringProgress')
+  const resetButton = document.getElementById('resetButton')
+  const statsEl = document.getElementById('stats')
+  const live = document.getElementById('live')
+  const autoRestRow = document.getElementById('autoRest')
+  const autoFocusRow = document.getElementById('autoFocus')
+  const soundRow = document.getElementById('sound')
+  const focusValue = document.getElementById('focusValue')
+  const restValue = document.getElementById('restValue')
+  const focusMinus = document.getElementById('focusMinus')
+  const focusPlus = document.getElementById('focusPlus')
+  const restMinus = document.getElementById('restMinus')
+  const restPlus = document.getElementById('restPlus')
+
+  function read(key) {
+    try {
+      const raw = localStorage.getItem(key)
+      return raw === null ? null : JSON.parse(raw)
+    } catch (_error) {
+      return null
+    }
+  }
+
+  function write(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+    } catch (_error) {
+      // 拒绝存储的浏览器仍然可以获得可用的内存计时。
+    }
+  }
+
+  function limitValue(value, limit, fallback) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
+    const stepped = Math.round(value / limit.step) * limit.step
+    return Math.min(limit.max, Math.max(limit.min, stepped))
+  }
+
+  function sanitizeSettings(input) {
+    const source = input !== null && typeof input === 'object' ? input : {}
+    return {
+      focusMin: limitValue(source.focusMin, LIMITS.focusMin, DEFAULTS.focusMin),
+      restMin: limitValue(source.restMin, LIMITS.restMin, DEFAULTS.restMin),
+      autoStartBreak: typeof source.autoStartBreak === 'boolean' ? source.autoStartBreak : DEFAULTS.autoStartBreak,
+      autoStartFocus: typeof source.autoStartFocus === 'boolean' ? source.autoStartFocus : DEFAULTS.autoStartFocus,
+      sound: typeof source.sound === 'boolean' ? source.sound : DEFAULTS.sound,
+    }
+  }
+
+  function sanitizeStats(input) {
+    const source = input !== null && typeof input === 'object' ? input : {}
+    return {
+      date: typeof source.date === 'string' ? source.date : '',
+      sessions: Number.isFinite(source.sessions) ? Math.max(0, Math.floor(source.sessions)) : 0,
+      minutes: Number.isFinite(source.minutes) ? Math.max(0, Math.floor(source.minutes)) : 0,
+    }
+  }
+
+  function dayKey(date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return year + '-' + month + '-' + day
+  }
+
+  function formatTime(milliseconds) {
+    const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000))
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
+  }
+
+  let settings = sanitizeSettings(read(SETTINGS_KEY))
+  const saved = read(TIMER_KEY)
+  const savedTimer = saved !== null && typeof saved === 'object' ? saved : {}
+
+  let mode = savedTimer.mode === 'rest' ? 'rest' : 'focus'
+  let status = savedTimer.status === 'running' || savedTimer.status === 'paused' ? savedTimer.status : 'idle'
+  let sessionDurationMs = Number.isFinite(savedTimer.sessionDurationMs) && savedTimer.sessionDurationMs > 0
+    ? Math.min(Math.max(savedTimer.sessionDurationMs, 60000), 4 * 60 * 60000)
+    : minutesFor(mode) * 60000
+  let remainingMs = Number.isFinite(savedTimer.remainingMs)
+    ? Math.min(Math.max(savedTimer.remainingMs, 0), sessionDurationMs)
+    : sessionDurationMs
+  let endAt = Number.isFinite(savedTimer.endAt) && savedTimer.endAt > 0 ? savedTimer.endAt : 0
+  let stats = sanitizeStats(savedTimer.stats)
+  let ticker = null
+  let noticeTimer = null
+  let audioContext = null
+  let settingsOpen = false
+
+  if (status === 'running' && endAt === 0) {
+    status = 'idle'
+    remainingMs = sessionDurationMs
+  }
+
+  function minutesFor(target) {
+    return target === 'focus' ? settings.focusMin : settings.restMin
+  }
+
+  function rollStats() {
+    const today = dayKey(new Date())
+    if (stats.date !== today) stats = { date: today, sessions: 0, minutes: 0 }
+  }
+
+  function persist() {
+    write(SETTINGS_KEY, settings)
+    write(TIMER_KEY, {
+      mode,
+      status,
+      remainingMs,
+      endAt,
+      sessionDurationMs,
+      stats,
+    })
+  }
+
+  // 状态变更的统一出口：同步计时器、落盘、重绘。
+  function commit() {
+    syncTicker()
+    persist()
+    render()
+  }
+
+  function announce(text) {
+    live.textContent = text
+    if (noticeTimer !== null) window.clearTimeout(noticeTimer)
+    noticeTimer = window.setTimeout(() => {
+      noticeTimer = null
+      live.textContent = ''
+    }, 6000)
+  }
+
+  function playChime() {
+    if (!settings.sound) return
+    try {
+      primeAudio()
+      if (audioContext === null || audioContext.state !== 'running') return
+      const start = audioContext.currentTime + 0.02
+      const notes = [[659.25, 0], [987.77, 0.17]]
+      for (const note of notes) {
+        const oscillator = audioContext.createOscillator()
+        const gain = audioContext.createGain()
+        const at = start + note[1]
+        oscillator.type = 'sine'
+        oscillator.frequency.value = note[0]
+        gain.gain.setValueAtTime(0.0001, at)
+        gain.gain.exponentialRampToValueAtTime(0.09, at + 0.02)
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.42)
+        oscillator.connect(gain)
+        gain.connect(audioContext.destination)
+        oscillator.start(at)
+        oscillator.stop(at + 0.45)
+      }
+    } catch (_error) {
+      // 声音只是锦上添花，计时不依赖它。
+    }
+  }
+
+  function primeAudio() {
+    try {
+      if (audioContext === null) {
+        if (typeof window.AudioContext !== 'function') return
+        audioContext = new window.AudioContext()
+      }
+      if (audioContext.state === 'suspended') void audioContext.resume()
+    } catch (_error) {
+      audioContext = null
+    }
+  }
+
+  function syncTicker() {
+    if (status === 'running' && ticker === null) {
+      ticker = window.setInterval(tick, 250)
+    } else if (status !== 'running' && ticker !== null) {
+      window.clearInterval(ticker)
+      ticker = null
+    }
+  }
+
+  function finishSession(options) {
+    const now = Date.now()
+    rollStats()
+    const finished = mode
+    if (finished === 'focus') {
+      stats = {
+        ...stats,
+        sessions: stats.sessions + 1,
+        minutes: stats.minutes + Math.max(1, Math.round(sessionDurationMs / 60000)),
+      }
+    }
+    const nextMode = finished === 'focus' ? 'rest' : 'focus'
+    const nextDuration = minutesFor(nextMode) * 60000
+    const autoStart = options.allowAutoStart
+      && (finished === 'focus' ? settings.autoStartBreak : settings.autoStartFocus)
+    mode = nextMode
+    sessionDurationMs = nextDuration
+    remainingMs = nextDuration
+    status = autoStart ? 'running' : 'idle'
+    endAt = autoStart ? now + nextDuration : 0
+    announce(finished === 'focus' ? '专注完成，休息一下。' : '休息结束，准备专注。')
+    if (options.chime) playChime()
+    commit()
+  }
+
+  function toggle() {
+    const now = Date.now()
+    rollStats()
+    if (status === 'running') {
+      remainingMs = Math.max(0, endAt - now)
+      endAt = 0
+      status = 'paused'
+      announce('已暂停')
+    } else {
+      primeAudio()
+      const wasPaused = status === 'paused'
+      if (!wasPaused) {
+        sessionDurationMs = minutesFor(mode) * 60000
+        remainingMs = sessionDurationMs
+      }
+      if (remainingMs <= 0) remainingMs = sessionDurationMs
+      endAt = now + remainingMs
+      status = 'running'
+      announce(wasPaused ? '继续计时' : mode === 'focus' ? '专注开始' : '休息开始')
+    }
+    commit()
+  }
+
+  function reset() {
+    status = 'idle'
+    endAt = 0
+    sessionDurationMs = minutesFor(mode) * 60000
+    remainingMs = sessionDurationMs
+    announce('计时已重置')
+    commit()
+  }
+
+  function selectMode(nextMode) {
+    if (nextMode !== 'focus' && nextMode !== 'rest') return
+    if (nextMode === mode || status !== 'idle') return
+    mode = nextMode
+    status = 'idle'
+    endAt = 0
+    sessionDurationMs = minutesFor(mode) * 60000
+    remainingMs = sessionDurationMs
+    commit()
+  }
+
+  // 预设、步进、开关、恢复默认共用的设置写入路径。
+  function applySettings(patch, message) {
+    const next = { ...settings }
+    for (const key of Object.keys(patch)) {
+      if (LIMITS[key] !== undefined) {
+        next[key] = limitValue(patch[key], LIMITS[key], next[key])
+      } else if (key in DEFAULTS) {
+        next[key] = Boolean(patch[key])
+      }
+    }
+    if (!Object.keys(next).some((key) => next[key] !== settings[key])) return
+    settings = next
+    const touchesCurrent = (mode === 'focus' && 'focusMin' in patch)
+      || (mode === 'rest' && 'restMin' in patch)
+    if (status === 'idle' && touchesCurrent) {
+      sessionDurationMs = minutesFor(mode) * 60000
+      remainingMs = sessionDurationMs
+    }
+    commit()
+    if (message !== undefined) announce(message)
+  }
+
+  function tick() {
+    if (status !== 'running') return
+    if (Date.now() >= endAt) {
+      finishSession({ allowAutoStart: true, chime: true })
+      return
+    }
+    renderTimer()
+  }
+
+  function renderTimer() {
+    const left = status === 'running' ? Math.max(0, endAt - Date.now()) : remainingMs
+    const timeText = formatTime(left)
+    timeEl.textContent = timeText
+    timeEl.setAttribute('aria-label', '剩余时间 ' + timeText)
+    stateEl.textContent = status === 'paused'
+      ? '已暂停'
+      : status === 'running'
+        ? (mode === 'focus' ? '专注中' : '休息中')
+        : (mode === 'focus' ? '准备专注' : '准备休息')
+    stateEl.classList.toggle('is-live', status === 'running')
+    const progress = sessionDurationMs > 0 ? Math.max(0, Math.min(1, left / sessionDurationMs)) : 0
+    ring.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - progress))
+    ring.style.strokeLinecap = progress >= 0.999 ? 'butt' : 'round'
+    ring.classList.toggle('is-paused', status === 'paused')
+    dial.title = status === 'running' ? '暂停' : status === 'paused' ? '继续' : '开始'
+  }
+
+  function renderTabs() {
+    for (const button of tabButtons) {
+      const isActive = button.dataset.mode === mode
+      button.setAttribute('aria-pressed', String(isActive))
+      const locked = status !== 'idle' && !isActive
+      button.disabled = locked
+      button.title = locked ? '先重置当前计时再切换类型' : ''
+    }
+  }
+
+  function renderPresets() {
+    const values = mode === 'focus' ? FOCUS_PRESETS : REST_PRESETS
+    if (durations.dataset.mode !== mode) {
+      durations.replaceChildren(...values.map((minutes) => {
+        const button = document.createElement('button')
+        button.type = 'button'
+        button.className = 'duration'
+        button.dataset.minutes = String(minutes)
+        button.textContent = String(minutes)
+        button.setAttribute('aria-label', minutes + ' 分钟')
+        return button
+      }))
+      durations.dataset.mode = mode
+    }
+    const locked = status !== 'idle'
+    const current = minutesFor(mode)
+    for (const button of durations.children) {
+      const minutes = Number(button.dataset.minutes)
+      button.setAttribute('aria-pressed', String(minutes === current))
+      button.disabled = locked
+    }
+    durations.setAttribute('aria-label', (mode === 'focus' ? '专注时长' : '休息时长')
+      + (locked ? ' · 先重置当前计时再切换时长' : ''))
+    durations.title = locked ? '先重置当前计时再切换时长' : ''
+  }
+
+  function renderSettings() {
+    focusValue.textContent = settings.focusMin + ' 分钟'
+    restValue.textContent = settings.restMin + ' 分钟'
+    focusMinus.disabled = settings.focusMin - LIMITS.focusMin.step < LIMITS.focusMin.min
+    focusPlus.disabled = settings.focusMin + LIMITS.focusMin.step > LIMITS.focusMin.max
+    restMinus.disabled = settings.restMin - LIMITS.restMin.step < LIMITS.restMin.min
+    restPlus.disabled = settings.restMin + LIMITS.restMin.step > LIMITS.restMin.max
+    autoRestRow.setAttribute('aria-checked', String(settings.autoStartBreak))
+    autoFocusRow.setAttribute('aria-checked', String(settings.autoStartFocus))
+    soundRow.setAttribute('aria-checked', String(settings.sound))
+  }
+
+  function render() {
+    page.dataset.mode = mode
+    renderTabs()
+    renderPresets()
+    renderTimer()
+    renderSettings()
+    statsEl.textContent = stats.sessions > 0
+      ? '今日 ' + stats.sessions + ' 次专注 · ' + stats.minutes + ' 分钟'
+      : '今天还没有完成专注'
+    settingsPanel.hidden = !settingsOpen
+    settingsButton.setAttribute('aria-expanded', String(settingsOpen))
+    settingsButton.setAttribute('aria-label', settingsOpen ? '收起设置' : '计时设置')
+    settingsButton.title = settingsOpen ? '收起设置' : '计时设置'
+  }
+
+  function openSettings() {
+    settingsOpen = true
+    render()
+    settingsClose.focus()
+  }
+
+  function closeSettings() {
+    if (!settingsOpen) return
+    settingsOpen = false
+    render()
+    settingsButton.focus()
+  }
+
+  dial.addEventListener('click', toggle)
+
+  resetButton.addEventListener('click', (event) => {
+    event.stopPropagation()
+    reset()
+  })
+
+  for (const button of tabButtons) {
+    button.addEventListener('click', () => { selectMode(button.dataset.mode) })
+  }
+
+  durations.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-minutes]')
+    if (button === null || button.disabled || status !== 'idle') return
+    const key = mode === 'focus' ? 'focusMin' : 'restMin'
+    const minutes = Number(button.dataset.minutes)
+    applySettings({ [key]: minutes },
+      (mode === 'focus' ? '专注时长已设为 ' : '休息时长已设为 ') + minutes + ' 分钟')
+  })
+
+  settingsButton.addEventListener('click', () => {
+    if (settingsOpen) closeSettings()
+    else openSettings()
+  })
+  settingsClose.addEventListener('click', closeSettings)
+
+  focusMinus.addEventListener('click', () => { applySettings({ focusMin: settings.focusMin - LIMITS.focusMin.step }) })
+  focusPlus.addEventListener('click', () => { applySettings({ focusMin: settings.focusMin + LIMITS.focusMin.step }) })
+  restMinus.addEventListener('click', () => { applySettings({ restMin: settings.restMin - LIMITS.restMin.step }) })
+  restPlus.addEventListener('click', () => { applySettings({ restMin: settings.restMin + LIMITS.restMin.step }) })
+
+  autoRestRow.addEventListener('click', () => { applySettings({ autoStartBreak: !settings.autoStartBreak }) })
+  autoFocusRow.addEventListener('click', () => { applySettings({ autoStartFocus: !settings.autoStartFocus }) })
+  soundRow.addEventListener('click', () => { applySettings({ sound: !settings.sound }) })
+
+  restoreButton.addEventListener('click', () => { applySettings({ ...DEFAULTS }) })
+
+  function onFirstGesture() {
+    primeAudio()
+    document.removeEventListener('pointerdown', onFirstGesture, true)
+    document.removeEventListener('keydown', onFirstGesture, true)
+  }
+  document.addEventListener('pointerdown', onFirstGesture, true)
+  document.addEventListener('keydown', onFirstGesture, true)
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && settingsOpen) {
+      event.preventDefault()
+      closeSettings()
+      return
+    }
+    if (event.key !== ' ' && event.code !== 'Space') return
+    if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return
+    const target = event.target
+    // 焦点在按钮或输入控件上时，保留浏览器原生的空格行为。
+    if (target instanceof Element
+      && target.closest('button, input, textarea, select, [contenteditable="true"]') !== null) return
+    event.preventDefault()
+    toggle()
+  })
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tick()
+  })
+
+  rollStats()
+
+  if (status === 'running' && endAt <= Date.now()) {
+    // 页面关闭时本轮已结束：只记一次，不自动串下一轮。
+    finishSession({ allowAutoStart: false, chime: false })
+  }
+
+  render()
+  syncTicker()
+})()
+</script>
+</body>
+</html>

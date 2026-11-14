@@ -6,6 +6,7 @@ const navItems = [
   { href: "/ai", label: "AI", icon: "sparkles" },
   { href: "/investment", label: "投资" },
   { href: "/health", label: "健康" },
+  { href: "/tools", label: "工具" },
   { href: "/author", label: "作者" },
 ];
 

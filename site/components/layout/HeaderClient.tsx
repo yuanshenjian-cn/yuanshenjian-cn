@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";

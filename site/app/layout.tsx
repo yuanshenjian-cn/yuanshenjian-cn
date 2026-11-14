@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { FooterGate } from "@/components/layout/FooterGate";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { BackToTop } from "@/components/system/BackToTop";
 import { ServiceWorkerRegistration } from "@/components/system/ServiceWorkerRegistration";
@@ -65,7 +66,9 @@ export default function RootLayout({
         <ThemeProvider>
           <Header />
           <div className="flex-1">{children}</div>
-          <Footer />
+          <FooterGate>
+            <Footer />
+          </FooterGate>
           <BackToTop />
           <ServiceWorkerRegistration />
         </ThemeProvider>

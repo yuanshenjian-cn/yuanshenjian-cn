@@ -5,6 +5,7 @@ import { getAllBriefings, getBriefingArchives } from "@/lib/briefings";
 import { config } from "@/lib/config";
 import { getInvestmentColumns } from "@/lib/investment-columns";
 import { getAllInvestmentBriefings, getInvestmentBriefingArchives } from "@/lib/investment-briefings";
+import { getAllTools } from "@/lib/tools";
 
 export const dynamic = "force-static";
 
@@ -16,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const investmentColumns = getInvestmentColumns();
   const investmentBriefings = getAllInvestmentBriefings();
   const investmentBriefingArchives = getInvestmentBriefingArchives();
+  const tools = getAllTools();
   const baseUrl = config.site.url;
   const { totalPages } = getPaginatedPosts(1);
 
@@ -73,6 +75,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
+  }));
+
+  const toolUrls = tools.map((tool) => ({
+    url: `${baseUrl}/tools/${tool.slug}`,
+    lastModified: tool.addedAt ? new Date(tool.addedAt) : new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
   }));
 
   return [
@@ -149,6 +158,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    {
+      url: `${baseUrl}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    ...toolUrls,
     ...postUrls,
   ];
 }

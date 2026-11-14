@@ -107,6 +107,42 @@ import { getAllPosts } from "@/lib/blog";
 
 ---
 
+### 小工具（`/tools`）约定
+
+小工具是独立的 HTML 单页，不走 React 渲染，直接由静态托管。
+
+| 项目 | 位置 |
+|---|---|
+| 工具 HTML | `site/public/tools/<slug>/view.html` |
+| 注册表（唯一真相源） | `site/data/tools.json` |
+| 读取层 | `site/lib/tools.ts` |
+| 列表页 / 详情页 | `site/app/tools/page.tsx`、`site/app/tools/[slug]/page.tsx` |
+| 列表组件 | `site/components/tools/` |
+
+新增工具只需两步，**不要改任何 TSX 代码**：
+
+```bash
+# 复制 HTML 并登记到注册表
+just add-tool "/path/to/tool.html" pomodoro "番茄钟" "一次只做一件事" "🍅" "效率,专注"
+```
+
+或手动放置 `site/public/tools/<slug>/view.html` 后在 `site/data/tools.json` 追加一条：
+
+```json
+{ "slug": "pomodoro", "title": "番茄钟", "description": "…", "emoji": "🍅", "tags": ["效率"], "addedAt": "2026-11-14" }
+```
+
+约束：
+
+- **入口文件名固定为 `view.html`**。详情页路由 `/tools/<slug>` 静态导出时会占用 `dist/tools/<slug>/index.html`，放 `index.html` 会被覆盖成裸 HTML（有测试守护）
+- `slug` 只能是小写字母、数字、中划线，且全局唯一；它就是 URL 与目录名
+- `title`、`description` 必填；`emoji` 缺省为 🧩
+- 工具页通过 iframe 承载，`localStorage` 可用，不要给 iframe 加 `sandbox`
+- 工具目录内可放图片等相对资源，用相对路径引用即可
+- 列表页的卡片 / 列表视图偏好保存在 `localStorage`（key：`ysj-tools-view-mode`）
+
+---
+
 ## 质量门禁
 
 完成 site 改动前必须运行根目录定义的前端校验命令（typecheck + lint + test）；具体命令见根目录 `AGENTS.md`。

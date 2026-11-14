@@ -17,6 +17,7 @@
 
 # Misc
 .DS_Store
+/Anaconda3-*.sh
 .local/investment-audits/
 .local/ai-briefing/
 *.pem
