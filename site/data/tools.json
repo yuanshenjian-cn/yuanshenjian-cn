@@ -1,9 +1,9 @@
 {
   "tools": [
     {
-      "slug": "body",
+      "slug": "body-metrics",
       "title": "身体指标",
-      "description": "BMI、体脂、腰高比与五区心率一次算清，附同龄心肺适能对照",
+      "description": "BMI、体脂、腰围与腰臀比一次算清，附五区心率与同龄心肺适能对照",
       "emoji": "🫀",
       "tags": [
         "健身",

@@ -532,6 +532,19 @@
   .scale-labels span:first-child { text-align: left; }
   .scale-labels span:last-child { text-align: right; }
 
+  /* ---- 卡内次级指标 ---- */
+  .card-sub {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .card-sub .result-value { font-size: clamp(24px, 7vw, 29px); }
+  .card-sub .scale { margin-top: 10px; }
+  .empty.is-sub {
+    margin-top: 16px;
+    padding: 10px 12px;
+  }
+
   /* ---- 心率区间 ---- */
   .zones {
     margin: 13px 0 0;
@@ -985,6 +998,21 @@
       </div>
 
       <div class="row">
+        <label class="row-label" for="hip">臀围 <span class="label-unit">可选</span></label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="hip" data-step="-1"
+                  aria-label="臀围减少 1 厘米">−</button>
+          <span class="row-value">
+            <input id="hip" class="num" type="number" inputmode="decimal"
+                   min="60" max="160" step="0.5" placeholder="—" aria-label="臀围，单位厘米">
+            <span class="unit">cm</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="hip" data-step="1"
+                  aria-label="臀围增加 1 厘米">+</button>
+        </div>
+      </div>
+
+      <div class="row">
         <label class="row-label" for="rhr">静息心率 <span class="label-unit">可选</span></label>
         <div class="stepper">
           <button type="button" class="step-btn" data-step-target="rhr" data-step="-1"
@@ -1015,7 +1043,7 @@
       </div>
 
       <p class="hint" style="margin-top:2px;padding-top:8px;border-top-style:solid">
-        体脂率留空按 <b>Deurenberg 公式</b>由 BMI 与年龄推算；腰围、静息心率、握力留空则跳过对应评估。体脂秤读数受水分影响，<b>看趋势比看单次更可靠</b>。
+        体脂率留空按 <b>Deurenberg 公式</b>由 BMI 与年龄推算；腰围、臀围、静息心率、握力留空则跳过对应评估。体脂秤读数受水分影响，<b>看趋势比看单次更可靠</b>。
       </p>
       <p class="hint" id="grip-note" hidden style="margin-top:0;padding-top:0;border-top:0"></p>
     </div>
@@ -1100,15 +1128,15 @@
     </p>
   </section>
 
-  <!-- 中心性脂肪 -->
-  <section class="card" aria-label="中心性脂肪">
+  <!-- 腹部脂肪 -->
+  <section class="card" aria-label="腹部脂肪">
     <div class="card-head">
-      <span class="card-title">中心性脂肪</span>
+      <span class="card-title">腹部脂肪</span>
       <span class="card-total" id="waist-status">未填腰围</span>
     </div>
 
     <div class="empty" id="waist-empty">
-      <p class="empty-text">腰围是比 BMI 更敏感的内脏脂肪信号，量一下就能看。</p>
+      <p class="empty-text">肚子上的脂肪分两层，包住器官的那层才伤代谢。腰围能粗略看出它多不多。</p>
       <button type="button" class="empty-action" id="waist-jump">去填腰围</button>
     </div>
 
@@ -1149,6 +1177,33 @@
           <dd id="waist-verdict">—</dd>
         </div>
       </dl>
+
+      <div class="card-sub" id="whr-body" hidden>
+        <div class="result">
+          <p class="result-label">腰臀比 WHR</p>
+          <p class="result-value" id="whr-value">0.86</p>
+          <p class="result-note" id="whr-note">—</p>
+        </div>
+
+        <div class="scale" id="whr-scale">
+          <div class="scale-track">
+            <span class="scale-seg ideal" id="whr-seg-ideal" style="width:50%"></span>
+            <span class="scale-seg over" id="whr-seg-over" style="width:20%"></span>
+            <span class="scale-seg high" id="whr-seg-high" style="width:30%"></span>
+            <span class="scale-pin" id="whr-pin" style="left:42%"></span>
+          </div>
+          <div class="scale-labels">
+            <span id="whr-lab-ideal" style="width:50%">理想</span>
+            <span id="whr-lab-over" style="width:20%">偏高</span>
+            <span style="width:30%">高风险</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty is-sub" id="whr-empty" hidden>
+        <p class="empty-text">再量一个臀围，就能看出脂肪是偏腰还是偏臀。</p>
+        <button type="button" class="empty-action" id="whr-jump">去填臀围</button>
+      </div>
 
       <p class="hint" id="waist-hint">
         量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。
@@ -1262,7 +1317,7 @@
           <span class="read-rank">03</span>
           <div>
             <p class="read-name">腰围与腰高比</p>
-            <p class="read-desc">比 BMI 更能捕捉内脏脂肪。84 万人研究显示，仅 BMI 超标而腰围正常者死亡风险并未升高；<b>「体重正常但肚子大」才是漏诊重灾区</b>。</p>
+            <p class="read-desc">比 BMI 更能看出肚子里那层脂肪（内脏脂肪）。84 万人研究显示，仅 BMI 超标而腰围正常者死亡风险并未升高；<b>「体重正常但肚子大」才是漏诊重灾区</b>。腰高比看总量，腰臀比看分布——同样的腰围，臀部越丰满风险越低。</p>
           </div>
         </div>
         <div class="read-item">
@@ -1382,7 +1437,7 @@
         </svg>
       </button>
     </div>
-    <p class="sheet-desc" id="editor-desc">腰围是比 BMI 更敏感的内脏脂肪信号。</p>
+    <p class="sheet-desc" id="editor-desc">腰围能粗略看出肚子里那层脂肪多不多，比 BMI 更敏感。</p>
 
     <div class="row">
       <label class="row-label" for="editor-input" id="editor-label">腰围</label>
@@ -1420,6 +1475,7 @@
     weight: 68,
     bodyfat: null,
     waist: null,
+    hip: null,
     rhr: null,
     grip: null,
     activity: 'light'
@@ -1470,6 +1526,7 @@
     weight: document.getElementById('weight'),
     bodyfat: document.getElementById('bodyfat'),
     waist: document.getElementById('waist'),
+    hip: document.getElementById('hip'),
     rhr: document.getElementById('rhr'),
     grip: document.getElementById('grip'),
     gripNote: document.getElementById('grip-note'),
@@ -1506,6 +1563,17 @@
     waistLimit: document.getElementById('waist-limit'),
     waistVerdict: document.getElementById('waist-verdict'),
     waistHint: document.getElementById('waist-hint'),
+    whrBody: document.getElementById('whr-body'),
+    whrEmpty: document.getElementById('whr-empty'),
+    whrJump: document.getElementById('whr-jump'),
+    whrValue: document.getElementById('whr-value'),
+    whrNote: document.getElementById('whr-note'),
+    whrPin: document.getElementById('whr-pin'),
+    whrSegIdeal: document.getElementById('whr-seg-ideal'),
+    whrSegOver: document.getElementById('whr-seg-over'),
+    whrSegHigh: document.getElementById('whr-seg-high'),
+    whrLabIdeal: document.getElementById('whr-lab-ideal'),
+    whrLabOver: document.getElementById('whr-lab-over'),
 
     vo2Status: document.getElementById('vo2-status'),
     vo2Empty: document.getElementById('vo2-empty'),
@@ -1620,8 +1688,19 @@
   function gradeWhtr(v) {
     if (v < 0.4) return { tone: 'warn', text: '偏瘦', note: '腰围小于身高一半为理想' };
     if (v < 0.5) return { tone: 'ok', text: '理想', note: '腰围小于身高一半' };
-    if (v < 0.6) return { tone: 'warn', text: '偏高', note: '建议开始减少内脏脂肪' };
-    return { tone: 'risk', text: '高风险', note: '内脏脂肪明显超标' };
+    if (v < 0.6) return { tone: 'warn', text: '偏高', note: '建议开始减肚子' };
+    return { tone: 'risk', text: '高风险', note: '腹部脂肪明显偏多' };
+  }
+
+  function gradeWhr(v, sex) {
+    var cut = sex === 'male' ? 0.90 : 0.85;
+    if (v < cut) {
+      return { tone: 'ok', text: '理想', note: '低于 WHO 行动线 ' + cut.toFixed(2) };
+    }
+    if (v < 1) {
+      return { tone: 'warn', text: '偏高', note: '达到 WHO 行动线 ' + cut.toFixed(2) + '，风险升高，优先减腰围' };
+    }
+    return { tone: 'risk', text: '高风险', note: '腰围已不小于臀围，腹部脂肪明显偏多' };
   }
 
   function vo2Norm(age, sex) {
@@ -1657,6 +1736,11 @@
         };
       case 'waist':
         return { key: 'waist', min: 40, max: 160, step: 0.5, input: el.waist, base: 80 };
+      case 'hip':
+        return {
+          key: 'hip', min: 60, max: 160, step: 0.5, input: el.hip,
+          base: state.sex === 'male' ? 98 : 96
+        };
       case 'rhr':
         return { key: 'rhr', min: 30, max: 120, step: 1, input: el.rhr, base: 70, integer: true };
       case 'grip':
@@ -1781,10 +1865,44 @@
       : '五区按<b>最大心率百分比</b>划分。填入静息心率后自动改用<b>心率储备法（Karvonen）</b>，区间会更贴合个人。';
   }
 
+  function renderWhr() {
+    if (state.hip === null) {
+      el.whrBody.hidden = true;
+      el.whrEmpty.hidden = false;
+      return;
+    }
+
+    el.whrBody.hidden = false;
+    el.whrEmpty.hidden = true;
+
+    var v = state.waist / state.hip;
+    var g = gradeWhr(v, state.sex);
+    var cut = state.sex === 'male' ? 0.90 : 0.85;
+    var min = 0.65;
+    var span = 1.15 - min;
+    var w1 = (cut - min) / span * 100;
+    var w2 = (1 - cut) / span * 100;
+    var w3 = (1.15 - 1) / span * 100;
+    w1 = Math.round(w1 * 100) / 100;
+    w2 = Math.round(w2 * 100) / 100;
+    w3 = Math.round(w3 * 100) / 100;
+
+    el.whrValue.textContent = v.toFixed(2);
+    el.whrNote.innerHTML = grade(g.tone, g.text) + ' ' + g.note;
+    el.whrSegIdeal.style.width = w1 + '%';
+    el.whrSegOver.style.width = w2 + '%';
+    el.whrSegHigh.style.width = w3 + '%';
+    el.whrLabIdeal.style.width = w1 + '%';
+    el.whrLabOver.style.width = w2 + '%';
+    el.whrPin.style.left = clamp((v - min) / span * 100, 0.6, 99.4) + '%';
+  }
+
   function renderWaist() {
     if (state.waist === null) {
       el.waistEmpty.hidden = false;
       el.waistBody.hidden = true;
+      el.whrBody.hidden = true;
+      el.whrEmpty.hidden = true;
       el.waistStatus.textContent = '未填腰围';
       return;
     }
@@ -1807,10 +1925,19 @@
       ? grade('risk', '超标')
       : grade('ok', '达标');
 
-    el.waistHint.innerHTML = state.waist >= limit
-      ? '腰围已达中国中心性肥胖标准（' + (state.sex === 'male' ? '男性 ≥90' : '女性 ≥85') +
-        ' cm），内脏脂肪风险升高，优先做有氧 + 力量组合训练。'
-      : '量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。';
+    var over = state.waist >= limit
+      ? '腰围已达到' + (state.sex === 'male' ? '男性上限 90' : '女性上限 85') +
+        ' cm，说明肚子上的脂肪偏多，优先做有氧 + 力量组合训练。'
+      : '';
+    var measure = '量法：站直、呼气末，软尺水平贴皮不勒紧；腰围取髂嵴上缘与第 12 肋下缘中点' +
+      (state.hip === null ? '。' : '，臀围取臀部最凸处。');
+    var caveat = state.hip === null
+      ? ''
+      : ' 腰臀比只看比例，腰围和臀围一起变大时它可能仍正常，要和腰高比一起看。';
+
+    el.waistHint.innerHTML = over + measure + caveat;
+
+    renderWhr();
   }
 
   function renderVo2() {
@@ -1861,10 +1988,10 @@
     el.baseSummary.textContent = state.age + ' 岁 · ' + trimNumber(state.height) + ' cm · ' +
       trimNumber(state.weight) + ' kg';
 
-    var filled = [state.bodyfat, state.waist, state.rhr, state.grip].filter(function (v) {
+    var filled = [state.bodyfat, state.waist, state.hip, state.rhr, state.grip].filter(function (v) {
       return v !== null;
     }).length;
-    el.optionalSummary.textContent = filled === 0 ? '留空则自动估算' : '已填 ' + filled + ' / 4 项';
+    el.optionalSummary.textContent = filled === 0 ? '留空则自动估算' : '已填 ' + filled + ' / 5 项';
   }
 
   function update() {
@@ -1914,6 +2041,7 @@
     state.weight = requiredOr(data.weight, DEFAULTS.weight, 30, 200);
     state.bodyfat = optionalOr(data.bodyfat, 2, 60);
     state.waist = optionalOr(data.waist, 40, 160);
+    state.hip = optionalOr(data.hip, 60, 160);
     state.rhr = optionalOr(data.rhr, 30, 120);
     state.grip = optionalOr(data.grip, 5, 90);
     if (typeof data.activity === 'string' && ACTIVITY[data.activity]) {
@@ -1933,6 +2061,7 @@
     el.weight.value = trimNumber(state.weight);
     paintOptional(el.bodyfat, state.bodyfat);
     paintOptional(el.waist, state.waist);
+    paintOptional(el.hip, state.hip);
     paintOptional(el.rhr, state.rhr);
     paintOptional(el.grip, state.grip);
   }
@@ -1997,6 +2126,7 @@
   bindRequired(el.weight, 'weight', 30, 200, DEFAULTS.weight);
   bindOptional(el.bodyfat, 'bodyfat', 2, 60);
   bindOptional(el.waist, 'waist', 40, 160);
+  bindOptional(el.hip, 'hip', 60, 160);
   bindOptional(el.rhr, 'rhr', 30, 120);
   bindOptional(el.grip, 'grip', 5, 90);
 
@@ -2037,10 +2167,17 @@
   var EDITOR_COPY = {
     waist: {
       title: '填写腰围',
-      desc: '腰围是比 BMI 更敏感的内脏脂肪信号，量一下就能看。',
+      desc: '腰围能粗略看出肚子里那层脂肪多不多，比 BMI 更敏感。',
       label: '腰围',
       unit: 'cm',
       note: '量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。'
+    },
+    hip: {
+      title: '填写臀围',
+      desc: '臀围和腰围一起看脂肪分布，比单看腰围更能分清胖在哪。',
+      label: '臀围',
+      unit: 'cm',
+      note: '站直、双脚并拢，软尺水平绕过臀部最凸处，贴皮不勒紧。'
     },
     rhr: {
       title: '填写静息心率',
@@ -2063,6 +2200,17 @@
       var limit = state.sex === 'male' ? 90 : 85;
       el.editorPreview.innerHTML = '腰高比 <b>' + ratio.toFixed(2) + '</b> ' +
         grade(g.tone, g.text) + ' · 中国上限 ' + limit + ' cm';
+      return;
+    }
+    if (editorKey === 'hip') {
+      if (state.waist === null) {
+        el.editorPreview.innerHTML = '填完腰围后即可算出腰臀比';
+        return;
+      }
+      var whr = state.waist / value;
+      var wg = gradeWhr(whr, state.sex);
+      el.editorPreview.innerHTML = '腰臀比 <b>' + whr.toFixed(2) + '</b> ' +
+        grade(wg.tone, wg.text) + ' · 行动线 ' + (state.sex === 'male' ? '0.90' : '0.85');
       return;
     }
     var hrmax = Math.round(208 - 0.7 * state.age);
@@ -2165,6 +2313,10 @@
 
   el.waistJump.addEventListener('click', function () {
     openEditor('waist');
+  });
+
+  el.whrJump.addEventListener('click', function () {
+    openEditor('hip');
   });
 
   el.rhrJump.addEventListener('click', function () {
