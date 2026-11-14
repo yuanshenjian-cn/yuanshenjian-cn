@@ -37,11 +37,6 @@ export function ToolRow({ tool }: ToolRowProps) {
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{tool.description}</p>
       </div>
 
-      {tool.addedAt && (
-        <span className="hidden shrink-0 text-[11px] text-muted-foreground/70 sm:block">
-          {tool.addedAt}
-        </span>
-      )}
       <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-foreground" />
     </Link>
   );

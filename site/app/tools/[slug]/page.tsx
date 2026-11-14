@@ -44,6 +44,7 @@ export default async function ToolPage({ params }: Props) {
       <iframe
         src={getToolEmbedPath(tool.slug)}
         title={tool.title}
+        allow="screen-wake-lock"
         className="h-full w-full border-0 bg-background"
       />
     </main>

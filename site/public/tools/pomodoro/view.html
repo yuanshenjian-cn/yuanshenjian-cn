@@ -791,8 +791,61 @@
     })
   }
 
+  // 计时运行期间申请屏幕常亮，暂停 / 结束 / 切到后台自动释放。
+  // 不支持的浏览器（如 Firefox）静默降级，不影响计时本身。
+  const wakeLock = (() => {
+    let sentinel = null
+    let pending = false
+    let wanted = false
+
+    function supported() {
+      return typeof navigator !== 'undefined' && 'wakeLock' in navigator
+    }
+
+    async function acquire() {
+      if (!wanted || sentinel || pending || !supported()) return
+      if (document.visibilityState !== 'visible') return
+      pending = true
+      try {
+        const lock = await navigator.wakeLock.request('screen')
+        if (!wanted) {
+          lock.release().catch(() => {})
+          return
+        }
+        sentinel = lock
+        lock.addEventListener('release', () => { sentinel = null })
+      } catch (error) {
+        // 低电量模式、权限被拒等情况：放弃常亮，计时照常。
+        sentinel = null
+      } finally {
+        pending = false
+      }
+    }
+
+    function release() {
+      if (!sentinel) return
+      const current = sentinel
+      sentinel = null
+      current.release().catch(() => {})
+    }
+
+    function sync(shouldHold) {
+      wanted = shouldHold
+      if (shouldHold) acquire()
+      else release()
+    }
+
+    // 切回前台时浏览器已自动释放锁，需要重新申请。
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && wanted) acquire()
+    })
+
+    return { sync }
+  })()
+
   // 状态变更的统一出口：同步计时器、落盘、重绘。
   function commit() {
+    wakeLock.sync(status === 'running')
     syncTicker()
     persist()
     render()
