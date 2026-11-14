@@ -1093,6 +1093,30 @@
     </p>
   </section>
 
+  <!-- 心肺适能 -->
+  <section class="card" aria-label="心肺适能">
+    <div class="card-head">
+      <span class="card-title">心肺适能 VO₂max</span>
+      <span class="card-total" id="vo2-status">需静息心率</span>
+    </div>
+
+    <div class="empty" id="vo2-empty">
+      <p class="empty-text">晨起静卧测 1 分钟静息心率，填入即可估算最大摄氧量，这是预测长期健康最强的单一指标。</p>
+      <button type="button" class="empty-action" id="rhr-jump">去填心率</button>
+    </div>
+
+    <div id="vo2-body" hidden>
+      <div class="result">
+        <p class="result-label">估算最大摄氧量 · mL/kg/min</p>
+        <p class="result-value"><span id="vo2-value">—</span></p>
+        <p class="result-note" id="vo2-note"><span class="grade ok">良好</span> 同龄男性</p>
+      </div>
+      <p class="hint" id="vo2-hint">
+        Uth 公式 15.3 × HRmax ÷ 静息心率，仅适用于安静状态下的粗略估算，误差约 ±10–15%。
+      </p>
+    </div>
+  </section>
+
   <!-- 心率 -->
   <section class="card" aria-label="心率与训练强度">
     <div class="card-head">
@@ -1128,10 +1152,10 @@
     </p>
   </section>
 
-  <!-- 腹部脂肪 -->
-  <section class="card" aria-label="腹部脂肪">
+  <!-- 脂肪分布 -->
+  <section class="card" aria-label="脂肪分布">
     <div class="card-head">
-      <span class="card-title">腹部脂肪</span>
+      <span class="card-title">脂肪分布</span>
       <span class="card-total" id="waist-status">未填腰围</span>
     </div>
 
@@ -1207,30 +1231,6 @@
 
       <p class="hint" id="waist-hint">
         量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。
-      </p>
-    </div>
-  </section>
-
-  <!-- 心肺适能 -->
-  <section class="card" aria-label="心肺适能">
-    <div class="card-head">
-      <span class="card-title">心肺适能 VO₂max</span>
-      <span class="card-total" id="vo2-status">需静息心率</span>
-    </div>
-
-    <div class="empty" id="vo2-empty">
-      <p class="empty-text">晨起静卧测 1 分钟静息心率，填入即可估算最大摄氧量，这是预测长期健康最强的单一指标。</p>
-      <button type="button" class="empty-action" id="rhr-jump">去填心率</button>
-    </div>
-
-    <div id="vo2-body" hidden>
-      <div class="result">
-        <p class="result-label">估算最大摄氧量 · mL/kg/min</p>
-        <p class="result-value"><span id="vo2-value">—</span></p>
-        <p class="result-note" id="vo2-note"><span class="grade ok">良好</span> 同龄男性</p>
-      </div>
-      <p class="hint" id="vo2-hint">
-        Uth 公式 15.3 × HRmax ÷ 静息心率，仅适用于安静状态下的粗略估算，误差约 ±10–15%。
       </p>
     </div>
   </section>
@@ -1703,6 +1703,12 @@
     return { tone: 'risk', text: '高风险', note: '腰围已不小于臀围，腹部脂肪明显偏多' };
   }
 
+  var TONE_RANK = { ok: 0, flat: 1, warn: 2, risk: 3 };
+
+  function worseGrade(a, b) {
+    return (TONE_RANK[b.tone] || 0) > (TONE_RANK[a.tone] || 0) ? b : a;
+  }
+
   function vo2Norm(age, sex) {
     var rows = VO2_NORMS[sex];
     for (var i = 0; i < rows.length; i++) {
@@ -1914,7 +1920,12 @@
     var g = gradeWhtr(ratio);
     var limit = state.sex === 'male' ? 90 : 85;
 
-    el.waistStatus.textContent = g.text;
+    var status = g;
+    if (state.hip !== null) {
+      status = worseGrade(g, gradeWhr(state.waist / state.hip, state.sex));
+    }
+
+    el.waistStatus.textContent = status.text;
     el.whtrValue.textContent = ratio.toFixed(2);
     el.whtrNote.innerHTML = grade(g.tone, g.text) + ' ' + g.note;
     el.whtrPin.style.left = clamp((ratio - 0.35) / 0.4 * 100, 0.6, 99.4) + '%';
