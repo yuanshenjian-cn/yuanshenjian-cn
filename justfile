@@ -191,6 +191,10 @@ purge-ai-briefing-cache date:
 purge-investment-briefing-cache date:
     @node scripts/purge-cloudflare-cache.js --scope investment-briefing --date "{{date}}"
 
+# 定向清理小工具相关 Cloudflare 缓存；不传 slug 时清理全部已登记工具。
+purge-tools-cache slug="":
+    @node scripts/purge-cloudflare-cache.js --scope tools {{ if slug == "" { "" } else { "--slug " + slug } }}
+
 # 运行 site 全量常用校验。
 check-site: typecheck-site lint-site test-site
 

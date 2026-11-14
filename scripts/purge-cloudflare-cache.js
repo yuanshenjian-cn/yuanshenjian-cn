@@ -13,6 +13,18 @@ const AI_BRIEFING_FILE_RE = /^content\/ai-briefings\/(?:\d{4}(?:\/\d{2}|-\d{2})\
 const INVESTMENT_BRIEFING_FILE_RE = /^content\/investment-briefings\/(?:\d{4}(?:\/\d{2}|-\d{2})\/)?(\d{4}-\d{2}-\d{2})-investment-briefing\.md$/;
 const ARTICLE_FILE_RE = /^content\/blog\/.+\/([^/]+)\.mdx?$/i;
 const BLOG_CONTENT_PREFIX = "content/blog/";
+const TOOLS_REGISTRY_FILE = "site/data/tools.json";
+const TOOLS_ASSET_FILE_RE = /^site\/public\/tools\/([a-z0-9]+(?:-[a-z0-9]+)*)\//;
+const TOOL_SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const TOOLS_RELATED_FILES = new Set([
+  "site/app/tools/page.tsx",
+  "site/app/tools/[slug]/page.tsx",
+  "site/components/tools/ToolCard.tsx",
+  "site/components/tools/ToolDirectory.tsx",
+  "site/components/tools/ToolRow.tsx",
+  "site/lib/tools.ts",
+  "site/types/tool.ts",
+]);
 const ARTICLE_SECTION_ROUTES = [
   { contentDir: "swd/ai-coding/ai-frontier", rootPath: "/ai", columnPath: "/ai/ai-frontier" },
   { contentDir: "swd/ai-coding/llm-family", rootPath: "/ai", columnPath: "/ai/llm-family" },
@@ -149,6 +161,38 @@ function buildInvestmentBriefingPurgePaths(date) {
     `/investment/briefings/${date}`,
     `/investment/briefings/${date}/opengraph-image`,
   ]);
+}
+
+function buildToolsPurgePaths(slugs) {
+  const paths = ["/tools", "/sitemap.xml"];
+
+  for (const slug of slugs) {
+    paths.push(`/tools/${slug}`, `/tools/${slug}/view.html`);
+  }
+
+  return unique(paths);
+}
+
+function getRegisteredToolSlugs() {
+  const registryFile = path.join(ROOT, TOOLS_REGISTRY_FILE);
+  if (!fs.existsSync(registryFile)) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(fs.readFileSync(registryFile, "utf8"));
+    if (!Array.isArray(parsed.tools)) {
+      return [];
+    }
+
+    return unique(
+      parsed.tools
+        .map((tool) => (typeof tool?.slug === "string" ? tool.slug.trim() : ""))
+        .filter((slug) => TOOL_SLUG_RE.test(slug)),
+    );
+  } catch {
+    return [];
+  }
 }
 
 function getMarkdownFiles(dir) {
@@ -294,6 +338,21 @@ function derivePurgePathsFromChangedFiles(changedFiles, options = {}) {
       continue;
     }
 
+    if (filePath === TOOLS_REGISTRY_FILE || TOOLS_RELATED_FILES.has(filePath)) {
+      for (const targetPath of buildToolsPurgePaths(getRegisteredToolSlugs())) {
+        pathSet.add(targetPath);
+      }
+      continue;
+    }
+
+    const toolsAssetMatch = TOOLS_ASSET_FILE_RE.exec(filePath);
+    if (toolsAssetMatch) {
+      for (const targetPath of buildToolsPurgePaths([toolsAssetMatch[1]])) {
+        pathSet.add(targetPath);
+      }
+      continue;
+    }
+
     if (filePath === "public/ai-data/index.json") {
       for (const targetPath of ["/articles", "/articles/latest", "/feed", "/sitemap.xml", "/ai-data/index.json"]) {
         pathSet.add(targetPath);
@@ -406,6 +465,8 @@ function printUsage() {
   npm run purge:cloudflare -- --scope ai-briefing --date 2026-05-26
   npm run purge:cloudflare -- --scope investment-briefing --date 2026-05-26
   npm run purge:cloudflare -- --scope article --slug opencode-efficiency-config-handbook
+  npm run purge:cloudflare -- --scope tools
+  npm run purge:cloudflare -- --scope tools --slug pomodoro
   npm run purge:cloudflare -- --scope deploy --changed-file content/ai-briefings/2026-05-26-ai-briefing.md
   npm run purge:cloudflare -- --url https://yuanshenjian.cn/ --url /ai/briefings/latest
 
@@ -441,6 +502,12 @@ function buildTargetUrls(options) {
         throw new Error("--scope article 需要同时传入 --slug");
       }
       targetPaths.push(...buildArticlePurgePaths(options.slug));
+      break;
+    case "tools":
+      if (options.slug && !TOOL_SLUG_RE.test(options.slug)) {
+        throw new Error(`--slug 不合法：${options.slug}`);
+      }
+      targetPaths.push(...buildToolsPurgePaths(options.slug ? [options.slug] : getRegisteredToolSlugs()));
       break;
     case "deploy":
       targetPaths.push(...derivePurgePathsFromChangedFiles(options.changedFiles));
@@ -510,8 +577,10 @@ module.exports = {
   buildInvestmentBriefingPurgePaths,
   buildInvestmentCoveragePaths,
   buildTargetUrls,
+  buildToolsPurgePaths,
   derivePurgePathsFromChangedFiles,
   getArticleSectionPaths,
+  getRegisteredToolSlugs,
   normalizeRepoPath,
   parseArgs,
   toAbsoluteUrl,

@@ -4,6 +4,8 @@ let buildAiBriefingPurgePaths: (date: string) => string[];
 let buildArticlePurgePaths: (slug: string, articlePageCount?: number) => string[];
 let buildInvestmentBriefingPurgePaths: (date: string) => string[];
 let buildInvestmentCoveragePaths: () => string[];
+let buildToolsPurgePaths: (slugs: string[]) => string[];
+let getRegisteredToolSlugs: () => string[];
 let getArticleSectionPaths: (filePath: string) => string[];
 let buildTargetUrls: (options: {
   changedFiles: string[];
@@ -25,8 +27,10 @@ describe("purge-cloudflare-cache script", () => {
       buildInvestmentBriefingPurgePaths,
       buildInvestmentCoveragePaths,
       buildTargetUrls,
+      buildToolsPurgePaths,
       derivePurgePathsFromChangedFiles,
       getArticleSectionPaths,
+      getRegisteredToolSlugs,
     } = await import("../purge-cloudflare-cache.js"));
   });
 
@@ -60,6 +64,50 @@ describe("purge-cloudflare-cache script", () => {
       "/investment/coverage",
       "/investment-data/coverage.json",
     ]);
+  });
+
+  it("builds tools purge paths with list, detail and embed routes", () => {
+    const paths = buildToolsPurgePaths(["pomodoro", "mortgage"]);
+
+    expect(paths).toContain("/tools");
+    expect(paths).toContain("/sitemap.xml");
+    expect(paths).toContain("/tools/pomodoro");
+    expect(paths).toContain("/tools/pomodoro/view.html");
+    expect(paths).toContain("/tools/mortgage");
+    expect(paths).toContain("/tools/mortgage/view.html");
+  });
+
+  it("derives tools purge targets from registry and tool asset changes", () => {
+    const registryPaths = derivePurgePathsFromChangedFiles(["site/data/tools.json"], {
+      articlePageCount: 2,
+    });
+
+    expect(registryPaths).toContain("/tools");
+    expect(registryPaths).toContain("/sitemap.xml");
+    for (const slug of getRegisteredToolSlugs()) {
+      expect(registryPaths).toContain(`/tools/${slug}`);
+      expect(registryPaths).toContain(`/tools/${slug}/view.html`);
+    }
+
+    const assetPaths = derivePurgePathsFromChangedFiles([
+      "site/public/tools/example-tool/view.html",
+      "site/public/tools/example-tool/img/demo.png",
+    ], { articlePageCount: 2 });
+
+    expect(assetPaths).toContain("/tools");
+    expect(assetPaths).toContain("/tools/example-tool");
+    expect(assetPaths).toContain("/tools/example-tool/view.html");
+  });
+
+  it("derives all tools purge targets from tools UI source changes", () => {
+    const paths = derivePurgePathsFromChangedFiles([
+      "site/components/tools/ToolDirectory.tsx",
+    ], { articlePageCount: 2 });
+
+    expect(paths).toContain("/tools");
+    for (const slug of getRegisteredToolSlugs()) {
+      expect(paths).toContain(`/tools/${slug}`);
+    }
   });
 
   it("builds article purge paths with listing, feed and pagination routes", () => {
