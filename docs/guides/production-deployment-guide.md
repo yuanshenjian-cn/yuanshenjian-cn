@@ -237,16 +237,23 @@ https://api.yuanshenjian.cn/healthz
 ```
 
 3. 到 Cloudflare `DNS` 页面，把 `api` 这条 `CNAME -> xxx.onrender.com` 从灰云 `DNS only` 切到橙云 `Proxied`
-4. 到 Cloudflare `SSL/TLS` 页面确认模式为 `Full (strict)`
-5. 到 Cloudflare `WAF -> Rate limiting rules` 新建一条外层粗限流规则
-6. 如果当前 Cloudflare 套餐只提供 1 条免费速率规则，优先把它留给最高成本、最容易被刷的接口；当前推荐优先保护：
+4. 到 Cloudflare `SSL/TLS` 页面确认模式为 `Full`；不要整站切 `Full (strict)`，因为 `www` 的 GitHub Pages 源站证书是 `*.github.io`，严格模式会误伤主站
+5. 到 Cloudflare `Caching -> Cache Rules` 新增一条 `api` 主机全站绕过缓存规则，避免 `api` 的响应被 Cloudflare 缓存：
+
+```text
+表达式：(http.host eq "api.yuanshenjian.cn")
+动作：Bypass cache（对应 API：set_cache_settings + cache=false）
+```
+
+6. 到 Cloudflare `WAF -> Rate limiting rules` 新建一条外层粗限流规则
+7. 如果当前 Cloudflare 套餐只提供 1 条免费速率规则，优先把它留给最高成本、最容易被刷的接口；当前推荐优先保护：
 
 ```text
 /api/v1/ai-assistant/*
 ```
 
-7. 规则先从保守值开始，例如按 `IP` 做粗粒度限流，不要一开始就把评论、管理员登录、AI 接口全部混进同一条高敏规则
-8. 切换后按本文下方验收顺序逐项回归，尤其是 AI SSE 流式接口
+8. 规则先从保守值开始，例如按 `IP` 做粗粒度限流，不要一开始就把评论、管理员登录、AI 接口全部混进同一条高敏规则
+9. 切换后按本文下方验收顺序逐项回归，尤其是 AI SSE 流式接口
 
 说明：
 
@@ -344,7 +351,7 @@ renderSubdomainPolicy: disabled
 
 建议的切换后验收顺序：
 
-1. `https://api.yuanshenjian.cn/healthz`
+1. `https://api.yuanshenjian.cn/healthz`，并确认响应头 `cache-control` 为 `no-store, max-age=0`、`cf-cache-status` 不是 `HIT`
 2. 主站文章页加载与评论列表
 3. 评论提交
 4. AI 推荐与 AI 流式问答
@@ -364,6 +371,7 @@ Render 环境变量：
 | `SESSION_SECRET` | 长随机字符串 | 必填 |
 | `ADMIN_SECRET_HASH` | 管理员密码哈希 | 必填 |
 | `TURNSTILE_SECRET_KEY` | Turnstile Secret Key | 必填 |
+| `TRUST_CF_CONNECTING_IP` | `true` | 橙云后必须为 `true`，否则应用层限流会按代理 IP 统计，导致全站共享同一配额 |
 | `EMERGENCY_DISABLE_AI` | `false` | 紧急关闭 AI |
 | `DEEPSEEK_API_KEY` | 真实 key | 当前激活 profile 需要 |
 | `MOONSHOT_API_KEY` | 真实 key 或空 | 可选 |
