@@ -7,7 +7,7 @@
  *
  * 用法：
  *   node scripts/add-tool.js /path/to/tool.html --slug pomodoro --title "番茄钟" \
- *     --description "一次只做一件事" [--emoji 🍅] [--tags 效率,专注] [--force]
+ *     --description "一次只做一件事" [--category 时间效率] [--emoji 🍅] [--tags 效率,专注] [--force]
  *
  *   just add-tool /path/to/tool.html pomodoro "番茄钟" "一次只做一件事"
  *
@@ -28,6 +28,8 @@ const REPO_ROOT = path.resolve(__dirname, "..");
 const TOOLS_DIR = path.join(REPO_ROOT, "site", "public", "tools");
 const REGISTRY_FILE = path.join(REPO_ROOT, "site", "data", "tools.json");
 const DEFAULT_EMOJI = "🧩";
+/** 与 site/lib/tool-categories.ts 的 DEFAULT_TOOL_CATEGORY 保持一致 */
+const DEFAULT_CATEGORY = "其他";
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
@@ -77,8 +79,9 @@ function printUsage() {
       "用法：node scripts/add-tool.js <html 路径> --slug <slug> --title <标题> --description <说明>",
       "",
       "可选参数：",
+      "  --category <分类> 一级分类，列表页按它筛选，如 理财计算；缺省为「其他」",
       "  --emoji <符号>    卡片展示符号，默认 🧩",
-      "  --tags <标签>     逗号分隔，如 效率,专注",
+      "  --tags <标签>     逗号分隔，细粒度描述，如 效率,专注",
       "  --force           覆盖已存在的同名工具",
       "  --no-copy         只登记，不复制 HTML（HTML 已手动放好时使用）",
     ].join("\n"),
@@ -165,11 +168,16 @@ function main() {
   const index = registry.tools.findIndex((tool) => tool && tool.slug === slug);
   const previous = index >= 0 ? registry.tools[index] : null;
 
+  // 分类缺失时保留旧值，避免 --force 重登记把已有分类冲掉
+  const category =
+    (typeof flags.category === "string" && flags.category.trim()) || previous?.category || DEFAULT_CATEGORY;
+
   /** @type {Record<string, unknown>} */
   const entry = {
     slug,
     title,
     description,
+    category,
     emoji: typeof flags.emoji === "string" && flags.emoji.trim() ? flags.emoji.trim() : previous?.emoji || DEFAULT_EMOJI,
     tags: tags.length > 0 ? tags : previous?.tags || [],
     addedAt: previous?.addedAt || formatDate(new Date()),

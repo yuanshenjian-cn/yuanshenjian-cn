@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
 
+import { filterToolsByCategory, getToolCategories } from "@/lib/tool-categories";
 import type { ToolMeta, ToolViewMode } from "@/types/tool";
 import { ToolCard } from "./ToolCard";
+import { ToolCategoryFilter } from "./ToolCategoryFilter";
 import { ToolRow } from "./ToolRow";
 
 const VIEW_MODE_STORAGE_KEY = "ysj-tools-view-mode";
+/** 分类筛选写进 URL，刷新和分享都能保住当前筛选 */
+const CATEGORY_QUERY_KEY = "cat";
 
 interface ToolDirectoryProps {
   tools: ToolMeta[];
@@ -24,7 +28,15 @@ const VIEW_OPTIONS: Array<{
 
 export function ToolDirectory({ tools }: ToolDirectoryProps) {
   const [viewMode, setViewMode] = useState<ToolViewMode>("card");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const prefetchedSlugs = useRef<Set<string>>(new Set());
+  const urlCategoryApplied = useRef(false);
+
+  const categories = useMemo(() => getToolCategories(tools), [tools]);
+  const visibleTools = useMemo(
+    () => filterToolsByCategory(tools, activeCategory),
+    [tools, activeCategory],
+  );
 
   // 悬念时预取工具页的 iframe 文档，点进去时直接命中缓存；弱网/省流模式跳过
   const prefetchToolDoc = (slug: string) => {
@@ -61,6 +73,17 @@ export function ToolDirectory({ tools }: ToolDirectoryProps) {
     }
   }, []);
 
+  // 从 URL 还原分类，只认已存在的分类，脏参数直接忽略
+  useEffect(() => {
+    if (urlCategoryApplied.current) return;
+    urlCategoryApplied.current = true;
+
+    const fromUrl = new URLSearchParams(window.location.search).get(CATEGORY_QUERY_KEY);
+    if (fromUrl && categories.some((category) => category.name === fromUrl)) {
+      setActiveCategory(fromUrl);
+    }
+  }, [categories]);
+
   const changeViewMode = (mode: ToolViewMode) => {
     setViewMode(mode);
     try {
@@ -70,13 +93,28 @@ export function ToolDirectory({ tools }: ToolDirectoryProps) {
     }
   };
 
+  const changeCategory = (category: string | null) => {
+    setActiveCategory(category);
+    try {
+      const url = new URL(window.location.href);
+      if (category) {
+        url.searchParams.set(CATEGORY_QUERY_KEY, category);
+      } else {
+        url.searchParams.delete(CATEGORY_QUERY_KEY);
+      }
+      window.history.replaceState(null, "", url.toString());
+    } catch {
+      // history 不可用时只保留内存态，不影响筛选本身
+    }
+  };
+
   return (
     <>
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <h1 className="mb-2 text-2xl font-medium tracking-tight">小工具</h1>
           <p className="text-sm text-muted-foreground">
-            随手打开就能用，数据只留在你自己的浏览器里。
+            开箱即用，数据在你的浏览器里
           </p>
         </div>
 
@@ -105,30 +143,45 @@ export function ToolDirectory({ tools }: ToolDirectoryProps) {
         </div>
       </div>
 
-      <div
-        onMouseOver={handleToolIntent}
-        onFocus={handleToolIntent}
-        onPointerDown={handleToolIntent}
-      >
-        {tools.length === 0 ? (
-          <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-            还没有小工具。把 HTML 放到 <code>site/public/tools/&lt;slug&gt;/view.html</code>，
-            再到 <code>site/data/tools.json</code> 登记一条即可。
+      {tools.length === 0 ? (
+        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+          还没有小工具。把 HTML 放到 <code>site/public/tools/&lt;slug&gt;/view.html</code>，
+          再到 <code>site/data/tools.json</code> 登记一条即可。
+        </div>
+      ) : (
+        <>
+          <ToolCategoryFilter
+            total={tools.length}
+            categories={categories}
+            active={activeCategory}
+            onSelect={changeCategory}
+          />
+
+          <div
+            onMouseOver={handleToolIntent}
+            onFocus={handleToolIntent}
+            onPointerDown={handleToolIntent}
+          >
+            {visibleTools.length === 0 ? (
+              <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+                这个分类下还没有工具，换一个标签看看。
+              </div>
+            ) : viewMode === "card" ? (
+              <div className="grid gap-5 sm:grid-cols-2">
+                {visibleTools.map((tool) => (
+                  <ToolCard key={tool.slug} tool={tool} />
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y overflow-hidden rounded-xl border">
+                {visibleTools.map((tool) => (
+                  <ToolRow key={tool.slug} tool={tool} />
+                ))}
+              </div>
+            )}
           </div>
-        ) : viewMode === "card" ? (
-          <div className="grid gap-5 sm:grid-cols-2">
-            {tools.map((tool) => (
-              <ToolCard key={tool.slug} tool={tool} />
-            ))}
-          </div>
-        ) : (
-          <div className="divide-y overflow-hidden rounded-xl border">
-            {tools.map((tool) => (
-              <ToolRow key={tool.slug} tool={tool} />
-            ))}
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </>
   );
 }

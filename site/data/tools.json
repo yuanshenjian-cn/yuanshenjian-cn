@@ -4,6 +4,7 @@
       "slug": "body-metrics",
       "title": "身体指标",
       "description": "BMI、体脂、腰围与腰臀比一次算清，附五区心率与同龄心肺适能对照",
+      "category": "健康健身",
       "emoji": "🫀",
       "tags": [
         "健身",
@@ -16,6 +17,7 @@
       "slug": "plank",
       "title": "平板支撑计时器",
       "description": "支撑、休息、组数自由设定，支持无限模式；阶段切换有提示音，计时期间屏幕常亮。",
+      "category": "健康健身",
       "emoji": "💪",
       "tags": [
         "健身",
@@ -28,6 +30,7 @@
       "slug": "pomodoro",
       "title": "番茄钟",
       "description": "一次只做一件事。专注 / 休息双模式、预设时长可调、完成提示音，设置自动保存在本地浏览器。",
+      "category": "时间效率",
       "emoji": "🍅",
       "tags": [
         "效率",
@@ -40,6 +43,7 @@
       "slug": "mortgage",
       "title": "房贷计算器",
       "description": "商贷 / 公积金 / 组合贷三种口径，LPR 与基点可加减，等额本息与等额本金随时切换。",
+      "category": "理财计算",
       "emoji": "🏠",
       "tags": [
         "理财",
@@ -52,6 +56,7 @@
       "slug": "tax",
       "title": "个税计算器",
       "description": "工资与年终奖个税测算，七项专项附加扣除随手配",
+      "category": "理财计算",
       "emoji": "🧾",
       "tags": [
         "理财",
@@ -64,6 +69,7 @@
       "slug": "calendar",
       "title": "日历",
       "description": "周 / 月 / 年三种视图，公历、农历、节气与法定节假日一屏看清",
+      "category": "时间效率",
       "emoji": "📅",
       "tags": [
         "效率",
@@ -71,6 +77,19 @@
       ],
       "addedAt": "2026-11-16",
       "order": 6
+    },
+    {
+      "slug": "investment",
+      "title": "投资计算器",
+      "description": "定投终值、月供反推、达成年限、财务自由与真实年化一站算清",
+      "category": "理财计算",
+      "emoji": "📈",
+      "tags": [
+        "理财",
+        "投资"
+      ],
+      "addedAt": "2026-11-16",
+      "order": 7
     }
   ]
 }

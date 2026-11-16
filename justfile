@@ -159,13 +159,13 @@ validate-content:
     @node scripts/validate-post.js
 
 # 新增小工具：复制 HTML 到 site/public/tools/<slug>/ 并登记到 site/data/tools.json。
-# 用法：just add-tool "/path/pomodoro.html" pomodoro "番茄钟" "一次只做一件事" "🍅" "效率,专注"
-add-tool html slug title desc emoji="🧩" tags="":
-    @node scripts/add-tool.js "{{html}}" --slug "{{slug}}" --title "{{title}}" --description "{{desc}}" --emoji "{{emoji}}" --tags "{{tags}}"
+# 用法：just add-tool "/path/pomodoro.html" pomodoro "番茄钟" "一次只做一件事" "🍅" "效率,专注" "时间效率"
+add-tool html slug title desc emoji="🧩" tags="" category="其他":
+    @node scripts/add-tool.js "{{html}}" --slug "{{slug}}" --title "{{title}}" --description "{{desc}}" --category "{{category}}" --emoji "{{emoji}}" --tags "{{tags}}"
 
-# 覆盖式更新已有小工具的 HTML 与登记信息（同上参数）。
-update-tool html slug title desc emoji="🧩" tags="":
-    @node scripts/add-tool.js "{{html}}" --slug "{{slug}}" --title "{{title}}" --description "{{desc}}" --emoji "{{emoji}}" --tags "{{tags}}" --force
+# 覆盖式更新已有小工具的 HTML 与登记信息（同上参数；省略 category 时保留原分类）。
+update-tool html slug title desc emoji="🧩" tags="" category="":
+    @node scripts/add-tool.js "{{html}}" --slug "{{slug}}" --title "{{title}}" --description "{{desc}}" --category "{{category}}" --emoji "{{emoji}}" --tags "{{tags}}" --force
 
 # 校验单篇内容文件。
 validate-content-file path:

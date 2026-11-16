@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>投资计算器</title>
+<meta name="description" content="定投终值、月供反推、达成年限、财务自由、真实年化、回本与费用损耗一站算清。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 24l7-9 5 5 10-13' fill='none' stroke='%230e8496' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    /* 主题：与站点开关共用 theme-preference（light / dark / system），未设置时跟随系统 */
+    (function () {
+      var KEY = "theme-preference";
+      function isDark() {
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+        if (stored === "dark") return true;
+        if (stored === "light") return false;
+        try {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch (e) {
+          return false;
+        }
+      }
+      function apply() {
+        document.documentElement.classList.toggle("dark", isDark());
+      }
+      apply();
+      // 站点切换开关写入 localStorage 后，同源的其他文档会收到 storage 事件
+      window.addEventListener("storage", function (event) {
+        if (event.key === KEY) apply();
+      });
+      // 选择「跟随系统」时，系统外观变化也要同步
+      try {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", apply);
+      } catch (e) {}
+    })();
+  </script>
+<style>
+  :root {
+    color-scheme: light;
+    --page-bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f1f2f4;
+    --border: #e3e5e9;
+    --border-soft: #eef0f2;
+    --ink: #1c2026;
+    --muted: #68707b;
+    --accent: #0e8496;
+    --accent-ink: #0a6b79;
+    --up: #c2544a;
+    --up-ink: #a5443b;
+    --down: #12936f;
+    --down-ink: #0c7757;
+    --warn: #b57d20;
+    --warn-ink: #94661a;
+    --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
+  }
+  .dark {
+    color-scheme: dark;
+    --page-bg: #101114;
+    --surface: #191b1f;
+    --surface-2: #22252a;
+    --border: #2d3137;
+    --border-soft: #24272c;
+    --ink: #eceef2;
+    --muted: #9aa1ac;
+    --accent: #43c6db;
+    --accent-ink: #7ddcec;
+    --up: #e88f86;
+    --up-ink: #f2ada6;
+    --down: #4cc79b;
+    --down-ink: #7fe0bc;
+    --warn: #e0ae62;
+    --warn-ink: #eec48c;
+    --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: clamp(12px, 2vh, 20px) 20px 40px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page { width: 100%; max-width: 500px; }
+
+  .head { margin-bottom: 12px; text-align: center; }
+  .title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    transition: background-color .15s ease, color .15s ease,
+      border-color .15s ease;
+  }
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  /* ---- 场景导航 ---- */
+  .scenes {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 12px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface-2);
+  }
+  .scenes button {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 2px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .scenes button:hover:not([aria-selected="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .scenes button[aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card + .card { margin-top: 12px; }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+  }
+  .card:not([hidden]) { animation: cardIn .18s ease-out both; }
+  @media (prefers-reduced-motion: reduce) {
+    .card:not([hidden]) { animation: none; }
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 280px;
+    height: 220px;
+    background: radial-gradient(circle,
+      color-mix(in srgb, var(--accent) 11%, transparent) 0%, transparent 68%);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .card > * { position: relative; }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .card-total {
+    margin-left: auto;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ---- 输入 ---- */
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background: var(--surface-2);
+    cursor: text;
+    transition: border-color .15s ease;
+  }
+  .row:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .row.is-off { opacity: .45; }
+  .row-label {
+    flex: none;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .label-unit {
+    margin-left: 3px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--muted) 62%, transparent);
+  }
+  .row-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+  }
+  .row.is-input .num { width: 7em; }
+  .num {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    outline: none;
+  }
+  .num::placeholder {
+    color: color-mix(in srgb, var(--muted) 70%, transparent);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .num::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+  .num:disabled { color: var(--muted); }
+  .unit {
+    flex: none;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* ---- 步进胶囊 ---- */
+  .stepper {
+    display: inline-flex;
+    align-items: stretch;
+    flex: none;
+    height: 32px;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .stepper:has(:focus-visible) {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .stepper .row-value {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 5px;
+    border-left: 1px solid var(--border-soft);
+    border-right: 1px solid var(--border-soft);
+  }
+  .stepper .num {
+    display: inline-block;
+    width: 4.2em;
+    height: auto;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .stepper .num.is-narrow { width: 3.2em; }
+  .stepper .num.is-wide { width: 5.2em; }
+  .stepper .unit { font-size: 12px; }
+  .step-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: color-mix(in srgb, var(--ink) 62%, var(--muted));
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background-color .12s ease, color .12s ease;
+  }
+  .step-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:active:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
+  .step-btn:disabled {
+    color: color-mix(in srgb, var(--muted) 30%, transparent);
+    cursor: default;
+  }
+  .step-btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: -3px;
+    border-radius: 8px;
+  }
+
+  /* ---- chips ---- */
+  .chips {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .chip {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 4px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip:hover:not([aria-pressed="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .chip small {
+    display: block;
+    margin-top: -1px;
+    font-size: 10px;
+    line-height: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .chips-caption {
+    display: grid;
+    gap: 1px;
+    margin: 2px 2px -4px;
+    font-size: 11.5px;
+    line-height: 17px;
+    color: var(--muted);
+  }
+  .chips-caption b {
+    font-weight: 500;
+    color: color-mix(in srgb, var(--ink) 82%, var(--muted));
+  }
+  .duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .duo .chips { padding: 2px; }
+  .duo .chip {
+    height: 29px;
+    padding: 0 2px;
+    font-size: 12px;
+  }
+  .duo .row { height: 40px; padding: 0 10px; }
+  .duo .row .num { width: 4.4em; font-size: 14px; }
+  .duo .row .row-label { font-size: 12px; }
+
+  /* ---- 结果 ---- */
+  .result { text-align: center; margin-top: 13px; }
+  .result-label {
+    margin: 0;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+  .result-value {
+    margin: 2px 0 0;
+    font-size: clamp(30px, 9vw, 38px);
+    line-height: 1.16;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .result-value .u {
+    margin-left: 2px;
+    font-size: .42em;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+  .result-note {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--muted);
+  }
+  .result-note b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .result-note .up { color: var(--up-ink); }
+  .result-note .down { color: var(--down-ink); }
+
+  .grade {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 17px;
+    font-weight: 500;
+    vertical-align: 1px;
+  }
+  .grade.ok {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent-ink);
+  }
+  .grade.warn {
+    background: color-mix(in srgb, var(--warn) 16%, transparent);
+    color: var(--warn-ink);
+  }
+  .grade.flat {
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    color: var(--muted);
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 13px 0 0;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .metric { min-width: 0; }
+  .metric dt {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .metric dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .metric dd small {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* ---- 堆叠条 ---- */
+  .bar {
+    display: flex;
+    height: 10px;
+    margin-top: 13px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .bar-seg { height: 100%; transition: width .25s ease; }
+  .bar-seg.invest {
+    background: color-mix(in srgb, var(--muted) 44%, var(--surface));
+    box-shadow: inset -1px 0 0 var(--surface);
+  }
+  .bar-seg.gain { background: color-mix(in srgb, var(--accent) 56%, var(--surface)); }
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 7px;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i {
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+  .legend .k-invest { color: color-mix(in srgb, var(--muted) 88%, transparent); }
+  .legend .k-gain { color: var(--accent-ink); }
+
+  /* ---- 进度条 ---- */
+  .progress {
+    height: 9px;
+    margin-top: 13px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--accent) 52%, var(--surface));
+    transition: width .25s ease;
+  }
+  .progress-note {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- 提示 ---- */
+  .hint {
+    margin: 11px 0 0;
+    padding-top: 9px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 11.5px;
+    line-height: 17px;
+    color: var(--muted);
+  }
+  .hint b {
+    font-weight: 500;
+    color: color-mix(in srgb, var(--ink) 82%, var(--muted));
+  }
+  .note {
+    margin-top: 10px;
+    padding: 9px 11px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    font-size: 11.5px;
+    line-height: 17px;
+    color: var(--muted);
+  }
+  .note b { color: var(--ink); font-weight: 500; }
+  .note .tag {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--warn) 16%, transparent);
+    color: var(--warn-ink);
+    font-size: 10px;
+    line-height: 16px;
+  }
+
+  /* ---- 流水 ---- */
+  .flows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 9px;
+  }
+  .flow-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px 22px;
+    gap: 5px;
+    align-items: center;
+  }
+  .flow-date, .flow-amount {
+    height: 38px;
+    min-width: 0;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+    transition: border-color .15s ease;
+  }
+  .flow-amount { text-align: right; }
+  .flow-date:focus, .flow-amount:focus {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .flow-kind {
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11.5px;
+    cursor: pointer;
+  }
+  .flow-kind[data-kind="out"] {
+    border-color: color-mix(in srgb, var(--accent) 26%, transparent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    color: var(--accent-ink);
+  }
+  .flow-kind[data-kind="in"] {
+    border-color: color-mix(in srgb, var(--down) 26%, transparent);
+    background: color-mix(in srgb, var(--down) 9%, transparent);
+    color: var(--down-ink);
+  }
+  .flow-del {
+    width: 22px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: color-mix(in srgb, var(--muted) 70%, transparent);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .flow-del:hover { color: var(--up-ink); }
+  .flow-add {
+    width: 100%;
+    height: 38px;
+    margin-top: 7px;
+    border: 1px dashed var(--border);
+    border-radius: 11px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .flow-add:hover {
+    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+    color: var(--accent-ink);
+  }
+
+  /* ---- 曲线 ---- */
+  .curve { margin-top: 12px; }
+  .curve svg { display: block; width: 100%; height: auto; }
+
+  /* ---- 复选组（回本） ---- */
+  .duo-out {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 11px;
+  }
+  .duo-out .box {
+    padding: 9px 10px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .duo-out dt {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--muted);
+  }
+  .duo-out dd {
+    margin: 1px 0 0;
+    font-size: 19px;
+    line-height: 26px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .duo-out .dd-up { color: var(--up-ink); }
+  .duo-out .dd-down { color: var(--down-ink); }
+
+  .reset-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+  }
+  .reset-button {
+    height: 32px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .reset-button:hover {
+    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+    color: var(--ink);
+  }
+
+  .foot {
+    margin: 14px 6px 0;
+    font-size: 10.5px;
+    line-height: 16px;
+    color: color-mix(in srgb, var(--muted) 88%, transparent);
+    text-align: center;
+  }
+  .foot p { margin: 0; }
+  .foot p + p { margin-top: 4px; }
+
+  @media (max-width: 420px) {
+    body { padding-left: 12px; padding-right: 12px; }
+    .card { padding: 14px 14px 16px; border-radius: 18px; }
+    .scenes { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .scenes button { font-size: 11.5px; }
+    .flow-row { grid-template-columns: minmax(0, 1fr) 78px 30px 20px; }
+    .flow-date { font-size: 11.5px; padding: 0 5px; }
+    .duo { grid-template-columns: 1fr 1fr; }
+    .duo .row { padding: 0 8px; }
+    .duo .row .num { width: 3.6em; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <h1 class="title">投资计算器</h1>
+    <p class="subtitle">要投多少、多久能到、到手还剩多少</p>
+  </header>
+
+  <nav class="scenes" id="scenes" role="tablist" aria-label="场景" aria-orientation="horizontal">
+    <button type="button" role="tab" id="tab-plan" data-goto="plan" aria-selected="true" aria-controls="plan">定投计划</button>
+    <button type="button" role="tab" id="tab-freedom" data-goto="freedom" aria-selected="false" aria-controls="freedom">财务自由</button>
+    <button type="button" role="tab" id="tab-real" data-goto="real" aria-selected="false" aria-controls="real">真实收益</button>
+    <button type="button" role="tab" id="tab-drawdown" data-goto="drawdown" aria-selected="false" aria-controls="drawdown">回本</button>
+    <button type="button" role="tab" id="tab-erosion" data-goto="erosion" aria-selected="false" aria-controls="erosion">损耗</button>
+    <button type="button" role="tab" id="tab-dividend" data-goto="dividend" aria-selected="false" aria-controls="dividend">股息</button>
+  </nav>
+
+  <!-- ============ 定投计划 ============ -->
+  <section class="card" id="plan" role="tabpanel" aria-labelledby="tab-plan">
+    <div class="card-head">
+      <span class="card-title">算一笔定投</span>
+      <span class="card-total" id="plan-span">20 年</span>
+    </div>
+
+    <div class="chips" id="mode-chips" role="group" aria-label="计算方向">
+      <button type="button" class="chip" data-mode="future" aria-pressed="true">算终值</button>
+      <button type="button" class="chip" data-mode="payment" aria-pressed="false">算每期投</button>
+      <button type="button" class="chip" data-mode="years" aria-pressed="false">算要多久</button>
+    </div>
+
+    <div class="fields" style="margin-top:8px">
+      <div class="row">
+        <label class="row-label" for="age">现在年龄</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="age" data-step="-1" aria-label="年龄减少 1 岁">−</button>
+          <span class="row-value">
+            <input id="age" class="num is-narrow" type="number" inputmode="numeric" min="16" max="90" step="1" value="32" aria-label="现在年龄，单位岁">
+            <span class="unit">岁</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="age" data-step="1" aria-label="年龄增加 1 岁">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="end-age">目标年龄</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="endAge" data-step="-1" aria-label="目标年龄减少 1 岁">−</button>
+          <span class="row-value">
+            <input id="end-age" class="num is-narrow" type="number" inputmode="numeric" min="17" max="100" step="1" value="52" aria-label="目标年龄，单位岁">
+            <span class="unit">岁</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="endAge" data-step="1" aria-label="目标年龄增加 1 岁">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="principal">已有本金</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="principal" data-step="-1" aria-label="已有本金减少 1 万元">−</button>
+          <span class="row-value">
+            <input id="principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="已有本金，单位万元">
+            <span class="unit">万</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="principal" data-step="1" aria-label="已有本金增加 1 万元">+</button>
+        </div>
+      </div>
+
+      <div class="row" id="payment-row">
+        <label class="row-label" for="payment">每期定投</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="payment" data-step="-500" aria-label="定投金额减少 500 元">−</button>
+          <span class="row-value">
+            <input id="payment" class="num is-wide" type="number" inputmode="decimal" min="0" max="1000000" step="100" value="3000" aria-label="每期定投金额，单位元">
+            <span class="unit">元</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="payment" data-step="500" aria-label="定投金额增加 500 元">+</button>
+        </div>
+      </div>
+
+      <div class="row" id="target-row" hidden>
+        <label class="row-label" for="target">目标金额</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="target" data-step="-10" aria-label="目标金额减少 10 万元">−</button>
+          <span class="row-value">
+            <input id="target" class="num is-wide" type="number" inputmode="decimal" min="1" max="100000" step="10" value="300" aria-label="目标金额，单位万元">
+            <span class="unit">万</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="target" data-step="10" aria-label="目标金额增加 10 万元">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="rate">预期年化</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="rate" data-step="-0.5" aria-label="年化收益减少 0.5%">−</button>
+          <span class="row-value">
+            <input id="rate" class="num" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="7" aria-label="预期年化收益率，单位百分比">
+            <span class="unit">%</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="rate" data-step="0.5" aria-label="年化收益增加 0.5%">+</button>
+        </div>
+      </div>
+
+      <div class="duo">
+        <div class="chips" id="freq-chips" role="group" aria-label="投入节奏">
+          <button type="button" class="chip" data-freq="month" aria-pressed="true">每月</button>
+          <button type="button" class="chip" data-freq="quarter" aria-pressed="false">每季</button>
+          <button type="button" class="chip" data-freq="year" aria-pressed="false">每年</button>
+        </div>
+        <div class="chips" id="timing-chips" role="group" aria-label="投入时点">
+          <button type="button" class="chip" data-timing="end" aria-pressed="true">期末</button>
+          <button type="button" class="chip" data-timing="begin" aria-pressed="false">期初</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <p class="result-label" id="plan-label">52 岁时预计有</p>
+      <p class="result-value"><span id="plan-value">—</span><span class="u" id="plan-unit"></span></p>
+      <p class="result-note" id="plan-note">—</p>
+    </div>
+
+    <div class="bar" id="plan-bar">
+      <span class="bar-seg invest" id="bar-invest" style="width:50%"></span>
+      <span class="bar-seg gain" id="bar-gain" style="width:50%"></span>
+    </div>
+    <div class="legend">
+      <span class="k-invest"><i></i>本金投入 <b id="legend-invest">—</b></span>
+      <span class="k-gain"><i></i>投资收益 <b id="legend-gain">—</b></span>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <dt>总投入</dt>
+        <dd id="plan-cost">—</dd>
+      </div>
+      <div class="metric">
+        <dt>收益占比</dt>
+        <dd id="plan-share">—</dd>
+      </div>
+      <div class="metric">
+        <dt>单笔翻倍</dt>
+        <dd id="plan-double">—</dd>
+      </div>
+    </div>
+
+    <p class="hint" id="plan-hint">
+      按复利逐期计算，期末投入为保守口径。年化收益是假设值，真实市场每年波动，中途可能多年不达预期。
+    </p>
+  </section>
+
+  <!-- ============ 财务自由 ============ -->
+  <section class="card" id="freedom" role="tabpanel" aria-labelledby="tab-freedom" hidden>
+    <div class="card-head">
+      <span class="card-title">多少钱可以不上班</span>
+      <span class="card-total" id="ff-progress-total">—</span>
+    </div>
+
+    <div class="fields">
+      <div class="row">
+        <label class="row-label" for="ff-age-input">现在年龄</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="ffAge" data-step="-1" aria-label="现在年龄减少 1 岁">−</button>
+          <span class="row-value">
+            <input id="ff-age-input" class="num is-narrow" type="number" inputmode="numeric" min="16" max="90" step="1" value="32" aria-label="现在年龄，单位岁">
+            <span class="unit">岁</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="ffAge" data-step="1" aria-label="现在年龄增加 1 岁">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="expense">每年支出</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="expense" data-step="-1" aria-label="每年支出减少 1 万元">−</button>
+          <span class="row-value">
+            <input id="expense" class="num" type="number" inputmode="decimal" min="1" max="10000" step="1" value="12" aria-label="每年支出，单位万元">
+            <span class="unit">万</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="expense" data-step="1" aria-label="每年支出增加 1 万元">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="ff-asset">当前可投资产</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="-1" aria-label="当前可投资产减少 1 万元">−</button>
+          <span class="row-value">
+            <input id="ff-asset" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="30" aria-label="当前可投资产，单位万元">
+            <span class="unit">万</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="1" aria-label="当前可投资产增加 1 万元">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="ff-payment">每月定投</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="ffPayment" data-step="-500" aria-label="每月定投减少 500 元">−</button>
+          <span class="row-value">
+            <input id="ff-payment" class="num is-wide" type="number" inputmode="decimal" min="0" max="1000000" step="500" value="5000" aria-label="每月定投金额，单位元">
+            <span class="unit">元</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="ffPayment" data-step="500" aria-label="每月定投增加 500 元">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="ff-rate">预期年化</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="ffRate" data-step="-0.5" aria-label="年化收益减少 0.5%">−</button>
+          <span class="row-value">
+            <input id="ff-rate" class="num" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="7" aria-label="预期年化收益率，单位百分比">
+            <span class="unit">%</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="ffRate" data-step="0.5" aria-label="年化收益增加 0.5%">+</button>
+        </div>
+      </div>
+
+      <div class="chips-caption">
+        <span>提取率＝每年从本金取走的比例</span>
+        <span id="swr-hint">—</span>
+      </div>
+      <div class="chips" id="swr-chips" role="group" aria-label="提取率">
+        <button type="button" class="chip" data-swr="3" aria-pressed="false">3%<small>很稳</small></button>
+        <button type="button" class="chip" data-swr="3.5" aria-pressed="true">3.5%<small>建议</small></button>
+        <button type="button" class="chip" data-swr="4" aria-pressed="false">4%<small>美股口径</small></button>
+        <button type="button" class="chip" data-swr="4.5" aria-pressed="false">4.5%<small>偏激进</small></button>
+      </div>
+    </div>
+
+    <div class="result">
+      <p class="result-label">需要的本金</p>
+      <p class="result-value"><span id="ff-target">—</span><span class="u">万</span></p>
+      <p class="result-note" id="ff-note">—</p>
+    </div>
+
+    <div class="progress">
+      <span id="ff-bar" style="width:0%"></span>
+    </div>
+    <div class="progress-note">
+      <span id="ff-current">—</span>
+      <span id="ff-pct">0%</span>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <dt>还差</dt>
+        <dd id="ff-gap">—</dd>
+      </div>
+      <div class="metric">
+        <dt>需要多久</dt>
+        <dd id="ff-years">—</dd>
+      </div>
+      <div class="metric">
+        <dt>达成年龄</dt>
+        <dd id="ff-age">—</dd>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="tag">注意</span>4% 法则来自美股 1926 年以来的回测。A 股波动更大、历史更短，国内测算 30 年不破产概率在 4% 下仅约一半，所以默认 <b>3.5%</b>。
+    </div>
+  </section>
+
+  <!-- ============ 真实收益 ============ -->
+  <section class="card" id="real" role="tabpanel" aria-labelledby="tab-real" hidden>
+    <div class="card-head">
+      <span class="card-title">我的真实年化</span>
+      <span class="card-total" id="real-count">—</span>
+    </div>
+
+    <div class="flows" id="flows"></div>
+    <button type="button" class="flow-add" id="flow-add">+ 添加一笔</button>
+
+    <div class="result">
+      <p class="result-label">资金加权年化 XIRR</p>
+      <p class="result-value"><span id="real-value">—</span><span class="u">%</span></p>
+      <p class="result-note" id="real-note">—</p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <dt>总投入</dt>
+        <dd id="real-in">—</dd>
+      </div>
+      <div class="metric">
+        <dt>已收回</dt>
+        <dd id="real-out">—</dd>
+      </div>
+      <div class="metric">
+        <dt>总收益</dt>
+        <dd id="real-profit">—</dd>
+      </div>
+    </div>
+
+    <p class="hint">
+      点「投 / 取」切换方向：<b>投</b>是买入、转入，<b>取</b>是取出或当前市值。把最后一笔设成今天的账户总值、方向选「取」，算出来的就是你真实的年化——它考虑了每笔钱实际的投入时长，比「总收益 ÷ 总投入」准得多。
+    </p>
+  </section>
+
+  <!-- ============ 回本 ============ -->
+  <section class="card" id="drawdown" role="tabpanel" aria-labelledby="tab-drawdown" hidden>
+    <div class="card-head">
+      <span class="card-title">跌了要涨多少才回本</span>
+      <span class="card-total" id="dd-total">—</span>
+    </div>
+
+    <div class="fields">
+      <div class="row">
+        <label class="row-label" for="dd-input">当前跌幅</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="drawdown" data-step="-1" aria-label="跌幅减少 1%">−</button>
+          <span class="row-value">
+            <input id="dd-input" class="num" type="number" inputmode="decimal" min="0" max="90" step="1" value="30" aria-label="当前跌幅，单位百分比">
+            <span class="unit">%</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="drawdown" data-step="1" aria-label="跌幅增加 1%">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="gain">当前涨幅</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="gain" data-step="-5" aria-label="涨幅减少 5%">−</button>
+          <span class="row-value">
+            <input id="gain" class="num" type="number" inputmode="decimal" min="0" max="900" step="5" value="50" aria-label="当前涨幅，单位百分比">
+            <span class="unit">%</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="gain" data-step="5" aria-label="涨幅增加 5%">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="duo-out">
+      <div class="box">
+        <dt>回本需要上涨</dt>
+        <dd class="dd-up" id="dd-need">—</dd>
+      </div>
+      <div class="box">
+        <dt>回吐全部收益需跌</dt>
+        <dd class="dd-down" id="dd-give">—</dd>
+      </div>
+    </div>
+
+    <div class="curve">
+      <svg id="dd-curve" viewBox="0 0 320 148" role="img" aria-label="跌幅与回本所需涨幅的关系曲线"></svg>
+    </div>
+
+    <p class="hint">
+      亏损和回本不是对称的：跌 30% 要涨 42.9%，跌 50% 要翻倍，跌 80% 要涨 400%。所以<b>控制回撤比追求高收益更重要</b>——这也是「先活下来」比「赚得快」更底层的原因。
+    </p>
+  </section>
+
+  <!-- ============ 隐形损耗 ============ -->
+  <section class="card" id="erosion" role="tabpanel" aria-labelledby="tab-erosion" hidden>
+    <div class="card-head">
+      <span class="card-title">最容易被忽略的损耗</span>
+      <span class="card-total" id="erosion-total">—</span>
+    </div>
+
+    <div class="chips" id="erosion-chips" role="group" aria-label="损耗类型">
+      <button type="button" class="chip" data-tab="inflation" aria-pressed="true">通货膨胀</button>
+      <button type="button" class="chip" data-tab="fee" aria-pressed="false">基金费率</button>
+    </div>
+
+    <div id="erosion-inflation">
+      <div class="fields" style="margin-top:8px">
+        <div class="row">
+          <label class="row-label" for="amount">现在的钱</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="amount" data-step="-10" aria-label="金额减少 10 万元">−</button>
+            <span class="row-value">
+              <input id="amount" class="num is-wide" type="number" inputmode="decimal" min="1" max="100000" step="10" value="100" aria-label="现在的金额，单位万元">
+              <span class="unit">万</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="amount" data-step="10" aria-label="金额增加 10 万元">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="row-label" for="years">经过年数</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="years" data-step="-1" aria-label="年数减少 1 年">−</button>
+            <span class="row-value">
+              <input id="years" class="num is-narrow" type="number" inputmode="numeric" min="1" max="60" step="1" value="20" aria-label="经过年数，单位年">
+              <span class="unit">年</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="years" data-step="1" aria-label="年数增加 1 年">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="row-label" for="inflation">年通胀率</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="inflation" data-step="-0.5" aria-label="通胀率减少 0.5%">−</button>
+            <span class="row-value">
+              <input id="inflation" class="num" type="number" inputmode="decimal" min="0" max="20" step="0.5" value="2.5" aria-label="年通胀率，单位百分比">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="inflation" data-step="0.5" aria-label="通胀率增加 0.5%">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="result">
+        <p class="result-label" id="inf-label">20 年后需要这么多才等值</p>
+        <p class="result-value"><span id="inf-value">—</span><span class="u">万</span></p>
+        <p class="result-note" id="inf-note">—</p>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <dt>贬值幅度</dt>
+          <dd id="inf-loss">—</dd>
+        </div>
+        <div class="metric">
+          <dt>购买力年缩水</dt>
+          <dd id="inf-real">—</dd>
+        </div>
+        <div class="metric">
+          <dt>物价翻倍</dt>
+          <dd id="inf-need">—</dd>
+        </div>
+      </div>
+    </div>
+
+    <div id="erosion-fee" hidden>
+      <div class="fields" style="margin-top:8px">
+        <div class="row">
+          <label class="row-label" for="fee-principal">已有本金</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="-1" aria-label="已有本金减少 1 万元">−</button>
+            <span class="row-value">
+              <input id="fee-principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="已有本金，单位万元">
+              <span class="unit">万</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="1" aria-label="已有本金增加 1 万元">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="row-label" for="fee-payment">每月定投</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="feePayment" data-step="-500" aria-label="每月定投减少 500 元">−</button>
+            <span class="row-value">
+              <input id="fee-payment" class="num is-wide" type="number" inputmode="decimal" min="0" max="1000000" step="500" value="3000" aria-label="每月定投金额，单位元">
+              <span class="unit">元</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="feePayment" data-step="500" aria-label="每月定投增加 500 元">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="row-label" for="fee-years">投资年数</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="feeYears" data-step="-1" aria-label="年数减少 1 年">−</button>
+            <span class="row-value">
+              <input id="fee-years" class="num is-narrow" type="number" inputmode="numeric" min="1" max="60" step="1" value="30" aria-label="投资年数，单位年">
+              <span class="unit">年</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="feeYears" data-step="1" aria-label="年数增加 1 年">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="row-label" for="fee-rate">毛年化</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="feeRate" data-step="-0.5" aria-label="毛年化减少 0.5%">−</button>
+            <span class="row-value">
+              <input id="fee-rate" class="num" type="number" inputmode="decimal" min="0" max="30" step="0.5" value="8" aria-label="毛年化收益率，单位百分比">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="feeRate" data-step="0.5" aria-label="毛年化增加 0.5%">+</button>
+          </div>
+        </div>
+        <div class="duo">
+          <div class="row is-input" style="padding:0 10px">
+            <label class="row-label" for="fee-a">费率 A</label>
+            <span class="row-value">
+              <input id="fee-a" class="num" type="number" inputmode="decimal" min="0" max="5" step="0.1" value="0.5" aria-label="费率 A，单位百分比">
+              <span class="unit">%</span>
+            </span>
+          </div>
+          <div class="row is-input" style="padding:0 10px">
+            <label class="row-label" for="fee-b">费率 B</label>
+            <span class="row-value">
+              <input id="fee-b" class="num" type="number" inputmode="decimal" min="0" max="5" step="0.1" value="1.5" aria-label="费率 B，单位百分比">
+              <span class="unit">%</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="result">
+        <p class="result-label" id="fee-label">30 年后，两个费率的差距</p>
+        <p class="result-value"><span id="fee-value">—</span><span class="u" id="fee-unit">万</span></p>
+        <p class="result-note" id="fee-note">—</p>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <dt>低费率终值</dt>
+          <dd id="fee-low">—</dd>
+        </div>
+        <div class="metric">
+          <dt>高费率终值</dt>
+          <dd id="fee-high">—</dd>
+        </div>
+        <div class="metric">
+          <dt>少赚比例</dt>
+          <dd id="fee-pct">—</dd>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="erosion-hint">
+      通胀按复利折算，不是简单相减。真实收益率 = (1+名义) ÷ (1+通胀) − 1。
+    </p>
+  </section>
+
+  <!-- ============ 税后股息 ============ -->
+  <section class="card" id="dividend" role="tabpanel" aria-labelledby="tab-dividend" hidden>
+    <div class="card-head">
+      <span class="card-title">股息到手能有多少</span>
+      <span class="card-total" id="div-total">—</span>
+    </div>
+
+    <div class="fields">
+      <div class="chips" id="market-chips" role="group" aria-label="市场">
+        <button type="button" class="chip" data-market="a" aria-pressed="true">A 股</button>
+        <button type="button" class="chip" data-market="hk" aria-pressed="false">港股通 H</button>
+        <button type="button" class="chip" data-market="red" aria-pressed="false">红筹</button>
+      </div>
+
+      <div class="chips" id="holding-chips" role="group" aria-label="持股期限">
+        <button type="button" class="chip" data-holding="lt1m" aria-pressed="false">不满 1 月</button>
+        <button type="button" class="chip" data-holding="lt1y" aria-pressed="false">1 月–1 年</button>
+        <button type="button" class="chip" data-holding="gt1y" aria-pressed="true">满 1 年</button>
+      </div>
+
+      <div class="row">
+        <label class="row-label" for="div-input">税前股息率</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="dividend" data-step="-0.25" aria-label="股息率减少 0.25%">−</button>
+          <span class="row-value">
+            <input id="div-input" class="num" type="number" inputmode="decimal" min="0" max="20" step="0.25" value="4.5" aria-label="税前股息率，单位百分比">
+            <span class="unit">%</span>
+          </span>
+          <button type="button" class="step-btn" data-step-target="dividend" data-step="0.25" aria-label="股息率增加 0.25%">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <p class="result-label">税后股息率</p>
+      <p class="result-value"><span id="div-value">—</span><span class="u">%</span></p>
+      <p class="result-note" id="div-note">—</p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <dt>适用税率</dt>
+        <dd id="div-tax">—</dd>
+      </div>
+      <div class="metric">
+        <dt>10 万每年到手</dt>
+        <dd id="div-cash">—</dd>
+      </div>
+      <div class="metric">
+        <dt>比税前少</dt>
+        <dd id="div-cut">—</dd>
+      </div>
+    </div>
+
+    <p class="hint" id="div-hint">
+      A 股红利税按持股期限差别化：满 1 年免征，1 个月至 1 年实际 10%，不满 1 个月 20%。
+    </p>
+  </section>
+
+  <div class="reset-row">
+    <button type="button" class="reset-button" id="reset">恢复默认</button>
+  </div>
+
+  <footer class="foot">
+    <p>所有结果都是基于你输入假设的数学推演，不是收益承诺。</p>
+    <p>预期年化请填<b>扣除通胀前</b>的名义收益率；实际投资请扣掉费率与税费。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'ysj-invest-calc-v1';
+
+  var DEFAULTS = {
+    scene: 'plan',
+    age: 32,
+    endAge: 52,
+    principalWan: 10,
+    payment: 3000,
+    targetWan: 300,
+    rate: 7,
+    freq: 'month',
+    timing: 'end',
+    mode: 'future',
+
+    expenseWan: 12,
+    swr: 3.5,
+    ffAge: 32,
+    ffAssetWan: 30,
+    ffPayment: 5000,
+    ffRate: 7,
+
+    flows: [
+      { date: '2023-11-16', amount: 50000, kind: 'out' },
+      { date: '2024-11-16', amount: 50000, kind: 'out' },
+      { date: '2025-11-16', amount: 50000, kind: 'out' },
+      { date: '2026-11-16', amount: 180000, kind: 'in' }
+    ],
+
+    drawdown: 30,
+    gain: 50,
+
+    erosionTab: 'inflation',
+    amountWan: 100,
+    years: 20,
+    inflation: 2.5,
+    feePrincipalWan: 10,
+    feePayment: 3000,
+    feeYears: 30,
+    feeRate: 8,
+    feeA: 0.5,
+    feeB: 1.5,
+
+    dividend: 4.5,
+    market: 'a',
+    holding: 'gt1y'
+  };
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+  function num(v, fb) {
+    var n = parseFloat(v);
+    return isFinite(n) ? n : fb;
+  }
+  function roundTo(v, step) {
+    var s = String(step);
+    var dot = s.indexOf('.');
+    var d = dot === -1 ? 0 : s.length - dot - 1;
+    return parseFloat(v.toFixed(Math.min(d, 4)));
+  }
+  function byId(id) { return document.getElementById(id); }
+
+  var state = clone(DEFAULTS);
+
+  var el = {
+    scenes: byId('scenes'),
+
+    modeChips: byId('mode-chips'),
+    freqChips: byId('freq-chips'),
+    timingChips: byId('timing-chips'),
+    swrChips: byId('swr-chips'),
+    erosionChips: byId('erosion-chips'),
+    marketChips: byId('market-chips'),
+    holdingChips: byId('holding-chips'),
+
+    age: byId('age'),
+    endAge: byId('end-age'),
+    principal: byId('principal'),
+    payment: byId('payment'),
+    target: byId('target'),
+    rate: byId('rate'),
+    paymentRow: byId('payment-row'),
+    targetRow: byId('target-row'),
+
+    planSpan: byId('plan-span'),
+    planLabel: byId('plan-label'),
+    planValue: byId('plan-value'),
+    planUnit: byId('plan-unit'),
+    planNote: byId('plan-note'),
+    barInvest: byId('bar-invest'),
+    barGain: byId('bar-gain'),
+    legendInvest: byId('legend-invest'),
+    legendGain: byId('legend-gain'),
+    planCost: byId('plan-cost'),
+    planShare: byId('plan-share'),
+    planDouble: byId('plan-double'),
+    planHint: byId('plan-hint'),
+
+    expense: byId('expense'),
+    ffAgeInput: byId('ff-age-input'),
+    ffAsset: byId('ff-asset'),
+    ffPayment: byId('ff-payment'),
+    ffRate: byId('ff-rate'),
+    ffTarget: byId('ff-target'),
+    ffNote: byId('ff-note'),
+    ffBar: byId('ff-bar'),
+    ffCurrent: byId('ff-current'),
+    ffPct: byId('ff-pct'),
+    ffGap: byId('ff-gap'),
+    ffYears: byId('ff-years'),
+    ffAge: byId('ff-age'),
+    ffProgressTotal: byId('ff-progress-total'),
+    swrHint: byId('swr-hint'),
+
+    flows: byId('flows'),
+    flowAdd: byId('flow-add'),
+    realCount: byId('real-count'),
+    realValue: byId('real-value'),
+    realNote: byId('real-note'),
+    realIn: byId('real-in'),
+    realOut: byId('real-out'),
+    realProfit: byId('real-profit'),
+
+    drawdown: byId('dd-input'),
+    gain: byId('gain'),
+    ddNeed: byId('dd-need'),
+    ddGive: byId('dd-give'),
+    ddTotal: byId('dd-total'),
+    ddCurve: byId('dd-curve'),
+
+    erosionInflation: byId('erosion-inflation'),
+    erosionFee: byId('erosion-fee'),
+    amount: byId('amount'),
+    years: byId('years'),
+    inflation: byId('inflation'),
+    infLabel: byId('inf-label'),
+    infValue: byId('inf-value'),
+    infNote: byId('inf-note'),
+    infLoss: byId('inf-loss'),
+    infReal: byId('inf-real'),
+    infNeed: byId('inf-need'),
+
+    feePrincipal: byId('fee-principal'),
+    feePayment: byId('fee-payment'),
+    feeYears: byId('fee-years'),
+    feeRate: byId('fee-rate'),
+    feeA: byId('fee-a'),
+    feeB: byId('fee-b'),
+    feeLabel: byId('fee-label'),
+    feeValue: byId('fee-value'),
+    feeUnit: byId('fee-unit'),
+    feeNote: byId('fee-note'),
+    feeLow: byId('fee-low'),
+    feeHigh: byId('fee-high'),
+    feePct: byId('fee-pct'),
+
+    erosionHint: byId('erosion-hint'),
+    erosionTotal: byId('erosion-total'),
+
+    dividend: byId('div-input'),
+    divValue: byId('div-value'),
+    divNote: byId('div-note'),
+    divTax: byId('div-tax'),
+    divCash: byId('div-cash'),
+    divCut: byId('div-cut'),
+    divHint: byId('div-hint'),
+    divTotal: byId('div-total'),
+
+    reset: byId('reset')
+  };
+
+  /* ============ 财务公式 ============ */
+
+  function periods(freq) {
+    return freq === 'quarter' ? 4 : freq === 'year' ? 1 : 12;
+  }
+  function freqName(freq) {
+    return freq === 'quarter' ? '每季' : freq === 'year' ? '每年' : '每月';
+  }
+
+  /* 终值：期初/期末年金 + 初始本金复利 */
+  function grow(principal, payment, rate, years, freq, timing) {
+    var k = periods(freq);
+    var i = rate / 100 / k;
+    var n = years * k;
+    var f = timing === 'begin' ? (1 + i) : 1;
+    if (i === 0) return principal + payment * n;
+    var a = Math.pow(1 + i, n);
+    return principal * a + payment * ((a - 1) / i) * f;
+  }
+
+  /* 反推每期投入 */
+  function paymentFor(principal, target, rate, years, freq, timing) {
+    var k = periods(freq);
+    var i = rate / 100 / k;
+    var n = years * k;
+    var f = timing === 'begin' ? (1 + i) : 1;
+    if (i === 0) {
+      var need0 = target - principal;
+      return need0 <= 0 ? 0 : need0 / n;
+    }
+    var need = target - principal * Math.pow(1 + i, n);
+    if (need <= 0) return 0;
+    return need * i / (Math.pow(1 + i, n) - 1) / f;
+  }
+
+  /* 反推年限（闭式解） */
+  function yearsFor(principal, payment, target, rate, freq, timing) {
+    var k = periods(freq);
+    var i = rate / 100 / k;
+    var f = timing === 'begin' ? (1 + i) : 1;
+    if (target <= principal) return 0;
+    if (i === 0) {
+      if (payment <= 0) return Infinity;
+      return (target - principal) / (payment * k);
+    }
+    var c = payment * f / i;
+    var base = principal + c;
+    if (!(base > 0)) return Infinity;
+    var a = (target + c) / base;
+    if (!(a > 1)) return 0;
+    return Math.log(a) / Math.log(1 + i) / k;
+  }
+
+  function doubleYears(rate) {
+    if (!(rate > 0)) return null;
+    return Math.log(2) / Math.log(1 + rate / 100);
+  }
+
+  /* ============ 格式化 ============ */
+
+  function moneyWan(v) {
+    if (!isFinite(v)) return { num: '—', unit: '' };
+    var a = Math.abs(v);
+    if (a >= 1e8) return { num: (v / 1e8).toFixed(2), unit: '亿' };
+    if (a >= 1e4) return { num: (v / 1e4).toFixed(1), unit: '万' };
+    return { num: Math.round(v).toLocaleString('en-US'), unit: '元' };
+  }
+
+  function yuan(v) {
+    if (!isFinite(v)) return '—';
+    return Math.round(v).toLocaleString('en-US');
+  }
+
+  function wanText(v, digits) {
+    if (!isFinite(v)) return '—';
+    return (v / 1e4).toFixed(digits === undefined ? 1 : digits) + ' 万';
+  }
+
+  function signedPct(v, digits) {
+    var d = digits === undefined ? 1 : digits;
+    if (!isFinite(v)) return '—';
+    return (v > 0 ? '+' : '') + v.toFixed(d) + '%';
+  }
+
+  /* ============ 卡片 1：定投计划 ============ */
+
+  function renderPlan() {
+    var years = Math.max(1, state.endAge - state.age);
+    var principal = state.principalWan * 10000;
+    var rate = clamp(state.rate, 0, 30);
+    var freq = state.freq;
+    var timing = state.timing;
+    var k = periods(freq);
+    var mode = state.mode;
+    var endAge = state.age + years;
+
+    el.planSpan.textContent = years + ' 年';
+
+    var fv = 0;
+    var payment = state.payment;
+    var cost = 0;
+    var yearsOut = years;
+
+    if (mode === 'future') {
+      fv = grow(principal, payment, rate, years, freq, timing);
+      cost = principal + payment * years * k;
+      var m = moneyWan(fv);
+      el.planLabel.textContent = endAge + ' 岁时预计有';
+      el.planValue.textContent = m.num;
+      el.planUnit.textContent = m.unit;
+      var profit = fv - cost;
+      el.planNote.innerHTML = '其中收益 <b>' + wanText(profit) +
+        '</b>，占总资产 ' + (fv > 0 ? (profit / fv * 100).toFixed(1) : '0.0') + '%';
+    } else if (mode === 'payment') {
+      var target = state.targetWan * 10000;
+      payment = paymentFor(principal, target, rate, years, freq, timing);
+      fv = grow(principal, payment, rate, years, freq, timing);
+      cost = principal + payment * years * k;
+      el.planLabel.textContent = freqName(freq) + '需要投入';
+      el.planValue.textContent = payment > 0 ? yuan(payment) : '0';
+      el.planUnit.textContent = '元';
+      if (payment <= 0) {
+        el.planNote.innerHTML = '现有本金按 ' + rate + '% 年化已经能到 <b>' +
+          wanText(target) + '</b>，不需要再追加投入';
+      } else {
+        el.planNote.innerHTML = '连续 ' + Math.round(years * k) + ' 期，共投入 <b>' +
+          wanText(cost) + '</b>，' + endAge + ' 岁达到 ' + wanText(target, 0);
+      }
+    } else {
+      var goal = state.targetWan * 10000;
+      yearsOut = yearsFor(principal, payment, goal, rate, freq, timing);
+      if (!isFinite(yearsOut)) {
+        el.planLabel.textContent = '按当前投入';
+        el.planValue.textContent = '∞';
+        el.planUnit.textContent = '';
+        el.planNote.innerHTML = '本金与定投都推不动，<b>需要提高每期投入或收益率</b>';
+        yearsOut = years;
+      } else {
+        yearsOut = Math.max(0, yearsOut);
+        fv = grow(principal, payment, rate, yearsOut, freq, timing);
+        cost = principal + payment * yearsOut * k;
+        el.planSpan.textContent = yearsOut < 100
+          ? (Math.round(yearsOut * 10) / 10) + ' 年'
+          : '100 年+';
+        el.planLabel.textContent = '达到 ' + wanText(goal, 0) + ' 需要';
+        el.planValue.textContent = yearsOut < 100
+          ? String(Math.round(yearsOut * 10) / 10)
+          : '100+';
+        el.planUnit.textContent = '年';
+        el.planNote.innerHTML = '约 <b>' + Math.floor(state.age + yearsOut) + ' 岁</b>达成，累计投入 ' +
+          wanText(cost) + '，其中收益 ' + wanText(fv - cost);
+      }
+    }
+
+    var investShare = fv > 0 ? clamp(cost / fv * 100, 0, 100) : 100;
+    el.barInvest.style.width = investShare + '%';
+    el.barGain.style.width = (100 - investShare) + '%';
+    el.legendInvest.innerHTML = '<b>' + wanText(cost) + '</b>';
+    el.legendGain.innerHTML = '<b>' + wanText(Math.max(0, fv - cost)) + '</b>';
+
+    el.planCost.innerHTML = wanText(cost);
+    var share = fv > 0 ? Math.max(0, (fv - cost) / fv * 100) : 0;
+    el.planShare.textContent = share.toFixed(1) + '%';
+
+    var dy = doubleYears(rate);
+    el.planDouble.textContent = dy === null ? '—' : dy.toFixed(1) + ' 年';
+    el.planDouble.title = '一次性投入按此收益率翻倍所需年数';
+
+    el.paymentRow.hidden = mode === 'payment';
+    el.targetRow.hidden = mode === 'future';
+
+    if (mode === 'payment') {
+      el.planHint.innerHTML = '反推结果是<b>每期需要投入的金额</b>，不含申购费。实际请把费率从年化里扣掉再算。';
+    } else if (mode === 'years') {
+      el.planHint.innerHTML = '年限由复利公式闭式解算出，四舍五入到整数年。若显示 ∞，说明当前投入永远达不到目标。';
+    } else {
+      el.planHint.innerHTML = '按复利逐期计算，期末投入是保守口径。年化是假设值，真实市场可能多年不达预期。';
+    }
+  }
+
+  /* ============ 卡片 2：财务自由 ============ */
+
+  function renderFreedom() {
+    var expense = state.expenseWan * 10000;
+    var swr = state.swr / 100;
+    var target = swr > 0 ? expense / swr : Infinity;
+    var asset = state.ffAssetWan * 10000;
+    var pay = state.ffPayment;
+    var rate = clamp(state.ffRate, 0, 30);
+
+    el.ffTarget.textContent = isFinite(target) ? (target / 1e4).toFixed(1) : '—';
+    el.ffProgressTotal.textContent = '提取率 ' + state.swr + '%';
+
+    // 说明「为什么比例越高、本金越少」：钱是固定的，比例越高这笔钱占本金的比例越大
+    if (isFinite(target) && target > 0) {
+      el.swrHint.innerHTML = '每年要花 <b>' + state.expenseWan + ' 万</b>（固定），只占本金的 <b>' +
+        state.swr + '%</b>，所以 <b>' + (target / 1e4).toFixed(1) +
+        ' 万</b>就够；比例越低，本金越多';
+    } else {
+      el.swrHint.textContent = '提取率要大于 0 才能反推本金';
+    }
+
+    var years = yearsFor(asset, pay, target, rate, 'month', 'end');
+    var reached = asset >= target;
+    var gap = Math.max(0, target - asset);
+
+    if (reached) {
+      el.ffNote.innerHTML = '当前资产已覆盖 <b>' + (swr * 100).toFixed(1) +
+        '%</b> 提取率下的支出，可以考虑降低风险敞口';
+      el.ffYears.textContent = '已达成';
+      el.ffAge.textContent = state.ffAge + ' 岁';
+    } else if (!isFinite(years)) {
+      el.ffNote.innerHTML = '按当前定投与收益率，<b>无法在合理年限内达成</b>，需要提高投入';
+      el.ffYears.textContent = '—';
+      el.ffAge.textContent = '—';
+    } else {
+      el.ffNote.innerHTML = '按 ' + rate + '% 年化，还需 <b>' +
+        (years < 10 ? years.toFixed(1) : Math.ceil(years)) + ' 年</b>';
+      el.ffYears.textContent = years < 10 ? years.toFixed(1) + ' 年' : Math.ceil(years) + ' 年';
+      el.ffAge.textContent = Math.ceil(state.ffAge + years) + ' 岁';
+    }
+
+    el.ffGap.innerHTML = reached ? '0' : (gap / 1e4).toFixed(1) + '<small> 万</small>';
+
+    var pct = isFinite(target) && target > 0 ? clamp(asset / target * 100, 0, 100) : 0;
+    el.ffBar.style.width = pct + '%';
+    el.ffCurrent.innerHTML = '已有 <b>' + wanText(asset, 0) + '</b>';
+    el.ffPct.textContent = pct.toFixed(1) + '%';
+  }
+
+  /* ============ 卡片 3：真实年化 ============ */
+
+  function dayNum(s) {
+    var p = String(s).split('-');
+    if (p.length !== 3) return NaN;
+    var t = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+    return isFinite(t) ? t : NaN;
+  }
+
+  function xirrOf(flows) {
+    var pts = [];
+    for (var i = 0; i < flows.length; i++) {
+      var f = flows[i];
+      var t = dayNum(f.date);
+      var v = num(f.amount, 0);
+      if (!isFinite(t) || v <= 0) continue;
+      pts.push({ t: t, v: f.kind === 'out' ? -v : v });
+    }
+    if (pts.length < 2) return null;
+    pts.sort(function (a, b) { return a.t - b.t; });
+
+    var span = pts[pts.length - 1].t - pts[0].t;
+    if (span < 86400000) return null;
+
+    var hasNeg = false;
+    var hasPos = false;
+    for (var j = 0; j < pts.length; j++) {
+      if (pts[j].v < 0) hasNeg = true;
+      if (pts[j].v > 0) hasPos = true;
+    }
+    if (!hasNeg || !hasPos) return null;
+
+    var t0 = pts[0].t;
+    function npv(r) {
+      var s = 0;
+      for (var k = 0; k < pts.length; k++) {
+        s += pts[k].v / Math.pow(1 + r, (pts[k].t - t0) / 86400000 / 365);
+      }
+      return s;
+    }
+
+    var lo = -0.9999;
+    var hi = 10;
+    var flo = npv(lo);
+    var fhi = npv(hi);
+    if (flo * fhi > 0) return null;
+
+    for (var step = 0; step < 240; step++) {
+      var mid = (lo + hi) / 2;
+      var fm = npv(mid);
+      if (Math.abs(fm) < 1e-6) return mid;
+      if (flo * fm <= 0) {
+        hi = mid;
+        fhi = fm;
+      } else {
+        lo = mid;
+        flo = fm;
+      }
+    }
+    return (lo + hi) / 2;
+  }
+
+  function renderFlows() {
+    el.flows.innerHTML = '';
+    state.flows.forEach(function (f, i) {
+      var row = document.createElement('div');
+      row.className = 'flow-row';
+
+      var date = document.createElement('input');
+      date.type = 'date';
+      date.className = 'flow-date';
+      date.value = f.date;
+      date.setAttribute('aria-label', '第 ' + (i + 1) + ' 笔日期');
+      date.addEventListener('input', function () {
+        if (!date.value) return;
+        state.flows[i].date = date.value;
+        renderReal();
+        save();
+      });
+
+      var amt = document.createElement('input');
+      amt.type = 'number';
+      amt.className = 'flow-amount';
+      amt.inputMode = 'decimal';
+      amt.min = '0';
+      amt.step = '1000';
+      amt.value = f.amount;
+      amt.setAttribute('aria-label', '第 ' + (i + 1) + ' 笔金额');
+      amt.addEventListener('input', function () {
+        if (amt.value === '') return;
+        state.flows[i].amount = num(amt.value, 0);
+        renderReal();
+        save();
+      });
+      amt.addEventListener('blur', function () {
+        amt.value = state.flows[i].amount;
+      });
+
+      var kind = document.createElement('button');
+      kind.type = 'button';
+      kind.className = 'flow-kind';
+      kind.dataset.kind = f.kind;
+      kind.textContent = f.kind === 'out' ? '投' : '取';
+      kind.title = f.kind === 'out' ? '点击改为取出' : '点击改为投入';
+      kind.addEventListener('click', function () {
+        state.flows[i].kind = state.flows[i].kind === 'out' ? 'in' : 'out';
+        renderFlows();
+        renderReal();
+        save();
+      });
+
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'flow-del';
+      del.textContent = '×';
+      del.setAttribute('aria-label', '删除第 ' + (i + 1) + ' 笔');
+      del.addEventListener('click', function () {
+        if (state.flows.length <= 2) return;
+        state.flows.splice(i, 1);
+        renderFlows();
+        renderReal();
+        save();
+      });
+
+      row.appendChild(date);
+      row.appendChild(amt);
+      row.appendChild(kind);
+      row.appendChild(del);
+      el.flows.appendChild(row);
+    });
+
+    el.realCount.textContent = state.flows.length + ' 笔';
+  }
+
+  function renderReal() {
+    var inflow = 0;
+    var outflow = 0;
+    state.flows.forEach(function (f) {
+      var v = num(f.amount, 0);
+      if (f.kind === 'out') outflow += v;
+      else inflow += v;
+    });
+
+    var r = xirrOf(state.flows);
+
+    if (r === null) {
+      el.realValue.textContent = '—';
+      el.realNote.innerHTML = '现金流<b>需要至少一笔投入和一笔取出</b>，且日期要跨天';
+    } else {
+      el.realValue.textContent = (r * 100).toFixed(1);
+      var profit = inflow - outflow;
+      el.realNote.innerHTML = profit >= 0
+        ? '累计投入 <b>' + wanText(outflow) + '</b>，已赚 <b>' + wanText(profit) + '</b>'
+        : '累计投入 <b>' + wanText(outflow) + '</b>，目前亏 <b>' + wanText(-profit) + '</b>';
+    }
+
+    el.realIn.innerHTML = wanText(outflow);
+    el.realOut.innerHTML = wanText(inflow);
+    var diff = inflow - outflow;
+    el.realProfit.innerHTML = (diff >= 0 ? '+' : '−') + wanText(Math.abs(diff));
+    el.realProfit.style.color = diff >= 0 ? 'var(--up-ink)' : 'var(--down-ink)';
+  }
+
+  /* ============ 卡片 4：回本 ============ */
+
+  function renderDrawdown() {
+    var d = clamp(state.drawdown, 0, 90);
+    var g = clamp(state.gain, 0, 900);
+
+    var need = d >= 90 ? 900 : (1 / (1 - d / 100) - 1) * 100;
+    var give = (1 - 1 / (1 + g / 100)) * 100;
+
+    el.ddNeed.textContent = need >= 900 ? '900%+' : '+' + need.toFixed(1) + '%';
+    el.ddGive.textContent = '−' + give.toFixed(1) + '%';
+    el.ddTotal.textContent = '跌 ' + Math.round(d) + '% · 涨 ' + Math.round(g) + '%';
+
+    drawCurve(d);
+  }
+
+  function drawCurve(dNow) {
+    var W = 320;
+    var H = 148;
+    var x0 = 34;
+    var x1 = 306;
+    var y0 = 112;
+    var y1 = 16;
+    var maxD = 75;
+    var maxR = 300;
+
+    function px(d) { return x0 + (d / maxD) * (x1 - x0); }
+    function py(r) { return y0 - (Math.min(r, maxR) / maxR) * (y0 - y1); }
+
+    var parts = [];
+    parts.push('<line x1="' + x0 + '" y1="' + y0 + '" x2="' + x1 + '" y2="' + y0 +
+      '" stroke="var(--border)" stroke-width="0.5"/>');
+    parts.push('<line x1="' + x0 + '" y1="' + y1 + '" x2="' + x0 + '" y2="' + y0 +
+      '" stroke="var(--border)" stroke-width="0.5"/>');
+
+    [100, 200, 300].forEach(function (v) {
+      var y = py(v);
+      parts.push('<line x1="' + x0 + '" y1="' + y + '" x2="' + x1 + '" y2="' + y +
+        '" stroke="var(--border-soft)" stroke-width="0.5" stroke-dasharray="2 3"/>');
+      parts.push('<text x="' + (x0 - 5) + '" y="' + (y + 3) + '" text-anchor="end" ' +
+        'font-size="8" fill="var(--muted)">' + v + '%</text>');
+    });
+
+    [0, 25, 50, 75].forEach(function (v) {
+      parts.push('<text x="' + px(v) + '" y="' + (y0 + 12) + '" text-anchor="middle" ' +
+        'font-size="8" fill="var(--muted)">' + v + '%</text>');
+    });
+
+    var pts = [];
+    for (var i = 0; i <= maxD; i += 0.5) {
+      var r = (1 / (1 - i / 100) - 1) * 100;
+      pts.push(px(i).toFixed(1) + ' ' + py(r).toFixed(1));
+    }
+    parts.push('<polyline points="' + pts.join(',') + '" fill="none" stroke="var(--accent)" ' +
+      'stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>');
+
+    var cx = px(Math.min(dNow, maxD));
+    var cr = (1 / (1 - Math.min(dNow, 74.5) / 100) - 1) * 100;
+    var cy = py(cr);
+    parts.push('<line x1="' + cx + '" y1="' + cy + '" x2="' + cx + '" y2="' + y0 +
+      '" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>');
+    parts.push('<circle cx="' + cx + '" cy="' + cy + '" r="3.4" fill="var(--accent)"/>');
+
+    parts.push('<text x="' + Math.min(cx + 6, x1 - 30) + '" y="' + Math.max(cy - 8, 10) +
+      '" font-size="9" fill="var(--accent-ink)">' + needLabel(dNow) + '</text>');
+
+    parts.push('<text x="' + x1 + '" y="' + (H - 4) + '" text-anchor="end" ' +
+      'font-size="8" fill="var(--muted)">跌幅 →</text>');
+
+    el.ddCurve.innerHTML = parts.join('');
+  }
+
+  function needLabel(d) {
+    var d2 = Math.min(d, 89);
+    var need = (1 / (1 - d2 / 100) - 1) * 100;
+    return '跌 ' + Math.round(d) + '% → 需涨 ' + need.toFixed(0) + '%';
+  }
+
+  /* ============ 卡片 5：损耗 ============ */
+
+  function renderErosion() {
+    var isInf = state.erosionTab === 'inflation';
+    el.erosionInflation.hidden = !isInf;
+    el.erosionFee.hidden = isInf;
+
+    if (isInf) {
+      var now = state.amountWan * 10000;
+      var n = Math.max(1, state.years);
+      var pi = clamp(state.inflation, 0, 20) / 100;
+      var future = now * Math.pow(1 + pi, n);
+      var remain = 1 / Math.pow(1 + pi, n);
+
+      el.infLabel.textContent = n + ' 年后需要这么多才等值';
+      el.erosionTotal.textContent = n + ' 年';
+      el.infValue.textContent = (future / 1e4).toFixed(1);
+      el.infNote.innerHTML = '反过来，那时的 ' + wanText(now, 0) + '只值今天 <b>' +
+        (now * remain / 1e4).toFixed(1) + ' 万</b>';
+
+      el.infLoss.textContent = ((1 - remain) * 100).toFixed(0) + '%';
+      el.infReal.textContent = '−' + (pi * 100).toFixed(1) + '%';
+      var dy = pi > 0 ? Math.log(2) / Math.log(1 + pi) : null;
+      el.infNeed.textContent = dy === null ? '—' : dy.toFixed(0) + ' 年';
+
+      el.erosionHint.innerHTML = '通胀按复利折算，<b>不是简单相减</b>。真实收益率 = (1+名义) ÷ (1+通胀) − 1。' +
+        '「物价翻倍」是只靠通胀、不投资的情况下，同样一笔钱购买力减半所需的年数。';
+      return;
+    }
+
+    var p = state.feePrincipalWan * 10000;
+    var pay = state.feePayment;
+    var yrs = Math.max(1, state.feeYears);
+    var rate = clamp(state.feeRate, 0, 30);
+    var fa = clamp(state.feeA, 0, 5);
+    var fb = clamp(state.feeB, 0, 5);
+
+    var low = grow(p, pay, Math.max(0, rate - Math.min(fa, fb)), yrs, 'month', 'end');
+    var high = grow(p, pay, Math.max(0, rate - Math.max(fa, fb)), yrs, 'month', 'end');
+    var diff = Math.abs(low - high);
+    var base = Math.max(low, high);
+
+    var m = moneyWan(diff);
+    el.feeValue.textContent = m.num;
+    el.feeUnit.textContent = m.unit;
+    el.feeLabel.textContent = yrs + ' 年后，两个费率的差距';
+    el.erosionTotal.textContent = yrs + ' 年';
+
+    el.feeNote.innerHTML = '费率 <b>' + Math.min(fa, fb).toFixed(1) + '%</b> 终值 ' +
+      wanText(base) + '，<b>' + Math.max(fa, fb).toFixed(1) + '%</b> 终值 ' +
+      wanText(Math.min(low, high));
+
+    el.feeLow.innerHTML = wanText(base);
+    el.feeHigh.innerHTML = wanText(Math.min(low, high));
+    el.feePct.textContent = base > 0 ? (diff / base * 100).toFixed(1) + '%' : '—';
+
+    el.erosionHint.innerHTML = '费率从收益里按年扣除，看起来只差 ' +
+      Math.abs(fb - fa).toFixed(1) + ' 个百分点，但按复利累积 ' + yrs + ' 年，差距会放大成一大笔钱。';
+  }
+
+  /* ============ 卡片 6：股息 ============ */
+
+  function taxRate() {
+    if (state.market === 'a') {
+      if (state.holding === 'lt1m') return 0.20;
+      if (state.holding === 'lt1y') return 0.10;
+      return 0;
+    }
+    if (state.market === 'hk') return 0.20;
+    return 0.28;
+  }
+
+  function renderDividend() {
+    var rate = clamp(state.dividend, 0, 20);
+    var tax = taxRate();
+    var after = rate * (1 - tax);
+    var cash = 100000 * after / 100;
+
+    el.divValue.textContent = after.toFixed(2);
+    el.divTax.textContent = (tax * 100).toFixed(0) + '%';
+    el.divCash.innerHTML = yuan(cash) + '<small> 元</small>';
+    el.divCut.textContent = tax === 0 ? '0' : '−' + (rate * tax).toFixed(2) + '%';
+
+    if (state.market === 'a') {
+      el.divTotal.textContent = 'A 股';
+      if (state.holding === 'gt1y') {
+        el.divNote.innerHTML = '<span class="grade ok">免征</span> 持股满 1 年，红利税全免';
+        el.divHint.innerHTML = 'A 股红利税按持股期限差别化：<b>满 1 年免征</b>，1 个月至 1 年实际 10%，不满 1 个月 20%。派息时先不扣，卖出时按实际持股时长补扣。';
+      } else if (state.holding === 'lt1y') {
+        el.divNote.innerHTML = '<span class="grade warn">10%</span> 持股 1 个月至 1 年，实际税负 10%';
+        el.divHint.innerHTML = '再持有到满 1 年，这 10% 就能免掉。对高股息持仓来说，<b>持有时长本身就是收益</b>。';
+      } else {
+        el.divNote.innerHTML = '<span class="grade warn">20%</span> 持股不满 1 个月，税负最重';
+        el.divHint.innerHTML = '短期持有高股息股最不划算：20% 的红利税会直接吃掉五分之一的股息，还没算交易成本。';
+      }
+    } else if (state.market === 'hk') {
+      el.divTotal.textContent = '港股通 H 股';
+      el.divNote.innerHTML = '<span class="grade warn">20%</span> 由公司代扣，与持有时长无关';
+      el.divHint.innerHTML = '港股通个人投资者持有 H 股，股息<b>统一代扣 20%</b>，没有 A 股「满一年免税」的优惠。所以同样是 4.5% 股息率，港股通到手只有 3.6%。';
+    } else {
+      el.divTotal.textContent = '港股通红筹';
+      el.divNote.innerHTML = '<span class="grade warn">28%</span> 10% 预提税 + 20% 个税';
+      el.divHint.innerHTML = '红筹股先由企业层面扣 10% 预提所得税，再扣 20% 个人所得税，综合 <b>1 − 0.9 × 0.8 = 28%</b>。部分已计提预提税的公司会略低。';
+    }
+  }
+
+  /* ============ 状态同步 ============ */
+
+  function setPressed(boxId, attr, value) {
+    var box = byId(boxId);
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('.chip'), function (btn) {
+      btn.setAttribute('aria-pressed', String(btn.dataset[attr] === String(value)));
+    });
+  }
+
+  function syncChips() {
+    setPressed('mode-chips', 'mode', state.mode);
+    setPressed('freq-chips', 'freq', state.freq);
+    setPressed('timing-chips', 'timing', state.timing);
+    setPressed('swr-chips', 'swr', state.swr);
+    setPressed('erosion-chips', 'tab', state.erosionTab);
+    setPressed('market-chips', 'market', state.market);
+    setPressed('holding-chips', 'holding', state.holding);
+
+    var isA = state.market === 'a';
+    Array.prototype.forEach.call(el.holdingChips.querySelectorAll('.chip'), function (btn) {
+      btn.disabled = !isA;
+      btn.style.opacity = isA ? '' : '.38';
+      btn.style.cursor = isA ? '' : 'default';
+    });
+    el.holdingChips.setAttribute('aria-disabled', String(!isA));
+  }
+
+  var STEP_IDS = {
+    age: 'age',
+    endAge: 'end-age',
+    rate: 'rate',
+    ffRate: 'ff-rate',
+    drawdown: 'dd-input',
+    gain: 'gain',
+    years: 'years',
+    inflation: 'inflation',
+    feeYears: 'fee-years',
+    feeRate: 'fee-rate',
+    dividend: 'div-input',
+    principal: 'principal',
+    payment: 'payment',
+    target: 'target',
+    expense: 'expense',
+    ffAge: 'ff-age-input',
+    ffAsset: 'ff-asset',
+    ffPayment: 'ff-payment',
+    feePrincipal: 'fee-principal',
+    feePayment: 'fee-payment',
+    amount: 'amount'
+  };
+
+  function syncInputs() {
+    el.age.value = state.age;
+    el.endAge.value = state.endAge;
+    el.principal.value = state.principalWan;
+    el.payment.value = state.payment;
+    el.target.value = state.targetWan;
+    el.rate.value = state.rate;
+    el.expense.value = state.expenseWan;
+    el.ffAgeInput.value = state.ffAge;
+    el.ffAsset.value = state.ffAssetWan;
+    el.ffPayment.value = state.ffPayment;
+    el.ffRate.value = state.ffRate;
+    el.drawdown.value = state.drawdown;
+    el.gain.value = state.gain;
+    el.amount.value = state.amountWan;
+    el.years.value = state.years;
+    el.inflation.value = state.inflation;
+    el.feePrincipal.value = state.feePrincipalWan;
+    el.feePayment.value = state.feePayment;
+    el.feeYears.value = state.feeYears;
+    el.feeRate.value = state.feeRate;
+    el.feeA.value = state.feeA;
+    el.feeB.value = state.feeB;
+    el.dividend.value = state.dividend;
+  }
+
+  function renderAll() {
+    renderPlan();
+    renderFreedom();
+    renderReal();
+    renderDrawdown();
+    renderErosion();
+    renderDividend();
+  }
+
+  /* ============ 场景切换 ============ */
+
+  var SCENES = ['plan', 'freedom', 'real', 'drawdown', 'erosion', 'dividend'];
+
+  function applyScene() {
+    if (SCENES.indexOf(state.scene) === -1) state.scene = 'plan';
+    SCENES.forEach(function (key) {
+      var panel = byId(key);
+      var tab = byId('tab-' + key);
+      var on = key === state.scene;
+      if (panel) panel.hidden = !on;
+      if (tab) {
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+      }
+    });
+  }
+
+  function switchScene(key) {
+    if (SCENES.indexOf(key) === -1 || key === state.scene) return;
+    state.scene = key;
+    applyScene();
+    if (window.scrollY > 0) window.scrollTo(0, 0);
+    save();
+  }
+
+  /* ============ 持久化 ============ */
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (!data || typeof data !== 'object') return;
+      Object.keys(DEFAULTS).forEach(function (key) {
+        if (data[key] !== undefined) state[key] = data[key];
+      });
+      if (!Array.isArray(state.flows) || state.flows.length < 2) {
+        state.flows = clone(DEFAULTS.flows);
+      }
+      state.flows = state.flows.map(function (f) {
+        return {
+          date: typeof f.date === 'string' ? f.date : '',
+          amount: num(f.amount, 0),
+          kind: f.kind === 'in' ? 'in' : 'out'
+        };
+      });
+    } catch (e) {
+      state = clone(DEFAULTS);
+    }
+  }
+
+  /* ============ 事件绑定 ============ */
+
+  function bindInput(id, key, after) {
+    var input = byId(id);
+    if (!input) return;
+    input.addEventListener('input', function () {
+      if (input.value === '') return;
+      var v = parseFloat(input.value);
+      if (!isFinite(v)) return;
+      state[key] = v;
+      if (after) after();
+      renderAll();
+      save();
+    });
+    input.addEventListener('blur', function () {
+      var lo = parseFloat(input.min);
+      var hi = parseFloat(input.max);
+      var v = num(state[key], DEFAULTS[key]);
+      if (isFinite(lo)) v = Math.max(lo, v);
+      if (isFinite(hi)) v = Math.min(hi, v);
+      state[key] = v;
+      input.value = v;
+      renderAll();
+      save();
+    });
+  }
+
+  bindInput('age', 'age', function () {
+    if (state.endAge <= state.age) {
+      state.endAge = Math.min(100, state.age + 1);
+      el.endAge.value = state.endAge;
+    }
+  });
+  bindInput('end-age', 'endAge', function () {
+    if (state.endAge <= state.age) {
+      state.age = Math.max(16, state.endAge - 1);
+      el.age.value = state.age;
+    }
+  });
+  bindInput('principal', 'principalWan');
+  bindInput('payment', 'payment');
+  bindInput('target', 'targetWan');
+  bindInput('rate', 'rate');
+  bindInput('expense', 'expenseWan');
+  bindInput('ff-age-input', 'ffAge');
+  bindInput('ff-asset', 'ffAssetWan');
+  bindInput('ff-payment', 'ffPayment');
+  bindInput('ff-rate', 'ffRate');
+  bindInput('dd-input', 'drawdown');
+  bindInput('gain', 'gain');
+  bindInput('amount', 'amountWan');
+  bindInput('years', 'years');
+  bindInput('inflation', 'inflation');
+  bindInput('fee-principal', 'feePrincipalWan');
+  bindInput('fee-payment', 'feePayment');
+  bindInput('fee-years', 'feeYears');
+  bindInput('fee-rate', 'feeRate');
+  bindInput('fee-a', 'feeA');
+  bindInput('fee-b', 'feeB');
+  bindInput('div-input', 'dividend');
+
+  Array.prototype.forEach.call(document.querySelectorAll('.step-btn'), function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.dataset.stepTarget;
+      var step = parseFloat(btn.dataset.step);
+      var id = STEP_IDS[key];
+      var input = id ? byId(id) : null;
+      if (!input || !isFinite(step)) return;
+      var lo = parseFloat(input.min);
+      var hi = parseFloat(input.max);
+      var cur = num(input.value, DEFAULTS[key]);
+      var next = roundTo(clamp(cur + step, lo, hi), step);
+      input.value = next;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+
+  function bindChips(boxId, attr, key, cast) {
+    var box = byId(boxId);
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('.chip'), function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        var v = btn.dataset[attr];
+        state[key] = cast ? cast(v) : v;
+        syncChips();
+        renderAll();
+        save();
+      });
+    });
+  }
+
+  bindChips('mode-chips', 'mode', 'mode');
+  bindChips('freq-chips', 'freq', 'freq');
+  bindChips('timing-chips', 'timing', 'timing');
+  bindChips('swr-chips', 'swr', 'swr', parseFloat);
+  bindChips('erosion-chips', 'tab', 'erosionTab');
+  bindChips('market-chips', 'market', 'market');
+  bindChips('holding-chips', 'holding', 'holding');
+
+  el.flowAdd.addEventListener('click', function () {
+    var today = new Date();
+    var y = today.getFullYear();
+    var m = String(today.getMonth() + 1).padStart(2, '0');
+    var d = String(today.getDate()).padStart(2, '0');
+    state.flows.push({ date: y + '-' + m + '-' + d, amount: 10000, kind: 'out' });
+    renderFlows();
+    renderReal();
+    save();
+  });
+
+  var tabs = Array.prototype.slice.call(el.scenes.querySelectorAll('[role="tab"]'));
+
+  tabs.forEach(function (btn, index) {
+    btn.addEventListener('click', function () {
+      switchScene(btn.dataset.goto);
+    });
+    btn.addEventListener('keydown', function (event) {
+      var key = event.key;
+      if (key !== 'ArrowRight' && key !== 'ArrowLeft' && key !== 'Home' && key !== 'End') return;
+      event.preventDefault();
+      var next = index;
+      if (key === 'ArrowRight') next = (index + 1) % tabs.length;
+      else if (key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+      else if (key === 'Home') next = 0;
+      else next = tabs.length - 1;
+      tabs[next].focus();
+      switchScene(tabs[next].dataset.goto);
+    });
+  });
+
+  el.reset.addEventListener('click', function () {
+    var keepScene = state.scene;
+    state = clone(DEFAULTS);
+    state.scene = keepScene;
+    syncInputs();
+    syncChips();
+    applyScene();
+    renderFlows();
+    renderAll();
+    try { localStorage.removeItem(KEY); } catch (e) {}
+  });
+
+  /* ============ 启动 ============ */
+
+  load();
+  syncInputs();
+  syncChips();
+  el.age.value = state.age;
+  el.endAge.value = state.endAge;
+  applyScene();
+  renderFlows();
+  renderAll();
+})();
+</script>
+</body>
+</html>
