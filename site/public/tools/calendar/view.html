@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>日历</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='6' width='24' height='22' rx='5' fill='none' stroke='%230e8496' stroke-width='2.4'/%3E%3Cpath d='M4 13h24M10 4v5M22 4v5' fill='none' stroke='%230e8496' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script>
+    /* 主题：与站点开关共用 theme-preference（light / dark / system），未设置时跟随系统 */
+    (function () {
+      var KEY = "theme-preference";
+      function isDark() {
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+        if (stored === "dark") return true;
+        if (stored === "light") return false;
+        try {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        } catch (e) {
+          return false;
+        }
+      }
+      function apply() {
+        document.documentElement.classList.toggle("dark", isDark());
+      }
+      apply();
+      window.addEventListener("storage", function (event) {
+        if (event.key === KEY) apply();
+      });
+      try {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", apply);
+      } catch (e) {}
+    })();
+  </script>
+<style>
+  :root {
+    color-scheme: light;
+    --page-bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f3f4f6;
+    --border: #e3e5e9;
+    --border-soft: #eef0f2;
+    --ink: #1c2026;
+    --muted: #6b7280;
+    --faint: #9aa1ab;
+    --accent: #0e8496;
+    --accent-ink: #0a6b79;
+    --accent-soft: #e6f4f6;
+    --holiday: #c2544a;
+    --holiday-soft: #fbeeed;
+    --term: #12936f;
+    --term-soft: #e9f6f2;
+    --shadow: 0 20px 48px -34px rgba(17, 24, 39, .45);
+  }
+  .dark {
+    color-scheme: dark;
+    --page-bg: #101114;
+    --surface: #191b1f;
+    --surface-2: #22252a;
+    --border: #2d3137;
+    --border-soft: #24272c;
+    --ink: #eceef2;
+    --muted: #9aa1ac;
+    --faint: #6f7782;
+    --accent: #43c6db;
+    --accent-ink: #7ddcec;
+    --accent-soft: #15333a;
+    --holiday: #e88f86;
+    --holiday-soft: #35211f;
+    --term: #4cc79b;
+    --term-soft: #16302a;
+    --shadow: 0 24px 58px -32px rgba(0, 0, 0, .9);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    padding: clamp(12px, 2vh, 22px) 18px 34px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { width: 100%; max-width: 760px; }
+
+  .head { margin: 0 0 14px; text-align: center; }
+  .title { margin: 0; font-size: 20px; line-height: 28px; font-weight: 500; }
+  .subtitle { margin: 2px 0 0; font-size: 12px; line-height: 18px; color: var(--muted); }
+
+  button { font: inherit; color: inherit; }
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  .panel {
+    padding: 14px 16px 16px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .seg {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+  .seg button {
+    padding: 0 14px;
+    height: 30px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .seg button.is-on {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
+  }
+
+  .nav { display: flex; align-items: center; gap: 6px; }
+  .icon-btn, .today-btn {
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .icon-btn { width: 32px; font-size: 16px; line-height: 1; }
+  .today-btn { padding: 0 11px; font-size: 12.5px; }
+  .icon-btn:hover, .today-btn:hover { background: var(--surface-2); }
+
+  .period {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin: 14px 2px 10px;
+    flex-wrap: wrap;
+  }
+  .period h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .period h2.is-pick {
+    padding: 0 2px 1px;
+    border-bottom: 1px dashed color-mix(in srgb, var(--faint) 65%, transparent);
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .period h2.is-pick::after {
+    content: "▾";
+    margin-left: 5px;
+    font-size: 10px;
+    color: var(--faint);
+  }
+  .period h2.is-pick:hover {
+    color: var(--accent-ink);
+    border-bottom-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .period h2.is-pick:hover::after { color: var(--accent-ink); }
+  .pill {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+
+  /* ---- 周视图 ---- */
+  .week-list { border-top: 1px solid var(--border-soft); }
+  .week-row {
+    display: grid;
+    grid-template-columns: 48px 46px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 8px;
+    border: 0;
+    border-bottom: 1px solid var(--border-soft);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .week-row:hover { background: var(--surface-2); }
+  .week-row.is-today { background: var(--accent-soft); }
+  .week-row.is-selected { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .w-name { font-size: 12px; color: var(--muted); }
+  .w-num {
+    font-size: 22px;
+    line-height: 26px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .week-row.is-today .w-num { color: var(--accent-ink); }
+  .w-lunar {
+    min-width: 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .w-flag { font-size: 11.5px; color: var(--muted); }
+
+  .badge {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    line-height: 16px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .badge.off { background: var(--holiday-soft); color: var(--holiday); }
+  .badge.work { background: var(--surface-2); color: var(--faint); }
+
+  /* ---- 月视图 ---- */
+  .weekdays, .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .weekdays {
+    padding-bottom: 6px;
+    font-size: 11px;
+    color: var(--faint);
+    text-align: center;
+  }
+  .month-grid { gap: 3px; }
+  .day {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    min-height: 62px;
+    padding: 5px 2px 4px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .day:hover { background: var(--surface-2); }
+  .day.is-out { opacity: .4; }
+  .day.is-today { background: var(--accent-soft); }
+  .day.is-selected { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .d-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .day.is-today .d-num { background: var(--accent); color: #fff; }
+  .d-sub {
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 14px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .d-sub.is-term { color: var(--term); }
+  .d-sub.is-fest { color: var(--holiday); }
+  .d-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 0 3px;
+    border-radius: 4px;
+    font-size: 9px;
+    line-height: 13px;
+  }
+  .d-badge.off { background: var(--holiday-soft); color: var(--holiday); }
+  .d-badge.work { background: var(--surface-2); color: var(--faint); }
+
+  /* ---- 年视图 ---- */
+  .year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ymonth {
+    padding: 9px 9px 8px;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .ymonth header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  .ymonth b { font-size: 13px; font-weight: 500; }
+  .ymonth header .ytags {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .ytag-fest {
+    flex: none;
+    font-style: normal;
+    font-size: 9.5px;
+    line-height: 14px;
+    font-weight: 500;
+    color: var(--holiday);
+    white-space: nowrap;
+  }
+  .ytag-dot {
+    flex: none;
+    font-size: 9px;
+    line-height: 14px;
+    color: var(--faint);
+  }
+  .ytag-term {
+    min-width: 0;
+    font-size: 9.5px;
+    line-height: 14px;
+    color: var(--term);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mini-head {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    margin: 1px 0 2px;
+    font-size: 9px;
+    line-height: 12px;
+    color: var(--faint);
+    text-align: center;
+  }
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1px;
+  }
+  .mini span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 17px;
+    border-radius: 5px;
+    font-size: 9.5px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+  .mini span.is-empty { cursor: default; }
+  .mini span:hover:not(.is-empty) { background: var(--surface-2); }
+  .mini span.is-today { background: var(--accent); color: #fff; }
+  .mini span.is-off { color: var(--holiday); }
+  .mini span.is-term { color: var(--term); }
+
+  /* ---- 详情 ---- */
+  .detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 16px;
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .detail-date { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .detail-num {
+    font-size: 26px;
+    line-height: 32px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .detail-week { font-size: 13px; color: var(--muted); }
+  .detail-full { margin: 0; font-size: 12px; color: var(--muted); }
+  .detail-lunar { margin: 2px 0 0; font-size: 13px; color: var(--ink); }
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: flex-end;
+    align-content: flex-start;
+  }
+  .chip {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+  .chip.off { background: var(--holiday-soft); color: var(--holiday); }
+  .chip.term { background: var(--term-soft); color: var(--term); }
+  .chip.sign { background: var(--accent-soft); color: var(--accent-ink); }
+  .chip.sign i {
+    margin-right: 4px;
+    font-style: normal;
+    font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2", sans-serif;
+    font-variant-emoji: text;
+  }
+
+  .foot {
+    margin: 12px 4px 0;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--faint);
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .year-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 430px) {
+    .year-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    body { padding-left: 10px; padding-right: 10px; }
+    .panel { padding: 12px 10px 12px; border-radius: 18px; }
+    .day { min-height: 54px; }
+    .d-sub { font-size: 9px; }
+    .detail { grid-template-columns: 1fr; }
+    .detail-meta { justify-content: flex-start; }
+    .week-row { grid-template-columns: 42px 40px minmax(0, 1fr) auto; gap: 6px; }
+    .w-num { font-size: 20px; }
+  }
+  .year-hint {
+    margin: 9px 2px 0;
+    font-size: 11px;
+    color: var(--faint);
+    text-align: center;
+  }
+
+  /* ---- 年份选择 ---- */
+  .picker {
+    width: min(292px, calc(100vw - 32px));
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 30px 64px -28px rgba(17, 24, 39, .55);
+  }
+  .picker::backdrop {
+    background: rgba(14, 18, 22, .42);
+    backdrop-filter: blur(2px);
+  }
+  .dark .picker { box-shadow: 0 30px 64px -22px rgba(0, 0, 0, .9); }
+  .dark .picker::backdrop { background: rgba(0, 0, 0, .62); }
+  .picker-inner { padding: 16px 16px 14px; }
+  .picker-title {
+    margin: 0;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+  .picker-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .picker-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: 17px;
+    line-height: 24px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+  .picker-row input:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: 1px;
+  }
+  .picker-unit { font-size: 13px; color: var(--muted); }
+  .picker-note {
+    margin: 7px 1px 0;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--faint);
+  }
+  .picker-note.is-error { color: var(--holiday); }
+  .picker-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .picker-btn {
+    padding: 0 14px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .picker-btn:hover { background: var(--surface-2); }
+  .picker-btn.is-primary {
+    border-color: transparent;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .dark .picker-btn.is-primary { color: #0b1417; }
+  .picker-btn.is-primary:hover { background: var(--accent-ink); }
+  .dark .picker-btn.is-primary:hover { background: var(--accent); filter: brightness(1.08); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <h1 class="title">日历</h1>
+    <p class="subtitle">公历 · 农历 · 节气 · 节假日</p>
+  </header>
+
+  <section class="panel" aria-label="日历">
+    <div class="toolbar">
+      <div class="seg" id="view-seg" role="group" aria-label="视图切换">
+        <button type="button" data-view="week">周</button>
+        <button type="button" data-view="month">月</button>
+        <button type="button" data-view="year">年</button>
+      </div>
+      <div class="nav">
+        <button type="button" class="icon-btn" id="prev" aria-label="上一页">‹</button>
+        <button type="button" class="today-btn" id="today">今天</button>
+        <button type="button" class="icon-btn" id="next" aria-label="下一页">›</button>
+      </div>
+    </div>
+
+    <div class="period">
+      <h2 id="period-title" tabindex="-1">2026 年 11 月</h2>
+      <span class="pill" id="period-sub">第 47 周</span>
+    </div>
+
+    <div id="view-week" hidden>
+      <div class="week-list" id="week-list"></div>
+    </div>
+
+    <div id="view-month">
+      <div class="weekdays" aria-hidden="true">
+        <span>一</span><span>二</span><span>三</span><span>四</span>
+        <span>五</span><span>六</span><span>日</span>
+      </div>
+      <div class="month-grid" id="month-grid"></div>
+    </div>
+
+    <div id="view-year" hidden>
+      <div class="year-grid" id="year-grid"></div>
+      <p class="year-hint">点标题年份可直接跳转，点月份进入月视图</p>
+    </div>
+  </section>
+
+  <dialog class="picker" id="year-picker" aria-labelledby="year-picker-title">
+    <form class="picker-inner" id="year-form" method="dialog" novalidate>
+      <p class="picker-title" id="year-picker-title">跳转到年份</p>
+      <div class="picker-row">
+        <input type="number" id="year-input" min="1901" max="2100" step="1"
+          inputmode="numeric" autocomplete="off" aria-describedby="year-note">
+        <span class="picker-unit">年</span>
+      </div>
+      <p class="picker-note" id="year-note">范围 1901–2100</p>
+      <div class="picker-actions">
+        <button type="button" class="picker-btn" id="year-cancel">取消</button>
+        <button type="submit" class="picker-btn is-primary">确定</button>
+      </div>
+    </form>
+  </dialog>
+
+  <section class="detail" id="detail" aria-live="polite">
+    <div>
+      <div class="detail-date">
+        <span class="detail-num" id="detail-num">16</span>
+        <span class="detail-week" id="detail-week">周一</span>
+      </div>
+      <p class="detail-full" id="detail-full">2026 年 11 月 16 日</p>
+      <p class="detail-lunar" id="detail-lunar">农历十月初八</p>
+    </div>
+    <div class="detail-meta" id="detail-meta"></div>
+  </section>
+
+  <p class="foot">
+    农历与节气数据覆盖 1901–2100 年；法定节假日取自国务院办公厅通知（2025–2027）。
+  </p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ 数据（由权威历法库生成） ============ */
+  var LUNAR_INFO = [
+    0x4bd8, 0x4ae0, 0xa570, 0x54d5, 0xd260, 0xd950, 0x16554, 0x56a0, 0x9ad0, 0x55d2,
+    0x4ae0, 0xa5b6, 0xa4d0, 0xd250, 0x1d255, 0xb540, 0xd6a0, 0xada2, 0x95b0, 0x14977,
+    0x4970, 0xa4b0, 0xb4b5, 0x6a50, 0x6d40, 0x1ab54, 0x2b60, 0x9570, 0x52f2, 0x4970,
+    0x6566, 0xd4a0, 0xea50, 0x16a95, 0x5ad0, 0x2b60, 0x186e3, 0x92e0, 0x1c8d7, 0xc950,
+    0xd4a0, 0x1d8a6, 0xb550, 0x56a0, 0x1a5b4, 0x25d0, 0x92d0, 0xd2b2, 0xa950, 0xb557,
+    0x6ca0, 0xb550, 0x15355, 0x4da0, 0xa5b0, 0x14573, 0x52b0, 0xa9a8, 0xe950, 0x6aa0,
+    0xaea6, 0xab50, 0x4b60, 0xaae4, 0xa570, 0x5260, 0xf263, 0xd950, 0x5b57, 0x56a0,
+    0x96d0, 0x4dd5, 0x4ad0, 0xa4d0, 0xd4d4, 0xd250, 0xd558, 0xb540, 0xb6a0, 0x195a6,
+    0x95b0, 0x49b0, 0xa974, 0xa4b0, 0xb27a, 0x6a50, 0x6d40, 0xaf46, 0xab60, 0x9570,
+    0x4af5, 0x4970, 0x64b0, 0x74a3, 0xea50, 0x6b58, 0x5ac0, 0xab60, 0x96d5, 0x92e0,
+    0xc960, 0xd954, 0xd4a0, 0xda50, 0x7552, 0x56a0, 0xabb7, 0x25d0, 0x92d0, 0xcab5,
+    0xa950, 0xb4a0, 0xbaa4, 0xad50, 0x55d9, 0x4ba0, 0xa5b0, 0x15176, 0x52b0, 0xa930,
+    0x7954, 0x6aa0, 0xad50, 0x5b52, 0x4b60, 0xa6e6, 0xa4e0, 0xd260, 0xea65, 0xd530,
+    0x5aa0, 0x76a3, 0x96d0, 0x4afb, 0x4ad0, 0xa4d0, 0x1d0b6, 0xd250, 0xd520, 0xdd45,
+    0xb5a0, 0x56d0, 0x55b2, 0x49b0, 0xa577, 0xa4b0, 0xaa50, 0x1b255, 0x6d20, 0xada0,
+    0x14b63, 0x9370, 0x49f8, 0x4970, 0x64b0, 0x168a6, 0xea50, 0x6b20, 0x1a6c4, 0xaae0,
+    0x92e0, 0xd2e3, 0xc960, 0xd557, 0xd4a0, 0xda50, 0x5d55, 0x56a0, 0xa6d0, 0x55d4,
+    0x52d0, 0xa9b8, 0xa950, 0xb4a0, 0xb6a6, 0xad50, 0x55a0, 0xaba4, 0xa5b0, 0x52b0,
+    0xb273, 0x6930, 0x7337, 0x6aa0, 0xad50, 0x14b55, 0x4b60, 0xa570, 0x54e4, 0xd160,
+    0xe968, 0xd520, 0xdaa0, 0x16aa6, 0x56d0, 0x4ae0, 0xa9d4, 0xa2d0, 0xd150, 0xf252,
+    0xd520
+  ];
+  var TERM_DATA = [
+    '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4e4t595p646k6z7f7u898o939i9x', '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x', '070l101f1u292o333j3y4e4u595p656k707f7v8a8p949i9x', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x',
+    '070l101f1u292o333j3y4e4u595p656k707f7v8a8p949i9x', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x', '070l101f1u292o333j3y4e4u595p656k707f7v8a8p939i9x', '060k0z1e1t282n333i3y4d4t595o646k6z7e7u898o939i9w', '060l0z1e1t282n333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1t292o333i3y4e4t595p646k707f7u898o939i9x',
+    '060l101f1u292o333j3y4e4u595p656k707f7u8a8p939i9x', '060k0z1e1t282n333i3x4d4t595o646k6z7e7u898o939i9w', '060l0z1e1t282n333i3y4d4t595p646k6z7f7u898o939i9w', '060l101f1t292o333i3y4e4t595p646k707f7u898o939i9x', '060l101f1u292o333j3y4e4u595p656k707f7u8a8p939i9x', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595p646k6z7f7u898o939i9w', '060l101e1t282o333i3y4e4t595p646k707f7u898o939i9x',
+    '060l101f1u292o333j3y4e4u595p656k707f7u8a8p939i9x', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4e4t595p646k707f7u898o939i9x', '060l101f1u292o333j3y4e4u595p656k707f7u898o939i9x', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4e4t595p646k6z7f7u898o939i9x',
+    '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x',
+    '060l101f1u292o333j3y4e4t595p656k707f7u898o939i9x', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1u292o333i3y4e4t595p656k707f7u898o939i9x', '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n333i3y4d4t595o646k6z7e7u898o939i9w', '060l0z1e1t282n333i3y4d4t595p646k6z7f7u898o939i9x',
+    '060l101f1t292o333i3y4e4t595p646k707f7u898o939i9x', '050k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939i9w', '060l0z1e1t282n333i3y4d4t595p646k6z7f7u898o939i9x', '060l101f1t292o333i3y4e4t595p646k707f7u898o939i9x', '050k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w',
+    '060l101f1t282o333i3y4e4t595p646k707f7u898o939i9x', '050k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4e4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w',
+    '060l101e1t282o333i3y4e4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w',
+    '060l101e1t282o333i3y4d4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323h3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7e7u898o939i9w', '060l101e1t282n333i3y4d4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o939h9w', '060k0z1e1t282n333i3x4d4t595o646k6z7e7u898o939i9w',
+    '060l101e1t282n333i3y4d4t595p646k6z7f7u898o939i9x', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939i9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9x', '050k0z1e1s282n323h3x4d4s585o636j6z7e7t888n929h9w', '050k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t585o646k6z7e7u898o939h9w',
+    '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '050k0z1e1s272n323h3x4d4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '050k0z1d1s272n323h3x4d4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w',
+    '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w',
+    '060l0z1e1t282n333i3y4d4t595o646k6z7f7u898o939i9w', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '060l0z1e1t282n333i3y4d4t595o646k6z7e7u898o939i9w', '050k0z1d1s272m323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o939h9w',
+    '060l0z1e1t282n333i3x4d4t595o646k6z7e7u898o939i9w', '050k0z1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t595o646k6z7e7u898o939i9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1s282n323h3x4d4s585o636j6z7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w',
+    '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939i9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1e1s272n323h3x4d4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w',
+    '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w',
+    '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4t585o646j6z7e7u898o939h9w', '050k0y1d1s272m323h3w4c4s585n636j6y7d7t888n929h9v', '050k0z1d1s272m323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w',
+    '060k0z1e1t282n323i3x4d4t585o646j6z7e7t898o939h9w', '050k0y1d1s272m313h3w4c4s585n636j6y7d7t888n929h9v', '050k0z1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '060k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929h9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1s272n323h3x4d4s585o636j6y7e7t888n929h9w',
+    '050k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929h9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t898o929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1e1s272n323h3x4c4s585o636j6y7e7t888n929h9w',
+    '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323i3x4d4s585o646j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w',
+    '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3w4c4s585n636j6y7d7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7s888n929g9v', '050k0y1d1s272m323h3w4c4s585n636j6y7d7t888n929h9v', '050k0z1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w',
+    '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4s575n636i6y7d7s888n929g9v', '050k0y1d1s272m313h3w4c4s575n636j6y7d7t888n929h9v', '050k0z1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1t282n323h3x4d4s585o636j6z7e7t888n929h9w', '050j0y1d1s272m313h3w4c4r575n636i6y7d7s888n919g9v', '050k0y1d1s272m313h3w4c4s575n636i6y7d7t888n929h9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w',
+    '050k0z1e1s272n323h3x4d4s585o636j6y7e7t888n929h9w', '040j0y1d1s272m313h3w4c4r575n636i6y7d7s888n919g9v', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929h9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9w', '050k0z1e1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '040j0y1d1s272m313h3w4c4r575n636i6y7d7s888n919g9v', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v',
+    '050k0z1e1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '040j0y1d1s272m313h3w4c4r575n636i6y7d7s878m919g9v', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v', '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w', '040j0y1d1s272m313h3w4c4r575n626i6y7d7s878m919g9v', '050j0y1d1s272m313h3w4c4s575n636i6y7d7t888n929g9v', '050k0y1d1s272m323h3x4c4s585n636j6y7e7t888n929h9v',
+    '050k0z1d1s272n323h3x4c4s585o636j6y7e7t888n929h9w'
+  ];
+  var TERM_NAMES = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+  var YEAR_BASE = 1900;
+  var MIN_YEAR = 1901;
+  var MAX_YEAR = 2100;
+
+  var HOLIDAY_RANGES = [
+    ['2025-01-01', '2025-01-01', '元旦'],
+    ['2025-01-28', '2025-02-04', '春节'],
+    ['2025-04-04', '2025-04-06', '清明'],
+    ['2025-05-01', '2025-05-05', '劳动节'],
+    ['2025-05-31', '2025-06-02', '端午'],
+    ['2025-10-01', '2025-10-08', '国庆中秋'],
+    ['2026-01-01', '2026-01-03', '元旦'],
+    ['2026-02-15', '2026-02-23', '春节'],
+    ['2026-04-04', '2026-04-06', '清明'],
+    ['2026-05-01', '2026-05-05', '劳动节'],
+    ['2026-06-19', '2026-06-21', '端午'],
+    ['2026-09-25', '2026-09-27', '中秋'],
+    ['2026-10-01', '2026-10-07', '国庆'],
+    ['2027-01-01', '2027-01-03', '元旦'],
+    ['2027-02-05', '2027-02-13', '春节'],
+    ['2027-04-03', '2027-04-05', '清明'],
+    ['2027-05-01', '2027-05-05', '劳动节'],
+    ['2027-06-09', '2027-06-09', '端午'],
+    ['2027-09-15', '2027-09-15', '中秋'],
+    ['2027-10-01', '2027-10-07', '国庆']
+  ];
+
+  var WORK_DAYS = [
+    ['2025-01-26', '春节调休'], ['2025-02-08', '春节调休'],
+    ['2025-04-27', '劳动节调休'], ['2025-09-28', '国庆调休'], ['2025-10-11', '国庆调休'],
+    ['2026-01-04', '元旦调休'], ['2026-02-14', '春节调休'], ['2026-02-28', '春节调休'],
+    ['2026-05-09', '劳动节调休'], ['2026-09-20', '国庆调休'], ['2026-10-10', '国庆调休'],
+    ['2027-01-31', '春节调休'], ['2027-02-14', '春节调休'],
+    ['2027-05-08', '劳动节调休'], ['2027-09-26', '国庆调休'], ['2027-10-09', '国庆调休']
+  ];
+
+  var WEEK_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  var GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+  var ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  var ZODIAC = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+  var LUNAR_MONTHS = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+
+  var SOLAR_FEST = {
+    '01-01': '元旦', '02-14': '情人节', '03-08': '妇女节', '03-12': '植树节',
+    '05-01': '劳动节', '05-04': '青年节', '06-01': '儿童节', '07-01': '建党节',
+    '08-01': '建军节', '09-10': '教师节', '10-01': '国庆节',
+    '12-24': '平安夜', '12-25': '圣诞节'
+  };
+  var LUNAR_FEST = {
+    '1-1': '春节', '1-15': '元宵', '2-2': '龙头节',
+    '5-5': '端午', '7-7': '七夕', '8-15': '中秋', '9-9': '重阳',
+    '12-8': '腊八', '12-23': '小年'
+  };
+
+  // 年视图月头只标注这四个大节，其余节日留到月视图看
+  var YEAR_FEST = { '春节': 1, '端午': 1, '中秋': 1, '重阳': 1 };
+
+  // [起始月, 起始日, 名称, 符号]；日期早于本月起始日则属于上一宫
+  // 符号后缀 \uFE0E 强制文本呈现，否则 macOS 会渲染成彩色 emoji
+  var STAR_SIGNS = [
+    [1, 20, '水瓶座', '♒\uFE0E'], [2, 19, '双鱼座', '♓\uFE0E'], [3, 21, '白羊座', '♈\uFE0E'],
+    [4, 20, '金牛座', '♉\uFE0E'], [5, 21, '双子座', '♊\uFE0E'], [6, 22, '巨蟹座', '♋\uFE0E'],
+    [7, 23, '狮子座', '♌\uFE0E'], [8, 23, '处女座', '♍\uFE0E'], [9, 23, '天秤座', '♎\uFE0E'],
+    [10, 24, '天蝎座', '♏\uFE0E'], [11, 23, '射手座', '♐\uFE0E'], [12, 22, '摩羯座', '♑\uFE0E']
+  ];
+
+  function starSign(m, d) {
+    var i = d < STAR_SIGNS[m - 1][1] ? (m + 10) % 12 : m - 1;
+    return STAR_SIGNS[i];
+  }
+
+  /* ============ 农历解码 ============ */
+  var monthCache = Object.create(null);
+  var yearDaysCache = Object.create(null);
+  var termCache = Object.create(null);
+
+  function leapMonth(y) { return LUNAR_INFO[y - YEAR_BASE] & 0xf; }
+  function leapDays(y) { return leapMonth(y) ? ((LUNAR_INFO[y - YEAR_BASE] & 0x10000) ? 30 : 29) : 0; }
+  function monthDays(y, m) { return (LUNAR_INFO[y - YEAR_BASE] & (0x10000 >> m)) ? 30 : 29; }
+
+  function yearDays(y) {
+    if (yearDaysCache[y]) return yearDaysCache[y];
+    var sum = 348;
+    for (var i = 0x8000; i > 0x8; i >>= 1) {
+      sum += (LUNAR_INFO[y - YEAR_BASE] & i) ? 1 : 0;
+    }
+    yearDaysCache[y] = sum + leapDays(y);
+    return yearDaysCache[y];
+  }
+
+  function lunarMonths(y) {
+    if (monthCache[y]) return monthCache[y];
+    var leap = leapMonth(y);
+    var list = [];
+    for (var m = 1; m <= 12; m++) {
+      list.push({ month: m, leap: false, days: monthDays(y, m) });
+      if (m === leap) list.push({ month: m, leap: true, days: leapDays(y) });
+    }
+    monthCache[y] = list;
+    return list;
+  }
+
+  function lunarFromDate(y, m, d) {
+    var offset = Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(1900, 0, 31)) / 86400000);
+    var ly = 1900;
+    while (ly < MAX_YEAR && offset >= yearDays(ly)) {
+      offset -= yearDays(ly);
+      ly += 1;
+    }
+    var list = lunarMonths(ly);
+    for (var i = 0; i < list.length; i++) {
+      if (offset < list[i].days) {
+        return {
+          year: ly, month: list[i].month, day: offset + 1,
+          leap: list[i].leap, daysInMonth: list[i].days
+        };
+      }
+      offset -= list[i].days;
+    }
+    return null;
+  }
+
+  function lunarDayName(d) {
+    var n = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    if (d <= 10) return '初' + n[d - 1];
+    if (d < 20) return '十' + n[d - 11];
+    if (d === 20) return '二十';
+    if (d < 30) return '廿' + n[d - 21];
+    return '三十';
+  }
+
+  function lunarMonthName(month, leap) {
+    return (leap ? '闰' : '') + LUNAR_MONTHS[month - 1] + '月';
+  }
+
+  /* ============ 节气 ============ */
+  function dayOfYear(y, m, d) {
+    return Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000) + 1;
+  }
+
+  function termOf(y, m, d) {
+    var line = TERM_DATA[y - YEAR_BASE];
+    if (!line) return null;
+    var map = termCache[y];
+    if (!map) {
+      map = Object.create(null);
+      for (var i = 0; i < 24; i++) {
+        map[parseInt(line.substr(i * 2, 2), 36)] = TERM_NAMES[i];
+      }
+      termCache[y] = map;
+    }
+    return map[dayOfYear(y, m, d)] || null;
+  }
+
+  /* ============ 节假日 ============ */
+  var holidayMap = Object.create(null);
+
+  function parseKey(key) {
+    var p = key.split('-');
+    return { y: Number(p[0]), m: Number(p[1]), d: Number(p[2]) };
+  }
+  function keyOf(y, m, d) {
+    return y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  }
+  function addDays(date, n) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + n, 12);
+  }
+
+  (function buildHolidays() {
+    HOLIDAY_RANGES.forEach(function (row) {
+      var start = parseKey(row[0]);
+      var end = parseKey(row[1]);
+      var cur = new Date(start.y, start.m - 1, start.d, 12);
+      var last = new Date(end.y, end.m - 1, end.d, 12);
+      var first = true;
+      while (cur <= last) {
+        holidayMap[keyOf(cur.getFullYear(), cur.getMonth() + 1, cur.getDate())] = {
+          name: row[2], type: 'off', first: first
+        };
+        first = false;
+        cur = addDays(cur, 1);
+      }
+    });
+    WORK_DAYS.forEach(function (row) {
+      var p = parseKey(row[0]);
+      holidayMap[row[0]] = { name: row[1], type: 'work', first: true, y: p.y, m: p.m, d: p.d };
+    });
+  })();
+
+  function holidayOf(key) { return holidayMap[key] || null; }
+
+  /* ============ 周与日期 ============ */
+  function isoWeek(date) {
+    var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    var day = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - day);
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return { year: d.getUTCFullYear(), week: week };
+  }
+
+  function mondayOf(date) {
+    var day = date.getDay() || 7;
+    return addDays(date, 1 - day);
+  }
+
+  function startOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+  }
+
+  function diffDays(a, b) {
+    var ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    var ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.round((ua - ub) / 86400000);
+  }
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* ============ 单日信息 ============ */
+  var infoCache = Object.create(null);
+
+  function dayInfo(date) {
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    var key = keyOf(y, m, d);
+    if (infoCache[key]) return infoCache[key];
+
+    var lunar = lunarFromDate(y, m, d);
+    var term = termOf(y, m, d);
+    var holiday = holidayOf(key);
+    var festival = null;
+
+    if (lunar) {
+      if (!lunar.leap) {
+        festival = LUNAR_FEST[lunar.month + '-' + lunar.day] || null;
+      }
+      if (!festival && lunar.month === 12 && lunar.day === lunar.daysInMonth) {
+        festival = '除夕';
+      }
+    }
+    if (!festival) {
+      festival = SOLAR_FEST[pad2(m) + '-' + pad2(d)] || null;
+    }
+
+    var week = isoWeek(date);
+    var info = {
+      key: key, date: date, y: y, m: m, d: d,
+      weekday: date.getDay(),
+      lunar: lunar,
+      term: term,
+      holiday: holiday,
+      festival: festival,
+      week: week
+    };
+    infoCache[key] = info;
+    return info;
+  }
+
+  function lunarLine(info) {
+    if (!info.lunar) return '';
+    return lunarMonthName(info.lunar.month, info.lunar.leap) + lunarDayName(info.lunar.day);
+  }
+
+  function subLabel(info) {
+    if (info.term) return { text: info.term, cls: 'is-term' };
+    if (info.festival) return { text: info.festival, cls: 'is-fest' };
+    if (info.holiday && info.holiday.type === 'off' && info.holiday.first) {
+      return { text: info.holiday.name, cls: 'is-fest' };
+    }
+    if (info.lunar) {
+      return {
+        text: info.lunar.day === 1
+          ? lunarMonthName(info.lunar.month, info.lunar.leap)
+          : lunarDayName(info.lunar.day),
+        cls: ''
+      };
+    }
+    return { text: '', cls: '' };
+  }
+
+  /* ============ 状态 ============ */
+  var STORE_KEY = 'ysj-calendar-v1';
+  var state = { view: 'month', date: startOfDay(new Date()) };
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        view: state.view,
+        date: keyOf(state.date.getFullYear(), state.date.getMonth() + 1, state.date.getDate())
+      }));
+    } catch (e) {}
+  }
+
+  function restore() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) {}
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data || typeof data !== 'object') return;
+    if (data.view === 'week' || data.view === 'month' || data.view === 'year') state.view = data.view;
+    if (typeof data.date === 'string') {
+      var p = parseKey(data.date);
+      if (p.y >= MIN_YEAR && p.y <= MAX_YEAR) {
+        var dt = new Date(p.y, p.m - 1, p.d, 12);
+        if (dt.getFullYear() === p.y && dt.getMonth() + 1 === p.m && dt.getDate() === p.d) {
+          state.date = dt;
+        }
+      }
+    }
+  }
+
+  /* ============ DOM ============ */
+  var el = {
+    seg: document.getElementById('view-seg'),
+    prev: document.getElementById('prev'),
+    next: document.getElementById('next'),
+    today: document.getElementById('today'),
+    title: document.getElementById('period-title'),
+    sub: document.getElementById('period-sub'),
+    viewWeek: document.getElementById('view-week'),
+    viewMonth: document.getElementById('view-month'),
+    viewYear: document.getElementById('view-year'),
+    weekList: document.getElementById('week-list'),
+    monthGrid: document.getElementById('month-grid'),
+    yearGrid: document.getElementById('year-grid'),
+    dNum: document.getElementById('detail-num'),
+    dWeek: document.getElementById('detail-week'),
+    dFull: document.getElementById('detail-full'),
+    dLunar: document.getElementById('detail-lunar'),
+    dMeta: document.getElementById('detail-meta'),
+    detail: document.getElementById('detail'),
+    yearPicker: document.getElementById('year-picker'),
+    yearForm: document.getElementById('year-form'),
+    yearInput: document.getElementById('year-input'),
+    yearNote: document.getElementById('year-note'),
+    yearCancel: document.getElementById('year-cancel')
+  };
+
+  var todayKey = keyOf(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+
+  function dayButton(info, opts) {
+    opts = opts || {};
+    var classes = ['day'];
+    if (opts.out) classes.push('is-out');
+    if (info.key === todayKey) classes.push('is-today');
+    if (info.key === keyOf(state.date.getFullYear(), state.date.getMonth() + 1, state.date.getDate())) classes.push('is-selected');
+
+    var sub = subLabel(info);
+    var badge = '';
+    if (info.holiday && info.holiday.type === 'off') badge = '<span class="d-badge off">休</span>';
+    if (info.holiday && info.holiday.type === 'work') badge = '<span class="d-badge work">班</span>';
+
+    return '<button type="button" class="' + classes.join(' ') + '" data-date="' + info.key + '" ' +
+      'aria-label="' + info.y + '年' + info.m + '月' + info.d + '日 ' + WEEK_NAMES[info.weekday] + '">' +
+      '<span class="d-num">' + info.d + '</span>' +
+      '<span class="d-sub ' + sub.cls + '">' + sub.text + '</span>' +
+      badge +
+      '</button>';
+  }
+
+  function renderWeek() {
+    var monday = mondayOf(state.date);
+    var days = [];
+    for (var i = 0; i < 7; i++) days.push(addDays(monday, i));
+
+    var end = days[6];
+    var wk = isoWeek(monday);
+    el.title.textContent = days[0].getMonth() + 1 + ' 月 ' + days[0].getDate() + ' 日 – ' +
+      (end.getMonth() + 1) + ' 月 ' + end.getDate() + ' 日';
+    el.sub.textContent = wk.year + ' 年第 ' + wk.week + ' 周';
+
+    el.weekList.innerHTML = days.map(function (date) {
+      var info = dayInfo(date);
+      var cls = 'week-row';
+      if (info.key === todayKey) cls += ' is-today';
+      if (info.key === keyOf(state.date.getFullYear(), state.date.getMonth() + 1, state.date.getDate())) cls += ' is-selected';
+
+      var sub = subLabel(info);
+      var flag = '';
+      if (info.holiday) {
+        flag = '<span class="badge ' + (info.holiday.type === 'off' ? 'off' : 'work') + '">' +
+          (info.holiday.type === 'off' ? (info.holiday.first ? info.holiday.name : '休') : '班') + '</span>';
+      } else if (info.term) {
+        flag = '<span class="badge" style="background:var(--term-soft);color:var(--term)">' + info.term + '</span>';
+      }
+
+      var extra = info.festival && !info.holiday ? ' · ' + info.festival : '';
+      return '<button type="button" class="' + cls + '" data-date="' + info.key + '">' +
+        '<span class="w-name">' + WEEK_NAMES[info.weekday] + '</span>' +
+        '<span class="w-num">' + info.d + '</span>' +
+        '<span class="w-lunar">' + lunarLine(info) + extra + '</span>' +
+        '<span class="w-flag">' + flag + '</span>' +
+        '</button>';
+    }).join('');
+  }
+
+  function renderMonth() {
+    var y = state.date.getFullYear();
+    var m = state.date.getMonth() + 1;
+    el.title.textContent = y + ' 年 ' + m + ' 月';
+    var wk = isoWeek(state.date);
+    el.sub.textContent = '第 ' + wk.week + ' 周';
+
+    var first = new Date(y, m - 1, 1, 12);
+    var offset = (first.getDay() + 6) % 7;
+    var start = addDays(first, -offset);
+    var cells = [];
+
+    for (var i = 0; i < 42; i++) {
+      var date = addDays(start, i);
+      var info = dayInfo(date);
+      cells.push(dayButton(info, { out: date.getMonth() + 1 !== m }));
+    }
+    el.monthGrid.innerHTML = cells.join('');
+  }
+
+  function renderYear() {
+    var y = state.date.getFullYear();
+    el.title.textContent = y + ' 年';
+    el.sub.textContent = '12 个月';
+
+    var blocks = [];
+    for (var m = 1; m <= 12; m++) {
+      var first = new Date(y, m - 1, 1, 12);
+      var offset = (first.getDay() + 6) % 7;
+      var daysInMonth = new Date(y, m, 0, 12).getDate();
+      var cells = [];
+      for (var i = 0; i < offset; i++) cells.push('<span class="is-empty"></span>');
+
+      var termNames = [];
+      var festNames = [];
+      for (var d = 1; d <= daysInMonth; d++) {
+        var info = dayInfo(new Date(y, m - 1, d, 12));
+        var cls = '';
+        if (info.key === todayKey) cls += ' is-today';
+        if (info.holiday && info.holiday.type === 'off') cls += ' is-off';
+        else if (info.term) cls += ' is-term';
+
+        var tip = m + ' 月 ' + d + ' 日 ' + WEEK_NAMES[info.weekday];
+        if (info.lunar) {
+          tip += ' · 农历' + lunarMonthName(info.lunar.month, info.lunar.leap) + lunarDayName(info.lunar.day);
+        }
+        var label = info.holiday ? info.holiday.name : (info.term || info.festival);
+        if (label) tip += ' · ' + label;
+
+        cells.push('<span class="' + cls + '" data-date="' + info.key + '" title="' + tip + '">' + d + '</span>');
+        if (info.term) termNames.push(info.term);
+        if (info.festival && YEAR_FEST[info.festival] && festNames.indexOf(info.festival) === -1) {
+          festNames.push(info.festival);
+        }
+      }
+
+      var tags = '';
+      if (festNames.length) tags += '<em class="ytag-fest">' + festNames.join(' · ') + '</em>';
+      if (festNames.length && termNames.length) tags += '<span class="ytag-dot">•</span>';
+      if (termNames.length) tags += '<span class="ytag-term">' + termNames.join(' · ') + '</span>';
+      var tagsHtml = tags ? '<span class="ytags">' + tags + '</span>' : '';
+
+      blocks.push('<section class="ymonth">' +
+        '<header data-month="' + m + '"><b>' + m + ' 月</b>' + tagsHtml + '</header>' +
+        '<div class="mini-head"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>' +
+        '<div class="mini">' + cells.join('') + '</div>' +
+        '</section>');
+    }
+    el.yearGrid.innerHTML = blocks.join('');
+  }
+
+  function renderDetail() {
+    var info = dayInfo(state.date);
+    el.dNum.textContent = info.d;
+    el.dWeek.textContent = WEEK_NAMES[info.weekday];
+    el.dFull.textContent = info.y + ' 年 ' + info.m + ' 月 ' + info.d + ' 日';
+
+    var lunar = info.lunar;
+    var line = lunar
+      ? '农历' + lunarMonthName(lunar.month, lunar.leap) + lunarDayName(lunar.day)
+      : '农历 —';
+    if (lunar) {
+      line += ' · ' + GAN[(lunar.year - 4) % 10] + ZHI[(lunar.year - 4) % 12] + ZODIAC[(lunar.year - 4) % 12] + '年';
+    }
+    el.dLunar.textContent = line;
+
+    var chips = [];
+    var wk = info.week;
+    chips.push('<span class="chip">第 ' + wk.week + ' 周</span>');
+    var star = starSign(info.m, info.d);
+    chips.push('<span class="chip sign"><i>' + star[3] + '</i>' + star[2] + '</span>');
+    if (info.term) chips.push('<span class="chip term">' + info.term + '</span>');
+    if (info.holiday) {
+      chips.push('<span class="chip ' + (info.holiday.type === 'off' ? 'off' : '') + '">' +
+        info.holiday.name + (info.holiday.type === 'off' ? ' 休' : ' 班') + '</span>');
+    } else if (info.festival) {
+      chips.push('<span class="chip off">' + info.festival + '</span>');
+    }
+
+    var today = startOfDay(new Date());
+    var delta = diffDays(state.date, today);
+    chips.push('<span class="chip">' + (delta === 0 ? '今天' : (delta > 0 ? delta + ' 天后' : (-delta) + ' 天前')) + '</span>');
+
+    el.dMeta.innerHTML = chips.join('');
+  }
+
+  function render() {
+    el.viewWeek.hidden = state.view !== 'week';
+    el.viewMonth.hidden = state.view !== 'month';
+    el.viewYear.hidden = state.view !== 'year';
+    el.detail.hidden = state.view === 'year';
+
+    var pickable = state.view === 'year';
+    el.title.classList.toggle('is-pick', pickable);
+    el.title.tabIndex = pickable ? 0 : -1;
+    if (pickable) el.title.setAttribute('role', 'button');
+    else el.title.removeAttribute('role');
+
+    Array.prototype.forEach.call(el.seg.querySelectorAll('button'), function (btn) {
+      var on = btn.getAttribute('data-view') === state.view;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', String(on));
+    });
+
+    if (state.view === 'week') renderWeek();
+    else if (state.view === 'month') renderMonth();
+    else renderYear();
+
+    renderDetail();
+    save();
+  }
+
+  /* ============ 交互 ============ */
+  function selectDate(key) {
+    var p = parseKey(key);
+    var dt = new Date(p.y, p.m - 1, p.d, 12);
+    if (dt.getFullYear() < MIN_YEAR || dt.getFullYear() > MAX_YEAR) return;
+    state.date = dt;
+    render();
+  }
+
+  function shift(delta) {
+    if (state.view === 'week') {
+      state.date = addDays(state.date, 7 * delta);
+    } else if (state.view === 'month') {
+      var d = state.date.getDate();
+      var target = new Date(state.date.getFullYear(), state.date.getMonth() + delta, 1, 12);
+      var last = new Date(target.getFullYear(), target.getMonth() + 1, 0, 12).getDate();
+      state.date = new Date(target.getFullYear(), target.getMonth(), Math.min(d, last), 12);
+    } else {
+      var y = state.date.getFullYear() + delta;
+      var m = state.date.getMonth();
+      var day = Math.min(state.date.getDate(), new Date(y, m + 1, 0, 12).getDate());
+      state.date = new Date(y, m, day, 12);
+    }
+    if (state.date.getFullYear() < MIN_YEAR) state.date = new Date(MIN_YEAR, 0, 1, 12);
+    if (state.date.getFullYear() > MAX_YEAR) state.date = new Date(MAX_YEAR, 11, 31, 12);
+    render();
+  }
+
+  el.seg.addEventListener('click', function (event) {
+    var btn = event.target.closest('button[data-view]');
+    if (!btn) return;
+    state.view = btn.getAttribute('data-view');
+    render();
+  });
+
+  el.prev.addEventListener('click', function () { shift(-1); });
+  el.next.addEventListener('click', function () { shift(1); });
+  el.today.addEventListener('click', function () {
+    state.date = startOfDay(new Date());
+    render();
+  });
+
+  el.weekList.addEventListener('click', function (event) {
+    var row = event.target.closest('[data-date]');
+    if (!row) return;
+    selectDate(row.getAttribute('data-date'));
+  });
+
+  el.monthGrid.addEventListener('click', function (event) {
+    var cell = event.target.closest('[data-date]');
+    if (!cell) return;
+    var key = cell.getAttribute('data-date');
+    var p = parseKey(key);
+    if (p.m !== state.date.getMonth() + 1) {
+      state.date = new Date(p.y, p.m - 1, p.d, 12);
+      render();
+      return;
+    }
+    selectDate(key);
+  });
+
+  el.yearGrid.addEventListener('click', function (event) {
+    var day = event.target.closest('.mini [data-date]');
+    if (day) {
+      var p = parseKey(day.getAttribute('data-date'));
+      state.view = 'month';
+      state.date = new Date(p.y, p.m - 1, p.d, 12);
+      render();
+      return;
+    }
+    var head = event.target.closest('header[data-month]');
+    if (head) {
+      var m = Number(head.getAttribute('data-month'));
+      state.view = 'month';
+      state.date = new Date(state.date.getFullYear(), m - 1, 1, 12);
+      render();
+    }
+  });
+
+  /* ---- 年份跳转 ---- */
+  function openYearPicker() {
+    el.yearInput.value = state.date.getFullYear();
+    el.yearNote.textContent = '范围 ' + MIN_YEAR + '–' + MAX_YEAR;
+    el.yearNote.classList.remove('is-error');
+    if (typeof el.yearPicker.showModal === 'function') {
+      if (!el.yearPicker.open) el.yearPicker.showModal();
+    } else {
+      el.yearPicker.setAttribute('open', '');
+    }
+    setTimeout(function () {
+      el.yearInput.focus({ preventScroll: true });
+      if (typeof el.yearInput.select === 'function') el.yearInput.select();
+    }, 30);
+  }
+
+  function closeYearPicker() {
+    if (typeof el.yearPicker.close === 'function') el.yearPicker.close();
+    else el.yearPicker.removeAttribute('open');
+  }
+
+  function applyYear() {
+    var raw = String(el.yearInput.value || '').trim();
+    var y = Number(raw);
+    if (!raw || !isFinite(y) || Math.floor(y) !== y || y < MIN_YEAR || y > MAX_YEAR) {
+      el.yearNote.textContent = '请输入 ' + MIN_YEAR + '–' + MAX_YEAR + ' 之间的整数年份';
+      el.yearNote.classList.add('is-error');
+      el.yearInput.focus({ preventScroll: true });
+      el.yearInput.select();
+      return false;
+    }
+    el.yearNote.classList.remove('is-error');
+    var m = state.date.getMonth();
+    var d = Math.min(state.date.getDate(), new Date(y, m + 1, 0, 12).getDate());
+    state.date = new Date(y, m, d, 12);
+    render();
+    return true;
+  }
+
+  el.title.addEventListener('click', function () {
+    if (state.view !== 'year') return;
+    openYearPicker();
+  });
+
+  el.title.addEventListener('keydown', function (event) {
+    if (state.view !== 'year') return;
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault();
+      openYearPicker();
+    }
+  });
+
+  el.yearForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (applyYear()) closeYearPicker();
+  });
+
+  el.yearCancel.addEventListener('click', closeYearPicker);
+
+  el.yearInput.addEventListener('input', function () {
+    el.yearNote.textContent = '范围 ' + MIN_YEAR + '–' + MAX_YEAR;
+    el.yearNote.classList.remove('is-error');
+  });
+
+  el.yearPicker.addEventListener('click', function (event) {
+    if (event.target === el.yearPicker) closeYearPicker();
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (el.yearPicker.hasAttribute('open')) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key === 'ArrowLeft') { event.preventDefault(); shift(-1); }
+    else if (event.key === 'ArrowRight') { event.preventDefault(); shift(1); }
+    else if (event.key === 't' || event.key === 'T') {
+      state.date = startOfDay(new Date());
+      render();
+    }
+  });
+
+  restore();
+  render();
+})();
+</script>
+</body>
+</html>
