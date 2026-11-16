@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LayoutGrid, List } from "lucide-react";
 
 import type { ToolMeta, ToolViewMode } from "@/types/tool";
@@ -24,6 +24,30 @@ const VIEW_OPTIONS: Array<{
 
 export function ToolDirectory({ tools }: ToolDirectoryProps) {
   const [viewMode, setViewMode] = useState<ToolViewMode>("card");
+  const prefetchedSlugs = useRef<Set<string>>(new Set());
+
+  // 悬念时预取工具页的 iframe 文档，点进去时直接命中缓存；弱网/省流模式跳过
+  const prefetchToolDoc = (slug: string) => {
+    if (!slug || prefetchedSlugs.current.has(slug)) return;
+
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection;
+    if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? "")) return;
+
+    prefetchedSlugs.current.add(slug);
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.setAttribute("as", "document");
+    link.href = `/tools/${slug}/view.html`;
+    document.head.appendChild(link);
+  };
+
+  const handleToolIntent = (event: React.SyntheticEvent<HTMLDivElement>) => {
+    const anchor = (event.target as HTMLElement | null)?.closest?.('a[href^="/tools/"]');
+    const slug = anchor?.getAttribute("href")?.split("/").filter(Boolean)[1];
+    if (slug) prefetchToolDoc(slug);
+  };
 
   // 读取上次选择的展示样式；放在副作用里避免水合不一致
   useEffect(() => {
@@ -81,24 +105,30 @@ export function ToolDirectory({ tools }: ToolDirectoryProps) {
         </div>
       </div>
 
-      {tools.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-          还没有小工具。把 HTML 放到 <code>site/public/tools/&lt;slug&gt;/view.html</code>，
-          再到 <code>site/data/tools.json</code> 登记一条即可。
-        </div>
-      ) : viewMode === "card" ? (
-        <div className="grid gap-5 sm:grid-cols-2">
-          {tools.map((tool) => (
-            <ToolCard key={tool.slug} tool={tool} />
-          ))}
-        </div>
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border">
-          {tools.map((tool) => (
-            <ToolRow key={tool.slug} tool={tool} />
-          ))}
-        </div>
-      )}
+      <div
+        onMouseOver={handleToolIntent}
+        onFocus={handleToolIntent}
+        onPointerDown={handleToolIntent}
+      >
+        {tools.length === 0 ? (
+          <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+            还没有小工具。把 HTML 放到 <code>site/public/tools/&lt;slug&gt;/view.html</code>，
+            再到 <code>site/data/tools.json</code> 登记一条即可。
+          </div>
+        ) : viewMode === "card" ? (
+          <div className="grid gap-5 sm:grid-cols-2">
+            {tools.map((tool) => (
+              <ToolCard key={tool.slug} tool={tool} />
+            ))}
+          </div>
+        ) : (
+          <div className="divide-y overflow-hidden rounded-xl border">
+            {tools.map((tool) => (
+              <ToolRow key={tool.slug} tool={tool} />
+            ))}
+          </div>
+        )}
+      </div>
     </>
   );
 }
