@@ -169,23 +169,8 @@
     font-weight: 500;
     font-variant-numeric: tabular-nums;
   }
-  .period h2.is-pick {
-    padding: 0 2px 1px;
-    border-bottom: 1px dashed color-mix(in srgb, var(--faint) 65%, transparent);
-    cursor: pointer;
-    transition: color .15s ease, border-color .15s ease;
-  }
-  .period h2.is-pick::after {
-    content: "▾";
-    margin-left: 5px;
-    font-size: 10px;
-    color: var(--faint);
-  }
-  .period h2.is-pick:hover {
-    color: var(--accent-ink);
-    border-bottom-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  }
-  .period h2.is-pick:hover::after { color: var(--accent-ink); }
+  /* 年视图标题可点开年份弹层，但外观与普通标题一致，只保留手型光标 */
+  .period h2.is-pick { cursor: pointer; }
   .pill {
     padding: 1px 8px;
     border-radius: 999px;
@@ -596,6 +581,31 @@
     color: var(--faint);
   }
   .picker-note.is-error { color: var(--holiday); }
+  .picker-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 11px;
+  }
+  .picker-quick:empty { display: none; }
+  .picker-chip {
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 22px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .picker-chip:hover { color: var(--ink); border-color: var(--border); }
+  .picker-chip.is-on {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
   .picker-actions {
     display: flex;
     justify-content: flex-end;
@@ -677,6 +687,7 @@
         <span class="picker-unit">年</span>
       </div>
       <p class="picker-note" id="year-note">范围 1901–2100</p>
+      <div class="picker-quick" id="year-quick" role="group" aria-label="常用年份"></div>
       <div class="picker-actions">
         <button type="button" class="picker-btn" id="year-cancel">取消</button>
         <button type="submit" class="picker-btn is-primary">确定</button>
@@ -774,6 +785,7 @@
   var YEAR_BASE = 1900;
   var MIN_YEAR = 1901;
   var MAX_YEAR = 2100;
+  var YEAR_PRESETS = [1970, 1990, 1997, 2000, 2020, 2050, 2070, 2090];
 
   var HOLIDAY_RANGES = [
     ['2025-01-01', '2025-01-01', '元旦'],
@@ -1379,8 +1391,14 @@
     yearForm: document.getElementById('year-form'),
     yearInput: document.getElementById('year-input'),
     yearNote: document.getElementById('year-note'),
-    yearCancel: document.getElementById('year-cancel')
+    yearCancel: document.getElementById('year-cancel'),
+    yearQuick: document.getElementById('year-quick')
   };
+
+  el.yearQuick.innerHTML = YEAR_PRESETS.map(function (year) {
+    return '<button type="button" class="picker-chip" data-year="' + year + '" ' +
+      'aria-label="填入 ' + year + ' 年">' + year + '</button>';
+  }).join('');
 
   var todayKey = keyOf(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
 
@@ -1760,6 +1778,7 @@
     el.yearInput.value = state.date.getFullYear();
     el.yearNote.textContent = '范围 ' + MIN_YEAR + '–' + MAX_YEAR;
     el.yearNote.classList.remove('is-error');
+    syncYearQuick();
     if (typeof el.yearPicker.showModal === 'function') {
       if (!el.yearPicker.open) el.yearPicker.showModal();
     } else {
@@ -1774,6 +1793,13 @@
   function closeYearPicker() {
     if (typeof el.yearPicker.close === 'function') el.yearPicker.close();
     else el.yearPicker.removeAttribute('open');
+  }
+
+  function syncYearQuick() {
+    var value = String(el.yearInput.value || '').trim();
+    Array.prototype.forEach.call(el.yearQuick.querySelectorAll('button[data-year]'), function (btn) {
+      btn.classList.toggle('is-on', btn.getAttribute('data-year') === value);
+    });
   }
 
   function applyYear() {
@@ -1814,9 +1840,20 @@
 
   el.yearCancel.addEventListener('click', closeYearPicker);
 
+  el.yearQuick.addEventListener('click', function (event) {
+    var chip = event.target.closest('button[data-year]');
+    if (!chip) return;
+    el.yearInput.value = chip.getAttribute('data-year');
+    el.yearNote.textContent = '范围 ' + MIN_YEAR + '–' + MAX_YEAR;
+    el.yearNote.classList.remove('is-error');
+    syncYearQuick();
+    el.yearInput.focus({ preventScroll: true });
+  });
+
   el.yearInput.addEventListener('input', function () {
     el.yearNote.textContent = '范围 ' + MIN_YEAR + '–' + MAX_YEAR;
     el.yearNote.classList.remove('is-error');
+    syncYearQuick();
   });
 
   el.yearPicker.addEventListener('click', function (event) {
