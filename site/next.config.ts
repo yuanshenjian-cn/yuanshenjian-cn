@@ -1,14 +1,14 @@
 import type { NextConfig } from "next";
 
-// dev 与生产构建分开输出：next dev 写 .next，next build/export 写 dist。
-// 共用同一个目录时，构建会覆盖 dev 正在使用的 manifests 和 webpack chunks，
-// 导致运行中的 dev server 出现 routes-manifest.json / vendor-chunks 缺失的 500。
+// output: "export" 且 distDir 不是 .next 时，Next 会把 distDir 当作最终导出目录，
+// 内部编译产物仍然写入 .next。因此 dev 必须使用独立的 .next-dev，
+// 否则 next dev 与 next build 会同时读写 .next，dev 写入的 prerender 路由会污染构建导出。
 const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
   output: "export",
-  distDir: isDev ? ".next" : "dist",
-  cleanDistDir: false,
+  distDir: isDev ? ".next-dev" : "dist",
+  cleanDistDir: true,
   basePath: "",
   experimental: {
     externalDir: true,

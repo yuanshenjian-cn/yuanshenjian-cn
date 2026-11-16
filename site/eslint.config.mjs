@@ -14,6 +14,7 @@ export default defineConfig([
   {
     ignores: [
       ".next/**",
+      ".next-dev/**",
       "dist/**",
       "node_modules/**",
       "public/**",
