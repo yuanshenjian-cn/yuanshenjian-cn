@@ -204,6 +204,88 @@
     transition: transform .2s ease;
   }
   .card-head[aria-expanded="false"] .caret { transform: rotate(-90deg); }
+  #input-summary {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* ---- 分栏 tab ---- */
+  .tabs {
+    display: flex;
+    gap: 3px;
+    margin-top: 12px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .tabs [role="tab"] {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 30px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .tabs [role="tab"]:hover:not([aria-selected="true"]) {
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    color: var(--ink);
+  }
+  .tabs [role="tab"][aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  /* 每个分栏的首张卡都留出与 tabs 的间距（三个分栏保持一致） */
+  [role="tabpanel"] > .card:first-child {
+    margin-top: 12px;
+  }
+  /* 分栏之后的常驻卡（指标解读）与上方内容拉开距离，避免糊成一块 */
+  [role="tabpanel"] + .card {
+    margin-top: 22px;
+  }
+  .field-group-label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 14px 0 8px;
+    padding: 12px 2px 0;
+    border: 0;
+    border-top: 1px solid var(--border-soft);
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+  .field-group-label small {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .field-group-label .caret {
+    flex: none;
+    margin-left: 8px;
+    color: var(--muted);
+    transform: rotate(0deg);
+    transition: transform .2s ease;
+  }
+  .field-group-label[aria-expanded="false"] .caret {
+    transform: rotate(-90deg);
+  }
 
   /* ---- 输入 ---- */
   .fields {
@@ -897,401 +979,418 @@
     <h1 class="title">身体指标</h1>
   </header>
 
-  <!-- 基础数据 -->
-  <section class="card" aria-label="身体基础数据">
-    <div class="card-head">
-      <span class="card-title">身体基础</span>
-      <span class="card-total" id="base-summary">30 岁 · 172 cm · 68 kg</span>
-    </div>
-    <div class="fields">
-      <div class="chips is-wide" id="sex-chips" role="group" aria-label="性别">
-        <button type="button" class="chip" data-sex="male" aria-pressed="true">男</button>
-        <button type="button" class="chip" data-sex="female" aria-pressed="false">女</button>
-      </div>
-
-      <div class="row">
-        <label class="row-label" for="age">年龄</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="age" data-step="-1"
-                  aria-label="年龄减少 1 岁">−</button>
-          <span class="row-value">
-            <input id="age" class="num is-narrow" type="number" inputmode="numeric"
-                   min="14" max="100" step="1" value="30" aria-label="年龄，单位岁">
-            <span class="unit">岁</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="age" data-step="1"
-                  aria-label="年龄增加 1 岁">+</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <label class="row-label" for="height">身高</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="height" data-step="-1"
-                  aria-label="身高减少 1 厘米">−</button>
-          <span class="row-value">
-            <input id="height" class="num" type="number" inputmode="decimal"
-                   min="120" max="230" step="1" value="172" aria-label="身高，单位厘米">
-            <span class="unit">cm</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="height" data-step="1"
-                  aria-label="身高增加 1 厘米">+</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <label class="row-label" for="weight">体重</label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="weight" data-step="-0.5"
-                  aria-label="体重减少 0.5 公斤">−</button>
-          <span class="row-value">
-            <input id="weight" class="num" type="number" inputmode="decimal"
-                   min="30" max="200" step="0.5" value="68" aria-label="体重，单位公斤">
-            <span class="unit">kg</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="weight" data-step="0.5"
-                  aria-label="体重增加 0.5 公斤">+</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 补充数据 -->
-  <section class="card" aria-label="补充数据">
-    <button type="button" class="card-head is-button" id="optional-toggle"
-            aria-expanded="true" aria-controls="optional-body">
-      <span class="card-title">补充数据</span>
-      <span class="card-total" id="optional-summary">留空则自动估算</span>
+  <!-- 我的数据（可折叠，收起后只显示一行摘要） -->
+  <section class="card" aria-label="我的数据">
+    <button type="button" class="card-head is-button" id="input-toggle"
+            aria-expanded="true" aria-controls="input-body">
+      <span class="card-title">我的数据</span>
+      <span class="card-total" id="input-summary">30 岁 · 172 cm · 68 kg</span>
       <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
            stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
     </button>
-    <div class="fields" id="optional-body">
-      <div class="row">
-        <label class="row-label" for="bodyfat">体脂率 <span class="label-unit">可选</span></label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="bodyfat" data-step="-1"
-                  aria-label="体脂率减少 1 个百分点">−</button>
-          <span class="row-value">
-            <input id="bodyfat" class="num" type="number" inputmode="decimal"
-                   min="2" max="60" step="0.5" placeholder="自动" aria-label="体脂率，单位百分比">
-            <span class="unit">%</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="bodyfat" data-step="1"
-                  aria-label="体脂率增加 1 个百分点">+</button>
+
+    <div id="input-body">
+      <div class="fields">
+        <div class="chips is-wide" id="sex-chips" role="group" aria-label="性别">
+          <button type="button" class="chip" data-sex="male" aria-pressed="true">男</button>
+          <button type="button" class="chip" data-sex="female" aria-pressed="false">女</button>
+        </div>
+
+        <div class="row">
+          <label class="row-label" for="age">年龄</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="age" data-step="-1"
+                    aria-label="年龄减少 1 岁">−</button>
+            <span class="row-value">
+              <input id="age" class="num is-narrow" type="number" inputmode="numeric"
+                     min="14" max="100" step="1" value="30" aria-label="年龄，单位岁">
+              <span class="unit">岁</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="age" data-step="1"
+                    aria-label="年龄增加 1 岁">+</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="row-label" for="height">身高</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="height" data-step="-1"
+                    aria-label="身高减少 1 厘米">−</button>
+            <span class="row-value">
+              <input id="height" class="num" type="number" inputmode="decimal"
+                     min="120" max="230" step="1" value="172" aria-label="身高，单位厘米">
+              <span class="unit">cm</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="height" data-step="1"
+                    aria-label="身高增加 1 厘米">+</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="row-label" for="weight">体重</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="weight" data-step="-0.5"
+                    aria-label="体重减少 0.5 公斤">−</button>
+            <span class="row-value">
+              <input id="weight" class="num" type="number" inputmode="decimal"
+                     min="30" max="200" step="0.5" value="68" aria-label="体重，单位公斤">
+              <span class="unit">kg</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="weight" data-step="0.5"
+                    aria-label="体重增加 0.5 公斤">+</button>
+          </div>
         </div>
       </div>
 
-      <div class="row">
-        <label class="row-label" for="waist">腰围 <span class="label-unit">可选</span></label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="waist" data-step="-1"
-                  aria-label="腰围减少 1 厘米">−</button>
-          <span class="row-value">
-            <input id="waist" class="num" type="number" inputmode="decimal"
-                   min="40" max="160" step="0.5" placeholder="—" aria-label="腰围，单位厘米">
-            <span class="unit">cm</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="waist" data-step="1"
-                  aria-label="腰围增加 1 厘米">+</button>
-        </div>
-      </div>
+      <button type="button" class="field-group-label" id="optional-toggle"
+              aria-expanded="false" aria-controls="optional-body">
+        <span>补充数据</span>
+        <small id="optional-summary">留空则自动估算</small>
+        <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
 
-      <div class="row">
-        <label class="row-label" for="hip">臀围 <span class="label-unit">可选</span></label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="hip" data-step="-1"
-                  aria-label="臀围减少 1 厘米">−</button>
-          <span class="row-value">
-            <input id="hip" class="num" type="number" inputmode="decimal"
-                   min="60" max="160" step="0.5" placeholder="—" aria-label="臀围，单位厘米">
-            <span class="unit">cm</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="hip" data-step="1"
-                  aria-label="臀围增加 1 厘米">+</button>
+      <div class="fields" id="optional-body" hidden>
+        <div class="row">
+          <label class="row-label" for="bodyfat">体脂率 <span class="label-unit">可选</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="bodyfat" data-step="-1"
+                    aria-label="体脂率减少 1 个百分点">−</button>
+            <span class="row-value">
+              <input id="bodyfat" class="num" type="number" inputmode="decimal"
+                     min="2" max="60" step="0.5" placeholder="自动" aria-label="体脂率，单位百分比">
+              <span class="unit">%</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="bodyfat" data-step="1"
+                    aria-label="体脂率增加 1 个百分点">+</button>
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <label class="row-label" for="rhr">静息心率 <span class="label-unit">可选</span></label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="rhr" data-step="-1"
-                  aria-label="静息心率减少 1 次">−</button>
-          <span class="row-value">
-            <input id="rhr" class="num is-narrow" type="number" inputmode="numeric"
-                   min="30" max="120" step="1" placeholder="—" aria-label="静息心率，单位次每分钟">
-            <span class="unit">bpm</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="rhr" data-step="1"
-                  aria-label="静息心率增加 1 次">+</button>
+        <div class="row">
+          <label class="row-label" for="waist">腰围 <span class="label-unit">可选</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="waist" data-step="-1"
+                    aria-label="腰围减少 1 厘米">−</button>
+            <span class="row-value">
+              <input id="waist" class="num" type="number" inputmode="decimal"
+                     min="40" max="160" step="0.5" placeholder="—" aria-label="腰围，单位厘米">
+              <span class="unit">cm</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="waist" data-step="1"
+                    aria-label="腰围增加 1 厘米">+</button>
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <label class="row-label" for="grip">握力 <span class="label-unit">可选</span></label>
-        <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="grip" data-step="-1"
-                  aria-label="握力减少 1 公斤">−</button>
-          <span class="row-value">
-            <input id="grip" class="num is-narrow" type="number" inputmode="decimal"
-                   min="5" max="90" step="0.5" placeholder="—" aria-label="握力，单位公斤">
-            <span class="unit">kg</span>
-          </span>
-          <button type="button" class="step-btn" data-step-target="grip" data-step="1"
-                   aria-label="握力增加 1 公斤">+</button>
+        <div class="row">
+          <label class="row-label" for="hip">臀围 <span class="label-unit">可选</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="hip" data-step="-1"
+                    aria-label="臀围减少 1 厘米">−</button>
+            <span class="row-value">
+              <input id="hip" class="num" type="number" inputmode="decimal"
+                     min="60" max="160" step="0.5" placeholder="—" aria-label="臀围，单位厘米">
+              <span class="unit">cm</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="hip" data-step="1"
+                    aria-label="臀围增加 1 厘米">+</button>
+          </div>
         </div>
-      </div>
 
-      <p class="hint" style="margin-top:2px;padding-top:8px;border-top-style:solid">
-        体脂率留空按 <b>Deurenberg 公式</b>由 BMI 与年龄推算；腰围、臀围、静息心率、握力留空则跳过对应评估。体脂秤读数受水分影响，<b>看趋势比看单次更可靠</b>。
-      </p>
-      <p class="hint" id="grip-note" hidden style="margin-top:0;padding-top:0;border-top:0"></p>
+        <div class="row">
+          <label class="row-label" for="rhr">静息心率 <span class="label-unit">可选</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="rhr" data-step="-1"
+                    aria-label="静息心率减少 1 次">−</button>
+            <span class="row-value">
+              <input id="rhr" class="num is-narrow" type="number" inputmode="numeric"
+                     min="30" max="120" step="1" placeholder="—" aria-label="静息心率，单位次每分钟">
+              <span class="unit">bpm</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="rhr" data-step="1"
+                    aria-label="静息心率增加 1 次">+</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="row-label" for="grip">握力 <span class="label-unit">可选</span></label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step-target="grip" data-step="-1"
+                    aria-label="握力减少 1 公斤">−</button>
+            <span class="row-value">
+              <input id="grip" class="num is-narrow" type="number" inputmode="decimal"
+                     min="5" max="90" step="0.5" placeholder="—" aria-label="握力，单位公斤">
+              <span class="unit">kg</span>
+            </span>
+            <button type="button" class="step-btn" data-step-target="grip" data-step="1"
+                     aria-label="握力增加 1 公斤">+</button>
+          </div>
+        </div>
+
+        <p class="hint" style="margin-top:2px;padding-top:8px;border-top-style:solid">
+          体脂率留空按 <b>Deurenberg 公式</b>由 BMI 与年龄推算；腰围、臀围、静息心率、握力留空则跳过对应评估。体脂秤读数受水分影响，<b>看趋势比看单次更可靠</b>。
+        </p>
+        <p class="hint" id="grip-note" hidden style="margin-top:0;padding-top:0;border-top:0"></p>
+      </div>
     </div>
   </section>
 
-  <!-- 身体概览 -->
-  <section class="card" aria-label="BMI 与身体成分">
-    <div class="result">
-      <p class="result-label">BMI · 身体质量指数</p>
-      <p class="result-value" id="bmi-value">23.0</p>
-      <p class="result-note" id="bmi-note"><span class="grade ok">正常</span> 中国标准 18.5–23.9</p>
-    </div>
+  <!-- 指标分栏 -->
+  <div class="tabs" id="tabs" role="tablist" aria-label="指标分类">
+    <button type="button" role="tab" id="tab-body" data-tab="body"
+            aria-selected="true" aria-controls="panel-body">身体成分</button>
+    <button type="button" role="tab" id="tab-cardio" data-tab="cardio"
+            aria-selected="false" aria-controls="panel-cardio" tabindex="-1">心肺心率</button>
+    <button type="button" role="tab" id="tab-meta" data-tab="meta"
+            aria-selected="false" aria-controls="panel-meta" tabindex="-1">代谢营养</button>
+  </div>
 
-    <div class="scale">
-      <div class="scale-track">
-        <span class="scale-seg under" style="width:20.45%"></span>
-        <span class="scale-seg ideal" style="width:25%"></span>
-        <span class="scale-seg over" style="width:18.18%"></span>
-        <span class="scale-seg high" style="width:36.37%"></span>
-        <span class="scale-pin" id="bmi-pin" style="left:41%"></span>
-      </div>
-      <div class="scale-labels">
-        <span style="width:20.45%">偏瘦</span>
-        <span style="width:25%">正常</span>
-        <span style="width:18.18%">超重</span>
-        <span style="width:36.37%">肥胖</span>
-      </div>
-    </div>
-
-    <dl class="metrics">
-      <div class="metric">
-        <dt id="bf-label">体脂率</dt>
-        <dd id="bf-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>去脂体重</dt>
-        <dd id="lbm-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>FFMI</dt>
-        <dd id="ffmi-value">—</dd>
-      </div>
-    </dl>
-
-    <p class="hint" id="bmi-hint">
-      理想体重区间 <b>54.7–70.7 kg</b>（BMI 18.5–23.9）。BMI 不区分肌肉与脂肪，肌肉量大的人容易被误判。
-    </p>
-  </section>
-
-  <!-- 心肺适能 -->
-  <section class="card" aria-label="心肺适能">
-    <div class="card-head">
-      <span class="card-title">心肺适能 VO₂max</span>
-      <span class="card-total" id="vo2-status">需静息心率</span>
-    </div>
-
-    <div class="empty" id="vo2-empty">
-      <p class="empty-text">晨起静卧测 1 分钟静息心率，填入即可估算最大摄氧量，这是预测长期健康最强的单一指标。</p>
-      <button type="button" class="empty-action" id="rhr-jump">去填心率</button>
-    </div>
-
-    <div id="vo2-body" hidden>
+  <div id="panel-body" role="tabpanel" aria-labelledby="tab-body">
+    <section class="card" aria-label="BMI 与身体成分">
       <div class="result">
-        <p class="result-label">估算最大摄氧量 · mL/kg/min</p>
-        <p class="result-value"><span id="vo2-value">—</span></p>
-        <p class="result-note" id="vo2-note"><span class="grade ok">良好</span> 同龄男性</p>
-      </div>
-      <p class="hint" id="vo2-hint">
-        Uth 公式 15.3 × HRmax ÷ 静息心率，仅适用于安静状态下的粗略估算，误差约 ±10–15%。
-      </p>
-    </div>
-  </section>
-
-  <!-- 心率 -->
-  <section class="card" aria-label="心率与训练强度">
-    <div class="card-head">
-      <span class="card-title">心率与训练强度</span>
-      <span class="card-total" id="hr-mode">按最大心率估算</span>
-    </div>
-
-    <div class="result">
-      <p class="result-label">最大心率 HRmax</p>
-      <p class="result-value"><span id="hrmax-value">187</span><span class="u">bpm</span></p>
-      <p class="result-note" id="hrmax-note">Tanaka 公式 208 − 0.7 × 年龄 · 个体误差约 ±10 bpm</p>
-    </div>
-
-    <dl class="metrics">
-      <div class="metric">
-        <dt>静息心率</dt>
-        <dd id="rhr-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>心率储备</dt>
-        <dd id="hrr-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>无氧区起点</dt>
-        <dd id="anaerobe-value">150</dd>
-      </div>
-    </dl>
-
-    <ul class="zones" id="zones"></ul>
-
-    <p class="hint" id="hr-hint">
-      五区按<b>最大心率百分比</b>划分。填入静息心率后自动改用<b>心率储备法（Karvonen）</b>，区间会更贴合个人。
-    </p>
-  </section>
-
-  <!-- 脂肪分布 -->
-  <section class="card" aria-label="脂肪分布">
-    <div class="card-head">
-      <span class="card-title">脂肪分布</span>
-      <span class="card-total" id="waist-status">未填腰围</span>
-    </div>
-
-    <div class="empty" id="waist-empty">
-      <p class="empty-text">肚子上的脂肪分两层，包住器官的那层才伤代谢。腰围能粗略看出它多不多。</p>
-      <button type="button" class="empty-action" id="waist-jump">去填腰围</button>
-    </div>
-
-    <div id="waist-body" hidden>
-      <div class="result">
-        <p class="result-label">腰高比 WHtR</p>
-        <p class="result-value" id="whtr-value">0.47</p>
-        <p class="result-note" id="whtr-note"><span class="grade ok">理想</span> 腰围小于身高一半</p>
+        <p class="result-label">BMI · 身体质量指数</p>
+        <p class="result-value" id="bmi-value">23.0</p>
+        <p class="result-note" id="bmi-note"><span class="grade ok">正常</span> 中国标准 18.5–23.9</p>
       </div>
 
       <div class="scale">
         <div class="scale-track">
-          <span class="scale-seg under" style="width:12.5%"></span>
+          <span class="scale-seg under" style="width:20.45%"></span>
           <span class="scale-seg ideal" style="width:25%"></span>
-          <span class="scale-seg over" style="width:25%"></span>
-          <span class="scale-seg high" style="width:37.5%"></span>
-          <span class="scale-pin" id="whtr-pin" style="left:30%"></span>
+          <span class="scale-seg over" style="width:18.18%"></span>
+          <span class="scale-seg high" style="width:36.37%"></span>
+          <span class="scale-pin" id="bmi-pin" style="left:41%"></span>
         </div>
         <div class="scale-labels">
-          <span style="width:12.5%">偏瘦</span>
-          <span style="width:25%">理想</span>
-          <span style="width:25%">偏高</span>
-          <span style="width:37.5%">高风险</span>
+          <span style="width:20.45%">偏瘦</span>
+          <span style="width:25%">正常</span>
+          <span style="width:18.18%">超重</span>
+          <span style="width:36.37%">肥胖</span>
         </div>
       </div>
 
       <dl class="metrics">
         <div class="metric">
-          <dt>腰围</dt>
-          <dd id="waist-value">—</dd>
+          <dt id="bf-label">体脂率</dt>
+          <dd id="bf-value">—</dd>
         </div>
         <div class="metric">
-          <dt>中国参考上限</dt>
-          <dd id="waist-limit">—</dd>
+          <dt>去脂体重</dt>
+          <dd id="lbm-value">—</dd>
         </div>
         <div class="metric">
-          <dt>判定</dt>
-          <dd id="waist-verdict">—</dd>
+          <dt>FFMI</dt>
+          <dd id="ffmi-value">—</dd>
         </div>
       </dl>
 
-      <div class="card-sub" id="whr-body" hidden>
+      <p class="hint" id="bmi-hint">
+        理想体重区间 <b>54.7–70.7 kg</b>（BMI 18.5–23.9）。BMI 不区分肌肉与脂肪，肌肉量大的人容易被误判。
+      </p>
+    </section>
+
+    <section class="card" aria-label="脂肪分布">
+      <div class="card-head">
+        <span class="card-title">脂肪分布</span>
+        <span class="card-total" id="waist-status">未填腰围</span>
+      </div>
+
+      <div class="empty" id="waist-empty">
+        <p class="empty-text">肚子上的脂肪分两层，包住器官的那层才伤代谢。腰围能粗略看出它多不多。</p>
+        <button type="button" class="empty-action" id="waist-jump">填腰围</button>
+      </div>
+
+      <div id="waist-body" hidden>
         <div class="result">
-          <p class="result-label">腰臀比 WHR</p>
-          <p class="result-value" id="whr-value">0.86</p>
-          <p class="result-note" id="whr-note">—</p>
+          <p class="result-label">腰高比 WHtR</p>
+          <p class="result-value" id="whtr-value">0.47</p>
+          <p class="result-note" id="whtr-note"><span class="grade ok">理想</span> 腰围小于身高一半</p>
         </div>
 
-        <div class="scale" id="whr-scale">
+        <div class="scale">
           <div class="scale-track">
-            <span class="scale-seg ideal" id="whr-seg-ideal" style="width:50%"></span>
-            <span class="scale-seg over" id="whr-seg-over" style="width:20%"></span>
-            <span class="scale-seg high" id="whr-seg-high" style="width:30%"></span>
-            <span class="scale-pin" id="whr-pin" style="left:42%"></span>
+            <span class="scale-seg under" style="width:12.5%"></span>
+            <span class="scale-seg ideal" style="width:25%"></span>
+            <span class="scale-seg over" style="width:25%"></span>
+            <span class="scale-seg high" style="width:37.5%"></span>
+            <span class="scale-pin" id="whtr-pin" style="left:30%"></span>
           </div>
           <div class="scale-labels">
-            <span id="whr-lab-ideal" style="width:50%">理想</span>
-            <span id="whr-lab-over" style="width:20%">偏高</span>
-            <span style="width:30%">高风险</span>
+            <span style="width:12.5%">偏瘦</span>
+            <span style="width:25%">理想</span>
+            <span style="width:25%">偏高</span>
+            <span style="width:37.5%">高风险</span>
           </div>
+        </div>
+
+        <dl class="metrics">
+          <div class="metric">
+            <dt>腰围</dt>
+            <dd id="waist-value">—</dd>
+          </div>
+          <div class="metric">
+            <dt>中国参考上限</dt>
+            <dd id="waist-limit">—</dd>
+          </div>
+          <div class="metric">
+            <dt>判定</dt>
+            <dd id="waist-verdict">—</dd>
+          </div>
+        </dl>
+
+        <div class="card-sub" id="whr-body" hidden>
+          <div class="result">
+            <p class="result-label">腰臀比 WHR</p>
+            <p class="result-value" id="whr-value">0.86</p>
+            <p class="result-note" id="whr-note">—</p>
+          </div>
+
+          <div class="scale" id="whr-scale">
+            <div class="scale-track">
+              <span class="scale-seg ideal" id="whr-seg-ideal" style="width:50%"></span>
+              <span class="scale-seg over" id="whr-seg-over" style="width:20%"></span>
+              <span class="scale-seg high" id="whr-seg-high" style="width:30%"></span>
+              <span class="scale-pin" id="whr-pin" style="left:42%"></span>
+            </div>
+            <div class="scale-labels">
+              <span id="whr-lab-ideal" style="width:50%">理想</span>
+              <span id="whr-lab-over" style="width:20%">偏高</span>
+              <span style="width:30%">高风险</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty is-sub" id="whr-empty" hidden>
+          <p class="empty-text">再量一个臀围，就能看出脂肪是偏腰还是偏臀。</p>
+          <button type="button" class="empty-action" id="whr-jump">填臀围</button>
+        </div>
+
+        <p class="hint" id="waist-hint">
+          量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="panel-cardio" role="tabpanel" aria-labelledby="tab-cardio" hidden>
+    <section class="card" aria-label="心肺适能">
+      <div class="card-head">
+        <span class="card-title">心肺适能 VO₂max</span>
+        <span class="card-total" id="vo2-status">需静息心率</span>
+      </div>
+
+      <div class="empty" id="vo2-empty">
+        <p class="empty-text">晨起静卧测 1 分钟静息心率，填入即可估算最大摄氧量，这是预测长期健康最强的单一指标。</p>
+        <button type="button" class="empty-action" id="rhr-jump">填心率</button>
+      </div>
+
+      <div id="vo2-body" hidden>
+        <div class="result">
+          <p class="result-label">估算最大摄氧量 · mL/kg/min</p>
+          <p class="result-value"><span id="vo2-value">—</span></p>
+          <p class="result-note" id="vo2-note"><span class="grade ok">良好</span> 同龄男性</p>
+        </div>
+        <p class="hint" id="vo2-hint">
+          Uth 公式 15.3 × HRmax ÷ 静息心率，仅适用于安静状态下的粗略估算，误差约 ±10–15%。
+        </p>
+      </div>
+    </section>
+
+    <section class="card" aria-label="心率与训练强度">
+      <div class="card-head">
+        <span class="card-title">心率与训练强度</span>
+        <span class="card-total" id="hr-mode">按最大心率估算</span>
+      </div>
+
+      <div class="result">
+        <p class="result-label">最大心率 HRmax</p>
+        <p class="result-value"><span id="hrmax-value">187</span><span class="u">bpm</span></p>
+        <p class="result-note" id="hrmax-note">Tanaka 公式 208 − 0.7 × 年龄 · 个体误差约 ±10 bpm</p>
+      </div>
+
+      <dl class="metrics">
+        <div class="metric">
+          <dt>静息心率</dt>
+          <dd id="rhr-value">—</dd>
+        </div>
+        <div class="metric">
+          <dt>心率储备</dt>
+          <dd id="hrr-value">—</dd>
+        </div>
+        <div class="metric">
+          <dt>无氧区起点</dt>
+          <dd id="anaerobe-value">150</dd>
+        </div>
+      </dl>
+
+      <ul class="zones" id="zones"></ul>
+
+      <p class="hint" id="hr-hint">
+        五区按<b>最大心率百分比</b>划分。填入静息心率后自动改用<b>心率储备法（Karvonen）</b>，区间会更贴合个人。
+      </p>
+    </section>
+
+  </div>
+
+  <div id="panel-meta" role="tabpanel" aria-labelledby="tab-meta" hidden>
+    <section class="card" aria-label="代谢与营养">
+      <div class="card-head">
+        <span class="card-title">代谢与营养</span>
+        <span class="card-total" id="tdee-status">轻度活动</span>
+      </div>
+
+      <div class="chips" id="activity-chips" role="group" aria-label="日常活动量">
+        <button type="button" class="chip" data-activity="sedentary" aria-pressed="false">久坐<small>1.2</small></button>
+        <button type="button" class="chip" data-activity="light" aria-pressed="true">轻度<small>1.375</small></button>
+        <button type="button" class="chip" data-activity="moderate" aria-pressed="false">中度<small>1.55</small></button>
+        <button type="button" class="chip" data-activity="high" aria-pressed="false">高强度<small>1.725</small></button>
+      </div>
+
+      <dl class="metrics">
+        <div class="metric">
+          <dt>基础代谢 BMR</dt>
+          <dd id="bmr-value">—</dd>
+        </div>
+        <div class="metric">
+          <dt>每日消耗 TDEE</dt>
+          <dd id="tdee-value">—</dd>
+        </div>
+        <div class="metric">
+          <dt>减脂参考</dt>
+          <dd id="cut-value">—</dd>
+        </div>
+      </dl>
+
+      <div class="nutri">
+        <div class="nutri-row">
+          <span class="nutri-label">蛋白质</span>
+          <span class="nutri-value" id="protein-value">—</span>
+        </div>
+        <div class="nutri-row">
+          <span class="nutri-label">每日饮水</span>
+          <span class="nutri-value" id="water-value">—</span>
+        </div>
+        <div class="nutri-row">
+          <span class="nutri-label">抗阻训练</span>
+          <span class="nutri-value">每周 2–3 次<small>覆盖主要肌群</small></span>
         </div>
       </div>
 
-      <div class="empty is-sub" id="whr-empty" hidden>
-        <p class="empty-text">再量一个臀围，就能看出脂肪是偏腰还是偏臀。</p>
-        <button type="button" class="empty-action" id="whr-jump">去填臀围</button>
-      </div>
-
-      <p class="hint" id="waist-hint">
-        量法：站直、呼气末，软尺水平贴皮不勒紧，取髂嵴上缘与第 12 肋下缘中点。
+      <p class="hint">
+        BMR 用 Mifflin-St Jeor 公式。减脂参考按 TDEE 减 400 kcal，每周约降 0.3–0.4 kg；低于 BMR 的极端节食会掉肌肉。
       </p>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- 代谢与营养 -->
-  <section class="card" aria-label="代谢与营养">
-    <div class="card-head">
-      <span class="card-title">代谢与营养</span>
-      <span class="card-total" id="tdee-status">轻度活动</span>
-    </div>
-
-    <div class="chips" id="activity-chips" role="group" aria-label="日常活动量">
-      <button type="button" class="chip" data-activity="sedentary" aria-pressed="false">久坐<small>1.2</small></button>
-      <button type="button" class="chip" data-activity="light" aria-pressed="true">轻度<small>1.375</small></button>
-      <button type="button" class="chip" data-activity="moderate" aria-pressed="false">中度<small>1.55</small></button>
-      <button type="button" class="chip" data-activity="high" aria-pressed="false">高强度<small>1.725</small></button>
-    </div>
-
-    <dl class="metrics">
-      <div class="metric">
-        <dt>基础代谢 BMR</dt>
-        <dd id="bmr-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>每日消耗 TDEE</dt>
-        <dd id="tdee-value">—</dd>
-      </div>
-      <div class="metric">
-        <dt>减脂参考</dt>
-        <dd id="cut-value">—</dd>
-      </div>
-    </dl>
-
-    <div class="nutri">
-      <div class="nutri-row">
-        <span class="nutri-label">蛋白质</span>
-        <span class="nutri-value" id="protein-value">—</span>
-      </div>
-      <div class="nutri-row">
-        <span class="nutri-label">每日饮水</span>
-        <span class="nutri-value" id="water-value">—</span>
-      </div>
-      <div class="nutri-row">
-        <span class="nutri-label">抗阻训练</span>
-        <span class="nutri-value">每周 2–3 次<small>覆盖主要肌群</small></span>
-      </div>
-    </div>
-
-    <p class="hint">
-      BMR 用 Mifflin-St Jeor 公式。减脂参考按 TDEE 减 400 kcal，每周约降 0.3–0.4 kg；低于 BMR 的极端节食会掉肌肉。
-    </p>
-  </section>
-
-  <!-- 指标解读 -->
+  <!-- 指标解读：跨三个分栏的元内容，不归属任何 tab -->
   <section class="card" aria-label="指标解读">
     <div class="card-head">
       <span class="card-title">指标解读</span>
-      <span class="card-total">哪些值得盯</span>
     </div>
 
-    <details class="read" open>
+    <details class="read">
       <summary>
         <span class="dot"></span>证据最强的五项指标
         <svg class="caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -1519,7 +1618,10 @@
   var lastZoneKey = '';
 
   var el = {
-    baseSummary: document.getElementById('base-summary'),
+    inputToggle: document.getElementById('input-toggle'),
+    inputBody: document.getElementById('input-body'),
+    inputSummary: document.getElementById('input-summary'),
+    tabs: document.getElementById('tabs'),
     sexChips: document.getElementById('sex-chips'),
     age: document.getElementById('age'),
     height: document.getElementById('height'),
@@ -1996,7 +2098,7 @@
     var wHigh = state.weight * 0.035;
     el.waterValue.innerHTML = wLow.toFixed(1) + '–' + wHigh.toFixed(1) + '<small> L</small>';
 
-    el.baseSummary.textContent = state.age + ' 岁 · ' + trimNumber(state.height) + ' cm · ' +
+    el.inputSummary.textContent = state.age + ' 岁 · ' + trimNumber(state.height) + ' cm · ' +
       trimNumber(state.weight) + ' kg';
 
     var filled = [state.bodyfat, state.waist, state.hip, state.rhr, state.grip].filter(function (v) {
@@ -2164,10 +2266,89 @@
     update();
   });
 
-  el.optionalToggle.addEventListener('click', function () {
-    var open = el.optionalBody.hidden;
+  /* ---------- 输入折叠与分栏 ---------- */
+
+  var UI_KEY = 'ysj-body-ui-v1';
+  var TABS = ['body', 'cardio', 'meta'];
+  var currentTab = 'body';
+
+  function saveUI() {
+    try {
+      localStorage.setItem(UI_KEY, JSON.stringify({
+        tab: currentTab,
+        open: !el.inputBody.hidden,
+        optional: !el.optionalBody.hidden
+      }));
+    } catch (e) {
+      /* 隐私模式下忽略 */
+    }
+  }
+
+  function readUI() {
+    try {
+      var raw = localStorage.getItem(UI_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      return data && typeof data === 'object' ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setInputOpen(open, persist) {
+    el.inputBody.hidden = !open;
+    el.inputToggle.setAttribute('aria-expanded', String(open));
+    if (persist !== false) saveUI();
+  }
+
+  function setOptionalOpen(open, persist) {
     el.optionalBody.hidden = !open;
     el.optionalToggle.setAttribute('aria-expanded', String(open));
+    if (persist !== false) saveUI();
+  }
+
+  function setTab(key, persist) {
+    if (TABS.indexOf(key) === -1) key = 'body';
+    currentTab = key;
+    TABS.forEach(function (name) {
+      var panel = document.getElementById('panel-' + name);
+      var tab = document.getElementById('tab-' + name);
+      var on = name === key;
+      if (panel) panel.hidden = !on;
+      if (tab) {
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+      }
+    });
+    if (persist !== false) saveUI();
+  }
+
+  el.inputToggle.addEventListener('click', function () {
+    setInputOpen(el.inputBody.hidden);
+  });
+
+  el.optionalToggle.addEventListener('click', function () {
+    setOptionalOpen(el.optionalBody.hidden);
+  });
+
+  el.tabs.addEventListener('click', function (event) {
+    var tab = event.target.closest('[role="tab"]');
+    if (!tab) return;
+    setTab(tab.getAttribute('data-tab'));
+  });
+
+  el.tabs.addEventListener('keydown', function (event) {
+    var key = event.key;
+    if (key !== 'ArrowRight' && key !== 'ArrowLeft' && key !== 'Home' && key !== 'End') return;
+    event.preventDefault();
+    var index = TABS.indexOf(currentTab);
+    if (key === 'ArrowRight') index = (index + 1) % TABS.length;
+    else if (key === 'ArrowLeft') index = (index - 1 + TABS.length) % TABS.length;
+    else if (key === 'Home') index = 0;
+    else index = TABS.length - 1;
+    setTab(TABS[index]);
+    var next = document.getElementById('tab-' + TABS[index]);
+    if (next) next.focus();
   });
 
   /* ---------- 弹层编辑 ---------- */
@@ -2383,6 +2564,9 @@
     paintSteppers();
     lastZoneKey = '';
     update();
+    // 恢复默认后把输入区打开，补充数据回到折叠
+    setInputOpen(true);
+    setOptionalOpen(false);
   });
 
   /* ---------- 步进按钮 ---------- */
@@ -2436,6 +2620,12 @@
   paintChips();
   paintSteppers();
   update();
+
+  // 输入区默认展开（可手动收起，选择会记住）；补充数据默认折叠
+  var ui = readUI() || {};
+  setInputOpen(ui.open !== false, false);
+  setOptionalOpen(ui.optional === true, false);
+  setTab(typeof ui.tab === 'string' ? ui.tab : 'body', false);
 })();
 </script>
 </body>
