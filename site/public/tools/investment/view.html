@@ -424,6 +424,10 @@
     font-weight: 500;
     color: color-mix(in srgb, var(--ink) 82%, var(--muted));
   }
+  /* 第二组 chips 前的说明，和上一组拉开距离 */
+  .chips + .chips-caption {
+    margin-top: 10px;
+  }
   .duo {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -463,6 +467,13 @@
     font-weight: 400;
     letter-spacing: 0;
     color: var(--muted);
+  }
+  .result-formula {
+    margin: 5px 0 0;
+    font-size: 11px;
+    line-height: 16px;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--muted) 82%, transparent);
   }
   .result-note {
     margin: 4px 0 0;
@@ -830,14 +841,14 @@
       </div>
 
       <div class="row">
-        <label class="row-label" for="principal">已有本金</label>
+        <label class="row-label" for="principal">起点本金</label>
         <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="principal" data-step="-1" aria-label="已有本金减少 1 万元">−</button>
+          <button type="button" class="step-btn" data-step-target="principal" data-step="-1" aria-label="起点本金减少 1 万元">−</button>
           <span class="row-value">
-            <input id="principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="已有本金，单位万元">
+            <input id="principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="起点本金，单位万元">
             <span class="unit">万</span>
           </span>
-          <button type="button" class="step-btn" data-step-target="principal" data-step="1" aria-label="已有本金增加 1 万元">+</button>
+          <button type="button" class="step-btn" data-step-target="principal" data-step="1" aria-label="起点本金增加 1 万元">+</button>
         </div>
       </div>
 
@@ -958,14 +969,14 @@
       </div>
 
       <div class="row">
-        <label class="row-label" for="ff-asset">当前可投资产</label>
+        <label class="row-label" for="ff-asset">起点本金</label>
         <div class="stepper">
-          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="-1" aria-label="当前可投资产减少 1 万元">−</button>
+          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="-1" aria-label="起点本金减少 1 万元">−</button>
           <span class="row-value">
-            <input id="ff-asset" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="30" aria-label="当前可投资产，单位万元">
+            <input id="ff-asset" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="30" aria-label="起点本金，单位万元">
             <span class="unit">万</span>
           </span>
-          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="1" aria-label="当前可投资产增加 1 万元">+</button>
+          <button type="button" class="step-btn" data-step-target="ffAsset" data-step="1" aria-label="起点本金增加 1 万元">+</button>
         </div>
       </div>
 
@@ -1003,11 +1014,22 @@
         <button type="button" class="chip" data-swr="4" aria-pressed="false">4%<small>美股口径</small></button>
         <button type="button" class="chip" data-swr="4.5" aria-pressed="false">4.5%<small>偏激进</small></button>
       </div>
+
+      <div class="chips-caption">
+        <span>通胀（可选）＝让目标每年按这个速度上涨</span>
+      </div>
+      <div class="chips" id="infl-chips" role="group" aria-label="通胀折算">
+        <button type="button" class="chip" data-infl="0" aria-pressed="true">不计<small>今天购买力</small></button>
+        <button type="button" class="chip" data-infl="2" aria-pressed="false">2%<small>温和</small></button>
+        <button type="button" class="chip" data-infl="2.5" aria-pressed="false">2.5%<small>长期均值</small></button>
+        <button type="button" class="chip" data-infl="3" aria-pressed="false">3%<small>偏保守</small></button>
+      </div>
     </div>
 
     <div class="result">
       <p class="result-label">需要的本金</p>
       <p class="result-value"><span id="ff-target">—</span><span class="u">万</span></p>
+      <p class="result-formula" id="ff-formula">—</p>
       <p class="result-note" id="ff-note">—</p>
     </div>
 
@@ -1202,14 +1224,14 @@
     <div id="erosion-fee" hidden>
       <div class="fields" style="margin-top:8px">
         <div class="row">
-          <label class="row-label" for="fee-principal">已有本金</label>
+          <label class="row-label" for="fee-principal">起点本金</label>
           <div class="stepper">
-            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="-1" aria-label="已有本金减少 1 万元">−</button>
+            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="-1" aria-label="起点本金减少 1 万元">−</button>
             <span class="row-value">
-              <input id="fee-principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="已有本金，单位万元">
+              <input id="fee-principal" class="num" type="number" inputmode="decimal" min="0" max="100000" step="1" value="10" aria-label="起点本金，单位万元">
               <span class="unit">万</span>
             </span>
-            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="1" aria-label="已有本金增加 1 万元">+</button>
+            <button type="button" class="step-btn" data-step-target="feePrincipal" data-step="1" aria-label="起点本金增加 1 万元">+</button>
           </div>
         </div>
         <div class="row">
@@ -1380,6 +1402,7 @@
     expenseWan: 12,
     swr: 3.5,
     ffAge: 32,
+    ffInflation: 0,
     ffAssetWan: 30,
     ffPayment: 5000,
     ffRate: 7,
@@ -1475,6 +1498,7 @@
     ffAge: byId('ff-age'),
     ffProgressTotal: byId('ff-progress-total'),
     swrHint: byId('swr-hint'),
+    ffFormula: byId('ff-formula'),
 
     flows: byId('flows'),
     flowAdd: byId('flow-add'),
@@ -1584,6 +1608,41 @@
     var a = (target + c) / base;
     if (!(a > 1)) return 0;
     return Math.log(a) / Math.log(1 + i) / k;
+  }
+
+  /**
+   * 目标按通胀逐年上涨时，求资产追平目标所需年数。
+   *
+   * 目标每年按 infl 涨，资产按 rate 复利涨并叠加定投，两条曲线的交点没有闭式解，
+   * 用二分法逼近。资产长期增速高于通胀时必有交点；否则返回 Infinity。
+   */
+  function yearsForInflatedTarget(principal, payment, target0, rate, infl) {
+    if (target0 <= principal) return 0;
+
+    var k = 12;
+    var i = rate / 100 / k;
+    var p = infl / 100;
+
+    function assetAt(years) {
+      var m = years * k;
+      if (i === 0) return principal + payment * m;
+      var g = Math.pow(1 + i, m);
+      return principal * g + payment * (g - 1) / i;
+    }
+
+    function gap(years) {
+      return assetAt(years) - target0 * Math.pow(1 + p, years);
+    }
+
+    var hi = 120;
+    if (gap(hi) < 0) return Infinity;
+
+    var lo = 0;
+    for (var step = 0; step < 60; step++) {
+      var mid = (lo + hi) / 2;
+      if (gap(mid) < 0) lo = mid; else hi = mid;
+    }
+    return hi;
   }
 
   function doubleYears(rate) {
@@ -1726,6 +1785,11 @@
     el.ffTarget.textContent = isFinite(target) ? (target / 1e4).toFixed(1) : '—';
     el.ffProgressTotal.textContent = '提取率 ' + state.swr + '%';
 
+    // 把算式摊开，避免「342.9 万」看起来像凭空出现的数字
+    el.ffFormula.textContent = isFinite(target) && target > 0
+      ? state.expenseWan + ' 万 ÷ ' + state.swr + '%'
+      : '提取率需大于 0';
+
     // 说明「为什么比例越高、本金越少」：钱是固定的，比例越高这笔钱占本金的比例越大
     if (isFinite(target) && target > 0) {
       el.swrHint.innerHTML = '每年要花 <b>' + state.expenseWan + ' 万</b>（固定），只占本金的 <b>' +
@@ -1735,7 +1799,10 @@
       el.swrHint.textContent = '提取率要大于 0 才能反推本金';
     }
 
-    var years = yearsFor(asset, pay, target, rate, 'month', 'end');
+    var infl = clamp(state.ffInflation || 0, 0, 10);
+    var years = infl > 0
+      ? yearsForInflatedTarget(asset, pay, target, rate, infl)
+      : yearsFor(asset, pay, target, rate, 'month', 'end');
     var reached = asset >= target;
     var gap = Math.max(0, target - asset);
 
@@ -1749,8 +1816,12 @@
       el.ffYears.textContent = '—';
       el.ffAge.textContent = '—';
     } else {
+      var inflNote = infl > 0
+        ? '（含 ' + infl + '% 通胀，届时目标约 ' +
+          (target * Math.pow(1 + infl / 100, years) / 1e4).toFixed(0) + ' 万）'
+        : '';
       el.ffNote.innerHTML = '按 ' + rate + '% 年化，还需 <b>' +
-        (years < 10 ? years.toFixed(1) : Math.ceil(years)) + ' 年</b>';
+        (years < 10 ? years.toFixed(1) : Math.ceil(years)) + ' 年</b>' + inflNote;
       el.ffYears.textContent = years < 10 ? years.toFixed(1) + ' 年' : Math.ceil(years) + ' 年';
       el.ffAge.textContent = Math.ceil(state.ffAge + years) + ' 岁';
     }
@@ -2125,6 +2196,7 @@
     setPressed('freq-chips', 'freq', state.freq);
     setPressed('timing-chips', 'timing', state.timing);
     setPressed('swr-chips', 'swr', state.swr);
+    setPressed('infl-chips', 'infl', state.ffInflation || 0);
     setPressed('erosion-chips', 'tab', state.erosionTab);
     setPressed('market-chips', 'market', state.market);
     setPressed('holding-chips', 'holding', state.holding);
@@ -2349,6 +2421,7 @@
   bindChips('freq-chips', 'freq', 'freq');
   bindChips('timing-chips', 'timing', 'timing');
   bindChips('swr-chips', 'swr', 'swr', parseFloat);
+  bindChips('infl-chips', 'infl', 'ffInflation', parseFloat);
   bindChips('erosion-chips', 'tab', 'erosionTab');
   bindChips('market-chips', 'market', 'market');
   bindChips('holding-chips', 'holding', 'holding');
