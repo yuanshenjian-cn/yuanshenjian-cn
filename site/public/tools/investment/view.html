@@ -1006,7 +1006,6 @@
 
       <div class="chips-caption">
         <span>提取率＝每年从本金取走的比例</span>
-        <span id="swr-hint">—</span>
       </div>
       <div class="chips" id="swr-chips" role="group" aria-label="提取率">
         <button type="button" class="chip" data-swr="3" aria-pressed="false">3%<small>很稳</small></button>
@@ -1497,7 +1496,6 @@
     ffYears: byId('ff-years'),
     ffAge: byId('ff-age'),
     ffProgressTotal: byId('ff-progress-total'),
-    swrHint: byId('swr-hint'),
     ffFormula: byId('ff-formula'),
 
     flows: byId('flows'),
@@ -1789,15 +1787,6 @@
     el.ffFormula.textContent = isFinite(target) && target > 0
       ? state.expenseWan + ' 万 ÷ ' + state.swr + '%'
       : '提取率需大于 0';
-
-    // 说明「为什么比例越高、本金越少」：钱是固定的，比例越高这笔钱占本金的比例越大
-    if (isFinite(target) && target > 0) {
-      el.swrHint.innerHTML = '每年要花 <b>' + state.expenseWan + ' 万</b>（固定），只占本金的 <b>' +
-        state.swr + '%</b>，所以 <b>' + (target / 1e4).toFixed(1) +
-        ' 万</b>就够；比例越低，本金越多';
-    } else {
-      el.swrHint.textContent = '提取率要大于 0 才能反推本金';
-    }
 
     var infl = clamp(state.ffInflation || 0, 0, 10);
     var years = infl > 0
