@@ -11,16 +11,16 @@ import { getAllTools } from "@/lib/tools";
 import type { ToolMeta } from "@/types/tool";
 
 const sample: ToolMeta[] = [
-  { slug: "body-metrics", title: "身体指标", description: "BMI", category: "健康健身" },
+  { slug: "body-metrics", title: "身体指标", description: "BMI", category: "运动健康" },
   { slug: "pomodoro", title: "番茄钟", description: "专注计时", category: "时间效率" },
-  { slug: "mortgage", title: "房贷计算器", description: "等额本息", category: "理财计算" },
-  { slug: "tax", title: "个税计算器", description: "专项扣除", category: "理财计算" },
+  { slug: "mortgage", title: "房贷计算器", description: "等额本息", category: "投资理财" },
+  { slug: "tax", title: "个税计算器", description: "专项扣除", category: "投资理财" },
 ];
 
 describe("工具分类", () => {
   describe("getToolCategory", () => {
     it("优先使用 category", () => {
-      expect(getToolCategory(sample[0])).toBe("健康健身");
+      expect(getToolCategory(sample[0])).toBe("运动健康");
     });
 
     it("缺省时归入「其他」，空白字符也算缺省", () => {
@@ -34,11 +34,25 @@ describe("工具分类", () => {
   });
 
   describe("getToolCategories", () => {
-    it("按工具顺序聚合，同名合并且计数正确", () => {
+    it("按 categoryOrder 排序，同名合并且计数正确", () => {
+      // tool 顺序是 运动健康 / 时间效率 / 投资理财，但展示顺序以 categoryOrder 为准
       expect(getToolCategories(sample)).toEqual([
-        { name: "健康健身", count: 1 },
+        { name: "运动健康", count: 1 },
+        { name: "投资理财", count: 2 },
         { name: "时间效率", count: 1 },
-        { name: "理财计算", count: 2 },
+      ]);
+    });
+
+    it("未登记顺序的分类排在已登记的后面，且保持首次出现顺序", () => {
+      const extra: ToolMeta[] = [
+        { slug: "a", title: "a", description: "a", category: "冷门一" },
+        { slug: "b", title: "b", description: "b", category: "运动健康" },
+        { slug: "c", title: "c", description: "c", category: "冷门二" },
+      ];
+      expect(getToolCategories(extra).map((item) => item.name)).toEqual([
+        "运动健康",
+        "冷门一",
+        "冷门二",
       ]);
     });
 
@@ -53,7 +67,7 @@ describe("工具分类", () => {
     });
 
     it("按分类过滤后仍保留原有顺序", () => {
-      expect(filterToolsByCategory(sample, "理财计算").map((tool) => tool.slug)).toEqual([
+      expect(filterToolsByCategory(sample, "投资理财").map((tool) => tool.slug)).toEqual([
         "mortgage",
         "tax",
       ]);

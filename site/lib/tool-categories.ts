@@ -1,3 +1,4 @@
+import registry from "@/data/tools.json";
 import type { ToolCategory, ToolMeta } from "@/types/tool";
 
 /**
@@ -13,15 +14,21 @@ export const DEFAULT_TOOL_CATEGORY = "其他";
 /** 全部分类的展示名（虚拟分类，不对应任何工具） */
 export const ALL_TOOL_CATEGORY = "全部";
 
+/** 分类的展示顺序，登记在 `data/tools.json` 的 `categoryOrder` */
+const CATEGORY_ORDER: string[] = Array.isArray((registry as { categoryOrder?: string[] }).categoryOrder)
+  ? ((registry as { categoryOrder?: string[] }).categoryOrder as string[])
+  : [];
+
 export function getToolCategory(tool: ToolMeta): string {
   return tool.category?.trim() || DEFAULT_TOOL_CATEGORY;
 }
 
 /**
- * 按工具列表顺序汇总分类。
+ * 汇总分类及数量。
  *
- * 顺序跟随传入的展示顺序（`getAllTools` 已按 order 排好），
- * 这样第一个工具所属的分类会排在最前，权重自然浮上来。
+ * 顺序以 `data/tools.json` 的 `categoryOrder` 为准；没登记的分类
+ * 按在工具列表里首次出现的顺序追加在后面（sort 在现代 JS 里是稳定的），
+ * 这样新增分类不会因为忘登记就把顺序打乱。
  */
 export function getToolCategories(tools: ToolMeta[]): ToolCategory[] {
   const counters = new Map<string, number>();
@@ -31,7 +38,12 @@ export function getToolCategories(tools: ToolMeta[]): ToolCategory[] {
     counters.set(name, (counters.get(name) ?? 0) + 1);
   }
 
-  return Array.from(counters, ([name, count]) => ({ name, count }));
+  const rank = new Map(CATEGORY_ORDER.map((name, index) => [name, index]));
+  const rankOf = (name: string): number => rank.get(name) ?? Number.MAX_SAFE_INTEGER;
+
+  return Array.from(counters, ([name, count]) => ({ name, count })).sort(
+    (a, b) => rankOf(a.name) - rankOf(b.name),
+  );
 }
 
 /** 按分类过滤，`null` 表示不筛选 */

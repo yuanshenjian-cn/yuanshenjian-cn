@@ -9,7 +9,7 @@ const tools: ToolMeta[] = [
     slug: "body-metrics",
     title: "身体指标",
     description: "BMI 与心率区间",
-    category: "健康健身",
+    category: "运动健康",
     tags: ["健身"],
   },
   {
@@ -23,14 +23,14 @@ const tools: ToolMeta[] = [
     slug: "mortgage",
     title: "房贷计算器",
     description: "等额本息与等额本金",
-    category: "理财计算",
+    category: "投资理财",
     tags: ["理财"],
   },
   {
     slug: "tax",
     title: "个税计算器",
     description: "专项附加扣除",
-    category: "理财计算",
+    category: "投资理财",
     tags: ["计算"],
   },
 ];
@@ -60,9 +60,9 @@ describe("ToolDirectory 分类筛选", () => {
     const chips = within(filterGroup()).getAllByRole("button");
     expect(chips.map((chip) => chip.getAttribute("aria-label"))).toEqual([
       "全部，共 4 个工具",
-      "健康健身，共 1 个工具",
+      "运动健康，共 1 个工具",
+      "投资理财，共 2 个工具",
       "时间效率，共 1 个工具",
-      "理财计算，共 2 个工具",
     ]);
   });
 
@@ -76,10 +76,10 @@ describe("ToolDirectory 分类筛选", () => {
   it("点击分类只保留该分类的工具，并切换选中态", () => {
     render(<ToolDirectory tools={tools} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^理财计算/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^投资理财/ }));
 
     expect(cardTitles()).toEqual(["房贷计算器", "个税计算器"]);
-    expect(screen.getByRole("button", { name: /^理财计算/ })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /^投资理财/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -104,7 +104,7 @@ describe("ToolDirectory 分类筛选", () => {
   it("点「全部」可以从任意分类回到全量", () => {
     render(<ToolDirectory tools={tools} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^健康健身/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^运动健康/ }));
     expect(cardTitles()).toEqual(["身体指标"]);
 
     fireEvent.click(screen.getByRole("button", { name: /^全部/ }));
@@ -114,8 +114,8 @@ describe("ToolDirectory 分类筛选", () => {
   it("筛选状态写进 URL，刷新后仍能还原", () => {
     render(<ToolDirectory tools={tools} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^理财计算/ }));
-    expect(new URLSearchParams(window.location.search).get("cat")).toBe("理财计算");
+    fireEvent.click(screen.getByRole("button", { name: /^投资理财/ }));
+    expect(new URLSearchParams(window.location.search).get("cat")).toBe("投资理财");
 
     // 回到「全部」时清掉参数，避免脏 URL 影响分享
     fireEvent.click(screen.getByRole("button", { name: /^全部/ }));
@@ -144,7 +144,7 @@ describe("ToolDirectory 分类筛选", () => {
   });
 
   it("只有一个分类时不渲染筛选条", () => {
-    const single = tools.filter((tool) => tool.category === "理财计算");
+    const single = tools.filter((tool) => tool.category === "投资理财");
 
     render(<ToolDirectory tools={single} />);
 
@@ -156,7 +156,7 @@ describe("ToolDirectory 分类筛选", () => {
     render(<ToolDirectory tools={tools} />);
 
     fireEvent.click(screen.getByRole("button", { name: "列表样式" }));
-    fireEvent.click(screen.getByRole("button", { name: /^健康健身/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^运动健康/ }));
 
     expect(cardTitles()).toEqual(["身体指标"]);
   });

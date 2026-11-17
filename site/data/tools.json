@@ -1,10 +1,15 @@
 {
+  "categoryOrder": [
+    "运动健康",
+    "投资理财",
+    "时间效率"
+  ],
   "tools": [
     {
       "slug": "body-metrics",
       "title": "身体指标",
       "description": "BMI、体脂、腰围与腰臀比一次算清，附五区心率与同龄心肺适能对照",
-      "category": "健康健身",
+      "category": "运动健康",
       "emoji": "🫀",
       "tags": [
         "健身",
@@ -17,7 +22,7 @@
       "slug": "plank",
       "title": "平板支撑计时器",
       "description": "支撑、休息、组数自由设定，支持无限模式；阶段切换有提示音，计时期间屏幕常亮。",
-      "category": "健康健身",
+      "category": "运动健康",
       "emoji": "💪",
       "tags": [
         "健身",
@@ -40,23 +45,23 @@
       "order": 3
     },
     {
-      "slug": "mortgage",
-      "title": "房贷计算器",
-      "description": "商贷 / 公积金 / 组合贷三种口径，LPR 与基点可加减，等额本息与等额本金随时切换。",
-      "category": "理财计算",
-      "emoji": "🏠",
+      "slug": "investment",
+      "title": "投资计算器",
+      "description": "定投终值、月供反推、达成年限、财务自由与真实年化一站算清",
+      "category": "投资理财",
+      "emoji": "📈",
       "tags": [
         "理财",
-        "计算"
+        "投资"
       ],
-      "addedAt": "2026-11-14",
+      "addedAt": "2026-11-16",
       "order": 4
     },
     {
       "slug": "tax",
       "title": "个税计算器",
       "description": "工资与年终奖个税测算，七项专项附加扣除随手配",
-      "category": "理财计算",
+      "category": "投资理财",
       "emoji": "🧾",
       "tags": [
         "理财",
@@ -64,6 +69,19 @@
       ],
       "addedAt": "2026-11-14",
       "order": 5
+    },
+    {
+      "slug": "mortgage",
+      "title": "房贷计算器",
+      "description": "商贷 / 公积金 / 组合贷三种口径，LPR 与基点可加减，等额本息与等额本金随时切换。",
+      "category": "投资理财",
+      "emoji": "🏠",
+      "tags": [
+        "理财",
+        "计算"
+      ],
+      "addedAt": "2026-11-14",
+      "order": 6
     },
     {
       "slug": "calendar",
@@ -74,19 +92,6 @@
       "tags": [
         "效率",
         "日期"
-      ],
-      "addedAt": "2026-11-16",
-      "order": 6
-    },
-    {
-      "slug": "investment",
-      "title": "投资计算器",
-      "description": "定投终值、月供反推、达成年限、财务自由与真实年化一站算清",
-      "category": "理财计算",
-      "emoji": "📈",
-      "tags": [
-        "理财",
-        "投资"
       ],
       "addedAt": "2026-11-16",
       "order": 7
