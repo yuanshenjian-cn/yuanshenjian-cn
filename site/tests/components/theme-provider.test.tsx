@@ -4,40 +4,6 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
-class MemoryStorage {
-  private store = new Map<string, string>();
-
-  get length() {
-    return this.store.size;
-  }
-
-  clear() {
-    this.store.clear();
-  }
-
-  getItem(key: string) {
-    return this.store.get(key) ?? null;
-  }
-
-  key(index: number) {
-    return Array.from(this.store.keys())[index] ?? null;
-  }
-
-  removeItem(key: string) {
-    this.store.delete(key);
-  }
-
-  setItem(key: string, value: string) {
-    this.store.set(key, value);
-  }
-}
-
-// Node 26 的实验性 localStorage 会覆盖 jsdom 的实现，这里显式注入内存版本
-Object.defineProperty(window, "localStorage", {
-  configurable: true,
-  value: new MemoryStorage(),
-});
-
 class MockMediaQueryList {
   matches: boolean;
   readonly media = "(prefers-color-scheme: dark)";
